@@ -1,581 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.2.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <title>
+        
+        Keep
+    </title>
+    <link rel="shortcut icon" href="/images/logo.svg">
+    
+<link rel="stylesheet" href="/css/style.css">
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.0.4/source/css/font-awesome.min.css">
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"example.com","root":"/"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":true,"expand_all":true},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/logo.svg","img_position":"left","left_side_width":"260px","content_max_width":"900px","hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."}},"local_search":{"enable":false,"trigger":"auto","unescape":false,"preload":false},"version":"3.0.4"};
+    KEEP.language = {"search":"Search...","prev":"Prev","next":"Next","prev_posts":"Prev posts","next_posts":"Next posts","page":"Page %d","recent_posts":"Recent Posts","share":"Share","powered_by":"Powered by %s","theme":"Theme","rss_feed":"RSS Feed","category":"Category","categories":"Categories","tag":"Tag","tags":"Tags","tagcloud":"Tag Cloud","comment":"Comment","home":"Home","archive":"Archive","archives":"Archives","about":"About","site_uv":"Visitor Count","site_pv":"Totalview","links":"Links","link":"Link","top":"TOP","read_more":"Read more","wordcount":"Words","min2read":"Mins","changelog":"Changelog","copyright":{"author":"Post author","title":"Post title","link":"Post link","create_time":"Create time","license_title":"Copyright Notice","license_content":"All articles in this blog are licensed under %s unless stating additionally."},"ago":{"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days age","week":"%s weeks age","month":"%s months age","year":"%s years age"}};
   </script>
-
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:locale" content="en_US">
-<meta property="article:author" content="John Doe">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://example.com/">
+<meta name="generator" content="Hexo 5.2.0"></head>
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : true,
-    isPost : false,
-    lang   : 'en'
-  };
-</script>
+<body>
+<div class="page-container">
 
-  <title>Hexo</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+    
+        <div class="first-screen-container flex-center">
+    <div class="content flex-center">
+        <div class="description">
+            Keep writing and Keep loving.
+        </div>
+        
     </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Hexo</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
 </div>
 
+    
 
-
-
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
+    <header class="page-header">
+        <div class="header-progress"></div>
     </header>
 
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
+    <main class="page-main">
 
+        <div class="page-main-content">
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
+            <div class="page-main-content-top">
+                <header class="header-wrapper">
 
-          <div class="content index posts-expand">
-            
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/10/Memorizing-Normality-to-Detect-Anomaly/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/12/10/Memorizing-Normality-to-Detect-Anomaly/" class="post-title-link" itemprop="url">Memorizing Normality to Detect Anomaly</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2020-12-10 20:24:24 / Modified: 20:25:01" itemprop="dateCreated datePublished" datetime="2020-12-10T20:24:24+08:00">2020-12-10</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201183707.png" alt="image-20201201183707250"></p>
-<p>ICCV, 2020</p>
-<h4 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h4><p>autoencoder被广泛应用到异常检测.</p>
-<p>前提假设:在正常的数据上训练, 在异常样本上会有较大的重构误差, 使用重构误差作为检测异常的标准. </p>
-<p>然而, 这一假设在实际应用中不一定成立. 有时autoencoder的泛化性太好, 而导致在面对异常样本时也能很好地重构, 即重构误差小, 这会导致漏报异常.  为了缓解这个问题, 本文提出了memory-augmented autoencoder(MemAE). 给定一个输入样本, MemAE首先使用编码器获得隐变量z, 然后使用z作为一个查询, 在memory中检索出与z最相近的条目, 然后将这些条目组合输入到解码器用于重构. 在训练阶段, memory中的内容不断更新. 在测试的使用, memory被固定, 不再更新. 这样做会使用重构的样本非常像正常的样本(训练的时候只有正常样本, 所以memory是用正常样本编码获得的.)  这样做可以使得异常样本的重构误差更大.  此外, MemAE不限定数据类型, 所以它适用于各种数据类型的异常检测.</p>
-<p>下图为检索数量为1的情况下的示意图:</p>
-<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201220151.png" alt="image-20201201220151716"></p>
-<h3 id="Memory-augmented-Autoencoder"><a href="#Memory-augmented-Autoencoder" class="headerlink" title="Memory-augmented Autoencoder"></a>Memory-augmented Autoencoder</h3><h4 id="1-Overview"><a href="#1-Overview" class="headerlink" title="1. Overview"></a>1. Overview</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201232017.png" alt="image-20201201232017450"></p>
-<p>模型有3个组成成分: encoder, decoder 和 memory.  给定一个输入, 首先编码获得隐变量z, 在训练的时候, 使用z去Memory中检索与z最像的一些记录, 然后将这些记录组合成新的隐变量$\hat{z}$, 然后传给解码器用于重构. </p>
-<p>在训练的时候, 编码器, 解码器优化的方向是最小化重构误差. Memory同时不断更新.</p>
-<p>在测试时, 输入一个测试样本, 只会使用Memory中的一些记录来重构. 这样的话, 重构样本会趋近与更像正常样本. 正常样本重构出来的重构误差更小, 异常样本的重构误差更大.</p>
-<h4 id="2-Enocder-and-Decoder"><a href="#2-Enocder-and-Decoder" class="headerlink" title="2.Enocder and Decoder"></a>2.Enocder and Decoder</h4><p>定义编码器为$f_{e}(\cdot): \mathbb{X} \rightarrow \mathbb{Z}$, 解码器为$f_{d}(\cdot): \mathbb{Z} \rightarrow \mathbb{X}$,  给定一个输入$x$, 首先通过编码器获得$z$, 然后从Memory中检索出$\hat{z}$, 然后经过解码器获得$\hat{x}$<br>$$<br>\mathbf{z}=f_{e}\left(\mathbf{x} ; \theta_{e}\right)<br>\<br>\widehat{\mathbf{x}}=f_{d}\left(\widehat{\mathbf{z}} ; \theta_{d}\right)<br>$$<br>使用的损失函数为MSE: $e=|\mathbf{x}-\widehat{\mathbf{x}}|_{2}^{2}$</p>
-<h4 id="3-Memory-Module-with-Attention-based-Sparse-Addressing"><a href="#3-Memory-Module-with-Attention-based-Sparse-Addressing" class="headerlink" title="3.Memory Module with Attention-based Sparse Addressing"></a>3.Memory Module with Attention-based Sparse Addressing</h4><p>本文所提出的memory模块包括两个部分: 存储模块和检索模块.</p>
-<h5 id="3-1-Memory设计"><a href="#3-1-Memory设计" class="headerlink" title="3.1 Memory设计"></a>3.1 Memory设计</h5><p>memory是一个矩阵$\mathbf{M} \in \mathbb{R}^{N \times C}$, 包含$N$个向量, 每个向量的维度是$C$ , $z$的维度是$C$. 设$m_i$是M的第i行. 给定一个query(查询)$\mathbf{z} \in \mathbb{R}^{C}$,首先获得一个寻址向量$\mathbf{w} \in \mathbb{R}^{1 \times N}$,  获得$\hat{z}$的方式为:<br>$$<br>\widehat{\mathbf{z}}=\mathbf{w} \mathbf{M}=\sum_{i=1}^{N} w_{i} \mathbf{m}_{i}<br>$$<br>$w$是和为1的非负向量, 相当于$\hat{z}$是$m_i$的加权求和. 经过实验, 认为模型对$N$的取值不是很敏感, 一个足够大的$N$就能够在所有数据集上都取得较好的效果.</p>
-<h5 id="3-2-w的计算方式"><a href="#3-2-w的计算方式" class="headerlink" title="3.2 w的计算方式"></a>3.2 w的计算方式</h5><p>计算$w_i$:<br>$$<br>w_{i}=\frac{\exp \left(d\left(\mathbf{z}, \mathbf{m}<em>{i}\right)\right)}{\sum</em>{j=1}^{N} \exp \left(d\left(\mathbf{z}, \mathbf{m}<em>{j}\right)\right)}<br>$$<br>$d(\cdot, \cdot)$是距离度量, 本文使用的是余弦距离:<br>$$<br>d\left(\mathbf{z}, \mathbf{m}</em>{i}\right)=\frac{\mathbf{z} \mathbf{m}<em>{i}^{\top}}{|\mathbf{z}|\left|\mathbf{m}</em>{i}\right|}<br>$$<br>在训练的时候, 由于Memory的空间有限, MemAE通过使用有限的m组合来重构样本, 这样会迫使模型充分利用Memory, 使得Memory存储的是最具代表性的原型模式. 下图是使用9作为正常样本来训练MemAE, 并从Memory中随机选几个m, 经过解码之后重构出来的样本. 这张图是为了说明Memory中存储的是有代表性的原型模式. </p>
-<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103206.png" alt="image-20201202103206688"></p>
-<p>在测试阶段, 给定训练好的Memory, 异常样本的重构也只能利用正常的m组合形成$\hat{z}$, 然后重构. 下图中, 左图是使用5来训练, 测试时输入9. 右图是使用2来训练, 测试时输入4. 重构出来的样本都很像是训练样本. </p>
-<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103625.png" alt="image-20201202103625165"></p>
-<h5 id="3-3-稀疏寻址-硬收缩"><a href="#3-3-稀疏寻址-硬收缩" class="headerlink" title="3.3 稀疏寻址(硬收缩)"></a>3.3 稀疏寻址(硬收缩)</h5><p>作者指出, 如果w很稠密, 即w的每个分量都很小, 会导致多个m组合之后, 使用模型仍然具有较好的泛化性, 也有可能重构出异常样本. 为了缓解这个问题, 迫使w变得稀疏:<br>$$<br>\widehat{w}<em>{i}=h\left(w</em>{i} ; \lambda\right)=\left{\begin{array}{ll}<br>w_{i}, &amp; \text { if } w_{i}&gt;\lambda \<br>0, &amp; \text { otherwise }<br>\end{array}\right.<br>$$<br>简单来说是设定一个阈值$\lambda$, 小于$\lambda$就设为0.</p>
-<p>上式不容易反向传播, 修改为(continuous ReLU activation function):<br>$$<br>\widehat{w}<em>{i}=\frac{\max \left(w</em>{i}-\lambda, 0\right) \cdot w_{i}}{\left|w_{i}-\lambda\right|+\epsilon}<br>$$<br>根据经验, $\lambda$在区间$[1 / N, 3 / N]$内取值会取得比较理想的效果.</p>
-<p>经过以上压缩之后,重新标准化:$\widehat{w}<em>{i}=\widehat{w}</em>{i} /|\widehat{\mathbf{w}}|_{1}$.  这样一来, $\widehat{\mathbf{z}}=\widehat{\mathbf{w}} \mathbf{M}$</p>
-<p>以上的稀疏寻址操作有两个好处: 一是迫使Memory中的m是更具有代表性的原型; 二是降低模型泛化性导致异常样本也能重构的可能性.</p>
-<h5 id="3-4-训练"><a href="#3-4-训练" class="headerlink" title="3.4 训练"></a>3.4 训练</h5><p>损失函数包括两部分:</p>
-<p>一. 样本重构误差<br>$$<br>R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)=\left|\mathbf{x}^{t}-\widehat{\mathbf{x}}^{t}\right|_{2}^{2}<br>$$<br>二. 除上述的硬收缩之外, 通过损失函数使得w更加稀疏.</p>
-<p>​    考虑到$\hat{\mathbf{w}}$中的元素非负且$|\widehat{\mathbf{w}}|<em>{1}=1$, 最小化它的交叉熵就可以达到稀疏化的效果.<br>$$<br>E\left(\widehat{\mathbf{w}}^{t}\right)=\sum</em>{i=1}^{T}-\widehat{w}<em>{i} \cdot \log \left(\widehat{w}</em>{i}\right)<br>$$<br>总体的损失函数如下:<br>$$<br>L\left(\theta_{e}, \theta_{d}, \mathbf{M}\right)=\frac{1}{T} \sum_{t=1}^{T}\left(R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)+\alpha E\left(\widehat{\mathbf{w}}^{t}\right)\right)<br>$$<br>$\alpha$是调节权重的超参, 本文设定为0.0002</p>
-<h4 id="4-实验"><a href="#4-实验" class="headerlink" title="4 实验"></a>4 实验</h4><h5 id="4-1-图像数据"><a href="#4-1-图像数据" class="headerlink" title="4.1 图像数据"></a>4.1 图像数据</h5><p>平均AUC. </p>
-<img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202112919.png" alt="image-20201202112919657" style="zoom: 80%;" />
-
-<h5 id="4-2-视频数据"><a href="#4-2-视频数据" class="headerlink" title="4.2 视频数据"></a>4.2 视频数据</h5><p>AUC:</p>
-<img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114254.png" alt="image-20201202114254063" style="zoom: 50%;" />
-
-<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114413.png" alt="image-20201202114413583"></p>
-<h5 id="4-3-网络安全数据"><a href="#4-3-网络安全数据" class="headerlink" title="4.3 网络安全数据"></a>4.3 网络安全数据</h5><p> KDDCUP99 </p>
-<p>Each sample can be organized as a vector with 120 dimensions </p>
-<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png" alt="image-20201202114638957"></p>
-<h5 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h5><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png" alt="image-20201202114807190"></p>
-<p>AE-ℓ1:最小化z的ℓ1范数.</p>
-<p>MemAE-nonSpar: 不做稀疏化处理</p>
-<p>MemAE w/o Shrinkage:没有硬收缩</p>
-<p>MemAE w/o Entropy loss:损失函数中没有交叉熵</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/10/Anomaly/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/12/10/Anomaly/" class="post-title-link" itemprop="url">Anomaly</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-12-10 20:23:46" itemprop="dateCreated datePublished" datetime="2020-12-10T20:23:46+08:00">2020-12-10</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/10/newpapername/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/12/10/newpapername/" class="post-title-link" itemprop="url">newpapername</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-12-10 20:21:58" itemprop="dateCreated datePublished" datetime="2020-12-10T20:21:58+08:00">2020-12-10</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/10/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="John Doe">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Hexo">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/12/10/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2020-12-10 19:49:17" itemprop="dateCreated datePublished" datetime="2020-12-10T19:49:17+08:00">2020-12-10</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-
-
-
-          </div>
-          
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">John Doe</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">4</span>
-          <span class="site-state-item-name">posts</span>
+    <div class="header-content">
+        <a class="logo-title" href="/">
+            Keep
         </a>
-      </div>
-  </nav>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class="active"
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class="active"
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+            </div>
+
+            <div class="page-main-content-middle">
+
+                <main class="main-content normal-code-theme">
+
+                    
+                        <div class="home-content-container fade-in-down-animation">
+    <ul class="home-article-list">
+        
+            <li class="home-article-item">
+
+                
+
+                <h3 class="home-article-title">
+                    <a href="/2020/12/10/Memorizing-Normality-to-Detect-Anomaly/">
+                        Memorizing Normality to Detect Anomaly
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        
+ICCV, 2020
+概要autoencoder被广泛应用到异常检测.
+前提假设:在正常的数据上训练, 在异常样本上会有较大的重构误差, 使用重构误差作为检测异常的标准. 
+然而, 这一假设在实际应用中不一定成立. 有时autoencoder的泛化...
+                    
+                </div>
+
+                <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fas fa-edit"></i> <span class="home-article-date" data-date="Thu Dec 10 2020 20:24:24 GMT+0800">2020-12-10</span></span>
+        
+        
+    </div>
+
+    <a href="/2020/12/10/Memorizing-Normality-to-Detect-Anomaly/">Read more <i class="fas fa-angle-right"></i></a>
+</div>
+
+            </li>
+        
+            <li class="home-article-item">
+
+                
+
+                <h3 class="home-article-title">
+                    <a href="/2020/12/10/Anomaly/">
+                        Anomaly
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        
+                    
+                </div>
+
+                <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fas fa-edit"></i> <span class="home-article-date" data-date="Thu Dec 10 2020 20:23:46 GMT+0800">2020-12-10</span></span>
+        
+        
+    </div>
+
+    <a href="/2020/12/10/Anomaly/">Read more <i class="fas fa-angle-right"></i></a>
+</div>
+
+            </li>
+        
+            <li class="home-article-item">
+
+                
+
+                <h3 class="home-article-title">
+                    <a href="/2020/12/10/newpapername/">
+                        newpapername
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        
+                    
+                </div>
+
+                <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fas fa-edit"></i> <span class="home-article-date" data-date="Thu Dec 10 2020 20:21:58 GMT+0800">2020-12-10</span></span>
+        
+        
+    </div>
+
+    <a href="/2020/12/10/newpapername/">Read more <i class="fas fa-angle-right"></i></a>
+</div>
+
+            </li>
+        
+            <li class="home-article-item">
+
+                
+
+                <h3 class="home-article-title">
+                    <a href="/2020/12/10/hello-world/">
+                        Hello World
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, yo...
+                    
+                </div>
+
+                <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fas fa-edit"></i> <span class="home-article-date" data-date="Thu Dec 10 2020 19:49:17 GMT+0800">2020-12-10</span></span>
+        
+        
+    </div>
+
+    <a href="/2020/12/10/hello-world/">Read more <i class="fas fa-angle-right"></i></a>
+</div>
+
+            </li>
+        
+    </ul>
+
+    <div class="home-paginator">
+        <div class="paginator">
+    
+
+    
+</div>
+
+    </div>
 </div>
 
 
+                    
+                </main>
 
-      </div>
+            </div>
 
+            <div class="page-main-content-bottom">
+                <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span> -
+            
+            2020 <i class="fas fa-heart icon-animate"></i> <a href="/">Keep team</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a class="theme-version" target="_blank"></a>
+        </div>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+</footer>
 
-
-      </div>
+            </div>
+        </div>
     </main>
 
-    <footer class="footer">
-      <div class="footer-inner">
+    <div class="sidebar-tools">
+        <div class="tools-container">
+    <ul class="tools-list">
         
 
         
 
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">John Doe</span>
+        <!-- TOC aside toggle -->
+        
+
+    </ul>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
 
+    </div>
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
         
 
+        <li class="tools-item tool-scroll-to-top flex-center">
+            <i class="fas fa-arrow-up"></i>
+        </li>
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="tools-ul-1">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+
+    </ul>
+</div>
+
+    </div>
+
+    <!-- page aside -->
+    <aside class="page-aside">
+        
+    </aside>
+
+    <!-- image viewer -->
+    <div class="image-viewer-container">
+    <div class="img-box">
+        <img src="">
+    </div>
+</div>
+
+
+</div>
 
 
 
 
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-
-<script src="/js/utils.js"></script>
-
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/muse.js"></script>
-
-
-<script src="/js/next-boot.js"></script>
+<script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.0.4/source/js/utils.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.0.4/source/js/main.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.0.4/source/js/header-shrink.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.0.4/source/js/back2top.js"></script><script src="//cdn.jsdelivr.net/npm/hexo-theme-keep@3.0.4/source/js/dark-light-toggle.js"></script>
 
 
 
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
 
 </body>
 </html>
