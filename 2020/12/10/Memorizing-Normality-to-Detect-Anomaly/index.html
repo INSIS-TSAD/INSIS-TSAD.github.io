@@ -20,7 +20,9 @@
     KEEP.theme_config = {"toc":{"enable":false,"number":true,"expand_all":true},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/logo.svg","img_position":"left","left_side_width":"260px","content_max_width":"900px","hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."}},"local_search":{"enable":false,"trigger":"auto","unescape":false,"preload":false},"version":"3.0.4"};
     KEEP.language = {"search":"Search...","prev":"Prev","next":"Next","prev_posts":"Prev posts","next_posts":"Next posts","page":"Page %d","recent_posts":"Recent Posts","share":"Share","powered_by":"Powered by %s","theme":"Theme","rss_feed":"RSS Feed","category":"Category","categories":"Categories","tag":"Tag","tags":"Tags","tagcloud":"Tag Cloud","comment":"Comment","home":"Home","archive":"Archive","archives":"Archives","about":"About","site_uv":"Visitor Count","site_pv":"Totalview","links":"Links","link":"Link","top":"TOP","read_more":"Read more","wordcount":"Words","min2read":"Mins","changelog":"Changelog","copyright":{"author":"Post author","title":"Post title","link":"Post link","create_time":"Create time","license_title":"Copyright Notice","license_content":"All articles in this blog are licensed under %s unless stating additionally."},"ago":{"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days age","week":"%s weeks age","month":"%s months age","year":"%s years age"}};
   </script>
-<meta name="generator" content="Hexo 5.2.0"></head>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.2.0"></head>
 
 
 <body>
@@ -145,26 +147,47 @@
 <p>模型有3个组成成分: encoder, decoder 和 memory.  给定一个输入, 首先编码获得隐变量z, 在训练的时候, 使用z去Memory中检索与z最像的一些记录, 然后将这些记录组合成新的隐变量$\hat{z}$, 然后传给解码器用于重构. </p>
 <p>在训练的时候, 编码器, 解码器优化的方向是最小化重构误差. Memory同时不断更新.</p>
 <p>在测试时, 输入一个测试样本, 只会使用Memory中的一些记录来重构. 这样的话, 重构样本会趋近与更像正常样本. 正常样本重构出来的重构误差更小, 异常样本的重构误差更大.</p>
-<h4 id="2-Enocder-and-Decoder"><a href="#2-Enocder-and-Decoder" class="headerlink" title="2.Enocder and Decoder"></a>2.Enocder and Decoder</h4><p>定义编码器为$f_{e}(\cdot): \mathbb{X} \rightarrow \mathbb{Z}$, 解码器为$f_{d}(\cdot): \mathbb{Z} \rightarrow \mathbb{X}$,  给定一个输入$x$, 首先通过编码器获得$z$, 然后从Memory中检索出$\hat{z}$, 然后经过解码器获得$\hat{x}$<br>$$<br>\mathbf{z}=f_{e}\left(\mathbf{x} ; \theta_{e}\right)<br>\<br>\widehat{\mathbf{x}}=f_{d}\left(\widehat{\mathbf{z}} ; \theta_{d}\right)<br>$$<br>使用的损失函数为MSE: $e=|\mathbf{x}-\widehat{\mathbf{x}}|_{2}^{2}$</p>
+<h4 id="2-Enocder-and-Decoder"><a href="#2-Enocder-and-Decoder" class="headerlink" title="2.Enocder and Decoder"></a>2.Enocder and Decoder</h4><p>定义编码器为$f_{e}(\cdot): \mathbb{X} \rightarrow \mathbb{Z}$, 解码器为$f_{d}(\cdot): \mathbb{Z} \rightarrow \mathbb{X}$,  给定一个输入$x$, 首先通过编码器获得$z$, 然后从Memory中检索出$\hat{z}$, 然后经过解码器获得$\hat{x}$</p>
+<script type="math/tex; mode=display">
+\mathbf{z}=f_{e}\left(\mathbf{x} ; \theta_{e}\right)
+\\
+\widehat{\mathbf{x}}=f_{d}\left(\widehat{\mathbf{z}} ; \theta_{d}\right)</script><p>使用的损失函数为MSE: $e=|\mathbf{x}-\widehat{\mathbf{x}}|_{2}^{2}$</p>
 <h4 id="3-Memory-Module-with-Attention-based-Sparse-Addressing"><a href="#3-Memory-Module-with-Attention-based-Sparse-Addressing" class="headerlink" title="3.Memory Module with Attention-based Sparse Addressing"></a>3.Memory Module with Attention-based Sparse Addressing</h4><p>本文所提出的memory模块包括两个部分: 存储模块和检索模块.</p>
-<h5 id="3-1-Memory设计"><a href="#3-1-Memory设计" class="headerlink" title="3.1 Memory设计"></a>3.1 Memory设计</h5><p>memory是一个矩阵$\mathbf{M} \in \mathbb{R}^{N \times C}$, 包含$N$个向量, 每个向量的维度是$C$ , $z$的维度是$C$. 设$m_i$是M的第i行. 给定一个query(查询)$\mathbf{z} \in \mathbb{R}^{C}$,首先获得一个寻址向量$\mathbf{w} \in \mathbb{R}^{1 \times N}$,  获得$\hat{z}$的方式为:<br>$$<br>\widehat{\mathbf{z}}=\mathbf{w} \mathbf{M}=\sum_{i=1}^{N} w_{i} \mathbf{m}_{i}<br>$$<br>$w$是和为1的非负向量, 相当于$\hat{z}$是$m_i$的加权求和. 经过实验, 认为模型对$N$的取值不是很敏感, 一个足够大的$N$就能够在所有数据集上都取得较好的效果.</p>
-<h5 id="3-2-w的计算方式"><a href="#3-2-w的计算方式" class="headerlink" title="3.2 w的计算方式"></a>3.2 w的计算方式</h5><p>计算$w_i$:<br>$$<br>w_{i}=\frac{\exp \left(d\left(\mathbf{z}, \mathbf{m}<em>{i}\right)\right)}{\sum</em>{j=1}^{N} \exp \left(d\left(\mathbf{z}, \mathbf{m}<em>{j}\right)\right)}<br>$$<br>$d(\cdot, \cdot)$是距离度量, 本文使用的是余弦距离:<br>$$<br>d\left(\mathbf{z}, \mathbf{m}</em>{i}\right)=\frac{\mathbf{z} \mathbf{m}<em>{i}^{\top}}{|\mathbf{z}|\left|\mathbf{m}</em>{i}\right|}<br>$$<br>在训练的时候, 由于Memory的空间有限, MemAE通过使用有限的m组合来重构样本, 这样会迫使模型充分利用Memory, 使得Memory存储的是最具代表性的原型模式. 下图是使用9作为正常样本来训练MemAE, 并从Memory中随机选几个m, 经过解码之后重构出来的样本. 这张图是为了说明Memory中存储的是有代表性的原型模式. </p>
+<h5 id="3-1-Memory设计"><a href="#3-1-Memory设计" class="headerlink" title="3.1 Memory设计"></a>3.1 Memory设计</h5><p>memory是一个矩阵$\mathbf{M} \in \mathbb{R}^{N \times C}$, 包含$N$个向量, 每个向量的维度是$C$ , $z$的维度是$C$. 设$m_i$是M的第i行. 给定一个query(查询)$\mathbf{z} \in \mathbb{R}^{C}$,首先获得一个寻址向量$\mathbf{w} \in \mathbb{R}^{1 \times N}$,  获得$\hat{z}$的方式为:</p>
+<script type="math/tex; mode=display">
+\widehat{\mathbf{z}}=\mathbf{w} \mathbf{M}=\sum_{i=1}^{N} w_{i} \mathbf{m}_{i}</script><p>$w$是和为1的非负向量, 相当于$\hat{z}$是$m_i$的加权求和. 经过实验, 认为模型对$N$的取值不是很敏感, 一个足够大的$N$就能够在所有数据集上都取得较好的效果.</p>
+<h5 id="3-2-w的计算方式"><a href="#3-2-w的计算方式" class="headerlink" title="3.2 w的计算方式"></a>3.2 w的计算方式</h5><p>计算$w_i$:</p>
+<script type="math/tex; mode=display">
+w_{i}=\frac{\exp \left(d\left(\mathbf{z}, \mathbf{m}_{i}\right)\right)}{\sum_{j=1}^{N} \exp \left(d\left(\mathbf{z}, \mathbf{m}_{j}\right)\right)}</script><p>$d(\cdot, \cdot)$是距离度量, 本文使用的是余弦距离:</p>
+<script type="math/tex; mode=display">
+d\left(\mathbf{z}, \mathbf{m}_{i}\right)=\frac{\mathbf{z} \mathbf{m}_{i}^{\top}}{\|\mathbf{z}\|\left\|\mathbf{m}_{i}\right\|}</script><p>在训练的时候, 由于Memory的空间有限, MemAE通过使用有限的m组合来重构样本, 这样会迫使模型充分利用Memory, 使得Memory存储的是最具代表性的原型模式. 下图是使用9作为正常样本来训练MemAE, 并从Memory中随机选几个m, 经过解码之后重构出来的样本. 这张图是为了说明Memory中存储的是有代表性的原型模式. </p>
 <p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103206.png" alt="image-20201202103206688"></p>
 <p>在测试阶段, 给定训练好的Memory, 异常样本的重构也只能利用正常的m组合形成$\hat{z}$, 然后重构. 下图中, 左图是使用5来训练, 测试时输入9. 右图是使用2来训练, 测试时输入4. 重构出来的样本都很像是训练样本. </p>
 <p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103625.png" alt="image-20201202103625165"></p>
-<h5 id="3-3-稀疏寻址-硬收缩"><a href="#3-3-稀疏寻址-硬收缩" class="headerlink" title="3.3 稀疏寻址(硬收缩)"></a>3.3 稀疏寻址(硬收缩)</h5><p>作者指出, 如果w很稠密, 即w的每个分量都很小, 会导致多个m组合之后, 使用模型仍然具有较好的泛化性, 也有可能重构出异常样本. 为了缓解这个问题, 迫使w变得稀疏:<br>$$<br>\widehat{w}<em>{i}=h\left(w</em>{i} ; \lambda\right)=\left{\begin{array}{ll}<br>w_{i}, &amp; \text { if } w_{i}&gt;\lambda \<br>0, &amp; \text { otherwise }<br>\end{array}\right.<br>$$<br>简单来说是设定一个阈值$\lambda$, 小于$\lambda$就设为0.</p>
-<p>上式不容易反向传播, 修改为(continuous ReLU activation function):<br>$$<br>\widehat{w}<em>{i}=\frac{\max \left(w</em>{i}-\lambda, 0\right) \cdot w_{i}}{\left|w_{i}-\lambda\right|+\epsilon}<br>$$<br>根据经验, $\lambda$在区间$[1 / N, 3 / N]$内取值会取得比较理想的效果.</p>
-<p>经过以上压缩之后,重新标准化:$\widehat{w}<em>{i}=\widehat{w}</em>{i} /|\widehat{\mathbf{w}}|_{1}$.  这样一来, $\widehat{\mathbf{z}}=\widehat{\mathbf{w}} \mathbf{M}$</p>
+<h5 id="3-3-稀疏寻址-硬收缩"><a href="#3-3-稀疏寻址-硬收缩" class="headerlink" title="3.3 稀疏寻址(硬收缩)"></a>3.3 稀疏寻址(硬收缩)</h5><p>作者指出, 如果w很稠密, 即w的每个分量都很小, 会导致多个m组合之后, 使用模型仍然具有较好的泛化性, 也有可能重构出异常样本. 为了缓解这个问题, 迫使w变得稀疏:</p>
+<script type="math/tex; mode=display">
+\widehat{w}_{i}=h\left(w_{i} ; \lambda\right)=\left\{\begin{array}{ll}
+w_{i}, & \text { if } w_{i}>\lambda \\
+0, & \text { otherwise }
+\end{array}\right.</script><p>简单来说是设定一个阈值$\lambda$, 小于$\lambda$就设为0.</p>
+<p>上式不容易反向传播, 修改为(continuous ReLU activation function):</p>
+<script type="math/tex; mode=display">
+\widehat{w}_{i}=\frac{\max \left(w_{i}-\lambda, 0\right) \cdot w_{i}}{\left|w_{i}-\lambda\right|+\epsilon}</script><p>根据经验, $\lambda$在区间$[1 / N, 3 / N]$内取值会取得比较理想的效果.</p>
+<p>经过以上压缩之后,重新标准化:$\widehat{w}_{i}=\widehat{w}_{i} /|\widehat{\mathbf{w}}|_{1}$.  这样一来, $\widehat{\mathbf{z}}=\widehat{\mathbf{w}} \mathbf{M}$</p>
 <p>以上的稀疏寻址操作有两个好处: 一是迫使Memory中的m是更具有代表性的原型; 二是降低模型泛化性导致异常样本也能重构的可能性.</p>
 <h5 id="3-4-训练"><a href="#3-4-训练" class="headerlink" title="3.4 训练"></a>3.4 训练</h5><p>损失函数包括两部分:</p>
-<p>一. 样本重构误差<br>$$<br>R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)=\left|\mathbf{x}^{t}-\widehat{\mathbf{x}}^{t}\right|_{2}^{2}<br>$$<br>二. 除上述的硬收缩之外, 通过损失函数使得w更加稀疏.</p>
-<p>​    考虑到$\hat{\mathbf{w}}$中的元素非负且$|\widehat{\mathbf{w}}|<em>{1}=1$, 最小化它的交叉熵就可以达到稀疏化的效果.<br>$$<br>E\left(\widehat{\mathbf{w}}^{t}\right)=\sum</em>{i=1}^{T}-\widehat{w}<em>{i} \cdot \log \left(\widehat{w}</em>{i}\right)<br>$$<br>总体的损失函数如下:<br>$$<br>L\left(\theta_{e}, \theta_{d}, \mathbf{M}\right)=\frac{1}{T} \sum_{t=1}^{T}\left(R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)+\alpha E\left(\widehat{\mathbf{w}}^{t}\right)\right)<br>$$<br>$\alpha$是调节权重的超参, 本文设定为0.0002</p>
+<p>一. 样本重构误差</p>
+<script type="math/tex; mode=display">
+R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)=\left\|\mathbf{x}^{t}-\widehat{\mathbf{x}}^{t}\right\|_{2}^{2}</script><p>二. 除上述的硬收缩之外, 通过损失函数使得w更加稀疏.</p>
+<p>​    考虑到$\hat{\mathbf{w}}$中的元素非负且$|\widehat{\mathbf{w}}|_{1}=1$, 最小化它的交叉熵就可以达到稀疏化的效果.</p>
+<script type="math/tex; mode=display">
+E\left(\widehat{\mathbf{w}}^{t}\right)=\sum_{i=1}^{T}-\widehat{w}_{i} \cdot \log \left(\widehat{w}_{i}\right)</script><p>总体的损失函数如下:</p>
+<script type="math/tex; mode=display">
+L\left(\theta_{e}, \theta_{d}, \mathbf{M}\right)=\frac{1}{T} \sum_{t=1}^{T}\left(R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)+\alpha E\left(\widehat{\mathbf{w}}^{t}\right)\right)</script><p>$\alpha$是调节权重的超参, 本文设定为0.0002</p>
 <h4 id="4-实验"><a href="#4-实验" class="headerlink" title="4 实验"></a>4 实验</h4><h5 id="4-1-图像数据"><a href="#4-1-图像数据" class="headerlink" title="4.1 图像数据"></a>4.1 图像数据</h5><p>平均AUC. </p>
-<img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202112919.png" alt="image-20201202112919657" style="zoom: 80%;" />
-
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202112919.png" alt="image-20201202112919657" style="zoom: 80%;" /></p>
 <h5 id="4-2-视频数据"><a href="#4-2-视频数据" class="headerlink" title="4.2 视频数据"></a>4.2 视频数据</h5><p>AUC:</p>
-<img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114254.png" alt="image-20201202114254063" style="zoom: 50%;" />
-
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114254.png" alt="image-20201202114254063" style="zoom: 50%;" /></p>
 <p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114413.png" alt="image-20201202114413583"></p>
 <h5 id="4-3-网络安全数据"><a href="#4-3-网络安全数据" class="headerlink" title="4.3 网络安全数据"></a>4.3 网络安全数据</h5><p> KDDCUP99 </p>
 <p>Each sample can be organized as a vector with 120 dimensions </p>
