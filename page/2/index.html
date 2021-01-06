@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="时序论文分享">
+<meta property="og:url" content="http://example.com/page/2/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="INSIS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/page/2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title>时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/HuGanghui/Adversarial%20Graph%20Representation%20Adaptation%20for%20Cross-Domain%20Facial%20Expression%20Recognition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/06/HuGanghui/Adversarial%20Graph%20Representation%20Adaptation%20for%20Cross-Domain%20Facial%20Expression%20Recognition/" class="post-title-link" itemprop="url">胡港辉 Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-06 11:20:03 / Modified: 12:08:12" itemprop="dateCreated datePublished" datetime="2021-01-06T11:20:03+08:00">2021-01-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%83%A1%E6%B8%AF%E8%BE%89/" itemprop="url" rel="index"><span itemprop="name">胡港辉</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="《Adversarial-Graph-Representation-Adaptation-for-Cross-Domain-Facial-Expression-Recognition》"><a href="#《Adversarial-Graph-Representation-Adaptation-for-Cross-Domain-Facial-Expression-Recognition》" class="headerlink" title="《Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition》"></a>《Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition》</h1><h2 id="ACM-MM-2020"><a href="#ACM-MM-2020" class="headerlink" title="ACM MM 2020"></a>ACM MM 2020</h2><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>由于主观的标注过程和不同的采集条件，不同的表情识别数据集之间难免存在数据不一致和偏差。最近的研究求助于学习领域不变特性的对抗机制来减轻领域转移。</p>
+<p>这些研究大多侧重于整体特征的适应，而忽略了更容易跨不同数据集转移的局部特征</p>
+<p>局部有限元具有更详细、更有辨别力的内容，因此结合局部特征可以实现细粒度的适应</p>
+<p>在这项工作中，我们提出了一种新的对抗图表示适应(AGRA)框架，该框架将图表示传播与对抗学习统一起来，用于跨域全局-局部特征的协同适应</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="数据集的差异"><a href="#数据集的差异" class="headerlink" title="数据集的差异"></a>数据集的差异</h3><ul>
+<li>因为人类对面部表情的理解随着他们的经验和生活文化的不同，他们的标注不可避免地是主观的，导致在不同的数据集中明显的领域变化。</li>
+<li>不同数据集的人脸图像通常是在不同的环境(如实验室控制或野外)和不同种族的人类中采集的，这进一步扩大了域偏移</li>
+</ul>
+<h3 id="领域自适应"><a href="#领域自适应" class="headerlink" title="领域自适应"></a>领域自适应</h3><ul>
+<li>为了减轻领域漂移，最近的研究引入了对抗学习机制，旨在学习领域不变特征</li>
+</ul>
+<h3 id="当前研究缺陷"><a href="#当前研究缺陷" class="headerlink" title="当前研究缺陷"></a>当前研究缺陷</h3><ul>
+<li><p>侧重于提取整体特征进行域自适应，忽略了从两个方面对跨域FER有利的局部特征</p>
+<ul>
+<li>局部区域具有更易于跨不同数据集迁移的判别特征。例如，唇角-拉皮动作对快乐表情具有区分性，对不同数据集的样本具有相似性</li>
+<li>局部区域对整体特征编码的细节性和互补性更强。对每个域内和不同域内的整体局部特征的相关性进行模化，可以使适应过程更细粒度，从而促进跨域迁移</li>
+</ul>
+</li>
+</ul>
+<h3 id="本文工作"><a href="#本文工作" class="headerlink" title="本文工作"></a>本文工作</h3><ul>
+<li><p>我们证明了在每个域内以及跨源和目标域的全局局部特征的相关性可以用结构化的图来明确表示，并且它们的相互作用和适应性可以通过图中的自适应信息支持来捕获</p>
+</li>
+<li><p>开发了一种新的对抗图表示适应(AGRA)框架，该框架将图表示传播与对抗学习机制集成在一起，以实现跨域整体-局部特征的相互作用和协同适应</p>
+</li>
+<li><p>具体来说，我们首先根据面部地标提取几个有鉴别性的局部区域(如眼睛、鼻子、嘴角等)，并分别构建两个图将整体图像与各个域内以及不同域之间的局部区域进行关联。</p>
+<ul>
+<li><p>图节点初始化</p>
+<ul>
+<li>给定一个域的输入图像，提取整体图像和局部区域的特征，初始化该域的相应节点</li>
+<li>其他域的节点由相应的每类可学习的统计特征分布初始化</li>
+</ul>
+</li>
+<li><p>图卷积网络</p>
+<ul>
+<li>我们引入两个堆叠图卷积网络，在每个域内传播节点消息，探索全域与局部特征的交互作用，以及跨两个不同域实现全域与局部特征的协同适应</li>
+</ul>
+</li>
+<li><p>通过这种方法，可以逐步缓解源域和目标域之间整体局部特征的漂移，实现学习判别特征和领域不变特征的学习，便于跨域FER。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Figure1.png" alt="Figure1"></p>
+</li>
+<li><p>作图仅使用整体特征进行领域自适应，右图为AGRA框架，能够较好地将来自不同领域、属于同一类别的样本的特征聚集在一起，在提高领域不变特征识别能力的同时，能够较好地学习领域不变特征</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>贡献</p>
+<ul>
+<li>我们提出将图表示传播与对抗学习机制整合在一起，以实现跨不同领域的整体-局部特征协同适应</li>
+<li>们开发了一种类感知的两阶段更新机制，迭代地学习每个域的统计特征分布，用于图节点初始化。它在减少领域漂移方面起着关键作用，有助于学习领域不变特征</li>
+</ul>
+</li>
+</ul>
+<h2 id="Related-Work"><a href="#Related-Work" class="headerlink" title="Related Work"></a>Related Work</h2><h3 id="本文所提出的框架也与一些工作有关，这些工作使图神经网络适应视觉交互学习和推理这些工作建议以图形的形式明确地建模标签依赖关系，并采用图形来指导特征交互学习。"><a href="#本文所提出的框架也与一些工作有关，这些工作使图神经网络适应视觉交互学习和推理这些工作建议以图形的形式明确地建模标签依赖关系，并采用图形来指导特征交互学习。" class="headerlink" title="本文所提出的框架也与一些工作有关，这些工作使图神经网络适应视觉交互学习和推理这些工作建议以图形的形式明确地建模标签依赖关系，并采用图形来指导特征交互学习。"></a>本文所提出的框架也与一些工作有关，这些工作使图神经网络适应视觉交互学习和推理这些工作建议以图形的形式明确地建模标签依赖关系，并采用图形来指导特征交互学习。</h3><h3 id="受这些工作的启发，我们进一步扩展了图，以建模域内和跨域的全局局部特征交互，从而实现细粒度的特征适应。"><a href="#受这些工作的启发，我们进一步扩展了图，以建模域内和跨域的全局局部特征交互，从而实现细粒度的特征适应。" class="headerlink" title="受这些工作的启发，我们进一步扩展了图，以建模域内和跨域的全局局部特征交互，从而实现细粒度的特征适应。"></a>受这些工作的启发，我们进一步扩展了图，以建模域内和跨域的全局局部特征交互，从而实现细粒度的特征适应。</h3><h2 id="AGRA-FRAMEWORK"><a href="#AGRA-FRAMEWORK" class="headerlink" title="AGRA FRAMEWORK"></a>AGRA FRAMEWORK</h2><h3 id="DANN的基本模型框架"><a href="#DANN的基本模型框架" class="headerlink" title="DANN的基本模型框架"></a>DANN的基本模型框架</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106113921758.png" alt="image-20210106113921758"></p>
+<h3 id="AGRA的基本模型框架"><a href="#AGRA的基本模型框架" class="headerlink" title="AGRA的基本模型框架"></a>AGRA的基本模型框架</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106113940321.png" alt="image-20210106113940321"></p>
+<ul>
+<li>首先构建一个图来关联每个域内的整体和局部区域，以及另一个图来关联不同域内的这些区域。然后，我们学习每个域的分类统计分布，并从输入图像中提取整体-局部特征来初始化对应的图节点</li>
+<li>最后，引入了两种堆叠图卷积网络来支撑每个域内的整体-局部特征，以探讨它们之间的相互作用以及跨不同域的整体-局部特征协同适应</li>
+<li>一旦两个图被构建，消息传播将通过域内图来探索与每个域的全域-局部耦合，并通过域间图来实现全域-局部特征的协同适应</li>
+</ul>
+<h3 id="Stack-graph-convolution-networks"><a href="#Stack-graph-convolution-networks" class="headerlink" title="Stack graph convolution networks"></a>Stack graph convolution networks</h3><ul>
+<li>我们使用两个堆叠的GCN，其中一个GCN通过域内图传播消息，以探索每个域内的整体-局部特征交互作用，另一个GCN通过域间GCN传输消息，以实现整体-局部特征的协同适应。</li>
+<li><p>具体细节</p>
+<ul>
+<li>首先使用原始源域图像来初始化域内图的每个节点，然后，利用目标域内所有类别簇的特征分布计算这个样本的距离，得到距离最小的簇c。然后，对目标域的每个节点进行特征分布初始化</li>
+<li>然后对初始特征进行重新排列，得到特征矩阵</li>
+<li>然后,我们对输入特征矩阵进行图卷积运算，迭代地传播和更新节点特征</li>
+<li>通过叠加域内图的卷积层，充分挖掘域内图内的节点信息，得到特征矩阵Hintra。</li>
+<li><p>然后利用该特征矩阵初始化域间图的节点，并通过图卷积运算迭代更新节点特征</p>
+</li>
+<li><p>同理，将图的卷积运算按Linter次数进行重复，得到最终的特征矩阵H。我们将源域节点的特征串接为最终特征，输入分类器预测表达式标签和域鉴别器来估计其域</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="EXPERIMENTS"><a href="#EXPERIMENTS" class="headerlink" title="EXPERIMENTS"></a>EXPERIMENTS</h2><h3 id="baseline对比实验"><a href="#baseline对比实验" class="headerlink" title="baseline对比实验"></a>baseline对比实验</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106113959177.png" alt="image-20210106113959177"></p>
+<h3 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h3><ul>
+<li><p>消融实验：局部特征以及GCN的作用</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106114024370.png" alt="image-20210106114024370"></p>
+</li>
+</ul>
+<ul>
+<li><p>消融实验：域内图、域间图以及双层迭代GCN的作用</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106114044295.png" alt="image-20210106114044295"></p>
+</li>
+</ul>
+<ul>
+<li><p>消融实验：邻接矩阵的不同定义方式</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106114103032.png" alt="image-20210106114103032"></p>
+</li>
+</ul>
+<ul>
+<li>通过手工定义连接，初始化域内图和域间图的两个相邻矩阵，为消息传播的正则化提供了先验指导，换为随机或者全一之后的效果下降。</li>
+<li>为了调整邻接矩阵以更好地引导消息传播，在训练过程中还对邻接矩阵进行了联合微调。在这一部分中，我们通过固定先验矩阵训练来验证它的有效性。在表5中展示了结果。平均正确率从66.13%降至56.01%。这表明，联合调整邻接矩阵可以学习数据集指定的矩阵，这对促进跨域FER至关重要。</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">邵世宽 Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-06 10:24:24 / Modified: 12:06:53" itemprop="dateCreated datePublished" datetime="2021-01-06T10:24:24+08:00">2021-01-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%82%B5%E4%B8%96%E5%AE%BD/" itemprop="url" rel="index"><span itemprop="name">邵世宽</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Vincent-Vercruyssen-Transfer-learning-and-Semi-Supervised文章总结"><a href="#Vincent-Vercruyssen-Transfer-learning-and-Semi-Supervised文章总结" class="headerlink" title="Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结"></a>Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结</h2><h4 id="1-Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection"><a href="#1-Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection" class="headerlink" title="1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection"></a>1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection</h4><p>Vincent Vercruyssen</p>
+<p>2020 AAAI</p>
+<p>提出LOCIT算法：1、选择源域(带标签)中的子集迁移到目标域(不带标签)中。2、使用半监督最近邻的方法同时考虑带标签和不带标签的实例来计算异常分数。</p>
+<p><strong>贡献：</strong></p>
+<p>1、使用实例在源域和目标域的分布(d1-局部距离和d2-相关距离)来度量是否可以迁移，使用目标域中的实例(假设了近邻的分布相同，距离很远点的分布不同)来训练一个SVM分类器判断是否可以迁移。</p>
+<p>2、同时考虑目标实例近邻中的带标签和不带标签的实例(半监督)来分别计算异常分数，并为这两个异常分数根据label instance的近邻中是否也包含目标实例来分配权重。</p>
+<p>LOF(基于密度的离群点检测方法)原理：利用了点O的周围密度和O的邻域内的周围密度的比值，这个值越接近1说明点O和他周围点越相似。这就和上面计算有标签和无标签的权重的方式很像</p>
+<p><strong>普通数据集构建：</strong></p>
+<p>​    本文确定的基准包含三个特性：1、出于经验评估的目的，benchmark应该包含大量的源域-目标域的数据对，他们之间的联合分布存在不同程度的差异。2、每一个源域-目标域对应该处于相同的特征空间。3、第三，源和目标域应该包含对分类来说并不简单的正常和异常实例。</p>
+<p>​    生成过程：为了生成目标域，从最大类(第二大类)采样正常目标实例(异常目标实例)，为了确保源域和目标域的分布差异，我们从目标域相同或不同类别来采样异常和正常样本来构造源域；follow了Emmott等人的程序来满足这个过程。</p>
+<p><strong>时间序列数据集构建：</strong></p>
+<p>​    有三个商店的三年的用水数据(单变量，采样间隔5分钟)，首先将每条时间序列按一小时间隔划分成时间窗口，通过特征提取，每个窗口提取出31维特征。由于每天的不同时间的用水量差异很大，所以对于相同的时间间隔，就将他们分成一个组(例如11：00-12：00)，这样每个商店就可以得到24个组，为每一个组训练一个异常检测器。</p>
+<p>​    这样是不是相当于把每天内，用水量的时间依赖信息给切断了。</p>
+<h4 id="2-Semi-supervised-Anomaly-Detection-with-an-Application-to-Water-Analytics"><a href="#2-Semi-supervised-Anomaly-Detection-with-an-Application-to-Water-Analytics" class="headerlink" title="2  -Semi-supervised Anomaly Detection with an Application to Water Analytics"></a>2  -Semi-supervised Anomaly Detection with an Application to Water Analytics</h4><p>Vincent Vercruyssen</p>
+<p>2018 ICDM</p>
+<p>提出了一种新的基于约束聚类的异常检测方法，该方法可在无监督和半监督环境下工作</p>
+<p><strong>贡献：</strong></p>
+<p>​    1、结合机器学习方法，以设计一种新的半监督的异常检测方法；</p>
+<p>​            该方法首先基于无监督模型，该模型使用基于聚类的方法(COP-k means约束聚类，)来定义典型的正常行为并识别异常(主要工作是<strong>基于三个假设定义一个异常分数，此异常分数比原来的分数相比有改进</strong>)。我们的系统采用主动学习，因此领域专家可以以真实标签的形式向模型提供反馈(Incorporating expert feedback into active anomaly discovery 2016)。只要提供反馈，该方法就会以半监督的方式运行，并以两种方式利用标签。第一，标签用于以约束形式指导聚类。第二，通过标签传播的方式更新初始的基于聚类的异常评分，以最大化所获取的标签数据的有用性。</p>
+<p>​    2、说明如何将我们的方法应用于用水案例；</p>
+<p>​    3、一项实证研究表明，我们提出的方法优于现有的异常检测方法以及公司的基准方法</p>
+<p>​    4、讨论了已部署的系统体系结构。</p>
+<p>在本文的相关工作(related work)中，作者列举了参考的其他方法，包括无监督和半监督，并且在每种方法的最后都强调了下自己方法的不同—-无监督和半监督结合，基于聚类（参考了CBLOF，参数少，并且考虑了聚类中心）等等</p>
+<p>划分窗口，特征构建：</p>
+<p><strong>实验：</strong></p>
+<p>​    数据集划分：</p>
+<p>​        这里的数据集划分和上面这篇Transfer Learning for Anomaly Detection的方法是相同的，也是将每天相同的小时组成一个组，为了进行评估，将那些包含多于50个带标签窗口的组挑选出来进行试验。 </p>
+<p>​    实验设置：</p>
+<p>​        将每个组中带标签的窗口划分成训练集$D_{train}$和测试集$D_{test}$，将$D’_{train}$初始化为空集，逐渐增加$D’_{train}$中元素的数量直到等于$D_{train}$，用来验证专家标签数量逐步增加对于半监督方法性能的提升有多大。使用$D’_{train}$选择最好的参数，来在$D_{test}$中测试。</p>
+<p><strong>已部署</strong></p>
+<h4 id="3-Transfer-learning-for-time-series-anomaly-detection"><a href="#3-Transfer-learning-for-time-series-anomaly-detection" class="headerlink" title="3 -Transfer learning for time series anomaly detection"></a>3 -Transfer learning for time series anomaly detection</h4><p>Vincent Vercruyssen</p>
+<p>2017 In CEUR Work- shop Proceedings</p>
+<p>​    本文的算法尝试将源域中的带标签的数据迁移到目标域(没有标签)中，迁移的方法利用了异常是低频和不经常发生的观点来决定是否将实例进行迁移。一旦迁移完成，就在目标域中构建最近邻分类器，并将动态时间规整作为相似性度量。在一个真实数据集中进行实验，并发现他的效果超过了无监督的方法。</p>
+<p>本文的方法：</p>
+<p>​    4.1 基于两个性质，定义了每个源实例是否迁移的<strong>权重</strong>，而这个权重需要估计<strong>源实例</strong>在<strong>目标域</strong>的<strong>概率分布</strong></p>
+<script type="math/tex; mode=display">
+\hat{f}_T(x_S)</script><p>​    4.2 基于密度的迁移决策函数</p>
+<p>​    本文的数据是基于单变量时间序列，每条序列长度固定，<strong>将每条序列看成是一个长度为 d 的向量</strong>，将这些向量进行迁移并进行异常检测。但由于随着向量维度的增加需要指数及增加的样本来进行密度估计，但这样是不现实的，所以为了精确的概率密度估计，将长度为d的向量分割成 $l$ 个等长度 m 的子向量，然后进行密度估计。得到每条子序列的密度估计</p>
+<script type="math/tex; mode=display">
+\hat{f}_{T,m}(s)</script><p>​    由于上面的调整，对于一条时间序列会得到$l$个密度估计值估计，所以需要调整权重的计算方式。计算出最终的权重之后，给权重设置一个阈值，来决定是否进行迁移。</p>
+<p>​    4.3 基于聚类的迁移决策函数</p>
+<p>​    首先对<strong>目标域</strong>进行聚类，将整个目标域划分成大集合和小集合两个集合，并定义每个聚类的半径。最后，还是基于上面的两个性质来决定是否将<strong>源域中</strong>的实例迁移到目标域中：对于一个正常标签的实例，如果被划分到目标域中的大集合；对于一个异常标签的实例，满足其中一个条件：这个实例被划分到小集合，或者被划分到大集合，但是该实例到聚类中心的距离大于聚类半径。</p>
+<p>​    4.4 监督异常检测</p>
+<p>​    迁移之后，进行有监督异常检测。我们忽略目标域中没有标签的实例，只使用有标签的实例，用这些带标签的实例，构建1NN(最近邻)-DTW(dynamic time warping)分类器。</p>
+<p>贡献：</p>
+<p>​    对于时间序列中基于实例的迁移学习收到很少的关注。本文提出的基于实例的迁移方法不需要目标域有任何的标签，</p>
+<p>实验：</p>
+<p>​    本文用到的无监督基线还是CBLOF(cluster based local outlier factor)这个算法。</p>
+<p>​    对于数据集，用到的也是真实数据集(用水)，对于数据集的划分，也是同样的方法-由于每天的用水量差异很大，所以也是划分成24个窗口，得到24个数据集，每一个实例都是长度为1小时的时间序列。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201110202315.png" alt="微信截图_20201110202315" style="zoom:60%;" /></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/06/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/" class="post-title-link" itemprop="url">邵世宽 Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-06 10:22:54 / Modified: 12:06:59" itemprop="dateCreated datePublished" datetime="2021-01-06T10:22:54+08:00">2021-01-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%82%B5%E4%B8%96%E5%AE%BD/" itemprop="url" rel="index"><span itemprop="name">邵世宽</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection"><a href="#Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection" class="headerlink" title="Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection"></a>Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection</h3><ul>
+<li>作者</li>
+</ul>
+<p>Vincent Vercruyssen, Wannes Meert, Jesse Davis</p>
+<p>DTAI group, KU Leuven, Belgium<br>firstname.lastname@kuleuven.be</p>
+<ul>
+<li>会议</li>
+</ul>
+<p>2020 AAAI</p>
+<ul>
+<li><p>介绍</p>
+<p>​    异常检测可以自然地作为一项无监督的学习任务，无监督的方法利用了异常不经常发生的假设，即异常会落在整个实例空间中的低密度区域。但是现实世界的数据经常违背这一假设，例如系统维护会不定期的发生，但不是异常。带标签的数据提供了修正这一差错的可能性，但是完全的监督方法却是不可行的，因为收集现实世界的异常标签是非常昂贵的。激发了对异常检测的半监督方法的研究兴趣，通常与主动学习结合来有效地收集标签。</p>
+<p>​    现实世界的异常检测任务经常会涉及监控大量的资产，而每一项资产只有细微的差别。这些场景经常会发生在一个工厂的许多机器和零售商店的所有连锁店中。这些场景需要监控大量的资产，因此即便使用主动学习的策略也很难为每一个资产收集所有标签。鉴于这些涉及相似异常检测任务的场景，我们可以使用迁移学习将有标签的实例从一个任务迁移到另一个任务。</p>
+<p>​    所以本文提出了一种专门针对异常检测的新型迁移学习算法-LOCIT。它的流程分为两步。首先，给定一部分带标签的源数据集和一个没有标签的目标数据集，LOCIT选择在源数据集和目标数据中有相似的局部数据分布的数据实例，将其迁移到目标数据集中，接下来，它使用半监督的最近邻方法分配异常分数，该方法同时考虑已迁移的带标签的源实例和不带标签的目标实例。</p>
+</li>
+<li><p>贡献</p>
+<ul>
+<li>提出一种用于异常检测的新的迁移学习算法：LOCIT(localized instance-transfer algorithm)，检查实例的局部数据分布在源和目标(目标问题)域中是否相似，以不依赖标签的方式决定是否将每个源实例迁移到目标域。</li>
+<li>使用一种半监督异常检测方法，SSKNNO，它结合未标记实例和标记实例(迁移之后的)计算每个目标实例的异常分数。</li>
+</ul>
+</li>
+<li><p>基础概念</p>
+<ul>
+<li><p>用于异常检测的迁移学习</p>
+<p>​    迁移学习的目的是通过给定的一个相关数据集(源域)的数据来学到另一个数据集(目标域)的模型，本文关注的是异常检测，所以任务就是给目标数据集中的每一个实例分配一个分数来量化异常程度，使用$D_S(D_T)$表示源域(目标域)，使用$x_s(x_t)$表示源域或目标域数据集中的实例。</p>
+<p>​    三个常见的迁移学习假设适用于异常检测任务。首先源数据和目标数据来自相同维度的空间。其次，源域和目标域的边缘分布不同(covariate shift assumption)。第三，条件分布会因上下文的变化而不同:同一行为在两个领域中可能具有不同的含义(concept shift assumption)。</p>
+</li>
+<li><p>Nearest Neighbors and KNNO</p>
+<p>​    实例$x$的$k$距离指的是在数据集$D$中离它最近的第$k$个邻居的距离，表示为$k-dist(x,D)$，在$D$中离$x$的最近的$k$个邻居表示为$N_k(x,D)$。在加权距离KNN中标准的权重函数为$\omega(x_i,x_j)=\frac{1}{\delta (x_i,x_j)^2}$，其中$\delta $是两个实例$x_i$和$x_j$的欧氏距离。最后KNNO根据实例的$k$距离将一个数据集中的所有实例进行排序，越高的距离意味着越多的异常实例。</p>
+</li>
+</ul>
+</li>
+<li><p>LOCIT</p>
+<p>问题：</p>
+<p>​    给定：来自相同特征空间的一个已标记的源数据集$D_S$和一个未标记的目标数据集$D_T$</p>
+<p>​    求：使用$D_T$和$D_S$的一个子集来给$D_T$中的每一个实例分配一个异常分数</p>
+<p>LOCIT分两步解决上面任务，首先通过检查实例的本地数据分布在源和目标域中是否相似，以不依赖标签的方式决定是否将每个源实例迁移到目标域。LOCIT采用无监督迁移方式，因为目标标签不可用，而且源标签的值不应该影响迁移决定。其次，LOCIT使用一种新的半监督异常检测算法给每个目标实例分配一个异常分数。</p>
+<ul>
+<li><p>本地实例的迁移(Localized Instance-Based Transfer)</p>
+<p>​    实例迁移函数$f(x_S;D_S,D_T)\mapsto\{0,1\}$决定是否将一个源实例$x_S \in D_S$迁移到目标域中。最理想的情况是，每一个已经迁移的源实例在两个域中有相同的含义。只有当源异常(正常)实例与目标异常(正常)实例相似时，将源异常(正常)实例迁移到目标域中才有意义。因此LOCIT做了一个假设：如果一个实例周围的源和目标边缘分布的局部结构相似，则实例在源和目标域中具有相似的意义，这里的分布结构由一阶和二阶统计量表征。</p>
+<ul>
+<li><p>表征实例的局部结构</p>
+<p>​    给定一个源实例$x_S$，LOCIT使用$x_S$的$\psi $个源域中最近的邻居集合$N_\psi (x_S,D_S)$定义了局部的源分布。同样局部的目标分布也是基于$x_S$的$\psi $个目标域中最近的邻居集合$N_\psi (x_S,D_T)$。假设是：如果$N_\psi (x_S,D_S)$与$N_\psi (x_S,D_T)$之间的分布相似，那么$x_S$就可以被迁移。相似性由下面$N_\psi (x_S,D_S)$和$N_\psi (x_S,D_T)$的两个一阶和二阶统计量来度量。</p>
+</li>
+<li><p>位置距离</p>
+<p>​    下面的公式定义了两个邻居集合$N1$和$N2$的质心之间的差值(即算术平均值)的l2-范数:</p>
+<script type="math/tex; mode=display">
+d_1(N1,N2)=||\frac{1}{k}(\sum_{x_i\in N_1}x_i-\sum_{x_j \in N_2}x_j)||_2</script><p>​    在这里，LOCIT计算了$d_1(N_\psi(x_S,D_S),N_\psi(x_S,D_T))$.直观上来看，$d_1$越大，表示两个集合覆盖的区域重叠的部分越少，也就减少了迁移这个实例的机会。</p>
+</li>
+<li><p>相关距离</p>
+<p>​    这是两个邻居集合协方差矩阵的相对距离：</p>
+<script type="math/tex; mode=display">
+d_2(N1,N2)=\frac{||C_{N1}-C_{N2}||_F}{||C_{N1}||_F}</script><p>​    其中$||.||_F$是$F$范数，$C$是协方差矩阵。LOCIT计算了$d_2(N_\psi(x_S,D_S),N_\psi(x_S,D_T))$。如果$d_2$很大，这表明潜在的局部源和目标分布在形状或方向上是不同的，这再一次较少了迁移的机会。邻居集的大小$\psi$是唯一一个在LOCIT迁移过程中的超参数。</p>
+</li>
+<li><p>学习实例迁移函数</p>
+<p>​    实例迁移函数$f$需要结合$d_1$和$d_2$提供的信息来决定是否迁移$x_s$，LOCIT在目标分布上学习了一个SVM分类器来作为$f$，分类器通过查看源实例在源数据和目标数据中的邻居集之间的相关距离和位置距离来预测源实例$x_s$是否属于目标域。</p>
+<p>​    为了训练分类器，LOCIT仅考虑目标数据来生成训练数据。它利用了光滑性假设，即相邻的目标实例应该具有类似的局部分布，而远处的实例则不应该具有。因此，正训练样本是由每一个实例$x_t \in D_T$通过找到它的最近的邻居$x_n \in D_T $\ $\{x_t\}$，并且计算$d_1(N_\psi(x_t,D_T),N_\psi(x_n,D_T))$和$d_2(N_\psi(x_t,D_T),N_\psi(x_n,D_T))$来产生。同样的，负样本的产生是计算每一个实例$x_t \in D_T$的特征向量包括$x_t$的邻居集和距离最远的邻居$x_f \in D_T$\ $\{x_t\}$之间的距离。下图比较了LOCIT和一种流行的全局域策略CORAL</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201006113453.png" alt="微信截图_20201006113453" style="zoom:60%;" /></p>
+</li>
+</ul>
+</li>
+<li><p>在目标域中预测(Prediction in the Target Domain)</p>
+<p>​    迁移之后，在对目标实例进行预测时存在两个挑战。首先，目标域现在混合包含带标签和未带标签的实例。其次，由于这是一个异常检测问题，目标实例邻居中的已知标签不一定提供其标签对应的信息。</p>
+<p>​    接下来就是LOCIT的第二个贡献，一种半监督异常检测方法SSKNNO，它结合未标记实例和(迁移的)标记实例计算每个目标实例的异常分数。一方面，在计算得分时考虑了未标记目标实例的局部分布。另一方面，它通过比较目标数据中(迁移的)标记实例和未标记实例的邻居来给这个分数加权。</p>
+<p>​    令$D^<em>=D_T\cup D_{trans}$表示包含目标实例和已迁移源实例的集合，对于一个目标实例$x_t$，找到所有邻居的集合$N_k(x_t,D^</em>)$并将集合中已标记的子集表示为$L_k(x_t,D^*)$。在$x_t$的邻居中已标记实例的权重现在是$W_l$：</p>
+<script type="math/tex; mode=display">
+W_l(x_t)=\frac{|x_i:x_i \in L_k(x_t,D^*)\wedge x_t \in N_k(x_i,D^*)|}{k}</script><p>​    直观来看，当给$x_t$分配一个异常分数时，如果一个源实例和$x_t$很相似时，我们就只想考虑这个迁移过的源实例的标签。例如，如果$x_t$是一个孤立的实例，那么它的$k$个最近的邻居将是很远的。即使贴上了标签，这些实例也不能很好地预测$x_t$的标签。这反映在$W_l(x_t)$，仅仅考虑那些$x_t$邻居中的实例(这些实例中$x_t$也是他们的近邻)。</p>
+<p>​    这个权重现在可以被用来计算实例$x_t$的异常分数$a(x_t)$，加权组合了一个无监督成$a_u$(考虑局部数据分布)和一个有监督成分$a_l$(考虑附近的有标签实例)，表示如下：</p>
+<script type="math/tex; mode=display">
+a(x_t) = (1 −W_l(x_t)) a_u(x_t) +W_l(x_t) a_l(x_t) \space\space\space\space\space\space\space\space\space\space\space\space\space\space(4)</script><p>​    有监督分数$a_l$为$x_t$相邻实例标签的距离加权平均值:</p>
+<script type="math/tex; mode=display">
+a_l(x_t)=\frac{\sum_{x_i \in L_k}\mathfrak{1}_{x_i=anomaly}(x_i)w(x_i;x_t)}{\sum_{x_i \in L_k}w(x_i;x_t)}</script><p>​    其中$w$在前面定义为欧氏距离；$\mathfrak{1}_{y_i=1}(x_i)$是1，如果专家给$x_i$标注的标签为异常。无监督分数$a_u$使用基于KNNO算法的$k-dist$，但使用了指数函数把范围限定在了$[0,1]$之间：</p>
+<script type="math/tex; mode=display">
+a_u(x_t)=1-exp(-\frac{k-dist(x_t,D^*)^2}{2 \gamma ^2})</script><p>​    其中，$\gamma$是假设的异常百分比为，设为源域中已知异常所占的比例。下图展示了SSKNNO方法</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201006172520.png" alt="微信截图_20201006172520" style="zoom:80%;" /></p>
+<p>​    在极端情况下，权值$W_l(x_t)$可以是0或1。如果$x_t$的邻居都没有被标记，$L_k$为空，$W_l(x_t)$变为零，公式4将简化为相应的KNNO分数。如果LOCIT的迁移函数没有选择实例来迁移，就会发生这种情况。反过来，如果$x_t$的所有邻域都被标记，并且$x_t$属于每一个邻域的邻域集，那么最终的异常值就是标准的加权KNN分类器。</p>
+</li>
+</ul>
+</li>
+<li><p>基准实验评估</p>
+<ul>
+<li><p>比较的方法</p>
+<p>​    比较了12个方法，可以分为三个范畴：异常检测的基线算法(KNNO，LOF，IFOREST，HBOS)、迁移学习的基线方法(TRANSFERALL，CORAL，TCA，GFK，JDA，TJM，JGSA，CBIT，迁移之后使用一个KNN分类器来分类)、LOCIT(本文的算法)</p>
+</li>
+<li><p>实验结果</p>
+<p>​    </p>
+</li>
+</ul>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201006174619.png" alt="微信截图_20201006174619" style="zoom:80%;" /></p>
+</li>
+</ul>
+<p>  <img src="http://echo23334.gitee.io/pic_repo/微信截图_20201006175121.png" alt="微信截图_20201006175121" style="zoom:80%;" /></p>
+<p>  <img src="http://echo23334.gitee.io/pic_repo\微信截图_20201006175501.png" alt="微信截图_20201006175501" style="zoom:80%;" /></p>
+<ul>
+<li><p>真实世界实验评估</p>
+<ul>
+<li><p>数据和方法</p>
+<p>​    我们有三家商店三年的用水量历史时间序列数据。数据由每五分钟记录一次的单变量测量数据组成。在每个商店，公司专家标记了大约10%的数据，每个提供的标签显示一个小时的区块(例如，01:00-02:00)是否显示正常行为。其余的数据没有标记。</p>
+</li>
+<li><p>实验结果</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://echo23334.gitee.io/pic_repo\微信截图_20201006175657.png" alt="微信截图_20201006175657" style="zoom:80%;" /></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/" class="post-title-link" itemprop="url">张宏钧 Memorizing Normality to Detect  Anomaly</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 12:07:11" itemprop="dateModified" datetime="2021-01-06T12:07:11+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%A0%E5%AE%8F%E9%92%A7/" itemprop="url" rel="index"><span itemprop="name">张宏钧</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201183707.png" alt="image-20201201183707250"></p>
+<p>ICCV, 2020</p>
+<h4 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h4><p>autoencoder被广泛应用到异常检测.</p>
+<p>前提假设:在正常的数据上训练, 在异常样本上会有较大的重构误差, 使用重构误差作为检测异常的标准. </p>
+<p>然而, 这一假设在实际应用中不一定成立. 有时autoencoder的泛化性太好, 而导致在面对异常样本时也能很好地重构, 即重构误差小, 这会导致漏报异常.  为了缓解这个问题, 本文提出了memory-augmented autoencoder(MemAE). 给定一个输入样本, MemAE首先使用编码器获得隐变量z, 然后使用z作为一个查询, 在memory中检索出与z最相近的条目, 然后将这些条目组合输入到解码器用于重构. 在训练阶段, memory中的内容不断更新. 在测试的使用, memory被固定, 不再更新. 这样做会使用重构的样本非常像正常的样本(训练的时候只有正常样本, 所以memory是用正常样本编码获得的.)  这样做可以使得异常样本的重构误差更大.  此外, MemAE不限定数据类型, 所以它适用于各种数据类型的异常检测.</p>
+<p>下图为检索数量为1的情况下的示意图:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201220151.png" alt="image-20201201220151716"></p>
+<h3 id="Memory-augmented-Autoencoder"><a href="#Memory-augmented-Autoencoder" class="headerlink" title="Memory-augmented Autoencoder"></a>Memory-augmented Autoencoder</h3><h4 id="1-Overview"><a href="#1-Overview" class="headerlink" title="1. Overview"></a>1. Overview</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201232017.png" alt="image-20201201232017450"></p>
+<p>模型有3个组成成分: encoder, decoder 和 memory.  给定一个输入, 首先编码获得隐变量z, 在训练的时候, 使用z去Memory中检索与z最像的一些记录, 然后将这些记录组合成新的隐变量$\hat{z}$, 然后传给解码器用于重构. </p>
+<p>在训练的时候, 编码器, 解码器优化的方向是最小化重构误差. Memory同时不断更新.</p>
+<p>在测试时, 输入一个测试样本, 只会使用Memory中的一些记录来重构. 这样的话, 重构样本会趋近与更像正常样本. 正常样本重构出来的重构误差更小, 异常样本的重构误差更大.</p>
+<h4 id="2-Enocder-and-Decoder"><a href="#2-Enocder-and-Decoder" class="headerlink" title="2.Enocder and Decoder"></a>2.Enocder and Decoder</h4><p>定义编码器为$f_{e}(\cdot): \mathbb{X} \rightarrow \mathbb{Z}$, 解码器为$f_{d}(\cdot): \mathbb{Z} \rightarrow \mathbb{X}$,  给定一个输入$x$, 首先通过编码器获得$z$, 然后从Memory中检索出$\hat{z}$, 然后经过解码器获得$\hat{x}$</p>
+<script type="math/tex; mode=display">
+\mathbf{z}=f_{e}\left(\mathbf{x} ; \theta_{e}\right)
+\\
+\widehat{\mathbf{x}}=f_{d}\left(\widehat{\mathbf{z}} ; \theta_{d}\right)</script><p>使用的损失函数为MSE: $e=|\mathbf{x}-\widehat{\mathbf{x}}|_{2}^{2}$</p>
+<h4 id="3-Memory-Module-with-Attention-based-Sparse-Addressing"><a href="#3-Memory-Module-with-Attention-based-Sparse-Addressing" class="headerlink" title="3.Memory Module with Attention-based Sparse Addressing"></a>3.Memory Module with Attention-based Sparse Addressing</h4><p>本文所提出的memory模块包括两个部分: 存储模块和检索模块.</p>
+<h5 id="3-1-Memory设计"><a href="#3-1-Memory设计" class="headerlink" title="3.1 Memory设计"></a>3.1 Memory设计</h5><p>memory是一个矩阵$\mathbf{M} \in \mathbb{R}^{N \times C}$, 包含$N$个向量, 每个向量的维度是$C$ , $z$的维度是$C$. 设$m_i$是M的第i行. 给定一个query(查询)$\mathbf{z} \in \mathbb{R}^{C}$,首先获得一个寻址向量$\mathbf{w} \in \mathbb{R}^{1 \times N}$,  获得$\hat{z}$的方式为:</p>
+<script type="math/tex; mode=display">
+\widehat{\mathbf{z}}=\mathbf{w} \mathbf{M}=\sum_{i=1}^{N} w_{i} \mathbf{m}_{i}</script><p>$w$是和为1的非负向量, 相当于$\hat{z}$是$m_i$的加权求和. 经过实验, 认为模型对$N$的取值不是很敏感, 一个足够大的$N$就能够在所有数据集上都取得较好的效果.</p>
+<h5 id="3-2-w的计算方式"><a href="#3-2-w的计算方式" class="headerlink" title="3.2 w的计算方式"></a>3.2 w的计算方式</h5><p>计算$w_i$:</p>
+<script type="math/tex; mode=display">
+w_{i}=\frac{\exp \left(d\left(\mathbf{z}, \mathbf{m}_{i}\right)\right)}{\sum_{j=1}^{N} \exp \left(d\left(\mathbf{z}, \mathbf{m}_{j}\right)\right)}</script><p>$d(\cdot, \cdot)$是距离度量, 本文使用的是余弦距离:</p>
+<script type="math/tex; mode=display">
+d\left(\mathbf{z}, \mathbf{m}_{i}\right)=\frac{\mathbf{z} \mathbf{m}_{i}^{\top}}{\|\mathbf{z}\|\left\|\mathbf{m}_{i}\right\|}</script><p>在训练的时候, 由于Memory的空间有限, MemAE通过使用有限的m组合来重构样本, 这样会迫使模型充分利用Memory, 使得Memory存储的是最具代表性的原型模式. 下图是使用9作为正常样本来训练MemAE, 并从Memory中随机选几个m, 经过解码之后重构出来的样本. 这张图是为了说明Memory中存储的是有代表性的原型模式. </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103206.png" alt="image-20201202103206688"></p>
+<p>在测试阶段, 给定训练好的Memory, 异常样本的重构也只能利用正常的m组合形成$\hat{z}$, 然后重构. 下图中, 左图是使用5来训练, 测试时输入9. 右图是使用2来训练, 测试时输入4. 重构出来的样本都很像是训练样本. </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103625.png" alt="image-20201202103625165"></p>
+<h5 id="3-3-稀疏寻址-硬收缩"><a href="#3-3-稀疏寻址-硬收缩" class="headerlink" title="3.3 稀疏寻址(硬收缩)"></a>3.3 稀疏寻址(硬收缩)</h5><p>作者指出, 如果w很稠密, 即w的每个分量都很小, 会导致多个m组合之后, 使用模型仍然具有较好的泛化性, 也有可能重构出异常样本. 为了缓解这个问题, 迫使w变得稀疏:</p>
+<script type="math/tex; mode=display">
+\widehat{w}_{i}=h\left(w_{i} ; \lambda\right)=\left\{\begin{array}{ll}
+w_{i}, & \text { if } w_{i}>\lambda \\
+0, & \text { otherwise }
+\end{array}\right.</script><p>简单来说是设定一个阈值$\lambda$, 小于$\lambda$就设为0.</p>
+<p>上式不容易反向传播, 修改为(continuous ReLU activation function):</p>
+<script type="math/tex; mode=display">
+\widehat{w}_{i}=\frac{\max \left(w_{i}-\lambda, 0\right) \cdot w_{i}}{\left|w_{i}-\lambda\right|+\epsilon}</script><p>根据经验, $\lambda$在区间$[1 / N, 3 / N]$内取值会取得比较理想的效果.</p>
+<p>经过以上压缩之后,重新标准化:$\widehat{w}_{i}=\widehat{w}_{i} /|\widehat{\mathbf{w}}|_{1}$.  这样一来, $\widehat{\mathbf{z}}=\widehat{\mathbf{w}} \mathbf{M}$</p>
+<p>以上的稀疏寻址操作有两个好处: 一是迫使Memory中的m是更具有代表性的原型; 二是降低模型泛化性导致异常样本也能重构的可能性.</p>
+<h5 id="3-4-训练"><a href="#3-4-训练" class="headerlink" title="3.4 训练"></a>3.4 训练</h5><p>损失函数包括两部分:</p>
+<p>一. 样本重构误差</p>
+<script type="math/tex; mode=display">
+R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)=\left\|\mathbf{x}^{t}-\widehat{\mathbf{x}}^{t}\right\|_{2}^{2}</script><p>二. 除上述的硬收缩之外, 通过损失函数使得w更加稀疏.</p>
+<p>​    考虑到$\hat{\mathbf{w}}$中的元素非负且$|\widehat{\mathbf{w}}|_{1}=1$, 最小化它的交叉熵就可以达到稀疏化的效果.</p>
+<script type="math/tex; mode=display">
+E\left(\widehat{\mathbf{w}}^{t}\right)=\sum_{i=1}^{T}-\widehat{w}_{i} \cdot \log \left(\widehat{w}_{i}\right)</script><p>总体的损失函数如下:</p>
+<script type="math/tex; mode=display">
+L\left(\theta_{e}, \theta_{d}, \mathbf{M}\right)=\frac{1}{T} \sum_{t=1}^{T}\left(R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)+\alpha E\left(\widehat{\mathbf{w}}^{t}\right)\right)</script><p>$\alpha$是调节权重的超参, 本文设定为0.0002</p>
+<h4 id="4-实验"><a href="#4-实验" class="headerlink" title="4 实验"></a>4 实验</h4><h5 id="4-1-图像数据"><a href="#4-1-图像数据" class="headerlink" title="4.1 图像数据"></a>4.1 图像数据</h5><p>平均AUC. </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202112919.png" alt="image-20201202112919657" style="zoom: 80%;" /></p>
+<h5 id="4-2-视频数据"><a href="#4-2-视频数据" class="headerlink" title="4.2 视频数据"></a>4.2 视频数据</h5><p>AUC:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114254.png" alt="image-20201202114254063" style="zoom: 50%;" /></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114413.png" alt="image-20201202114413583"></p>
+<h5 id="4-3-网络安全数据"><a href="#4-3-网络安全数据" class="headerlink" title="4.3 网络安全数据"></a>4.3 网络安全数据</h5><p> KDDCUP99 </p>
+<p>Each sample can be organized as a vector with 120 dimensions </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png" alt="image-20201202114638957"></p>
+<h5 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h5><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png" alt="image-20201202114807190"></p>
+<p>AE-ℓ1:最小化z的ℓ1范数.</p>
+<p>MemAE-nonSpar: 不做稀疏化处理</p>
+<p>MemAE w/o Shrinkage:没有硬收缩</p>
+<p>MemAE w/o Entropy loss:损失函数中没有交叉熵</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/anoGan-f-anoGan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/09/ZhangHongjun/anoGan-f-anoGan/" class="post-title-link" itemprop="url">张宏钧 anoGan</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 13:05:03" itemprop="dateModified" datetime="2021-01-06T13:05:03+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%A0%E5%AE%8F%E9%92%A7/" itemprop="url" rel="index"><span itemprop="name">张宏钧</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="anoGan"><a href="#anoGan" class="headerlink" title="anoGan"></a>anoGan</h2><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery</em></p>
+<p>2017, IPMI ( Information Processing in Medical Imaging ) </p>
+<p>生物医学影像与影像引导治疗系, 奥地利维也纳医科大学</p>
+<p>数据类型为医学影像, 光学相干层析成像(Optical Coherence tomography, OCT)技术</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027112727.png" alt="image-20201027112720144"></p>
+<h4 id="异常检测前提"><a href="#异常检测前提" class="headerlink" title="异常检测前提"></a>异常检测前提</h4><p>使用正常样本来训练生成器和判别器, 正常样本能够很好地被重构出来， 而异常样本不能被很好地重构出来。</p>
+<h4 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027153314.png" alt="image-20201027153314856"></p>
+<h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><p>生成器G, 将隐变量z经过一系列的反卷积操作, 生成样本.</p>
+<p>判别器D, 最后一层的激活函数是sigmoid, 输出一个概率, $\in[0,1 ]$, 越大代表判别器D认为输入的样本为真实的样本.</p>
+<p>使用健康人的样本来训练模型.  隐变量Z,服从标准正态分布.  采样z, 经过生成器G(z), 得到生成的图片G(z). 将生成的图片样本G(z) 和 健康人图片样本x, 一起输入到判别器D. </p>
+<p>训练步骤:</p>
+<ol>
+<li>将G(z), x 输入到判别器D,  根据以下目标函数更新判别器D的参数:</li>
+</ol>
+<script type="math/tex; mode=display">
+\max _{D} V(D, G)=\mathbb{E}_{\mathbf{x} \sim p_{\text {data}}(\mathbf{x})}[\log D(\mathbf{x})]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log (1-D(G(\mathbf{z})))]</script><p>​    意义是,  对于输入样本为真实样本x, 希望判别器的输出值趋近1; 对于输入样本为生成样本G(z), 希望判别器的输出值趋近于0.</p>
+<ol>
+<li>固定判别器D的参数, 根据以下目标函数更新生成器G的参数:<script type="math/tex; mode=display">
+\min _{G} V(D, G)=\mathbb{E}_{\mathbf{x} \sim p_{\text {data}}(\mathbf{x})}[\log D(\mathbf{x})]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log (1-D(G(\mathbf{z})))]</script>意义是, 通过调整生成器G的参数,让生成的样本G(z)更像真实样本x, 让判别器D无法判别真实样本和生成样本.</li>
+</ol>
+<p>经过这样的对抗训练之后, 生成样本G(z)越来越像真实样本.</p>
+<h4 id="找到输入样本x对应的隐变量z"><a href="#找到输入样本x对应的隐变量z" class="headerlink" title="找到输入样本x对应的隐变量z"></a>找到输入样本x对应的隐变量z</h4><p>生成器G可以将隐变量z映射到x, $G(\mathbf{z})=\mathbf{z} \mapsto \mathbf{x}$. 如果给定x, 很难直接找到这个x对应的z, 使得G(z)看起来跟x很像. 为了找到最好的z,  固定生成器G的参数. 先随机采样一个$z_1$, 生成一个图像$G(z_1)$,  利于一个损失函数来提供梯度, 去更新$z_1$的系数, 更新后的位置设为$z_2$.  为了找到与输入图片样本x最相似的生成图片样本$G\left(\mathbf{z}_{\Gamma}\right)$, 需要经过迭代过程$\gamma=1,2, \ldots, \Gamma$.</p>
+<p>以上使用的损失函数, 包括两个部分:</p>
+<ol>
+<li><p><strong>Residual Loss</strong></p>
+<p>利用生成器G:生成样本和真实样本之间像素级别的差距.</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">
+\mathcal{L}_{R}\left(\mathbf{z}_{\gamma}\right)=\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|</script><ol>
+<li><p><strong>Discrimination Loss</strong></p>
+<p>利用判别器D: </p>
+<p>原始的版本:交叉熵损失</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{\hat{D}}\left(\mathbf{z}_{\gamma}\right) = -ylog(D(G(z_\gamma))) - (1-y)log(1-D(G(z_\gamma)))</script><p>   其中目标为1, 即希望判别器D不能判别出$G(z_\gamma)$为生成样本, 以上公式化简为:</p>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{\hat{D}}\left(\mathbf{z}_{\gamma}\right) = -ylog(D(G(z_\gamma)))</script><p>   本文改进的版本: 利用判别器的中间结果:</p>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{D}\left(\mathbf{z}_{\gamma}\right)=\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|</script><p>   其中$f(*)$为判别器的中间层的输出.</p>
+<p>综上,  寻找最优的$z$所用的损失函数为:</p>
+<script type="math/tex; mode=display">
+\mathcal{L}\left(\mathbf{z}_{\gamma}\right)=(1-\lambda) \cdot \mathcal{L}_{R}\left(\mathbf{z}_{\gamma}\right)+\lambda \cdot \mathcal{L}_{D}\left(\mathbf{z}_{\gamma}\right)</script><p>其中$\lambda$为权重, 本文设定为0.1 </p>
+<h4 id="异常检测"><a href="#异常检测" class="headerlink" title="异常检测"></a>异常检测</h4><p>定义异常分数, 利用以上的损失函数:</p>
+<script type="math/tex; mode=display">
+A(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot D(\mathbf{x})
+\\
+=(1-\lambda) \cdot \mathcal{L}_{R}\left(\mathbf{z}_{\Gamma}\right)+\lambda \cdot \mathcal{L}_{D}\left(\mathbf{z}_{\Gamma}\right)</script><h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027202802.png" alt="image-20201027112720144"></p>
+<p>第一,二列为训练样本, 第三列为测试样本.  第一行为输入样本, 第二行为对应的生成样本, 第三行中的红色部分为异常分数较高的区域, 最后一行中的绿色区域为异常区域.</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027204822.png" alt="image-20201027204822072"></p>
+<p><strong>图a</strong>: 不同的模型的检测结果</p>
+<p>AnoGAN:$A(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot D(\mathbf{x})$</p>
+<p>$GAN_R$:$\hat{A}(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot \hat{D}(\mathbf{x})$</p>
+<p>$P_D$:  直接的D(x), 不经过生成器. </p>
+<p><strong>图b</strong>: 不同的部分的异常检测结果.</p>
+<p><strong>图c</strong>:Residual loss A(x) =$\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|$ 的分布</p>
+<p><strong>图d</strong>:Discrimination loss A(x) =$\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|$ 的分布</p>
+<p>其中蓝色为训练集, 绿色为测试集, 红色为异常样本.</p>
+<p>综上,  能够检测出异常的部分主要是$R(X)=\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|$,   </p>
+<p>$D(X)=\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|$能够稍微提升检测结果.</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>由于在训练的时候, 只使用了正常样本,</p>
+<p>对于生成器来说,  给定异常样本x, 重构出来的会很像是正常样本.</p>
+<p>对于判别器来说, 由于没有使用异常真实样本来训练,  不能将异常真实样本判定为真实样本. 只有正常真实样本, 才能判定为真实样本. </p>
+<h2 id="f-anoGan"><a href="#f-anoGan" class="headerlink" title="f-anoGan"></a>f-anoGan</h2><p><strong>Paper</strong>：<em>f-AnoGAN: Fast unsupervised anomaly detection with generative adversarial networks</em></p>
+<p>2019, Medical Image Analysis </p>
+<h4 id="anoGan的缺点"><a href="#anoGan的缺点" class="headerlink" title="anoGan的缺点"></a>anoGan的缺点</h4><p>在检测的时候, 为了找到输入样本x对应的隐变量$z_\Gamma$, 需要经过500次迭代. 为了加速检测, 提出了f-anoGan</p>
+<h4 id="新的网络结构"><a href="#新的网络结构" class="headerlink" title="新的网络结构"></a>新的网络结构</h4><p>原来的结构:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211838.png" alt="image-20201027211838605"></p>
+<p>为了在检测的时候, 快速找到输入样本x对应的隐变量$z_\Gamma$, 在训练好生成器G和判别器D之后, 固定G和D的参数, 加入编码器E:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211946.png" alt="image-20201027211946806"></p>
+<p>训练编码器E, 是的输入的样本x经过编码器E之后, 直接得到对应的隐变量z.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/" class="post-title-link" itemprop="url">张宏钧 DEEP SEMI-SUPERVISED ANOMALY DETECTION</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 13:05:22" itemprop="dateModified" datetime="2021-01-06T13:05:22+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%A0%E5%AE%8F%E9%92%A7/" itemprop="url" rel="index"><span itemprop="name">张宏钧</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION（2020-ICLR）"><a href="#DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION（2020-ICLR）" class="headerlink" title="DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）"></a>DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）</h3><h4 id="1-优点（解决的问题）。"><a href="#1-优点（解决的问题）。" class="headerlink" title="1.优点（解决的问题）。"></a>1.优点（解决的问题）。</h4><ul>
+<li><p>在半监督异常检测方法中，除了利用无标签的样本，大多数监督方法只利用了标记出来的正常样本，本方法同时利用的标记的正常样本和异常样本。</p>
+</li>
+<li><p>在Mnist，fashion-mnist、cifar-10和其他异常检测基准数据集上，与浅层的方法、混合的方法以及深度的方法比较， 效果相当或者比它们好。</p>
+</li>
+<li><p>使用很少的有标签样本能够明显提高效果。</p>
+</li>
+</ul>
+<h4 id="2-模型原理"><a href="#2-模型原理" class="headerlink" title="2. 模型原理"></a>2. 模型原理</h4><h5 id="2-1-SVDD（Support-Vector-Data-Description）支持向量数据描述"><a href="#2-1-SVDD（Support-Vector-Data-Description）支持向量数据描述" class="headerlink" title="2.1 SVDD（Support Vector Data Description）支持向量数据描述"></a>2.1 SVDD（Support Vector Data Description）支持向量数据描述</h5><p>一分类问题。训练出一个最小的超球面，将数据全部包起来。在识别新的数据时， 如果数据在球内，就属于这个类。</p>
+<p>实现思路：原始数据–高维表示–Min超球体积–求得c和R。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221831.png" alt="image-20200830221831085"></p>
+<h5 id="2-2-deep-SVDD"><a href="#2-2-deep-SVDD" class="headerlink" title="2.2 deep SVDD."></a>2.2 deep SVDD.</h5><p>同作者论文：Deep One-Class Classification, PMLR, 2018</p>
+<p>应用场景：Anomaly Detction</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830214926.png" alt="image-20200830214925996"></p>
+<p>使用神经网络来将数据映射到高维空间。</p>
+<p>超球体中心为C， 半径为R。</p>
+<p>目标：最小化超球面的体积， 正常的样本在球内，异常样本在球外。</p>
+<p>得到球体中心：利用autoencoder，使用所有样本训练autoencoder。 使用收敛之后的encoder部分作为初始化的网络， 同时将所有样本在encoder的输出的平均值作为超球体中心C。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831120602.png" alt="image-20200831120602081"></p>
+<p>目标函数：</p>
+<p>n个样本， $\Phi$是代表网络的函数， $x_i$是输入样本， $W$是网络权重。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830215431.png" alt="image-20200830215431541"></p>
+<p>预先定义球体中心C，迫使所有的样本向C靠拢，离球中心越远的样本越可能是异常样本。</p>
+<p>异常分数：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221730.png" alt="image-20200830221730565"></p>
+<h5 id="2-3-（本文）DEEP-SAD（deep-semi-supervised-anomaly-detection）"><a href="#2-3-（本文）DEEP-SAD（deep-semi-supervised-anomaly-detection）" class="headerlink" title="2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）"></a>2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）</h5><p>目标函数：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830222630.png" alt="image-20200830222630686"></p>
+<p>$\tilde{y}=-1$表示异常，$\tilde{y}=+1$表示正常。</p>
+<p>意义： 对于无标签的样本，尽量往球体中心靠拢； 对于便签为正常的样本， 尽量往球体中心靠拢； 对于便签为异常的样本， $\tilde{y}=-1$, 括号内的值越大越好， 也就是异常样本尽量远离球体中心。</p>
+<p>参数$\eta$与前一项分子上的1对应，控制有标签的样本和无标签的样本的影响， $\eta&gt;1$ 则侧重于有标签样本， $\eta &lt; 1$ 则侧重于无标签样本。</p>
+<h4 id="3-实验"><a href="#3-实验" class="headerlink" title="3.实验"></a>3.实验</h4><h5 id="3-1对比实验："><a href="#3-1对比实验：" class="headerlink" title="3.1对比实验："></a>3.1对比实验：</h5><p>shallow unsupervised baselines：</p>
+<ul>
+<li>OC-SVM</li>
+</ul>
+<p>deep unsupervised competitors：</p>
+<ul>
+<li>Deep SVDD</li>
+</ul>
+<p>浅层的半监督方法：</p>
+<ul>
+<li>shallow SSAD method</li>
+</ul>
+<p>深层的自监督方法： 缺乏深层的自监督方法（同时利用标记的正常样本和异常样本），这里自行构建</p>
+<ul>
+<li>hybrid SSAD：自编码器和SSAD</li>
+</ul>
+<p>深层的自监督方法：只利用标记的正常样本。</p>
+<ul>
+<li>Semi-Supervised Deep Generative Model (SS-DGM)</li>
+</ul>
+<p>有监督方法：</p>
+<ul>
+<li>supervised deep classifier</li>
+</ul>
+<h5 id="3-2-实验场景"><a href="#3-2-实验场景" class="headerlink" title="3.2 实验场景"></a>3.2 实验场景</h5><p>MNIST, Fashion-MNIST, 以及 CIFAR-10都是十分类问题。设置其中一类为正常样本（无标签），其余九类构成异常样本池， 从池中抽取一下异常样本作为有便签异常样本。这样就满足假设：大多数无标签样本为正常样本（这里设置为全部无标签样本为正常样本）。</p>
+<h5 id="场景一：加入有便签的异常样本（不同比例）"><a href="#场景一：加入有便签的异常样本（不同比例）" class="headerlink" title="场景一：加入有便签的异常样本（不同比例）"></a>场景一：加入有便签的异常样本（不同比例）</h5><p>比例$\gamma_l=m/(n+m)$， </p>
+<p>m：有标签样本数量，n: 无标签样本数</p>
+<p>在取异常样本时，只从其中9个异常类别中的一类中选取，测试时同时使用9个异常类别。这样在测试时， 会有模型从没见过的异常类别。</p>
+<p>实验数量：对于每个$\gamma_l$, 进行10 * 9 = 90 次实验。</p>
+<p>结果： 90次实验AUC的均值和标准差。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831100546.png" alt="image-20200831100546365"></p>
+<p>$\gamma_l=0$, 退化为无监督问题。</p>
+<p>在数据较为复杂的CIFAR10上， 本文的Deep SAD 表现最好。</p>
+<p>hybrid SSAD表现也较好。</p>
+<h5 id="场景二：污染训练数据"><a href="#场景二：污染训练数据" class="headerlink" title="场景二：污染训练数据"></a>场景二：污染训练数据</h5><p>在无标签的正常样本中混入无标签异常样本。</p>
+<p>固定$\gamma_l=0.05$, 取不同的污染比列$\gamma_p$, </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831101617.png" alt="image-20200831101617372"></p>
+<p>原文：最鲁棒的是本文的Deep SAD</p>
+<p>观察:</p>
+<p>在Mnist和Fashion Mnist上，最好的反而是OC-SVM Hybrid。</p>
+<p>在CIFAR-10上最好是本文的Deep SAD。(数据较复杂)</p>
+<h5 id="场景三：不同的已知异常类别数"><a href="#场景三：不同的已知异常类别数" class="headerlink" title="场景三：不同的已知异常类别数"></a>场景三：不同的已知异常类别数</h5><p>已知异常类别数：$k_l$,</p>
+<p>选取异常样本方法：随机抽取$k_l$个样本。对于每个$k_l$, 做10次随机抽取，10个类别，共10*10=100次实验。</p>
+<p>结果：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831104502.png" alt="image-20200831104502119"></p>
+<p>训练时使用的异常类别越多，效果越好。</p>
+<p>总体而言，我们看到Deep SAD在更复杂的数据上特别有用。</p>
+<p>同时暴露了有监督分类的一个问题：在测试时出现没有见过的异常类型， 表现较差。</p>
+<h5 id="超参的影响"><a href="#超参的影响" class="headerlink" title="超参的影响"></a>超参的影响</h5><ul>
+<li><p>设定   有便签异常样本比例：$\gamma_l=0.05$，无标签样本污染比例：$\eta_p=0.1$,  已知异常类别数$k_l=1$,</p>
+<p>$\eta$的影响如下图， 结论：对$\eta$的变化是鲁棒的。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114314.png" alt="image-20200831114314276"></p>
+<ul>
+<li>隐表示的维度d    </li>
+</ul>
+<p>  <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831115723.png" alt="image-20200831115723567"></p>
+<p>  <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114942.png" alt="image-20200831114942261"></p>
+<p>  结论：d越大越好。</p>
+<h4 id="4-结论"><a href="#4-结论" class="headerlink" title="4.结论"></a>4.结论</h4><p>介绍了一个泛化的自监督方法（同时利用有标签的正常和异常样本）， 在同时获得有标签的正常和异常样本时， 本文方法是更好的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/Buzz/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/09/ZhangHongjun/Buzz/" class="post-title-link" itemprop="url">张宏钧 自编码器 异常检测</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 13:22:09" itemprop="dateModified" datetime="2021-01-06T13:22:09+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%A0%E5%AE%8F%E9%92%A7/" itemprop="url" rel="index"><span itemprop="name">张宏钧</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="自编码器-异常检测"><a href="#自编码器-异常检测" class="headerlink" title="自编码器-异常检测"></a>自编码器-异常检测</h2><h3 id="1-1-VAE"><a href="#1-1-VAE" class="headerlink" title="1.1 VAE"></a>1.1 VAE</h3><p><strong>Paper</strong>：<em>Variational Autoencoder based Anomaly Detection using Reconstruction Probability</em></p>
+<p> 2015，<a target="_blank" rel="noopener" href="https://scholar.google.com/citations?user=ULc8ybUAAAAJ&amp;hl=zh-CN&amp;oi=sra">J An</a>, <a target="_blank" rel="noopener" href="https://scholar.google.com/citations?user=dEdyEc0AAAAJ&amp;hl=zh-CN&amp;oi=sra">S Cho</a> - Special Lecture on IE</p>
+<h4 id="1-1-1-autoencoder-based-anomaly-detection"><a href="#1-1-1-autoencoder-based-anomaly-detection" class="headerlink" title="1.1.1 autoencoder based anomaly detection"></a>1.1.1 autoencoder based anomaly detection</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021105152.png" alt="image-20201021105145861" style="zoom:67%;" /></p>
+<p>一般认为使用正常样本将编码器训练好之后，正常样本能够很好地被重构出来， 而异常样本不能被很好地重构出来。</p>
+<p>loss function:</p>
+<script type="math/tex; mode=display">
+E=\sum_{i=1}^{N}\left\|x^{(i)}-g_{\theta}\left(f_{\phi}\left(x^{(i)}\right)\right)\right\|</script><p>detection, anomaly score ( reconstrction error):</p>
+<script type="math/tex; mode=display">
+\operatorname{error}(i)=\left\|x^{(i)}-g_{\theta}\left(f_{\phi}\left(x^{(i)}\right)\right)\right\|</script><h4 id="1-1-2-Variational-autoencoder-based-anomaly-detection"><a href="#1-1-2-Variational-autoencoder-based-anomaly-detection" class="headerlink" title="1.1.2 Variational autoencoder based anomaly detection"></a>1.1.2 Variational autoencoder based anomaly detection</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021113221.png" style="zoom: 50%;" /></p>
+<p>一般假设z的先验分布是标准正态分布：</p>
+<script type="math/tex; mode=display">
+p_\theta z =\mathcal{N}(0, \mathrm{I})</script><p>z的后验分布是正态分布:</p>
+<script type="math/tex; mode=display">
+q_{\phi}(\mathbf{z} \mid \mathbf{x})=\mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{z}}, \boldsymbol{\sigma}_{\mathbf{z}}^{2} \mathbf{I}\right)</script><p>这个$\mu_{\mathbf{z}}$ 和 $\sigma _{\mathbf{z}}$ 就是编码器生成的z的均值和方差。</p>
+<p>解码器（decoder）输出的， 是x的后验分布  $p_{\theta}(\mathrm{x} \mid \mathrm{z})$，的均值， 在这个分布上采样， 才得到我们想要的重构后的$\vec{x}^{\prime}$。</p>
+<p>object function， 最小化以下函数 ：</p>
+<script type="math/tex; mode=display">
+E=\sum_{i=1}^{N}D_{K L}\left(q_{\phi}\left(z \mid x^{(i)}\right) \| p_{\theta}(z)\right)-\frac{1}{L} \sum_{l=1}^{L}\left(\log p_{\theta}\left(x^{(i)} \mid z^{(i, l)}\right)\right)</script><p><strong>其中，前一项</strong>， $D_{K L}\left(q_{\phi}\left(z \mid x^{(i)}\right) | p_{\theta}(z)\right)$，是z的近似后验分布 $q_{\phi}\left(z \mid x^{(i)}\right)$ ， 和z的先验分布 $p_\theta z =\mathcal{N}(0, \mathrm{I})$， 这两个分布的KL散度，放在损失函数里面，是希望 encoder 生成的z的后验分布 $q_{\phi}\left(z \mid x^{(i)}\right)$ ，逼近假设的z的先验分布 $p_\theta z =\mathcal{N}(0, \mathrm{I})$。</p>
+<p><strong>其中，后一项</strong>，$\frac{1}{L} \sum_{l=1}^{L}\left(\log p_{\theta}\left(x^{(i)} \mid z^{(i, l)}\right)\right)$， 用来度量输入样本x和x的后验分布的距离。用正态分布来举例：</p>
+<p>正态分布：</p>
+<script type="math/tex; mode=display">
+f(x)=\frac{1}{\sqrt{2 \pi} \sigma} \exp \left(-\frac{(x-\mu_x)^{2}}{2 \sigma^{2}}\right)</script><p>综上所述，在vae训练过程中，目标函数不仅约束了重构样本$\hat{x}$, 还约束了中间隐变量z，让z的分布往假设的先验分布$p_\theta z =\mathcal{N}(0, \mathrm{I})$靠近。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106132206049.png" alt="image-20210106132206049"></p>
+<p>在检测阶段，异常分数为：</p>
+<script type="math/tex; mode=display">
+score(i) =-\frac{1}{L} \sum_{l=1}^{L} p_{\theta}\left(x^{(i)} \mid \boldsymbol{\mu}_{\hat{\boldsymbol{x}}^{(i, l)}}, \boldsymbol{\sigma}_{\hat{\boldsymbol{x}}^{(i, l)}}\right)</script><p>重构的样本与输入样本越相近， 这个异常分数越小。设定一个阈值， 当这个重构概率大于阈值时， 就认为它是异常样本。</p>
+<h3 id="1-2-donut-VAE"><a href="#1-2-donut-VAE" class="headerlink" title="1. 2. donut(VAE)"></a>1. 2. donut(VAE)</h3><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications</em></p>
+<p>2018， 裴丹， The Web Conference 2018 - Proceedings of the World Wide Web Conference, WWW 2018</p>
+<p>关键词：周期性KPI</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021155142.png" alt="image-20201021154918466" style="zoom:67%;" /></p>
+<p>大体上还是VAE， 中间加了一些小技巧。</p>
+<p><strong>trick1：</strong>计算方差时使用soft plus</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021194859.png" alt="image-20201021194859135"></p>
+<p>一般的vae获得方差$\sigma$的方式：方差$\sigma &gt;= 0$, 隐藏层输出$h$不符合这个条件。可以假设$h = log \sigma$, 这样$\sigma = exp(h)$ 就满足大于等于0的条件。而在异常检测场景中，我们感兴趣的KPI的局部变化非常小，即$\sigma \rightarrow 0$, 导致$h \rightarrow -\infty$, 在计算的时候会问题。</p>
+<p>改用softplus：$\sigma_=\operatorname{SoftPlus}(h)+{\epsilon}=log(1+exp(h))+\epsilon$, 其中$\epsilon$是很小的，大于零的超参，本文设置为$\epsilon=10^{-4}$。</p>
+<p><strong>trick2：</strong>修改损失函数</p>
+<p>原来的vae目标函数为</p>
+<script type="math/tex; mode=display">
+=\mathbb{E}_{q_{\phi}(\mathrm{z} \mid \mathrm{x})}\left[\log p_{\theta}(\mathrm{x} \mid \mathrm{z})+\log p_{\theta}(\mathrm{z})-\log q_{\phi}(\mathrm{z} \mid \mathrm{x})\right]</script><p>考虑缺失点和异常值点, 修改目标函数为:</p>
+<script type="math/tex; mode=display">
+\tilde{\mathcal{L}}(\mathrm{x})=\mathbb{E}_{\boldsymbol{q}_{\phi}(\mathbf{z} \mid \mathbf{x})}\left[\sum_{\boldsymbol{w}=1}^{W} \alpha_{\boldsymbol{w}} \log p_{\theta}\left(x_{\boldsymbol{w}} \mid \mathbf{z}\right)+\beta \log p_{\theta}(\mathbf{z})-\log q_{\phi}(\mathbf{z} \mid \mathbf{x})\right]</script><p>$\alpha_w\in \left\{ 0,1 \right\} $, 正常点取1,异常点取0, $\beta$是放缩系数,$\beta=\left(\sum_{w=1}^{W} \alpha_{w}\right) / W$</p>
+<p><strong>trick3</strong>:检测时, 异常值和缺失值补全</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021203227.png" alt="image-20201021203227211"></p>
+<p>在一个窗口中,异常点和缺失点,先使用训练好的vae,经过M次迭代, 得到新的窗口序列, 然后再进行异常检测.</p>
+<p>效果: 降噪</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021210122.png" alt="image-20201021210122601"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021210218.png" alt="image-20201021210218109"></p>
+<p>甚至修复:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021211803.png" alt="image-20201021211803428"></p>
+<h3 id="1-3-bagel-CVAE"><a href="#1-3-bagel-CVAE" class="headerlink" title="1.3. bagel(CVAE)"></a>1.3. bagel(CVAE)</h3><p><strong>Paper</strong>：<em>Robust and Unsupervised KPI Anomaly Detection Based on Conditional Variational Autoencoder</em></p>
+<p>2018 ,裴丹， <em>2018 IEEE 37th International Performance Computing and Communications Conference, IPCCC</em></p>
+<p><strong>time information related anomalies</strong>:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021205159.png" alt="image-20201021205159731"></p>
+<p>如上图的周期性KPI, 在最右边的蓝色框内为正常序列, 但是前后被异常序列包围. 由于Donut是使用滑动窗口的方法采样,而且训练的时候是将样本顺序打乱之后输入到网络中,所以面对这样的样本时, 很容易出现虚假警报. 本文提出使用CVAE的方法, 引入时间信息来解决这个问题.</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021203757.png" alt="image-20201021203757438" style="zoom:67%;" /></p>
+<h3 id="2-buzz-adversarial-training-VAE"><a href="#2-buzz-adversarial-training-VAE" class="headerlink" title="2. buzz(adversarial training VAE)"></a>2. buzz(adversarial training VAE)</h3><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection for Intricate KPIs via Adversarial Training of VAE</em></p>
+<p>2019,裴丹， <em>Proceedings - IEEE INFOCOM</em></p>
+<p>以上介绍的方法, 都只适用于周期性的KPI. 本文的模型适用于复杂的kpi</p>
+<p><strong>复杂的kpi:</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022154945.png" alt="image-20201022154945274"></p>
+<p>KPI分为两种, 一种为周期平滑的KPI, 另外一种为复杂的KPI. 前者通常是服务级别的指标,比如每分钟交易次数. 后者是更加底层的指标,比如 每秒的I/O请求数量, 通常粒度更细.  通常可以认为, 周期性kpi的噪声是独立的高斯噪声, 而复杂KPI的噪声不是这种简单的高斯噪声.</p>
+<p>复杂的kpi 虽然局部的抖动很严重, 但是 总体上还是有一定的模式.</p>
+<p><strong>网络结构:</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022151230.png" alt="image-20201022151230779"></p>
+<p>window size=128, reshape: [8, 16], 然后卷积</p>
+<p><strong>训练流程:</strong></p>
+<p>两个超参数:s=32, b=8</p>
+<p>取时刻点集合$\mathcal{W}= \left\{w_{1}, w_{2}, \ldots, w_{b}\right\}$,  是一个mini_batch的时刻点集合. 满足一下条件:$w_{i}$是s的倍数,  这样, 每个单元的数据是$\mathbf{x}^{(w)}, \mathbf{x}^{(w+1)}, \ldots, \mathbf{x}^{(w+s-1)}$,</p>
+<p>训练过程中, 每经过40个epoch, 更新$s = s /2, b=b*2$, 直到$s=1$</p>
+<p><strong>目标函数:</strong></p>
+<p>最大化该函数</p>
+<p>令判别器为 $F$, 生成器为$G$,  </p>
+<script type="math/tex; mode=display">
+\tilde{\mathcal{L}}_{B u z z}=-\lambda \sup _{F}\left[\sum_{w \in \mathcal{W}}(|\mathcal{T}(F, w)|-\eta \mathcal{R}(F, w))\right]-\mathcal{K}-\log Z(\lambda)</script><p>其中一项:</p>
+<script type="math/tex; mode=display">
+\mathcal{K}=\frac{1}{b s} \sum_{w \in \mathcal{W}} \sum_{i=0}^{s-1} \mathrm{KL}\left[q_{\phi}\left(\mathbf{z} \mid \mathbf{x}^{(w+i)}\right) \| \mathcal{N}(\mathbf{0}, \mathbf{1})\right]</script><p>$\mathcal{K}$是隐变量$z$的先验分布和后验分布的KL散度, 意义是让z的后验分布往先验分布靠拢.</p>
+<p>其中另外一项:</p>
+<script type="math/tex; mode=display">
+\mathcal{T}(F, w)=\frac{1}{b s} \sum_{i=0}^{s-1} \mathbb{E}_{q_{\phi}\left(\mathbf{z} \mid \mathbf{x}^{(w+i)}\right)}\left[F\left(\mathbf{x}^{(w+i)}\right)-F(G(\mathbf{z}))\right]</script><p>目的是让判别器F, 判别原始样本$\mathbf{x}^{(w+i)}$, 判别生成的样本$G(\mathbf{z})$.两者的输出差距越大越好.</p>
+<p><strong>检测方法:</strong></p>
+<p>先用训练好的vae,重构x,得到$\overline{\mathbf{x}} \leftarrow \mathbf{x}$, 然后计算$\log p_{\theta}(\mathbf{x})-\log p_{\theta}(\overline{\mathbf{x}})$,</p>
+<script type="math/tex; mode=display">
+\log \frac{1}{L} \sum_{l=1}^{L}\left[\frac{p_{\theta}\left(\mathbf{x} \mid \mathbf{z}^{(l)}\right) p_{\theta}\left(\mathbf{z}^{(l)}\right)}{q_{\phi}\left(\mathbf{z}^{(l)} \mid \overline{\mathbf{x}}\right)}\right]-\log \frac{1}{L} \sum_{l=1}^{L}\left[\frac{p_{\theta}\left(\overline{\mathbf{x}} \mid \mathbf{z}^{(l)}\right) p_{\theta}\left(\mathbf{z}^{(l)}\right)}{q_{\phi}\left(\mathbf{z}^{(l)} \mid \overline{\mathbf{x}}\right)}\right]</script><p>结果:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022155242.png" alt="image-20201022155242807"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/" class="post-title-link" itemprop="url">徐伟 Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-23 23:38:20" itemprop="dateCreated datePublished" datetime="2020-11-23T23:38:20+08:00">2020-11-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 17:28:58" itemprop="dateModified" datetime="2021-01-06T17:28:58+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%90%E4%BC%9F/" itemprop="url" rel="index"><span itemprop="name">徐伟</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p>论文：<strong>Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning</strong></p>
+<p>会议：KDD 2019</p>
+<p>作者：</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122205649219.png" alt="image-20201122205649219"></p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><strong>时间序列预测问题</strong>是研究如何在历史观测的基础上准确地预测未来。提高预测精度有利于提高社会各方面的运行效率</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><blockquote>
+<p>本文提出了一种新颖的数据驱动方法来解决多水平概率预测任务，该任务可预测未来时间范围内时间序列的完整分布。本文说明，历史信息中隐藏的时间模式在长时间序列的准确预测中起着重要作用。传统的方法依赖于人工建立时间依赖关系来探索历史数据的相关模式，这在现实世界数据的长期序列预测中是不现实的。相反，<strong>本文提出显示地学习用深层神经网络构建隐藏模式表征，并关注历史的不同部分来预测未来。</strong></p>
+<p>本文提出了一个用于多水平时间序列预测的端到端深度学习的框架，通过时间注意机制，以更好地捕捉历史数据中的潜在模式。基于学习到的潜在模式特征，可以同时<strong>生成多个未来水平的多分位数的预测</strong>。本文还提出了一种多模式融合机制，该机制用于<strong>组合历史不同部分的特征以更好地预测未来</strong>。实验结果表明，本文的方法在两个不同领域的大型预测数据集上均实现了最先进的性能。</p>
+</blockquote>
+<h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><ol>
+<li>长期预测给基于LSTM的模型带来了挑战（局部动态来源于历史信息和未来的动态输入变量）</li>
+<li>有时需要预测目标的总体分布，以帮助企业决策。(分位数预测：一个典型的例子是，库存计划需要对产品的销售进行不同程度的高估，以降低库存缺货成本。根据每种产品的受欢迎程度和缺货成本，从预测分布中选择不同的高估水平)</li>
+</ol>
+<h3 id="分位数回归"><a href="#分位数回归" class="headerlink" title="分位数回归"></a>分位数回归</h3><p>分位数回归：分位数回归提出的原因，就是因为不希望仅仅是研究y的期望，而是希望能探索y的完整分布状况，</p>
+<p>ex1:</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122232538815.png" alt="image-20201122232538815" style="zoom:50%;" /></p>
+<p><em>具有分位数预测的现实世界在线销售数据上的销售预测示例。 显示了每月50,000种产品的平均日销售量。 考虑到洋红色线条所示的2018年1月至3月的历史每日销售额，任务是预测4月至6月。 黑线表示实际销售额； 深蓝色线表示分位数为0.5的预测； 蓝色阴影区域显示分位数预测为0.2和0.8。</em></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201124155629912.png" alt="image-20201124155629912" style="zoom:50%;" /></p>
+<h3 id="Contribution"><a href="#Contribution" class="headerlink" title="Contribution"></a>Contribution</h3><ol>
+<li><p>提出了一种用于多水平时间序列预测的端到端深度学习框架，该框架具有新颖的结构以更好地捕捉未来水平上的时间模式，能组合历史不同部分的特征以更好地预测未来，同时生成多分位数预测。</p>
+<blockquote>
+<p>这个想法是首先使用双向LSTM解码器在向前和向后两个方向上传播未来输入变量的信息，同时考虑诸如促销和日历事件之类的动态未来信息。然后在每个未来的时间步中，我们使用解码器隐藏状态关注历史的几个不同时期，并分别生成关注向量。我们将不同的历史时期视为不同的模式，通过学习每种模式在预测当前时间步长的相对重要性，我们将它们结合起来。组合特征，我们称为时间背景特征，结合历史信息和未来的背景信息，可以最好地描述当前的时间步</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><h3 id="Basic-encoder-decoder-structure"><a href="#Basic-encoder-decoder-structure" class="headerlink" title="Basic encoder-decoder structure"></a>Basic encoder-decoder structure</h3><p>本文采用这个序列到序列的学习流水线来编码历史(和未来)的输入变量，并对未来的预测进行解码</p>
+<p><strong>LSTM</strong>：将历史信息映射进潜在表示$h_{t-1}$: $h_{t}^{e}=L S T M^{e}\left(x_{t} ; h_{t-1}\right)$</p>
+<script type="math/tex; mode=display">
+\begin{aligned} i_{t} &=\sigma\left(W_{i x} x_{t}+W_{i m} m_{t-1}\right) \\ f_{t} &=\sigma\left(W_{f x} x_{t}+W_{f m} m_{t-1}\right) \\ o_{t} &=\sigma\left(W_{o x} x_{t}+W_{o m} m_{t-1}\right) \\ c_{t} &=f_{t} \cdot c_{t-1}+i_{t} \cdot \tanh \left(W_{c x} x_{t}+W_{c m} m_{t-1}\right) \\ h_{t} &=o_{t} \cdot \tanh \left(c_{t}\right) \end{aligned}</script><p>$x_{t}$为t时刻的输入， $h_{t}$为t时刻的隐藏状态</p>
+<h4 id="BiLSTM"><a href="#BiLSTM" class="headerlink" title="BiLSTM"></a>BiLSTM</h4><script type="math/tex; mode=display">
+\begin{aligned} h_{t}^{f} &=L S T M^{f}\left(x_{t} ; h_{t-1}\right) \\ h_{t}^{b} &=L S T M^{b}\left(x_{t} ; h_{t+1}\right) \\ h_{t} &=\left[h_{t}^{f} ; h_{t}^{b}\right] \end{aligned}</script><h4 id="quantile-predictions"><a href="#quantile-predictions" class="headerlink" title="quantile predictions"></a>quantile predictions</h4><p>分位数的预测（K维）</p>
+<script type="math/tex; mode=display">
+\begin{aligned} y_{t}^{e} &=W_{e} h_{t}^{e}+b_{e} \\ y_{t}^{d} &=W_{d} h_{t}^{d}+b_{d} \end{aligned}</script><h4 id="Structure"><a href="#Structure" class="headerlink" title="Structure"></a>Structure</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123205439202.png" alt="image-20201123205439202" style="zoom:35%;" /></p>
+<ol>
+<li>分为Encoder 和Decoder</li>
+<li>Encoder 编码历史信息，使用单向的LSTM对历史信息进行编码</li>
+<li>Decoder使用编码的历史信息作为初始状态，使用未来信息作为输入，生成未来序列的输出，采用的是双向的LSTM（使未来的每个时间片都能得到未来和过去的输入信息。）</li>
+<li>最后的预测应该在BiLSTM中信息传播之后进行，换句话说，并不使用之前时间步的预测结果来预测当前的时间步。将信息传播阶段与预测阶段分离的目的是为了防止误差积累，特别是对于长水平预测</li>
+</ol>
+<h3 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h3><p>由于LSTM记忆机制，需要不断的擦除旧的记忆，更新新的观测值，所以很难捕捉长程依赖。可以使用基于位置的注意力模型(position-based attention model)来捕捉历史数据中的伪周期模式。但是，他们的模型存在误差积累问题，同时需要动态的未来信息，这对预测精度有很大的影响。而且，他们的模型很难直接应用于长时间的历史，因为他们的注意力适用于整个历史，可能会被明显稀释</p>
+<h4 id="Stracture"><a href="#Stracture" class="headerlink" title="Stracture"></a>Stracture</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123232718614.png" alt="image-20201123232718614" style="zoom:40%;" /></p>
+<h4 id="Temporal-attention"><a href="#Temporal-attention" class="headerlink" title="Temporal attention"></a>Temporal attention</h4><p>在译码阶段，在每个未来时间步上使用BiLSTM hidden state来关注历史的不同部分，从而形成未来步的隐藏表示。没有关注整个历史，（1. 历史数据可能非常长， 2. 分别关注不同的时期，与多模态可以结合起来捕获周期信息）</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123232823979.png" alt="image-20201123232823979" style="zoom:40%;" /></p>
+<p><strong>公式：</strong></p>
+<script type="math/tex; mode=display">
+\begin{array}{l}\mathrm{g}=\mathrm{v}_{g}^{\top} \tanh \left(\mathrm{W}_{g} \mathrm{~s}_{t}+\mathrm{V}_{g} \mathrm{~h}+\mathrm{b}_{g}\right) \\ \gamma_{i}=\frac{\exp \left(g_{i}\right)}{\sum_{j=1}^{T_{h}} \exp \left(g_{j}\right)} \quad \text { for } i=1 \ldots T_{h}\end{array}</script><script type="math/tex; mode=display">
+\begin{aligned} \mathbf{c}_{t} &=\sum_{i=1}^{T_{h}} \gamma_{i} \mathbf{h}_{i} \\ \mathbf{d}_{t} &=\operatorname{ReLU}\left(\mathbf{W}_{d} \mathbf{c}_{t}+\mathbf{b}_{d}\right) \end{aligned}</script><h4 id="Multimodal-fusion"><a href="#Multimodal-fusion" class="headerlink" title="Multimodal fusion"></a>Multimodal fusion</h4><p>使用之前计算出的转换向量$\mathrm{d}_{t}^{m}$和BiLSTM隐藏状态$s_t$计算不同时间段的权值，进一步进行多模态的融合（这的多模态指的是不同的时期）。</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233028016.png" alt="image-20201123233028016" style="zoom:50%;" /></p>
+<p><strong>公式：</strong></p>
+<script type="math/tex; mode=display">
+\begin{aligned} \mathbf{p}_{t}^{m} &=\mathbf{v}_{p}^{\top} \tanh \left(\mathbf{W}_{p} \mathbf{s}_{t}+\mathbf{V}_{p}^{m} \mathbf{d}_{t}^{m}+\mathbf{b}_{p}\right) \\ \phi_{t}^{m} &=\frac{\exp \left(p_{t}^{m}\right)}{\sum_{k=1}^{M} \exp \left(p_{t}^{k}\right)} \quad \text { for } m=1 \ldots M \end{aligned}</script><p>最终得到：</p>
+<script type="math/tex; mode=display">
+\mathbf{x}_{t}=\sum_{m=1}^{M} \phi_{t}^{m} \mathbf{d}_{t}^{m}</script><h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><h4 id="D50K-Online-Sales-Forecasting"><a href="#D50K-Online-Sales-Forecasting" class="headerlink" title="D50K Online Sales Forecasting"></a>D50K Online Sales Forecasting</h4><p>本文从全球在线零售公司JD.com收集了庞大的现实世界在线销售数据集。 该数据集包括2014年至2018年在中国6个地区销售的不同产品的每日销售数据的50,000个时间序列。坐着感兴趣的是预测所有需求区域中所有产品感兴趣月份的每日需求量，并且感兴趣的是0.50到0.95的分位数预测</p>
+<p>由于必须同时考虑多个因素，例如产品类别，地理区域，促销等，因此销售预测具有挑战性。我们简要介绍可用功能，作为数据集中提供的历史和未来信息：</p>
+<ol>
+<li>配送中心id</li>
+<li>商品分类</li>
+<li>促销活动(促销活动假定是预先计划好的，因此可以作为历史和未来的输入变量)</li>
+<li>日历信息（节日等信息）</li>
+</ol>
+<p><strong>Loss</strong>:</p>
+<script type="math/tex; mode=display">
+L^{M A D}=\sum_{i} \sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{i t}-\hat{y}_{i t}^{q}\right)^{+}+(1-q)\left(\hat{y}_{i t}^{q}-y_{i t}\right)^{+}\right]</script><p>$i \in\{1,2, \ldots, 50,000\}$表示第i条序列</p>
+<p>$q \in\{0.5,0.6,0.7,0.8,0.9,0.95\}$表示预设的分位数</p>
+<p>$t$表示预测的未来时间步</p>
+<h4 id="GEFCom2014-Electricity-Price-Forecasting"><a href="#GEFCom2014-Electricity-Price-Forecasting" class="headerlink" title="GEFCom2014 Electricity Price Forecasting"></a>GEFCom2014 Electricity Price Forecasting</h4><p>2014年全球能源预测大赛(GEFCom2014)引入的电价预测任务评估模型。GEFCom2014价格预测数据集包含2011-01- 2013-12-31三年的小时电价。这项任务是在平均分配的12个评估周内提供未来24小时的预测。在此数据集中，基于小时的区域和总电力负荷估算是过去和未来信息中都可以使用的两个时间特征。</p>
+<p><strong>Loss</strong></p>
+<script type="math/tex; mode=display">
+L^{M A D}=\sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{t}-\hat{y}_{t}^{q}\right)^{+}+(1-q)\left(\hat{y}_{t}^{q}-y_{t}\right)^{+}\right]</script><h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><h4 id="Baseline"><a href="#Baseline" class="headerlink" title="Baseline"></a>Baseline</h4><ol>
+<li>Benchmark ：直接复制历史值作为将来的预测</li>
+<li>Gradient-Boosting:梯度提升机，这是一种用于回归和分类问题的经典机器学习方法。</li>
+<li>POS-RNN ：这是一种深度学习方法，将基于位置的注意力模型应用于序列的历史，并获得一个历史特征</li>
+<li>MQ-RNN：使用LSTM编码器将序列的历史总结为一个隐藏特征，并使用MLP对隐藏特征与所有未来输入变量一起对所有未来范围进行预测，避免了错误累计。</li>
+<li>TRMF：通过添加可衡量观察训练时间序列可能性的正则化项，将时间依赖性纳入矩阵分解模型中。本文采用他们选择的参数进行销售预测</li>
+</ol>
+<h4 id="Model-variants"><a href="#Model-variants" class="headerlink" title="Model variants"></a>Model variants</h4><ol>
+<li>BiLSTM-Enc-Dec(h=1)，BiLSTM-Enc-Dec(h=3)是上文提到了不包含Attention机制的 LSTM encoder and BiLSTM decoder模型，其中h表示模型编码的历史信息的周期数</li>
+<li>Single-Attention(h=1), 只涉及一个历史周期的Attention计算</li>
+<li>Multimodal-Attention(h=3)，接受三个时期的历史数据，并首先分别对它们进行多重关注，然后将它们与多模式融合相结合，</li>
+</ol>
+<h4 id="Experiment-results"><a href="#Experiment-results" class="headerlink" title="Experiment results"></a>Experiment results</h4><p><strong>分位数损失对比</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233425077.png" alt="image-20201123233425077" style="zoom:33%;" /></p>
+<ol>
+<li>Benchmark仅仅通过复制历史信息，就达到了 4.98的分位数损失</li>
+<li>POS-RNN由于使用attention挖掘历史信息，达到了2.95的分位数损失</li>
+<li>MQ-RNN要比POS-RNN更好，它独立输出每个未来的结果，并避免解码阶段的错误累积</li>
+<li>bi-lstm - ence - dec (h=1)和bi-lstm - ence - dec (h=3)超出了以前的方法，这多亏了使用BiLSTMdecoder，它可以向前和向后传播动态的未来信息(事件和促销)。</li>
+<li>通过结合注意机制，Single-Attention(h=1)模型将bi-lstm模型提高到2.14，而多注意(h=3)模型进一步提高到2.12，该模型使用了三个月的历史数据，并将注意应用于每个月。</li>
+</ol>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233441242.png" alt="image-20201123233441242" style="zoom:33%;" /></p>
+<p><strong>MSE对比</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201124234637201.png" alt="image-20201124234637201" style="zoom:33%;" /></p>
+<p>还将在CEFCom2014和JD50K数据集上，将本文的方法Single-Attention（h = 1）和Multimodal-Attention（h = 3）与具有均方误差（MSE）的基准和TRMF [32]进行了比较。 所示，在两个数据集上，本文提出的方法总是优于基准和TRMF超过20％，Multimodal-Attention（h = 3）优于Single-Attention（h = 1）约3％</p>
+<h4 id="Forecasts-visualization"><a href="#Forecasts-visualization" class="headerlink" title="Forecasts visualization"></a>Forecasts visualization</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201125134650866.png" alt="image-20201125134650866" style="zoom:50%;" /></p>
+<p>对电价预测方法进行了两周的评估。黑线表示实际价格;红色阴影区域的上下边界表示0.25和0.75的分位数的预测;黄色阴影区域的边界显示0.01和0.99分位数的预测。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/10/21/XuWei/Adaptive%20Graph%20Convolutional%20Recurrent%20Network%20for%20Traffic%20Forecasting/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/10/21/XuWei/Adaptive%20Graph%20Convolutional%20Recurrent%20Network%20for%20Traffic%20Forecasting/" class="post-title-link" itemprop="url">徐伟 Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-10-21 22:28:10" itemprop="dateCreated datePublished" datetime="2020-10-21T22:28:10+08:00">2020-10-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 17:28:44" itemprop="dateModified" datetime="2021-01-06T17:28:44+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%90%E4%BC%9F/" itemprop="url" rel="index"><span itemprop="name">徐伟</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p>论文：<strong>Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting</strong></p>
+<p>会议：NIPS 2020</p>
+<p>作者：</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201012210058579.png" alt="image-20201012210058579"></p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><blockquote>
+<p>在相关的时间序列数据中对复杂的空间和时间相关性进行建模对于理解交通动态并预测不断发展的交通系统的未来状态是必不可少的。 <strong>最近的工作专注于设计复杂的图神经网络，以借助预定义的图捕获共享模式。在本文中，作者认为，学习节点特定的模式对流量预测至关重要，同时可避免使用预定义的图</strong></p>
+<p>为此，本文提出了两个具有新功能的自适应模块来增强图卷积网络(GCN): <strong>1)一个节点自适应参数学习(NAPL)模块来捕获节点特定模式;2)数据自适应图生成(DAGG)模块，自动推导出不同交通序列之间的依赖关系。</strong></p>
+<p>我们进一步提出了一种自适应图卷积递推网络(AGCRN)，以自动捕获流量序列中细粒度的空间和时间相关性。我们在两个真实世界流量数据集上的实验表明，在没有预先定义空间连接图的情况下，AGCRN的表现明显优于最先进的技术</p>
+</blockquote>
+<h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><p><strong>特定模式</strong></p>
+<p>事实上，交通序列呈现出多种多样的模式(如图1所示)，由于不同数据源的属性不同，可能出现相似、不相似甚至矛盾的情况。下图具有不同模式的交通流示例。 白天，道路3的交通流量稳定。 相比之下，道路1,2和4的交通流量分别具有明显的傍晚高峰，早晨高峰和两个高峰。</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201012212333738.png" alt="image-20201012212333738" style="zoom:150%;" /></p>
+<p><strong>预先定义的图</strong></p>
+<p>此外，现有的基于GCN的方法需要通过相似性或距离度量[14]预先定义互连图以捕获空间相关性。 这进一步需要大量的领域知识，并且对图形质量敏感。 以这种方式生成的图形通常是直观的，不完整的，并且并非直接针对预测任务。 它们可能包含偏见，并且在没有适当知识的情况下无法适应领域</p>
+<h3 id="Contribution"><a href="#Contribution" class="headerlink" title="Contribution"></a>Contribution</h3><p>没有设计更复杂的网络体系结构，而是通过设计当前方法（GCN）的基本模块来分别解决上述问题，本文提出了两种简洁而有效的机制。 具体来说，本文使用两个自适应模块来增强GCN，以进行流量预测任务：</p>
+<ol>
+<li><p>节点自适应参数学习（NAPL）模块，用于学习每个流量系列的特定于节点的模式，NAPL对传统GCN中的参数进行分解，并根据节点嵌入从所有节点共享的权重池和偏差池中生成特定于节点的参数</p>
+</li>
+<li><p>一个数据自适应图生成(DAGG)模块，用于从数据中推断节点嵌入(属性)并在训练期间生成图</p>
+</li>
+</ol>
+<p><em>NAPL和DAGG是独立的，可以分别或联合用于现有的基于GCN的流量预测模型。 可以轻松地以端到端的方式学习模块中的所有参数。 此外，我们将NAPL和DAGG与递归网络相结合，并提出了统一的流量预测模型-AdaptiveGraph卷积递归网络（AGCRN）</em></p>
+<h2 id="Methodology"><a href="#Methodology" class="headerlink" title="Methodology"></a>Methodology</h2><h3 id="Problem-Definition"><a href="#Problem-Definition" class="headerlink" title="Problem Definition"></a>Problem Definition</h3><p><strong>N个相关单变量交通流量时间序列，长为t：</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{X}=\left\{\boldsymbol{X}_{:, 0}, \boldsymbol{X}_{:, 1}, \ldots, \boldsymbol{X}_{:, t}, \ldots\right\}</script><script type="math/tex; mode=display">
+\boldsymbol{X}_{:, t}=\left\{x_{1, l}, x_{2, l}, \ldots, x_{i, l}, \ldots x_{N, l}\right\}^{T} \in R^{N \times 1}</script><p><strong>图</strong></p>
+<script type="math/tex; mode=display">
+\mathcal{G}=(\mathcal{V}, \mathcal{E}, A)，\boldsymbol{A} \in R^{N \times N}</script><p><em>$\mathcal{V}$表示结点集合，<script type="math/tex">\mathcal{E}</script>表示边集合，<script type="math/tex">\boldsymbol{A}</script>是表示交通节点连接关系的邻接矩阵</em></p>
+<p><strong>目标：</strong></p>
+<p>使用过去<script type="math/tex">T</script>个时刻的交通流量数据，预测未来<script type="math/tex">\tau</script>个时刻的流量数据</p>
+<script type="math/tex; mode=display">
+\left\{\boldsymbol{X}_{:, t+1}, \boldsymbol{X}_{:, t+2}, \ldots, \boldsymbol{X}_{:, t+\tau}\right\}=\mathcal{F}_{\boldsymbol{\theta}}\left(\boldsymbol{X}_{:, t}, \boldsymbol{X}_{:, t-1}, \ldots, \boldsymbol{X}_{:, t-\boldsymbol{T}+\mathbf{1}}\right)</script><p><strong>problem</strong></p>
+<script type="math/tex; mode=display">
+\left\{\boldsymbol{X}_{:, t+1}, X_{:, t+2}, \ldots, X_{:, t+\tau}\right\}=\mathcal{F}_{\theta}\left(X_{:, t}, X_{:, t-1}, \ldots, X_{:, t-T+1} ; \mathcal{G}\right)</script><h3 id="Node-Adaptive-Parameter-Learning"><a href="#Node-Adaptive-Parameter-Learning" class="headerlink" title="Node Adaptive Parameter Learning"></a>Node Adaptive Parameter Learning</h3><h4 id="图卷积"><a href="#图卷积" class="headerlink" title="图卷积"></a>图卷积</h4><script type="math/tex; mode=display">
+Z=\left(I_{N}+D^{-\frac{1}{2}} A D^{-\frac{1}{2}}\right) X \Theta+\mathrm{b}</script><p><em>注</em></p>
+<p><em>$A \in R^{N \times N}$ 表示邻接矩阵， $D$表示度矩阵， $\boldsymbol{X} \in R^{N \times C},Z \in R^{N \times F}$表示图卷积层的输入和输出</em></p>
+<p><em>$\Theta \in R^{C \times F},\mathrm{b} \in R^{F}$表示图卷积的参数(weights and bias)</em></p>
+<p><strong>作用</strong></p>
+<p>使用共享的参数完成节点特征的变换：$\boldsymbol{X}^{i} \in R^{1 \times C} \text { to } Z^{i} \in R^{1 \times F}$</p>
+<p><strong>问题</strong></p>
+<p><strong>共享参数可能有助于在许多问题中学习所有节点中最突出的模式，并能显著减少参数数，但对于交通预测问题，我们发现共享参数不是最优的。</strong>除了封闭相关交通序列之间存在密切的空间相关性外，由于时间序列数据的动态适宜性以及节点的各种影响交通的因素，<strong>不同交通序列之间也存在着不同的模式。</strong>来自两个相邻节点的流量流也可能由于其特定属性(如PoI、天气)而在某一特定时段呈现不同的模式。另一方面，来自两个不相交节点的交通量甚至可能显示相反的模式。 <strong>结果，仅捕获所有节点之间的共享模式不足以进行准确的流量预测，并且必须为每个节点保持唯一的参数空间以学习特定于节点的模式。</strong></p>
+<h4 id="Node-Adaptive-Parameter-Learning-module"><a href="#Node-Adaptive-Parameter-Learning-module" class="headerlink" title="Node Adaptive Parameter Learning module"></a>Node Adaptive Parameter Learning module</h4><p><strong>为什么要用这个模块？</strong></p>
+<p>为每一个节点分配参数 =&gt; $\Theta \in R^{N \times C \times F}$，会导致参数量巨大难以优化，同时造成 over-fitting</p>
+<p><strong>方法</strong></p>
+<ol>
+<li>不直接学习$\Theta \in R^{N \times C \times F}$,设计一个可以学习的节点嵌入$\boldsymbol{E}_{G}$，以及权重池$W_{\mathcal{G}}$，来生成$\Theta$。</li>
+<li>理解为利用节点$i$的嵌入$E_{\mathcal{G}}^{i}$从权重池$W_{\mathcal{G}}$中提取参数$\Theta^{i}$,这样每个节点都能学到独立的模式</li>
+</ol>
+<script type="math/tex; mode=display">
+\boldsymbol{E}_{\boldsymbol{G}} \in R^{N \times d}, \boldsymbol{W}_{\boldsymbol{G}} \in R^{d \times C \times F}, d<<N</script><script type="math/tex; mode=display">
+\Theta=E_{\mathcal{G}} \cdot W_{\mathcal{G}}</script><script type="math/tex; mode=display">
+Z=\left(I_{N}+D^{-\frac{1}{2}} A D^{-\frac{1}{2}}\right) X E_{\mathcal{G}} W_{\mathcal{G}}+E_{\mathcal{G}} \mathrm{b}_{\mathcal{G}}</script><h3 id="Data-Adaptive-Graph-Generation"><a href="#Data-Adaptive-Graph-Generation" class="headerlink" title="Data Adaptive Graph Generation"></a>Data Adaptive Graph Generation</h3><p><strong>预定义的图存在的问题</strong></p>
+<ol>
+<li>预先定义的图不能包含关于空间依赖的完整信息</li>
+<li>不能保证预先定义的图与预测任务的直接关系</li>
+</ol>
+<p><strong>方法</strong></p>
+<p>随机初始化可学习的节点嵌入矩阵$\boldsymbol{E}_{\boldsymbol{A}} \in R^{N \times d_{e}}$，通过矩阵运算来得出节点之间的依赖关系</p>
+<p>使用DAGG的卷积公式如下所示：</p>
+<script type="math/tex; mode=display">
+D^{-\frac{1}{2}} A D^{-\frac{1}{2}}=\operatorname{softmax}\left(\operatorname{ReLU}\left(E_{A} \cdot E_{A}^{T}\right)\right)</script><script type="math/tex; mode=display">
+Z=\left(I_{N}+\operatorname{softmax}\left(\operatorname{Re} L U\left(E_{A} \cdot E_{A}^{T}\right)\right)\right) X \Theta</script><h3 id="Adaptive-Graph-Convolutional-Recurrent-Network"><a href="#Adaptive-Graph-Convolutional-Recurrent-Network" class="headerlink" title="Adaptive Graph Convolutional Recurrent Network"></a>Adaptive Graph Convolutional Recurrent Network</h3><p>集成NAPL-GCN、DAGG和门控循环单元(GRU)，以捕获流量级中特定节点的空间和时间相关性</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014002022667.png" alt="image-20201014002022667" style="zoom:53%;" /></p>
+<h2 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h2><h3 id="Datasets"><a href="#Datasets" class="headerlink" title="Datasets"></a>Datasets</h3><ol>
+<li><p>PeMSD4</p>
+<p>307个检测器</p>
+</li>
+<li><p>PeMSD8</p>
+<p>170个检测器</p>
+</li>
+</ol>
+<h3 id="Overall"><a href="#Overall" class="headerlink" title="Overall"></a>Overall</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014002201008.png" alt="image-20201014002201008" style="zoom:250%;" /></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014002339241.png" alt="image-20201014002339241"></p>
+<ol>
+<li>GCN对交通流量预测任务的重要性</li>
+<li>本文提出的模型实现了5%的提升</li>
+</ol>
+<h3 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014110846596.png" alt="image-20201014110846596"></p>
+<ul>
+<li>GCGRU：GCN+GRU的传统模型</li>
+<li>NAPL-GCGRU：使用本文提出的NAPL替换了传统GCN的模型</li>
+<li>DAGG-GCGRU：使用本文提出的DAGG替换了传统GCN中的预定义图</li>
+<li>AGCRN-I 所有模块的节点嵌入不共享</li>
+<li>AGCRN 节点嵌入在所有模块中共享</li>
+</ul>
+<ol>
+<li>NAPL-GCGRU胜过GCGRU，AGCRN-1胜过DAGG-GCGRU，这说明捕获特定于节点的模式的必要性。NAPL主要增强长期预测，对短期预测的影响较小。论文推测，其原因是长期预测缺乏来自历史观测的足够有用的信息，因此从NAPL模块学习到的特定节点嵌入中获益，从而推断出未来的模式</li>
+<li>DAGG-GCGRU提升了GCGRU, AGCRN-I打败了NAPL-GCGRU。两者都显示了DAGG在推断空间相关性方面的优势。证明并不一定需要预定义的图</li>
+<li>AGCRN的性能最好，说明我们可以共享所有模块的节点嵌入，并从数据中学习到每个节点统一的节点嵌入。</li>
+</ol>
+<h3 id="Model-Analysis"><a href="#Model-Analysis" class="headerlink" title="Model Analysis"></a>Model Analysis</h3><h4 id="Graph-Generation"><a href="#Graph-Generation" class="headerlink" title="Graph Generation"></a>Graph Generation</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014112913213.png" alt="image-20201014112913213"></p>
+<ul>
+<li>NAGG-r 去除了原本模型的中的自环连接</li>
+<li>NAGG-1 本文提出的方法</li>
+<li>NAGG-2 使用$D^{-\frac{1}{2}} A D^{-\frac{1}{2}}$模仿2阶切比雪夫多项式</li>
+</ul>
+<ol>
+<li>从DAGG中删除单位矩阵会严重损害预测性能，这表明在预测中手动突出显示自我信息的重要性</li>
+<li>DAGG-2和 DAGG-1的性能类似，表明生成的图拉普拉斯矩阵$D^{-\frac{1}{2}} A D^{-\frac{1}{2}}$具有与切比雪夫多项式展开式中的预定义图相似的属性</li>
+</ol>
+<h4 id="Embedding-Dimension"><a href="#Embedding-Dimension" class="headerlink" title="Embedding Dimension"></a>Embedding Dimension</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014113514138.png" alt="image-20201014113514138"></p>
+<h4 id="Computation-Cost"><a href="#Computation-Cost" class="headerlink" title="Computation Cost"></a>Computation Cost</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201014113434977.png" alt="image-20201014113434977"></p>
+<p>(dim = 10性能最好)</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/" class="post-title-link" itemprop="url">徐伟 Connecting the Dots Multivariate Time Series Forecasting with Graph Neural Networks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-24 16:15:40" itemprop="dateCreated datePublished" datetime="2020-09-24T16:15:40+08:00">2020-09-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-06 17:25:07" itemprop="dateModified" datetime="2021-01-06T17:25:07+08:00">2021-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%90%E4%BC%9F/" itemprop="url" rel="index"><span itemprop="name">徐伟</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p><strong>题目:</strong></p>
+<p><strong>Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks</strong></p>
+<p><strong>会议:</strong></p>
+<p>KDD 2020</p>
+<p><strong>作者:</strong><br><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007210738438.png" alt="image-20201007210738438"></p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><blockquote>
+<p>多元时间序列建模一直是一个热门主题，吸引了来自不同领域的研究人员，包括经济、金融和交通。多元时间序列预测背后的一个基本假设是，其变量相互依赖，但仔细观察，可以说现有方法无法完全利用变量对之间的潜在空间依赖性。同时，近年来，图神经网络（GNN）在处理关系依赖方面表现出了很高的能力。GNN需要用于信息传播的定义明确的图结构，这意味着它们无法直接应用于事先不知道相关性的多元时间序列。在本文中，我们<strong>提出了一个专门为多元时间序列数据设计的通用图神经网络框架</strong>。我们的方法<strong>通过图形学习模块自动提取变量之间的单向关系，可以轻松地将诸如变量属性之类的外部知识整合到其中</strong>。进一步<strong>提出了一种新颖的混合跳跃传播层和一个扩张的起始层来捕获时间序列内的空间和时间依赖性</strong>。在端到端框架中共同学习图学习，图卷积和时间卷积模块。实验结果表明，我们提出的模型在4个基准数据集中的3个方面优于最新的基线方法，并在提供额外结构信息的两个交通数据集上与其他方法相比具有同等的性能。</p>
+</blockquote>
+<h3 id="时空图神经网络"><a href="#时空图神经网络" class="headerlink" title="时空图神经网络"></a>时空图神经网络</h3><p><strong>图神经网络由于其置换不变性、局部连通性和组合性</strong>，在处理图数据方面取得了很大的成功。通过通过结构传播信息，<strong>图神经网络允许图中的每个节点都知道它的邻域</strong>。</p>
+<p>多元时间序列预测可以很自然地从图的角度来看待。<strong>多元时间序列中的变量可以看作是图中的节点，它们通过隐藏的依赖关系相互连接</strong>。因此，利用图神经网络对多变量时间序列数据进行建模是一种很有前途的方法，可以在充分利用时间序列之间的相关性的同时，保留多变量时间序列的时间轨迹。</p>
+<p><strong>最适合用于多变量时间序列的图神经网络类型是时空图神经网络</strong>。时空图神经网络以多元时间序列和外部图结构作为输入，预测多元时间序列的未来值或标签。与不利用结构信息的方法相比，时空图神经网络已经取得了显著的改进。</p>
+<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><p><strong>挑战1:未知的图形结构。</strong>现有的GNN方法很大程度上依赖于预先设定的图结构来进行时间序列预测。在大多数情况下，多元时间序列没有明确的图结构。变量之间的关系必须从数据中发现，而不是作为基本真理知识提供。</p>
+<p><strong>挑战2:图形学习与处理GNN学习。</strong>虽然有图结构，但大多数GNN方法只关注消息传递(GNN学习)，忽略了图结构不是最优的，需要在训练时进行更新。接下来的问题是如何在端到端框架中同时学习时间序列的图结构和GNN。</p>
+<h3 id="模型总结"><a href="#模型总结" class="headerlink" title="模型总结"></a>模型总结</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007211843231.png" alt="image-20201007211843231" style="zoom:50%;" /></p>
+<p><strong>框架由三个核心组件组成:图学习层、图卷积模块和时序卷积模块。</strong></p>
+<ul>
+<li>针对挑战1，我们提出了一种新的图学习层，它基于数据自适应地表达稀疏图邻接矩阵。此外，我们开发了一个图卷积模块来解决变量之间的空间依赖性，给定由图学习层计算的邻接矩阵。</li>
+<li>最后，我们提出了一个时间卷积模块，通过改进一维卷积来捕获时间模式。它既能发现多频率的时间模式，又能处理很长的序列。</li>
+<li>由于所有参数都可以通过梯度下降来学习，因此提出的框架能够以端到端的方式对多元时间序列数据进行建模并同时学习内部图形结构</li>
+<li>将时间序列划分成子组，适用于长短的时间序列任务</li>
+</ul>
+<h3 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h3><p><strong>如图1所示，我们的框架由三个核心组件组成:图学习层、图卷积模块和时序卷积模块。</strong></p>
+<p><strong>1.据我们所知，这是第一次使用图形神经网络从基于图形的角度对多变量时间序列数据进行研究。</strong></p>
+<p><strong>2.我们提出了一个新的图学习模块来学习变量之间隐藏的空间依赖关系。该方法为GNN模型在处理数据时不需要明确的图结构打开了一扇新的大门。</strong></p>
+<p><strong>3.我们提出了一个建模多元时间序列数据和学习图结构的联合框架。我们的框架比任何现有的时空图神经网络更通用，因为它可以处理多变量时间序列，无论是否使用预先修改过的图结构。</strong></p>
+<p><strong>4.实验结果表明，我们的方法在4个基准数据集中的3个数据集上的性能优于现有的方法，并在两个提供额外结构信息的交通数据集上达到与其他GNNs相同的性能。</strong></p>
+<h3 id="FRAMEWORK-OF-MTGNN"><a href="#FRAMEWORK-OF-MTGNN" class="headerlink" title="FRAMEWORK OF MTGNN"></a>FRAMEWORK OF MTGNN</h3><p>图2所示，最高级别的MTGNN由学习层，m个图卷积模块，m个时间卷积模块和输出模块组成。 为了发现节点之间的隐藏关联，图学习层计算图邻接矩阵，该矩阵随后用作所有图卷积模块的输入。图卷积模块与时间卷积模块交错，分别捕获空间和时间相关性。  为了避免梯度消失的问题，将残余连接从时间卷积模块的输入添加到图卷积模块的输出。 在每个时间卷积模块之后添加跳过连接。 为了获得最终输出，输出模块将隐藏特征投影到所需的输出尺寸。 </p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007214453265.png" alt="image-20201007214453265"></p>
+<p><strong>时空卷积结合</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008100536371.png" alt="image-20201008100536371"></p>
+<p><em>红色是t时序卷积 蓝色是空间卷积</em></p>
+<h4 id="Graph-Learning-Layer"><a href="#Graph-Learning-Layer" class="headerlink" title="Graph Learning Layer"></a>Graph Learning Layer</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007220142608.png" alt="image-20201007220142608"></p>
+<p>$E$是随机的节点嵌入(可以进行预设。外部知识)，$\Theta$是模型参数</p>
+<h4 id="Graph-Convolution-Module"><a href="#Graph-Convolution-Module" class="headerlink" title="Graph Convolution Module"></a>Graph Convolution Module</h4><p>图卷积模块旨在将节点的信息与邻居的信息融合在一起，以处理图中的空间依赖性。 图卷积模块由两个混合跃点传播层组成，以分别处理通过每个节点的流入和流出信息。 通过将两个混合跳跃传播层的输出相加获得净流入信息。 下图显示了图卷积模块和mix-hop传播层的体系结构</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007220652954.png" alt="image-20201007220652954"></p>
+<h5 id="Mix-hop"><a href="#Mix-hop" class="headerlink" title="Mix-hop"></a>Mix-hop</h5><p>给定一个图邻接矩阵，我们提出了混合跳跃传播层来处理信息流在空间上相关的节点。 所提出的混合跳跃传播层包括两个步骤-信息传播步骤和信息选择步骤。GC module 通过A和A的转置来整合双向的信息</p>
+<p><strong>信息传播：</strong></p>
+<script type="math/tex; mode=display">
+\mathrm{H}^{(k)}=\beta \mathrm{H}_{i n}+(1-\beta) \tilde{\mathrm{A}} \mathrm{H}^{(k-1)}</script><p><strong>信息选择:</strong></p>
+<script type="math/tex; mode=display">
+\mathbf{H}_{o u t}=\sum_{i=0}^{K} \mathbf{H}^{(k)} \mathbf{W}^{(k)}</script><p>k是传播的深度，$\mathbf{H}_{i n}$表示上一层产生的输入隐状态，$\mathbf{H}_{out}$表示当前层的输出</p>
+<p><strong>信息传播</strong>通过k次卷积运算，计算了k-hop的邻居</p>
+<p><strong>信息选择</strong>则进行信息选择和整合</p>
+<h4 id="Temporal-Convolution-Module"><a href="#Temporal-Convolution-Module" class="headerlink" title="Temporal Convolution Module"></a>Temporal Convolution Module</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007221752735.png" alt="image-20201007221752735"></p>
+<p>sigmoid起着门控的作用，控制信息流入</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092338113.png" alt="image-20201008092338113"></p>
+<h3 id="多元时间序列的单步预测"><a href="#多元时间序列的单步预测" class="headerlink" title="多元时间序列的单步预测"></a>多元时间序列的单步预测</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092414037.png" alt="image-20201008092414037"></p>
+<h3 id="多元时间序列的多步预测"><a href="#多元时间序列的多步预测" class="headerlink" title="多元时间序列的多步预测"></a>多元时间序列的多步预测</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092456714.png" alt="image-20201008092456714"></p>
+<h3 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h3><p><strong>数据集：METR-LA</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092605904.png" alt="image-20201008092605904"></p>
+<h3 id="图学习方法对比"><a href="#图学习方法对比" class="headerlink" title="图学习方法对比"></a>图学习方法对比</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092637606.png" alt="image-20201008092637606"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
