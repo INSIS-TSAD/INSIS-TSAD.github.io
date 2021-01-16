@@ -184,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/Buzz/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/anoGan-f-anoGan/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -198,7 +198,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/12/09/ZhangHongjun/Buzz/" class="post-title-link" itemprop="url">张宏钧 自编码器 异常检测</a>
+            <a href="/2020/12/09/ZhangHongjun/anoGan-f-anoGan/" class="post-title-link" itemprop="url">zhj anoGan</a>
         </h2>
 
         <div class="post-meta">
@@ -215,7 +215,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-06 13:22:09" itemprop="dateModified" datetime="2021-01-06T13:22:09+08:00">2021-01-06</time>
+                <time title="Modified: 2021-01-16 11:27:59" itemprop="dateModified" datetime="2021-01-16T11:27:59+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,7 +223,316 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%A0%E5%AE%8F%E9%92%A7/" itemprop="url" rel="index"><span itemprop="name">张宏钧</span></a>
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="anoGan"><a href="#anoGan" class="headerlink" title="anoGan"></a>anoGan</h2><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery</em></p>
+<p>2017, IPMI ( Information Processing in Medical Imaging ) </p>
+<p>生物医学影像与影像引导治疗系, 奥地利维也纳医科大学</p>
+<p>数据类型为医学影像, 光学相干层析成像(Optical Coherence tomography, OCT)技术</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027112727.png" alt="image-20201027112720144"></p>
+<h4 id="异常检测前提"><a href="#异常检测前提" class="headerlink" title="异常检测前提"></a>异常检测前提</h4><p>使用正常样本来训练生成器和判别器, 正常样本能够很好地被重构出来， 而异常样本不能被很好地重构出来。</p>
+<h4 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027153314.png" alt="image-20201027153314856"></p>
+<h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><p>生成器G, 将隐变量z经过一系列的反卷积操作, 生成样本.</p>
+<p>判别器D, 最后一层的激活函数是sigmoid, 输出一个概率, $\in[0,1 ]$, 越大代表判别器D认为输入的样本为真实的样本.</p>
+<p>使用健康人的样本来训练模型.  隐变量Z,服从标准正态分布.  采样z, 经过生成器G(z), 得到生成的图片G(z). 将生成的图片样本G(z) 和 健康人图片样本x, 一起输入到判别器D. </p>
+<p>训练步骤:</p>
+<ol>
+<li>将G(z), x 输入到判别器D,  根据以下目标函数更新判别器D的参数:</li>
+</ol>
+<script type="math/tex; mode=display">
+\max _{D} V(D, G)=\mathbb{E}_{\mathbf{x} \sim p_{\text {data}}(\mathbf{x})}[\log D(\mathbf{x})]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log (1-D(G(\mathbf{z})))]</script><p>​    意义是,  对于输入样本为真实样本x, 希望判别器的输出值趋近1; 对于输入样本为生成样本G(z), 希望判别器的输出值趋近于0.</p>
+<ol>
+<li>固定判别器D的参数, 根据以下目标函数更新生成器G的参数:<script type="math/tex; mode=display">
+\min _{G} V(D, G)=\mathbb{E}_{\mathbf{x} \sim p_{\text {data}}(\mathbf{x})}[\log D(\mathbf{x})]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log (1-D(G(\mathbf{z})))]</script>意义是, 通过调整生成器G的参数,让生成的样本G(z)更像真实样本x, 让判别器D无法判别真实样本和生成样本.</li>
+</ol>
+<p>经过这样的对抗训练之后, 生成样本G(z)越来越像真实样本.</p>
+<h4 id="找到输入样本x对应的隐变量z"><a href="#找到输入样本x对应的隐变量z" class="headerlink" title="找到输入样本x对应的隐变量z"></a>找到输入样本x对应的隐变量z</h4><p>生成器G可以将隐变量z映射到x, $G(\mathbf{z})=\mathbf{z} \mapsto \mathbf{x}$. 如果给定x, 很难直接找到这个x对应的z, 使得G(z)看起来跟x很像. 为了找到最好的z,  固定生成器G的参数. 先随机采样一个$z_1$, 生成一个图像$G(z_1)$,  利于一个损失函数来提供梯度, 去更新$z_1$的系数, 更新后的位置设为$z_2$.  为了找到与输入图片样本x最相似的生成图片样本$G\left(\mathbf{z}_{\Gamma}\right)$, 需要经过迭代过程$\gamma=1,2, \ldots, \Gamma$.</p>
+<p>以上使用的损失函数, 包括两个部分:</p>
+<ol>
+<li><p><strong>Residual Loss</strong></p>
+<p>利用生成器G:生成样本和真实样本之间像素级别的差距.</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">
+\mathcal{L}_{R}\left(\mathbf{z}_{\gamma}\right)=\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|</script><ol>
+<li><p><strong>Discrimination Loss</strong></p>
+<p>利用判别器D: </p>
+<p>原始的版本:交叉熵损失</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{\hat{D}}\left(\mathbf{z}_{\gamma}\right) = -ylog(D(G(z_\gamma))) - (1-y)log(1-D(G(z_\gamma)))</script><p>   其中目标为1, 即希望判别器D不能判别出$G(z_\gamma)$为生成样本, 以上公式化简为:</p>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{\hat{D}}\left(\mathbf{z}_{\gamma}\right) = -ylog(D(G(z_\gamma)))</script><p>   本文改进的版本: 利用判别器的中间结果:</p>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{D}\left(\mathbf{z}_{\gamma}\right)=\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|</script><p>   其中$f(*)$为判别器的中间层的输出.</p>
+<p>综上,  寻找最优的$z$所用的损失函数为:</p>
+<script type="math/tex; mode=display">
+\mathcal{L}\left(\mathbf{z}_{\gamma}\right)=(1-\lambda) \cdot \mathcal{L}_{R}\left(\mathbf{z}_{\gamma}\right)+\lambda \cdot \mathcal{L}_{D}\left(\mathbf{z}_{\gamma}\right)</script><p>其中$\lambda$为权重, 本文设定为0.1 </p>
+<h4 id="异常检测"><a href="#异常检测" class="headerlink" title="异常检测"></a>异常检测</h4><p>定义异常分数, 利用以上的损失函数:</p>
+<script type="math/tex; mode=display">
+A(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot D(\mathbf{x})
+\\
+=(1-\lambda) \cdot \mathcal{L}_{R}\left(\mathbf{z}_{\Gamma}\right)+\lambda \cdot \mathcal{L}_{D}\left(\mathbf{z}_{\Gamma}\right)</script><h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027202802.png" alt="image-20201027112720144"></p>
+<p>第一,二列为训练样本, 第三列为测试样本.  第一行为输入样本, 第二行为对应的生成样本, 第三行中的红色部分为异常分数较高的区域, 最后一行中的绿色区域为异常区域.</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027204822.png" alt="image-20201027204822072"></p>
+<p><strong>图a</strong>: 不同的模型的检测结果</p>
+<p>AnoGAN:$A(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot D(\mathbf{x})$</p>
+<p>$GAN_R$:$\hat{A}(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot \hat{D}(\mathbf{x})$</p>
+<p>$P_D$:  直接的D(x), 不经过生成器. </p>
+<p><strong>图b</strong>: 不同的部分的异常检测结果.</p>
+<p><strong>图c</strong>:Residual loss A(x) =$\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|$ 的分布</p>
+<p><strong>图d</strong>:Discrimination loss A(x) =$\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|$ 的分布</p>
+<p>其中蓝色为训练集, 绿色为测试集, 红色为异常样本.</p>
+<p>综上,  能够检测出异常的部分主要是$R(X)=\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|$,   </p>
+<p>$D(X)=\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|$能够稍微提升检测结果.</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>由于在训练的时候, 只使用了正常样本,</p>
+<p>对于生成器来说,  给定异常样本x, 重构出来的会很像是正常样本.</p>
+<p>对于判别器来说, 由于没有使用异常真实样本来训练,  不能将异常真实样本判定为真实样本. 只有正常真实样本, 才能判定为真实样本. </p>
+<h2 id="f-anoGan"><a href="#f-anoGan" class="headerlink" title="f-anoGan"></a>f-anoGan</h2><p><strong>Paper</strong>：<em>f-AnoGAN: Fast unsupervised anomaly detection with generative adversarial networks</em></p>
+<p>2019, Medical Image Analysis </p>
+<h4 id="anoGan的缺点"><a href="#anoGan的缺点" class="headerlink" title="anoGan的缺点"></a>anoGan的缺点</h4><p>在检测的时候, 为了找到输入样本x对应的隐变量$z_\Gamma$, 需要经过500次迭代. 为了加速检测, 提出了f-anoGan</p>
+<h4 id="新的网络结构"><a href="#新的网络结构" class="headerlink" title="新的网络结构"></a>新的网络结构</h4><p>原来的结构:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211838.png" alt="image-20201027211838605"></p>
+<p>为了在检测的时候, 快速找到输入样本x对应的隐变量$z_\Gamma$, 在训练好生成器G和判别器D之后, 固定G和D的参数, 加入编码器E:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211946.png" alt="image-20201027211946806"></p>
+<p>训练编码器E, 是的输入的样本x经过编码器E之后, 直接得到对应的隐变量z.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/" class="post-title-link" itemprop="url">zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:28:14" itemprop="dateModified" datetime="2021-01-16T11:28:14+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION（2020-ICLR）"><a href="#DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION（2020-ICLR）" class="headerlink" title="DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）"></a>DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）</h3><h4 id="1-优点（解决的问题）。"><a href="#1-优点（解决的问题）。" class="headerlink" title="1.优点（解决的问题）。"></a>1.优点（解决的问题）。</h4><ul>
+<li><p>在半监督异常检测方法中，除了利用无标签的样本，大多数监督方法只利用了标记出来的正常样本，本方法同时利用的标记的正常样本和异常样本。</p>
+</li>
+<li><p>在Mnist，fashion-mnist、cifar-10和其他异常检测基准数据集上，与浅层的方法、混合的方法以及深度的方法比较， 效果相当或者比它们好。</p>
+</li>
+<li><p>使用很少的有标签样本能够明显提高效果。</p>
+</li>
+</ul>
+<h4 id="2-模型原理"><a href="#2-模型原理" class="headerlink" title="2. 模型原理"></a>2. 模型原理</h4><h5 id="2-1-SVDD（Support-Vector-Data-Description）支持向量数据描述"><a href="#2-1-SVDD（Support-Vector-Data-Description）支持向量数据描述" class="headerlink" title="2.1 SVDD（Support Vector Data Description）支持向量数据描述"></a>2.1 SVDD（Support Vector Data Description）支持向量数据描述</h5><p>一分类问题。训练出一个最小的超球面，将数据全部包起来。在识别新的数据时， 如果数据在球内，就属于这个类。</p>
+<p>实现思路：原始数据–高维表示–Min超球体积–求得c和R。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221831.png" alt="image-20200830221831085"></p>
+<h5 id="2-2-deep-SVDD"><a href="#2-2-deep-SVDD" class="headerlink" title="2.2 deep SVDD."></a>2.2 deep SVDD.</h5><p>同作者论文：Deep One-Class Classification, PMLR, 2018</p>
+<p>应用场景：Anomaly Detction</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830214926.png" alt="image-20200830214925996"></p>
+<p>使用神经网络来将数据映射到高维空间。</p>
+<p>超球体中心为C， 半径为R。</p>
+<p>目标：最小化超球面的体积， 正常的样本在球内，异常样本在球外。</p>
+<p>得到球体中心：利用autoencoder，使用所有样本训练autoencoder。 使用收敛之后的encoder部分作为初始化的网络， 同时将所有样本在encoder的输出的平均值作为超球体中心C。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831120602.png" alt="image-20200831120602081"></p>
+<p>目标函数：</p>
+<p>n个样本， $\Phi$是代表网络的函数， $x_i$是输入样本， $W$是网络权重。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830215431.png" alt="image-20200830215431541"></p>
+<p>预先定义球体中心C，迫使所有的样本向C靠拢，离球中心越远的样本越可能是异常样本。</p>
+<p>异常分数：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221730.png" alt="image-20200830221730565"></p>
+<h5 id="2-3-（本文）DEEP-SAD（deep-semi-supervised-anomaly-detection）"><a href="#2-3-（本文）DEEP-SAD（deep-semi-supervised-anomaly-detection）" class="headerlink" title="2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）"></a>2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）</h5><p>目标函数：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830222630.png" alt="image-20200830222630686"></p>
+<p>$\tilde{y}=-1$表示异常，$\tilde{y}=+1$表示正常。</p>
+<p>意义： 对于无标签的样本，尽量往球体中心靠拢； 对于便签为正常的样本， 尽量往球体中心靠拢； 对于便签为异常的样本， $\tilde{y}=-1$, 括号内的值越大越好， 也就是异常样本尽量远离球体中心。</p>
+<p>参数$\eta$与前一项分子上的1对应，控制有标签的样本和无标签的样本的影响， $\eta&gt;1$ 则侧重于有标签样本， $\eta &lt; 1$ 则侧重于无标签样本。</p>
+<h4 id="3-实验"><a href="#3-实验" class="headerlink" title="3.实验"></a>3.实验</h4><h5 id="3-1对比实验："><a href="#3-1对比实验：" class="headerlink" title="3.1对比实验："></a>3.1对比实验：</h5><p>shallow unsupervised baselines：</p>
+<ul>
+<li>OC-SVM</li>
+</ul>
+<p>deep unsupervised competitors：</p>
+<ul>
+<li>Deep SVDD</li>
+</ul>
+<p>浅层的半监督方法：</p>
+<ul>
+<li>shallow SSAD method</li>
+</ul>
+<p>深层的自监督方法： 缺乏深层的自监督方法（同时利用标记的正常样本和异常样本），这里自行构建</p>
+<ul>
+<li>hybrid SSAD：自编码器和SSAD</li>
+</ul>
+<p>深层的自监督方法：只利用标记的正常样本。</p>
+<ul>
+<li>Semi-Supervised Deep Generative Model (SS-DGM)</li>
+</ul>
+<p>有监督方法：</p>
+<ul>
+<li>supervised deep classifier</li>
+</ul>
+<h5 id="3-2-实验场景"><a href="#3-2-实验场景" class="headerlink" title="3.2 实验场景"></a>3.2 实验场景</h5><p>MNIST, Fashion-MNIST, 以及 CIFAR-10都是十分类问题。设置其中一类为正常样本（无标签），其余九类构成异常样本池， 从池中抽取一下异常样本作为有便签异常样本。这样就满足假设：大多数无标签样本为正常样本（这里设置为全部无标签样本为正常样本）。</p>
+<h5 id="场景一：加入有便签的异常样本（不同比例）"><a href="#场景一：加入有便签的异常样本（不同比例）" class="headerlink" title="场景一：加入有便签的异常样本（不同比例）"></a>场景一：加入有便签的异常样本（不同比例）</h5><p>比例$\gamma_l=m/(n+m)$， </p>
+<p>m：有标签样本数量，n: 无标签样本数</p>
+<p>在取异常样本时，只从其中9个异常类别中的一类中选取，测试时同时使用9个异常类别。这样在测试时， 会有模型从没见过的异常类别。</p>
+<p>实验数量：对于每个$\gamma_l$, 进行10 * 9 = 90 次实验。</p>
+<p>结果： 90次实验AUC的均值和标准差。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831100546.png" alt="image-20200831100546365"></p>
+<p>$\gamma_l=0$, 退化为无监督问题。</p>
+<p>在数据较为复杂的CIFAR10上， 本文的Deep SAD 表现最好。</p>
+<p>hybrid SSAD表现也较好。</p>
+<h5 id="场景二：污染训练数据"><a href="#场景二：污染训练数据" class="headerlink" title="场景二：污染训练数据"></a>场景二：污染训练数据</h5><p>在无标签的正常样本中混入无标签异常样本。</p>
+<p>固定$\gamma_l=0.05$, 取不同的污染比列$\gamma_p$, </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831101617.png" alt="image-20200831101617372"></p>
+<p>原文：最鲁棒的是本文的Deep SAD</p>
+<p>观察:</p>
+<p>在Mnist和Fashion Mnist上，最好的反而是OC-SVM Hybrid。</p>
+<p>在CIFAR-10上最好是本文的Deep SAD。(数据较复杂)</p>
+<h5 id="场景三：不同的已知异常类别数"><a href="#场景三：不同的已知异常类别数" class="headerlink" title="场景三：不同的已知异常类别数"></a>场景三：不同的已知异常类别数</h5><p>已知异常类别数：$k_l$,</p>
+<p>选取异常样本方法：随机抽取$k_l$个样本。对于每个$k_l$, 做10次随机抽取，10个类别，共10*10=100次实验。</p>
+<p>结果：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831104502.png" alt="image-20200831104502119"></p>
+<p>训练时使用的异常类别越多，效果越好。</p>
+<p>总体而言，我们看到Deep SAD在更复杂的数据上特别有用。</p>
+<p>同时暴露了有监督分类的一个问题：在测试时出现没有见过的异常类型， 表现较差。</p>
+<h5 id="超参的影响"><a href="#超参的影响" class="headerlink" title="超参的影响"></a>超参的影响</h5><ul>
+<li><p>设定   有便签异常样本比例：$\gamma_l=0.05$，无标签样本污染比例：$\eta_p=0.1$,  已知异常类别数$k_l=1$,</p>
+<p>$\eta$的影响如下图， 结论：对$\eta$的变化是鲁棒的。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114314.png" alt="image-20200831114314276"></p>
+<ul>
+<li>隐表示的维度d    </li>
+</ul>
+<p>  <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831115723.png" alt="image-20200831115723567"></p>
+<p>  <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114942.png" alt="image-20200831114942261"></p>
+<p>  结论：d越大越好。</p>
+<h4 id="4-结论"><a href="#4-结论" class="headerlink" title="4.结论"></a>4.结论</h4><p>介绍了一个泛化的自监督方法（同时利用有标签的正常和异常样本）， 在同时获得有标签的正常和异常样本时， 本文方法是更好的。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/Buzz/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2020/12/09/ZhangHongjun/Buzz/" class="post-title-link" itemprop="url">zhj 自编码器 异常检测</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:28:06" itemprop="dateModified" datetime="2021-01-16T11:28:06+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
                 </span>
             </span>
 
@@ -355,7 +664,7 @@ score(i) =-\frac{1}{L} \sum_{l=1}^{L} p_{\theta}\left(x^{(i)} \mid \boldsymbol{\
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/" class="post-title-link" itemprop="url">徐伟 Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning</a>
+            <a href="/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/" class="post-title-link" itemprop="url">xw Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning</a>
         </h2>
 
         <div class="post-meta">
@@ -372,7 +681,7 @@ score(i) =-\frac{1}{L} \sum_{l=1}^{L} p_{\theta}\left(x^{(i)} \mid \boldsymbol{\
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-06 17:28:58" itemprop="dateModified" datetime="2021-01-06T17:28:58+08:00">2021-01-06</time>
+                <time title="Modified: 2021-01-16 11:27:11" itemprop="dateModified" datetime="2021-01-16T11:27:11+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -380,7 +689,7 @@ score(i) =-\frac{1}{L} \sum_{l=1}^{L} p_{\theta}\left(x^{(i)} \mid \boldsymbol{\
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BE%90%E4%BC%9F/" itemprop="url" rel="index"><span itemprop="name">徐伟</span></a>
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
                 </span>
             </span>
 
@@ -523,7 +832,7 @@ L^{M A D}=\sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{t}-\hat{y}_{t}^{q}\right)
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/10/21/XuWei/Adaptive%20Graph%20Convolutional%20Recurrent%20Network%20for%20Traffic%20Forecasting/" class="post-title-link" itemprop="url">徐伟 Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting</a>
+            <a href="/2020/10/21/XuWei/Adaptive%20Graph%20Convolutional%20Recurrent%20Network%20for%20Traffic%20Forecasting/" class="post-title-link" itemprop="url">xw Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting</a>
         </h2>
 
         <div class="post-meta">
@@ -540,7 +849,7 @@ L^{M A D}=\sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{t}-\hat{y}_{t}^{q}\right)
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-06 17:28:44" itemprop="dateModified" datetime="2021-01-06T17:28:44+08:00">2021-01-06</time>
+                <time title="Modified: 2021-01-16 11:26:58" itemprop="dateModified" datetime="2021-01-16T11:26:58+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -548,7 +857,7 @@ L^{M A D}=\sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{t}-\hat{y}_{t}^{q}\right)
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BE%90%E4%BC%9F/" itemprop="url" rel="index"><span itemprop="name">徐伟</span></a>
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
                 </span>
             </span>
 
@@ -699,7 +1008,7 @@ Z=\left(I_{N}+\operatorname{softmax}\left(\operatorname{Re} L U\left(E_{A} \cdot
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/" class="post-title-link" itemprop="url">徐伟 Connecting the Dots Multivariate Time Series Forecasting with Graph Neural Networks</a>
+            <a href="/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/" class="post-title-link" itemprop="url">xw Connecting the Dots Multivariate Time Series Forecasting with Graph Neural Networks</a>
         </h2>
 
         <div class="post-meta">
@@ -716,7 +1025,7 @@ Z=\left(I_{N}+\operatorname{softmax}\left(\operatorname{Re} L U\left(E_{A} \cdot
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-06 17:25:07" itemprop="dateModified" datetime="2021-01-06T17:25:07+08:00">2021-01-06</time>
+                <time title="Modified: 2021-01-16 11:27:04" itemprop="dateModified" datetime="2021-01-16T11:27:04+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -724,7 +1033,7 @@ Z=\left(I_{N}+\operatorname{softmax}\left(\operatorname{Re} L U\left(E_{A} \cdot
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BE%90%E4%BC%9F/" itemprop="url" rel="index"><span itemprop="name">徐伟</span></a>
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
                 </span>
             </span>
 
@@ -874,20 +1183,20 @@ Z=\left(I_{N}+\operatorname{softmax}\left(\operatorname{Re} L U\left(E_{A} \cdot
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

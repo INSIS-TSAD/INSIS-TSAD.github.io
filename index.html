@@ -184,6 +184,293 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/" class="post-title-link" itemprop="url">Untitled</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-16 11:23:08" itemprop="dateCreated datePublished" datetime="2021-01-16T11:23:08+08:00">2021-01-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-12 17:04:58" itemprop="dateModified" datetime="2021-01-12T17:04:58+08:00">2021-01-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="Diagnosing-Root-Causes-of-Intermittent-Slow-Queries-in-Large-Scale-Cloud-Databases"><a href="#Diagnosing-Root-Causes-of-Intermittent-Slow-Queries-in-Large-Scale-Cloud-Databases" class="headerlink" title="Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases"></a>Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases</h1><blockquote>
+<p>Proc. VLDB Endow. 13(8): 1176-1189 (2020)</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBXBF"><img src="https://s3.ax1x.com/2021/01/12/sJBXBF.png" alt="sJBXBF.png"></a></p>
+</blockquote>
+<p>tag：根因诊断，时间序列</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>随着云数据库市场的不断增长，检测和消除慢速查询对服务稳定性至关重要。以前的研究集中在优化由于内部原因(例如，编写得不好的sql)而导致的缓慢查询。</p>
+<p>在这项工作中，我们发现了一组不同的慢速查询，与其他慢速查询相比，这些查询对数据库用户的危害可能更大。我们将这种查询命名为<strong>间歇性慢速查询(iSQs)</strong>，因为它们通常是由外部的间歇性性能问题造成的(例如，在数据库或机器级别)。诊断iSQs的根本原因是一项艰巨但非常有价值的任务。</p>
+<p>本文提出<strong>iSQUAD（Intermittent Slow QUery Anomaly Diagnoser）</strong>，一个可以诊断iSQs的根本原因的框架，它对人工干预的需求比较松。</p>
+<p>面临的挑战：<strong>通用性、标签开销和可解释性</strong>。因此设计了四个组件：</p>
+<ul>
+<li>异常提取</li>
+<li>依赖清理</li>
+<li>面向类型的模式集成聚类(TOPIC)</li>
+<li>贝叶斯实例模型（Bayesian Case Model）</li>
+</ul>
+<p><strong>组成：</strong></p>
+<ul>
+<li>阶段一：离线聚类+解释</li>
+<li>阶段二：在线跟因诊断+更新</li>
+</ul>
+<p><strong>数据集：</strong>阿里巴巴OLTP数据库的真实数据集</p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>云数据库正在不断地发展，数据库中的服务中断或性能故障可能会导致严重的效率损失和品牌损失。因此，数据库总是处于不断的监控之中，检测和消除慢速查询对于服务的稳定性至关重要。</p>
+<p>大多数数据库系统，如MySQL、Oracle、SQL Server，会自动记录完成时间超过用户限制阈值的查询的详细信息。一些缓慢的查询是由<u>内部原因</u>造成的，比如复杂性、缺乏索引和SQL语句编写得很差，这些可以被自动分析和优化。</p>
+<p><strong>间歇性慢速查询(iSQs)：</strong>这些慢速查询是由<u>外部的</u>间歇性性能问题(例如，在数据库或机器级别)导致的。</p>
+<blockquote>
+<p><strong>造成损失严重，手动诊断费事费力</strong></p>
+<p>通常，iSQs是云数据库中性能问题甚至故障的主要症状。由于iSQs是断断续续的，服务开发人员和客户希望它们能够正常响应，而突然增加的延迟会产生巨大的影响。例如，在浏览网页时，iSQ可能导致网页加载延迟。据报道，亚马逊每0.1秒的加载延迟就会损失1%的销售额，而谷歌搜索结果每0.5秒的加载延迟就会导致的流量下降20%。我们获得了阿里巴巴OLTP数据库的数据库管理员在一年内注意到的几个性能问题记录:当一个性能问题发生时，一系列的isq持续几分钟。事实上，手动诊断iSQs的根本原因需要几十分钟，这既费时又容易出错。</p>
+</blockquote>
+<p>本文的工作目标：尽可能的减少人工干预来进行于数据库中iSQ的跟因诊断。以下是观察到的异常症状和跟因的一些记录：</p>
+<ul>
+<li><strong>数据库管理员需要扫描数百个关键性能指标来查找性能问题症状。</strong></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBqXT"><img src="https://s3.ax1x.com/2021/01/12/sJBqXT.png" alt="sJBqXT.png"  /></a></p>
+<ul>
+<li><p><strong>性能问题异常主要包括不同的kpi模式。</strong>我们总结了三组对称的KPI模式，即，<strong>突起突降，水平漂移（向上或向下），缺失</strong>。单纯基于检测KPI异常与否，我们无法准确诊断iSQs的根本原因。</p>
+</li>
+<li><p><strong>一个异常KPI通常伴随着另一个或多个异常KPI。</strong></p>
+</li>
+<li><p><strong>类似的异常与相同的根因相关。</strong>在每个根本原因类别中，性能问题的KPI症状彼此相似。</p>
+</li>
+</ul>
+<p>提出<strong>iSQUAD（Intermittent Slow QUery Anomaly Diagnoser）</strong>，其中，我们采用异常提取和依赖清理来代替传统的异常检测方法，以解决异常多样性的挑战。为了减少标记开销，提出了面向类型的模式集成聚类(TOPIC)，将具有相同根源的iSQ聚类在一起，同时考虑KPI和异常类型。在聚类可解释性方面，利用贝叶斯实例模型为每个聚类提取基于实例的表示，便于DBAs研究。</p>
+<p><strong>组成：</strong></p>
+<ul>
+<li><p>阶段一：离线聚类+解释</p>
+<p>获得聚类和跟因，用于在线阶段的诊断。数据库管理员只需要对每个聚类标记一次，除非在线阶段出现了新的类。</p>
+</li>
+<li><p>阶段二：在线跟因诊断+更新</p>
+</li>
+</ul>
+<p><strong>工作主要贡献：</strong></p>
+<ul>
+<li><p>基于云数据库中iSQs速度慢的问题，并设计了一个名为<strong>iSQUAD的可伸缩框架</strong>，该框架可以为iSQs提供准确而有效的根因诊断。它采用了机器学习技术，克服了在通用性、标识开销和可交互性等方面的挑战。</p>
+</li>
+<li><p><strong>异常提取</strong>：使用KPIs的异常提取来代替异常检测来区分异常类型。</p>
+</li>
+<li><p><strong>聚类</strong>：提出了一种新的聚类算法TOPIC来减少标记开销。</p>
+</li>
+<li><p>最先通过<strong>贝叶斯实例模型</strong>在数据库领域中应用和改进基于实例的推理，并将实例子空间表示推给DBAs用于标记。</p>
+</li>
+<li><p>我们对iSQUAD的评估进行了大量的实验，证明了我们的方法获得了平均F1-score 80.4%，较前一种技术提高了49.2%。此外，已经在真实的云数据库服务中部署了iSQUAD的原型。iSQUAD可以帮助DBAs在80分钟内找到数百个iSQs的全部10个根因，这比传统的逐例诊断快大约30倍。</p>
+</li>
+</ul>
+<h3 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h3><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><h5 id="阿里巴巴OLTP数据库"><a href="#阿里巴巴OLTP数据库" class="headerlink" title="阿里巴巴OLTP数据库"></a>阿里巴巴OLTP数据库</h5><p>支持的服务有淘宝、天猫、钉钉和菜鸟等。这个数据库包含了跨越几十个地理区域的十万个实际运行的实体，配备有一个度量系统用于收集日志和KPIs。</p>
+<h5 id="Intermittent-Slow-Queries-iSQs"><a href="#Intermittent-Slow-Queries-iSQs" class="headerlink" title="Intermittent Slow Queries (iSQs)"></a>Intermittent Slow Queries (iSQs)</h5><p><strong>查询时间</strong>：SQL查询被提交给数据库和其结果被数据库返回之间的时间。</p>
+<p><strong>iSQ：</strong>第$t$ 个SQL语句 $Q_t$，执行时间$X_t$,当$X_t&gt;z$且$P(X_i&gt;z)&lt;\epsilon$,其中$1&lt;=t,i&lt;=T$，z是一个iSQ的阈值。对于阿里数据库管理员设置：$z=1s,\epsilon=0.01,T=10^4$</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBbcV"><img src="https://s3.ax1x.com/2021/01/12/sJBbcV.png" alt="sJBbcV.png"></a></p>
+<blockquote>
+<p>图（a） 每条语句查询时间的概率分布，iSQs的占比0.0028</p>
+<p>图（b） 每条语句查询时间的概率分布，每条SQL语句都比较慢</p>
+</blockquote>
+<p>在慢速查询中，其他类型的慢速查询主要是由任务的复杂性造成的，通常是非交互和可容忍的(约占79%)，这些慢速查询可以通过添加索引或重写SQL语句等方式来进行优化。</p>
+<p>iSQs只占1%，但其影响非常大，比例很小，但是每天都会是成千上万的，处理优化这些异常有利于调高用户体验。</p>
+<h4 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h4><p>由于当出现性能问题时，许多正常的在线服务查询会受到影响，速度会比平时慢得多，所以，理解iSQs的根本原因对于缓解慢速查询很重要。</p>
+<ul>
+<li><p><strong>（需要多变量）KPIs对于定位iSQs的根本原因非常重要。</strong>单独的KPI不能捕获所有类型的问题，不同类型的KPI才能掌握跟踪整个系统的状态。</p>
+</li>
+<li><p><strong>（以前的工作并没有关注异常类型，仅关注<u>是否异常</u>）应该注意kpi的异常类型。</strong></p>
+<p>​    突起突降、水平漂移（向上或向下）、无效（缺失或为0）</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBH10"><img src="https://s3.ax1x.com/2021/01/12/sJBH10.png" alt="sJBH10.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBOnU"><img src="https://s3.ax1x.com/2021/01/12/sJBOnU.png" alt="sJBOnU.png"></a></p>
+<blockquote>
+<p>异常类型与异常跟因有关</p>
+<p>case1 实例1进行数据库备份，两个实例共享IO</p>
+<p>case2 只有一个物理机器，发生总体工作负载增加（闪购时间）</p>
+</blockquote>
+<ul>
+<li><p><strong>（序列之间的相关性、依赖性）KPIs间异常是高度相关的，</strong>其关系可能是单向，也可能双向。</p>
+</li>
+<li><p><strong>类似的KPI模式与相同的根本原因相关。</strong></p>
+<blockquote>
+<p>例：DBAs将异常跟因分为了10类，每种跟因中，有些KPI异常是相似的，可以相互替换，比如 sql-update和sql-delete引起的负载异常。</p>
+</blockquote>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBxAJ"><img src="https://s3.ax1x.com/2021/01/12/sJBxAJ.png" alt="sJBxAJ.png"></a></p>
+<h4 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h4><ul>
+<li>异常类型多样性</li>
+</ul>
+<blockquote>
+<p>之前的方法的局限性：目前的异常研究普遍忽略和过度概括了异常类型。这样的检测方法可能会在(监控数据)预处理阶段错误地检测出大量信息，从而降低(监控)数据集的质量。</p>
+</blockquote>
+<ul>
+<li>标签开销大：专家工作量大、过程复杂</li>
+</ul>
+<blockquote>
+<p>之前的方法的局限性：有复现跟因的方法——实际情况不允许；<u>自定义数据负载进行统计也是不现实的</u>（？）</p>
+</blockquote>
+<ul>
+<li>可解释的模型：模型的准确性和它对人类的可解释性之间存在不可避免的权衡。</li>
+</ul>
+<blockquote>
+<p>之前的方法的局限性：决策树，依赖于开始时提供精确的信息，因为即使是输入中的细微差别也可能导致大的树修改，此外，决策树还可能产生“分析瘫痪”的问题，即向决策者提供的信息过多，而不是关键要素。</p>
+</blockquote>
+<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><p>模型框架：<strong>iSQUAD (Intermittent Slow QUery Anomaly Diagnoser)</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDShR"><img src="https://s3.ax1x.com/2021/01/12/sJDShR.png" alt="sJDShR.png"></a></p>
+<ul>
+<li><p>离线阶段：对iSQs进行聚类，让专家更容易的识别标记跟因。</p>
+<p>异常提取—异常KPIs离散化—依赖清理—聚类—Bayesian Case Model（一个典型的iSQ和它的基本KPI矩阵作为特征空间）</p>
+</li>
+<li><p>在线阶段：输入iSQ和其对应的KPIs—异常提取—异常KPIs离散化—依赖清理—查询匹配一个跟因类—给DBAs展示解释异常（若未匹配，则分配到一个新类）</p>
+</li>
+</ul>
+<h3 id="iSQUAD细节设计"><a href="#iSQUAD细节设计" class="headerlink" title="iSQUAD细节设计"></a>iSQUAD细节设计</h3><h4 id="离线阶段：异常提取"><a href="#离线阶段：异常提取" class="headerlink" title="离线阶段：异常提取"></a>离线阶段：异常提取</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBzN9"><img src="https://s3.ax1x.com/2021/01/12/sJBzN9.png" alt="sJBzN9.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBH10"><img src="https://s3.ax1x.com/2021/01/12/sJBH10.png" alt="sJBH10.png"></a></p>
+<ul>
+<li><p>峰值：Robust Threshold（中位数和中位数绝对偏差值）（假设是柯西分布），时间间隔1h，阈值根据经验。</p>
+</li>
+<li><p>水平漂移：分成两个窗口，检验两个窗口分布是否相似，如果通过T-Test（一种用于测试两组平均差异的推断统计量）发现存在明显差异，则确定发生水平飘移。窗口30分钟，t值根据经验。</p>
+</li>
+</ul>
+<h4 id="离线阶段：依赖清理"><a href="#离线阶段：依赖清理" class="headerlink" title="离线阶段：依赖清理"></a>离线阶段：依赖清理</h4><p>目的：确保KPIs之间相互独立，这样就没有相关性或者过度表示。</p>
+<p><strong>相关指数（阈值）</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJD991"><img src="https://s3.ax1x.com/2021/01/12/sJD991.png" alt="sJD991.png"></a></p>
+<blockquote>
+<p>例子：CPU（实体和物理机器）</p>
+</blockquote>
+<h4 id="离线阶段：面向类型的模式集成聚类（Type-Oriented-Pattern-Integration-Clustering，TOPIC）"><a href="#离线阶段：面向类型的模式集成聚类（Type-Oriented-Pattern-Integration-Clustering，TOPIC）" class="headerlink" title="离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）"></a>离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）</h4><blockquote>
+<p>pattern：一个iSQ的封装的KPI特定组合</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDABD"><img src="https://s3.ax1x.com/2021/01/12/sJDABD.png" alt="sJDABD.png"></a></p>
+<p>两个iSQs之间的相似度：<a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDC1x"><img src="https://s3.ax1x.com/2021/01/12/sJDC1x.png" alt="sJDC1x.png"></a>t是KPI类型数目，T是总KPI类型数目</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDijK"><img src="https://s3.ax1x.com/2021/01/12/sJDijK.png" alt="sJDijK.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDZAH"><img src="https://s3.ax1x.com/2021/01/12/sJDZAH.png" alt="sJDZAH.png"></a></p>
+<h4 id="离线阶段：Bayesian-Case-Model-贝叶斯实例模型"><a href="#离线阶段：Bayesian-Case-Model-贝叶斯实例模型" class="headerlink" title="离线阶段：Bayesian Case Model 贝叶斯实例模型"></a>离线阶段：Bayesian Case Model 贝叶斯实例模型</h4><p>作用：从每个聚类中提取有用的和有启发性的信息，为DBAs打标签提供便利</p>
+<p>前提：离散化 标签（聚类的结果）</p>
+<h4 id="在线阶段：跟因检测和更新"><a href="#在线阶段：跟因检测和更新" class="headerlink" title="在线阶段：跟因检测和更新"></a>在线阶段：跟因检测和更新</h4><p>匹配：相似度最高的一个模式</p>
+<p>更新：匹配失败后，交给DBAs处理</p>
+<h3 id="评估"><a href="#评估" class="headerlink" title="评估"></a>评估</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p><strong>iSQs数据集</strong> 阿里OLTP数据集（随机的，一个任意一天的数据集 两个 周数据集）（一个实体上的每个时间戳只选一个iSQ）</p>
+<p><strong>KPIs数据集</strong> 发生在iSQ前后一小时的数据，粒度5秒</p>
+<p><strong>人工标记标记 （DBAs）</strong></p>
+<ul>
+<li>三个数据集上随机选取319个iSQs标记跟因 </li>
+</ul>
+<h4 id="评估分数"><a href="#评估分数" class="headerlink" title="评估分数"></a>评估分数</h4><ul>
+<li>F1-Score</li>
+<li>Weighted Average F1-score</li>
+<li>Clustering Accuracy </li>
+<li>Normalized Mutual Information （归一化互信息）</li>
+</ul>
+<h4 id="iSQUAD的准确性和效率"><a href="#iSQUAD的准确性和效率" class="headerlink" title="iSQUAD的准确性和效率"></a>iSQUAD的准确性和效率</h4><blockquote>
+<p>设置：对174个iSQs进行聚类，得到10个聚类，对剩下145进行测试</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDPc6"><img src="https://s3.ax1x.com/2021/01/12/sJDPc6.png" alt="sJDPc6.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDknO"><img src="https://s3.ax1x.com/2021/01/12/sJDknO.png" alt="sJDknO.png"></a></p>
+<blockquote>
+<p>iSQUAD在四个方面优于DBSherlock</p>
+<p>1）DBSherlock需要用户自定义或自动生成KPI的异常和正常间隔。其旨在解释异常间隔，而非时间戳</p>
+<p>2）DBSherlock根据<strong>平均值</strong>的差异是否超过一个阈值来区分两个部分，iSQUAD具有利用不同波动的异常提取功能</p>
+<p>3）DBSherlock不能消除KPIs之间的依赖关系</p>
+<p>4）DBSherlock利用因果模型提供纯文本解释不同，忽略了一部分异常类型和模式；iSQUAD使用了贝叶斯实例模型，以向DBAs显示可理解的实例子空间表示。</p>
+</blockquote>
+<h4 id="异常提取的性能"><a href="#异常提取的性能" class="headerlink" title="异常提取的性能"></a>异常提取的性能</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDeNd"><img src="https://s3.ax1x.com/2021/01/12/sJDeNd.png" alt="sJDeNd.png"></a></p>
+<blockquote>
+<p>时间计算：执行一个iSQ</p>
+<p>性能优的原因：包容性和通用性</p>
+</blockquote>
+<h4 id="依赖清理精度"><a href="#依赖清理精度" class="headerlink" title="依赖清理精度"></a>依赖清理精度</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDu9I"><img src="https://s3.ax1x.com/2021/01/12/sJDu9I.png" alt="sJDu9I.png"></a></p>
+<h4 id="TOPIC评估"><a href="#TOPIC评估" class="headerlink" title="TOPIC评估"></a>TOPIC评估</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJD1u8"><img src="https://s3.ax1x.com/2021/01/12/sJD1u8.png" alt="sJD1u8.png"></a></p>
+<blockquote>
+<p>层次聚类容易产生离群值效应，新模式的iSQ会被归类为离群值，而非新的一类。层次聚类需要预先设定聚类中心的个数。</p>
+<p>K-means集群也需要预先限定的集群数量。此外，它高度依赖于初始iSQ模式，因此不稳定。</p>
+<p>DBSCAN产生的集群是严重倾斜和分散</p>
+</blockquote>
+<h4 id="BCM评估"><a href="#BCM评估" class="headerlink" title="BCM评估"></a>BCM评估</h4><p><strong>BCM的影响：</strong>使用了iSQUAD后，减少了DBAs需要考虑的KPIs数量。减少诊断时间，是以前的30倍。</p>
+<p><strong>可视化平台：</strong>将贝叶斯实例模型嵌入可视化平台中，该可视化平台可以显示iSQ类的实例子空间表示及其跟因。在DBA选择iSQ类之后，该平台会立即显示相应的KPI，并输出这个iSQ类的根因。</p>
+<p><strong>用户研究</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDK3t"><img src="https://s3.ax1x.com/2021/01/12/sJDK3t.png" alt="sJDK3t.png"></a></p>
+<h3 id="案例及讨论"><a href="#案例及讨论" class="headerlink" title="案例及讨论"></a>案例及讨论</h3><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDMgP"><img src="https://s3.ax1x.com/2021/01/12/sJDMgP.png" alt="sJDMgP.png"></a></p>
+<blockquote>
+<p>人工：18min</p>
+<p>框架：40s</p>
+</blockquote>
+<p><strong>多跟因</strong>：1）挖掘更深层次的原因 2）多跟因的发生概率很小</p>
+<p><strong>iSQUAD的普遍性</strong> 很多场景适用</p>
+<p><strong>对不同原因的操作</strong></p>
+<p>（1）Scaling(#1，#2，#3，#5，#6)：增大资源</p>
+<p>（2）Limiting (#4, #8)：限制速率</p>
+<p>（3）Optimizing (#7, #9, #10)</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDQjf"><img src="https://s3.ax1x.com/2021/01/12/sJDQjf.png" alt="sJDQjf.png"></a></p>
+<h3 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h3><ul>
+<li><p>Slow Query Analysis</p>
+<p>自动化索引修改、机器学习算法调优数据库参数、深度学习提升查询</p>
+</li>
+<li><p>Anomaly Extraction</p>
+<p>二分类（即异常、正常）的异常检测方法：</p>
+<blockquote>
+<p>Opprentice</p>
+<p>dSPOT </p>
+<p>iSST </p>
+<p>雅虎的EGADS</p>
+<p>推特的S-H-ESD </p>
+<p>Netflix的RPCA</p>
+</blockquote>
+</li>
+<li><p>Clustering Algorithm</p>
+</li>
+<li><p>Root Cause Diagnosis</p>
+</li>
+</ul>
+<h3 id="未来工作"><a href="#未来工作" class="headerlink" title="未来工作"></a>未来工作</h3><p>作为未来的工作，我们的目标是在iSQUAD的基础上开发一个更通用的、更有能力的框架，自动化故障诊断和系统恢复。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -198,7 +485,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/" class="post-title-link" itemprop="url">宋钰丹 Bidirectional Learning for Time-series Models with Hidden Units</a>
+            <a href="/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/" class="post-title-link" itemprop="url">syd Bidirectional Learning for Time-series Models with Hidden Units</a>
         </h2>
 
         <div class="post-meta">
@@ -207,17 +494,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-07 14:20:10 / Modified: 14:28:02" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:26:27" itemprop="dateModified" datetime="2021-01-16T11:26:27+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%8B%E9%92%B0%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">宋钰丹</span></a>
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
                 </span>
             </span>
 
@@ -335,7 +628,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/" class="post-title-link" itemprop="url">宋钰丹 TWNet:a Dynamic Time Warping Network</a>
+            <a href="/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/" class="post-title-link" itemprop="url">syd TWNet:a Dynamic Time Warping Network</a>
         </h2>
 
         <div class="post-meta">
@@ -344,17 +637,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-07 14:20:10 / Modified: 14:27:50" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:26:42" itemprop="dateModified" datetime="2021-01-16T11:26:42+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%8B%E9%92%B0%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">宋钰丹</span></a>
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
                 </span>
             </span>
 
@@ -495,7 +794,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/" class="post-title-link" itemprop="url">宋钰丹 A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning</a>
+            <a href="/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/" class="post-title-link" itemprop="url">syd A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning</a>
         </h2>
 
         <div class="post-meta">
@@ -504,17 +803,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-07 14:20:10 / Modified: 14:26:59" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:26:34" itemprop="dateModified" datetime="2021-01-16T11:26:34+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%8B%E9%92%B0%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">宋钰丹</span></a>
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
                 </span>
             </span>
 
@@ -686,7 +991,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/07/SongYudan/%E3%80%90CVPR%202019%E3%80%91End-To-End%20Multi-Task%20Learning%20With%20Attention/" class="post-title-link" itemprop="url">宋钰丹 Multi-task learning</a>
+            <a href="/2021/01/07/SongYudan/%E3%80%90CVPR%202019%E3%80%91End-To-End%20Multi-Task%20Learning%20With%20Attention/" class="post-title-link" itemprop="url">syd Multi-task learning</a>
         </h2>
 
         <div class="post-meta">
@@ -695,17 +1000,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-07 14:20:10 / Modified: 14:30:34" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:26:20" itemprop="dateModified" datetime="2021-01-16T11:26:20+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AE%8B%E9%92%B0%E4%B8%B9/" itemprop="url" rel="index"><span itemprop="name">宋钰丹</span></a>
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
                 </span>
             </span>
 
@@ -828,7 +1139,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/" class="post-title-link" itemprop="url">邵世宽 NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY</a>
+            <a href="/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/" class="post-title-link" itemprop="url">ssk NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY</a>
         </h2>
 
         <div class="post-meta">
@@ -837,17 +1148,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-06 20:24:24 / Modified: 13:23:21" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:25:41" itemprop="dateModified" datetime="2021-01-16T11:25:41+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%82%B5%E4%B8%96%E5%AE%BD/" itemprop="url" rel="index"><span itemprop="name">邵世宽</span></a>
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
                 </span>
             </span>
 
@@ -983,7 +1300,7 @@ s_{NAP}(x)=||(\textbf{d}(x)-\mu_X)^TV\sum{^{-1}}||_2^2</script><p>​    其中$
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/" class="post-title-link" itemprop="url">邵世宽 Transfer Anomaly Detection by Inferring Latent Domain Representations</a>
+            <a href="/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/" class="post-title-link" itemprop="url">ssk Transfer Anomaly Detection by Inferring Latent Domain Representations</a>
         </h2>
 
         <div class="post-meta">
@@ -992,17 +1309,23 @@ s_{NAP}(x)=||(\textbf{d}(x)-\mu_X)^TV\sum{^{-1}}||_2^2</script><p>​    其中$
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-06 20:24:24 / Modified: 12:06:47" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:25:48" itemprop="dateModified" datetime="2021-01-16T11:25:48+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E9%82%B5%E4%B8%96%E5%AE%BD/" itemprop="url" rel="index"><span itemprop="name">邵世宽</span></a>
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
                 </span>
             </span>
 
@@ -1093,7 +1416,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/" class="post-title-link" itemprop="url">叶佳楠 Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)</a>
+            <a href="/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/" class="post-title-link" itemprop="url">yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)</a>
         </h2>
 
         <div class="post-meta">
@@ -1102,17 +1425,23 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-06 20:24:24 / Modified: 17:22:12" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:27:34" itemprop="dateModified" datetime="2021-01-16T11:27:34+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%8F%B6%E4%BD%B3%E6%A5%A0/" itemprop="url" rel="index"><span itemprop="name">叶佳楠</span></a>
+                  <a href="/categories/yjn/" itemprop="url" rel="index"><span itemprop="name">yjn</span></a>
                 </span>
             </span>
 
@@ -1284,7 +1613,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/" class="post-title-link" itemprop="url">焦泽辉 A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals</a>
+            <a href="/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/" class="post-title-link" itemprop="url">jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals</a>
         </h2>
 
         <div class="post-meta">
@@ -1293,17 +1622,23 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-06 20:24:24 / Modified: 17:31:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:24:04" itemprop="dateModified" datetime="2021-01-16T11:24:04+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%84%A6%E6%B3%BD%E8%BE%89/" itemprop="url" rel="index"><span itemprop="name">焦泽辉</span></a>
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
                 </span>
             </span>
 
@@ -1399,7 +1734,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/" class="post-title-link" itemprop="url">焦泽辉 A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification</a>
+            <a href="/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/" class="post-title-link" itemprop="url">jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification</a>
         </h2>
 
         <div class="post-meta">
@@ -1408,17 +1743,23 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2021-01-06 20:24:24 / Modified: 17:31:50" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:24:29" itemprop="dateModified" datetime="2021-01-16T11:24:29+08:00">2021-01-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%84%A6%E6%B3%BD%E8%BE%89/" itemprop="url" rel="index"><span itemprop="name">焦泽辉</span></a>
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
                 </span>
             </span>
 
@@ -1479,116 +1820,6 @@ p=\operatorname{softmax}\left(W_{c} v+b_{c}\right)</script><p>损失函数</p>
 <p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154317371.png" alt="image-20201006154317371"></p>
 <h4 id="Attention-权重"><a href="#Attention-权重" class="headerlink" title="Attention 权重"></a>Attention 权重</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006155249282.png" alt="image-20201006155249282"></p>
 <h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文提出了一种具有注意机制的分层双向GRU模型(H-A TT-BGRU)，用于学习脑电序列特征并对其进行跨受试者情感分类。随着脑电序列epoch长度的增加，我们的模型表现出比其他baseline模型更好的分类性能，表明该模型能够有效降低长期脑电序列非平稳性的影响，提高基于脑电的情感分类的准确性和鲁棒性。该模型将应用于未来开发鲁棒的情感脑机接口的应用。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/Deep%20Transfer%20Learning%20for%20Single-Channel%20Automatic%20Sleep%20Staging%20with%20Channel%20Mismatch/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/06/JiaoZehui/Deep%20Transfer%20Learning%20for%20Single-Channel%20Automatic%20Sleep%20Staging%20with%20Channel%20Mismatch/" class="post-title-link" itemprop="url">焦泽辉 Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-06 20:24:24 / Modified: 17:32:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%84%A6%E6%B3%BD%E8%BE%89/" itemprop="url" rel="index"><span itemprop="name">焦泽辉</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="Deep-Transfer-Learning-for-Single-Channel-Automatic-Sleep-Staging-with-Channel-Mismatch"><a href="#Deep-Transfer-Learning-for-Single-Channel-Automatic-Sleep-Staging-with-Channel-Mismatch" class="headerlink" title="Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch"></a>Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch</h1><p>[TOC]</p>
-<h2 id="文献信息"><a href="#文献信息" class="headerlink" title="文献信息"></a>文献信息</h2><p><strong>会议：</strong> 2019 27th European Signal Processing Conference (EUSIPCO)</p>
-<p><strong>作者：</strong> </p>
-<p>Huy Phan , Oliver Y. Chen, Philipp Koch, Alfred Mertins, and Maarten De Vos </p>
-<p><em>University of Kent, United Kingdom</em></p>
-<p><em>University of Oxford, United Kingdom</em></p>
-<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>​    许多睡眠研究都面临数据不足的问题，无法充分利用深层神经网络，因为不同的实验室使用不同的记录设置，因此需要在相当小的数据库上训练算法，然而，由于通道不匹配，大型的数据库不能直接进行数据补偿。本文提出了一种<strong>深度转移学习方法来克服通道不匹配问题</strong>，并将知识从一个大的数据集转移到一个小的队列中来研究单通道输入下的自动睡眠分期。我们采用最先进的SeqSleepNet并在源域（即大数据集）中训练网络。然后，在目标域（即小群体）中对预训练网络进行微调，完成知识转移。我们研究了源域和目标域之间存在轻微和严重通道不匹配的两种迁移学习场景。我们还研究微调完全或部分预训练的网络是否会影响目标域上睡眠分段的性能。<br>​    本研究以蒙特利尔睡眠研究档案馆（MASS）的200名受试者为源域，以20名受试者组成的Sleep-EDF扩展数据库作为目标域，我们的实验结果表明，所提出的深度转移学习方法在睡眠分期方面有显著的改善。此外，这些结果也揭示了微调预训练网络的特征学习部分以绕过信道失配问题的必要性。</p>
-<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Automatic sleep staging, deep learning, transfer learning, SeqSleepNet</strong></p>
-<h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><h3 id="深度学习的缺陷"><a href="#深度学习的缺陷" class="headerlink" title="深度学习的缺陷"></a>深度学习的缺陷</h3><p>深度学习已经成功地应用于许多领域，并受到睡眠研究界的广泛关注。深度学习具有自动表示学习理解大数据集的能力，显著提高了自动睡眠分期的性能，准确率达到睡眠专家手动评分的水平。</p>
-<p>然而，这种专家水平的表现只有在研究群体规模较大时才能获得，即数百到数千名受试者。原因是深层神经网络通常需要大量的数据来训练。在实践中，许多睡眠研究都有一个小群体，比如几十个研究对象，有时甚至更少，尤其是那些与睡眠障碍相关的研究或探索新的通道位置。</p>
-<p>当不同的研究使用不同的通道布局或可能探索新的电极放置时，会出现通道失配问题。此外，当研究调查一种特殊的睡眠异常时，这种情况也会发生，当模型只在健康志愿者身上进行训练时，可能会获得较差的表现。</p>
-<h3 id="我们的工作"><a href="#我们的工作" class="headerlink" title="我们的工作"></a>我们的工作</h3><p>我们提出了一种转移学习的方法来解决信道失配问题，使得从一个大数据库中有效地转移知识，从而在更小的数据集中利用深度神经网络来研究单通道睡眠分期。</p>
-<p>本研究以蒙特利尔睡眠研究档案馆（MASS）数据库为源域，以20名受试者为目标域的Sleep-EDF扩展数据库。SeqSleepNet是一种序列到序列的模型，它被用作基本模型。</p>
-<p>首先用源域数据训练网络，然后用目标域数据对网络进行微调。研究了两种情况：（1）源域为EEG信道，目标域为另一个EEG信道时，信道轻微不匹配的同态转移学习；（2）源域为EEG信道，目标域为EOG信道时，信道严重不匹配的跨模态转移学习。此外，我们研究了不同的微调策略，以深入了解不同通道失配条件下的深度转移学习。</p>
-<h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>本研究以MASS为源域。这个数据集包括200名年龄在18至76岁之间的受试者的整晚记录（97名男性和103名女性）。睡眠专家根据AASM标准（SS1和SS3子集）或R&amp;K标准（SS2、SS4和SS5子集）对记录的每个时期进行手动注释。</p>
-<p>我们转化为W,N1,N2,N3,REM。将20秒的epoch扩展为30秒的epoch。我们采用C4-A1脑电通道（C4-A1）作为源域数据。最初采样频率为256Hz的信号被降采样至100Hz。</p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/c5aebd1a996439c636198b015fde00b4c739f487.png@1320w_460h.webp" alt="img"></p>
-<p>我们采用SLEEP-EDF数据集中的（SC）子集作为目标域。它由20名年龄在25-34岁之间的受试者组成。采样频率为100Hz，每个受试者都可以获得随后两个白天和夜晚的PSG记录，只有一个受试者（受试者13）是一个晚上的数据。睡眠专家根据R&amp;K标准对每30秒的记录进行手动标记，分为八类{W，N1，N2，N3，N4，REM，MOVEMENT，UNKNOWN}。与之前的工作相似，N3和N4级合并为单个N3级。排除运动和未知类别。在同一通道和跨通道转移学习实验中，我们研究了Fpz-Cz-EEG通道和EOG通道。根据以前论文的建议，只包括了录音的床上部分（从熄灯时间到开灯时间）。</p>
-<h2 id="本文方法"><a href="#本文方法" class="headerlink" title="本文方法"></a>本文方法</h2><h3 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201211114218708.png" alt="image-20201211114218708"></p>
-<h3 id="图卷积"><a href="#图卷积" class="headerlink" title="图卷积"></a>图卷积</h3><script type="math/tex; mode=display">
-\mathbf{Z}=\hat{\mathbf{D}}^{-\frac{1}{2}} \hat{\mathbf{A}} \hat{\mathbf{D}}^{-\frac{1}{2}} \mathbf{X}^{T} \mathbf{W}</script><h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><script type="math/tex; mode=display">
-\begin{aligned} \mathcal{L}\left(\mathcal{X}_{S}, \mathcal{Y}_{S}, \mathcal{X}_{T}\right) &=\mathcal{L}_{C}\left(\mathcal{X}_{S}, \mathcal{Y}_{S}\right)+\lambda \mathcal{L}_{D A}\left(\mathcal{X}_{S}, \mathcal{X}_{T}\right) +\gamma \mathcal{L}_{C A}\left(\mathcal{X}_{S}, \mathcal{Y}_{S}, \mathcal{X}_{T}\right)+\eta \mathcal{L}_{T} \end{aligned}</script><p>​    Xs和Xt是源域和目标域提取的特征是由以下过程得到，X为CNN提取的样本特征，我们认为这是图信号，即图中每个节点的特征。图的邻接矩阵由DSA网络提取Xsc，然后乘以其转置矩阵得到邻接矩阵A。这样我们就有了A和X，可以进行图卷积。</p>
-<script type="math/tex; mode=display">
-\mathbf{X}=C N N\left(\mathbf{X}_{b a t c h}\right)
-\\\mathbf{X_{sc}}=D S A\left(\mathbf{X}_{b a t c h}\right)
-\\\hat{\mathbf{A}}=\mathbf{X}_{s c} \mathbf{X}_{s c}^{T}</script><h4 id="分类损失"><a href="#分类损失" class="headerlink" title="分类损失"></a>分类损失</h4><p>​        交叉熵损失</p>
-<script type="math/tex; mode=display">
-\mathcal{L}_{C}\left(\mathcal{X}_{S}, \mathcal{Y}_{S}\right)=\mathbb{E}_{(x, y) \sim D_{S}}[J(f(x), y)]</script><h4 id="域对齐损失"><a href="#域对齐损失" class="headerlink" title="域对齐损失"></a>域对齐损失</h4><script type="math/tex; mode=display">
-\begin{aligned} \mathcal{L}_{D A}\left(\mathcal{X}_{S}, \mathcal{X}_{T}\right) &=\mathbb{E}_{x \in D_{S}}[\log (1-D(G(x)))] +\mathbb{E}_{x \in D_{T}}[\log (D(G(x)))] \end{aligned}</script><h4 id="structure-aware-对齐损失"><a href="#structure-aware-对齐损失" class="headerlink" title="structure-aware 对齐损失"></a>structure-aware 对齐损失</h4><p>​        利用triplet loss来约束DSA结构。</p>
-<script type="math/tex; mode=display">
-\mathcal{L}_{T}=\max \left(\left\|\mathbf{X}_{s c_{a}}-\mathbf{X}_{s c_{p}}\right\|^{2}-\left\|\mathbf{X}_{s c_{a}}-\mathbf{X}_{s c_{n}}\right\|^{2}+\alpha_{T}, 0\right)</script><p>​        由于CNN的源特征和目标特征在训练初期具有区域区分性，同时构造图可能会影响网络训练的稳定性。因此，源图和目标图被单独构造并输入到参数共享的gcn中以学习表示。</p>
-<h4 id="类质心对齐损失"><a href="#类质心对齐损失" class="headerlink" title="类质心对齐损失"></a>类质心对齐损失</h4><script type="math/tex; mode=display">
-\mathcal{L}_{C A}\left(\mathcal{X}_{S}, \mathcal{Y}_{S}, \mathcal{X}_{T}, \mathcal{Y}_{T}\right)=\sum_{k=1}^{K} \phi\left(\mathcal{C}_{S}^{k}, \mathcal{C}_{T}^{k}\right)</script><p>​        距离度量函数选择的是欧氏距离。</p>
-<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h3 id="数据集-1"><a href="#数据集-1" class="headerlink" title="数据集"></a>数据集</h3><p><strong>Office-31</strong> 来自三个不同域的31个类中的4110个图像，三个域分别是亚马逊A、网络摄像头W和单反相机D。</p>
-<p><strong>ImageCrep-DA</strong> 是ImageCrep 2014域适应挑战赛的基准数据集，它包含以下三个公共数据集12个常见类别。每个数据集被视为一个域：Caltrch-256（C）、ImageNet ILSVRC 2012（I）和Pascal VOC 2012（P）。每个类别有50个图像，每个域有600个图像。</p>
-<p><strong>Office Home</strong> 包含4个域，每个域有65个类别，都是日常用品。具体而言，Art（Ar）是对象图像的艺术描绘，Clipart（Cl）表示剪贴画的图片集合，Product（Pr）显示背景清晰的物品图像。</p>
-<h3 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h3><p>我们使用0.9动量的随机梯度下降，学习速率按µp=µ0*(1+α·p)^β退火，其中µ0=0.01，α=10，β=0.75。我们将微调层的学习速率设置为学习率的0.1倍。<br>我们将每个域的batchs size设置为128。域对抗性系数损失0.1。</p>
-<h3 id="Office-31"><a href="#Office-31" class="headerlink" title="Office-31"></a>Office-31</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201207221738570.png" alt="image-20201207221738570"></p>
-<h3 id="ImageCLEF-DA"><a href="#ImageCLEF-DA" class="headerlink" title="ImageCLEF-DA"></a>ImageCLEF-DA</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201207221838366.png" alt="image-20201207221838366"></p>
-<h3 id="Office-home"><a href="#Office-home" class="headerlink" title="Office-home"></a>Office-home</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201207221903561.png" alt="image-20201207221903561"></p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>在本文中，我们提出了一种新的方法，在统一的深层网络中联合使用数据结构、域标签和类标签信息，以实现无监督域自适应。</p>
-<p>为了实现源域和目标域分布的鲁棒匹配，我们设计了三种有效的对齐机制，包括结构感知对齐、域对齐和类质心对齐。</p>
-<p>这三种对齐机制可以相互增强和互补，以学习目标任务的领域不变性和区分性表示。在标准域自适应数据集上的实验验证了该模型的有效性。</p>
 
       
     </div>
@@ -1673,20 +1904,20 @@ p=\operatorname{softmax}\left(W_{c} v+b_{c}\right)</script><p>损失函数</p>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-count">26</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
