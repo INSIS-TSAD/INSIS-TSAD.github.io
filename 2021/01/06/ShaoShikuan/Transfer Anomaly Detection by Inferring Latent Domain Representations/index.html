@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122173041877.png">
 <meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122173053750.png">
 <meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
-<meta property="article:modified_time" content="2021-01-16T03:25:48.402Z">
+<meta property="article:modified_time" content="2021-01-16T03:49:49.757Z">
 <meta property="article:author" content="INSIS">
 <meta property="article:tag" content="迁移学习">
 <meta property="article:tag" content="异常检测">
@@ -228,7 +228,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:25:48" itemprop="dateModified" datetime="2021-01-16T11:25:48+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:49:49" itemprop="dateModified" datetime="2021-01-16T11:49:49+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -260,6 +260,7 @@
       
         <h3 id="Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations"><a href="#Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations" class="headerlink" title="Transfer Anomaly Detection by Inferring Latent Domain Representations"></a>Transfer Anomaly Detection by Inferring Latent Domain Representations</h3><h5 id="作者：Atsutoshi-Kumagai，Tomoharu-Iwata"><a href="#作者：Atsutoshi-Kumagai，Tomoharu-Iwata" class="headerlink" title="作者：Atsutoshi Kumagai，Tomoharu Iwata"></a>作者：Atsutoshi Kumagai，Tomoharu Iwata</h5><h5 id="会议：NeurIPS-2019"><a href="#会议：NeurIPS-2019" class="headerlink" title="会议：NeurIPS 2019"></a>会议：NeurIPS 2019</h5><h5 id="贡献："><a href="#贡献：" class="headerlink" title="贡献："></a>贡献：</h5><p>​        使用源域的正常和异常实例或者仅使用正常实例训练自编码器，通过引入隐域向量(<em>latent domain vector</em>)(<em>域的隐表示，由每一个域的正常实例通过神经网络得到</em>)的概念，所提出的方法可以为目标域推断出异常检测器，而不需要在目标域中重新训练。</p>
 <p>​        每一个域的隐域向量都是由每个域的正常实例来得到的，每个域的异常分数函数由自编码器的偏差来建模，并且自编码器具体的域属性由隐域向量来控制。</p>
+<a id="more"></a>
 <p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201123164447.png" alt="微信截图_20201123164447" style="zoom:67%;" /></p>
 <h5 id="准备知识："><a href="#准备知识：" class="headerlink" title="准备知识："></a>准备知识：</h5><p>​        由于AE的简洁有效性，AE在最近的半监督异常检测中广泛使用，所以本文也使用AE作为所提出方法的基础。AE的用来训练的损失函数表示如下：</p>
 <script type="math/tex; mode=display">
@@ -399,7 +400,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -412,7 +413,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

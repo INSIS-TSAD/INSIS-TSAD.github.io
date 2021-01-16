@@ -44,7 +44,7 @@
 <meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208210742680.png">
 <meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208211105819.png">
 <meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
-<meta property="article:modified_time" content="2021-01-16T03:25:26.160Z">
+<meta property="article:modified_time" content="2021-01-16T03:49:09.265Z">
 <meta property="article:author" content="INSIS">
 <meta property="article:tag" content="异常检测">
 <meta name="twitter:card" content="summary">
@@ -238,7 +238,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:25:26" itemprop="dateModified" datetime="2021-01-16T11:25:26+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:49:09" itemprop="dateModified" datetime="2021-01-16T11:49:09+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -269,6 +269,7 @@
 
       
         <h1 id="Time-Series-Anomaly-Detection-Service-at-Microsoft-KDD’-2019"><a href="#Time-Series-Anomaly-Detection-Service-at-Microsoft-KDD’-2019" class="headerlink" title="Time-Series Anomaly Detection Service at Microsoft | [KDD’ 2019]"></a>Time-Series Anomaly Detection Service at Microsoft | <strong>[KDD’ 2019]</strong></h1><p><strong>摘要：</strong>大型公司需要实时监视其应用程序和服务中的各种<code>指标</code>（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于<strong>谱残差（SR）</strong>和<strong>卷积神经网络（CNN）</strong>的新算法。我们的工作是尝试将<strong>视觉显着性检测域中</strong>的SR模型首次迁移到时间序列异常检测中。此外，我们创新地将SR和CNN结合在一起以改善SR模型的性能。与公共数据集和Microsoft数据集的最新基准（只使用了周期相关的历史数据，没有使用上同周期相邻时刻的历史数据）模型相比，我们的方法获得了优异的实验结果。</p>
+<a id="more"></a>
 <h2 id="论文背景与意义"><a href="#论文背景与意义" class="headerlink" title="论文背景与意义"></a>论文背景与意义</h2><p><strong>异常检测</strong>旨在发现意外事件或数据中的稀有项。它在许多工业(以盈利为主的)应用中都很流行，并且它也是数据挖掘中的重要研究领域。准确的异常检测可以触发及时的故障排除，从而避免企业亏损，并维护了公司的声誉和品牌。为此，大公司开始建立异常检测服务来监视其业务，产品和服务的健康状况。例如，雅虎发布了EGADS系统 ，可以自动监视数百万个不同Yahoo属性的时间序列并发出警报。在Microsoft，我们构建了异常检测服务来监视例如Bing，Office和Azure等应用的数百万个指标，这使工程师能够更快地解决问题。然而在设计时序异常检测的工业服务时面临了许多挑战：</p>
 <p><strong>挑战1：缺乏标签</strong>。为了给单个业务场景提供异常检测服务，系统必须同时处理<strong>数百万</strong>个时间序列。用户没有简单的方法能够手动标记每个时间序列。而且，时间序列的数据分布是<strong>不断变化</strong>的，这要求系统能识别出以前从未出现过类似数据的模式。这使得有监督模型在工业场景中应用不足。</p>
 <p><strong>挑战2：泛化</strong>。需要监视来自<strong>不同业务场景</strong>的各种时间序列。如图1所示，有几种典型的时间序列模式类别。对于工业异常检测服务来说，在各种模式下正常工作是非常的重要。然而，对于不同的模式，现有的方法还没有得到足够的概括。例如，<code>Holt winters模型</code>（基于时间序列中当前已有的数据来预测其之后的走势）在（b）和（c）中总是表现出差的结果。 <code>Spot模型</code> 在（a）中总是表现出差的结果。因此，我们需要找到通用性更好的解决方案。</p>
@@ -356,8 +357,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/06/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/" rel="prev" title="gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
-      <i class="fa fa-chevron-left"></i> gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data
+    <a href="/2021/01/06/HuGanghui/Adversarial%20Graph%20Representation%20Adaptation%20for%20Cross-Domain%20Facial%20Expression%20Recognition/" rel="prev" title="hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition">
+      <i class="fa fa-chevron-left"></i> hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition
     </a></div>
       <div class="post-nav-item">
     <a href="/2021/01/06/JiaoZehui/Transfer%20Learning%20for%20EEG-Based%20Brain-Computer%20Interfaces%20A%20Review%20of%20Progress%20Made%20Since%202016/" rel="next" title="jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016">
@@ -435,7 +436,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -448,7 +449,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

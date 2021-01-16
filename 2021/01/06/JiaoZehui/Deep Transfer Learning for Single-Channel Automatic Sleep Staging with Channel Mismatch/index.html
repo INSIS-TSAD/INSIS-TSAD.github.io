@@ -19,12 +19,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
   </script>
 
-  <meta name="description" content="Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch[TOC] 文献信息会议： 2019 27th European Signal Processing Conference (EUSIPCO) 作者：  Huy Phan , Oliver Y. Chen, Philipp K">
+  <meta name="description" content="摘要​    许多睡眠研究都面临数据不足的问题，无法充分利用深层神经网络，因为不同的实验室使用不同的记录设置，因此需要在相当小的数据库上训练算法，然而，由于通道不匹配，大型的数据库不能直接进行数据补偿。本文提出了一种深度转移学习方法来克服通道不匹配问题，并将知识从一个大的数据集转移到一个小的队列中来研究单通道输入下的自动睡眠分期。我们采用最先进的SeqSleepNet并在源域（即大数据集）中训练网">
 <meta property="og:type" content="article">
 <meta property="og:title" content="jzh Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch">
 <meta property="og:url" content="http://example.com/2021/01/06/JiaoZehui/Deep%20Transfer%20Learning%20for%20Single-Channel%20Automatic%20Sleep%20Staging%20with%20Channel%20Mismatch/index.html">
 <meta property="og:site_name" content="时序论文分享">
-<meta property="og:description" content="Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch[TOC] 文献信息会议： 2019 27th European Signal Processing Conference (EUSIPCO) 作者：  Huy Phan , Oliver Y. Chen, Philipp K">
+<meta property="og:description" content="摘要​    许多睡眠研究都面临数据不足的问题，无法充分利用深层神经网络，因为不同的实验室使用不同的记录设置，因此需要在相当小的数据库上训练算法，然而，由于通道不匹配，大型的数据库不能直接进行数据补偿。本文提出了一种深度转移学习方法来克服通道不匹配问题，并将知识从一个大的数据集转移到一个小的队列中来研究单通道输入下的自动睡眠分期。我们采用最先进的SeqSleepNet并在源域（即大数据集）中训练网">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/c5aebd1a996439c636198b015fde00b4c739f487.png@1320w_460h.webp">
 <meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201211114218708.png">
@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201207221838366.png">
 <meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201207221903561.png">
 <meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
-<meta property="article:modified_time" content="2021-01-16T03:24:38.555Z">
+<meta property="article:modified_time" content="2021-01-16T03:45:25.839Z">
 <meta property="article:author" content="INSIS">
 <meta property="article:tag" content="迁移学习">
 <meta property="article:tag" content="EEG">
@@ -227,7 +227,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:24:38" itemprop="dateModified" datetime="2021-01-16T11:24:38+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:45:25" itemprop="dateModified" datetime="2021-01-16T11:45:25+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -257,13 +257,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Deep-Transfer-Learning-for-Single-Channel-Automatic-Sleep-Staging-with-Channel-Mismatch"><a href="#Deep-Transfer-Learning-for-Single-Channel-Automatic-Sleep-Staging-with-Channel-Mismatch" class="headerlink" title="Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch"></a>Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch</h1><p>[TOC]</p>
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>​    许多睡眠研究都面临数据不足的问题，无法充分利用深层神经网络，因为不同的实验室使用不同的记录设置，因此需要在相当小的数据库上训练算法，然而，由于通道不匹配，大型的数据库不能直接进行数据补偿。本文提出了一种<strong>深度转移学习方法来克服通道不匹配问题</strong>，并将知识从一个大的数据集转移到一个小的队列中来研究单通道输入下的自动睡眠分期。我们采用最先进的SeqSleepNet并在源域（即大数据集）中训练网络。然后，在目标域（即小群体）中对预训练网络进行微调，完成知识转移。我们研究了源域和目标域之间存在轻微和严重通道不匹配的两种迁移学习场景。我们还研究微调完全或部分预训练的网络是否会影响目标域上睡眠分段的性能。<br>​    本研究以蒙特利尔睡眠研究档案馆（MASS）的200名受试者为源域，以20名受试者组成的Sleep-EDF扩展数据库作为目标域，我们的实验结果表明，所提出的深度转移学习方法在睡眠分期方面有显著的改善。此外，这些结果也揭示了微调预训练网络的特征学习部分以绕过信道失配问题的必要性。</p>
+<a id="more"></a> 
 <h2 id="文献信息"><a href="#文献信息" class="headerlink" title="文献信息"></a>文献信息</h2><p><strong>会议：</strong> 2019 27th European Signal Processing Conference (EUSIPCO)</p>
 <p><strong>作者：</strong> </p>
 <p>Huy Phan , Oliver Y. Chen, Philipp Koch, Alfred Mertins, and Maarten De Vos </p>
 <p><em>University of Kent, United Kingdom</em></p>
 <p><em>University of Oxford, United Kingdom</em></p>
-<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>​    许多睡眠研究都面临数据不足的问题，无法充分利用深层神经网络，因为不同的实验室使用不同的记录设置，因此需要在相当小的数据库上训练算法，然而，由于通道不匹配，大型的数据库不能直接进行数据补偿。本文提出了一种<strong>深度转移学习方法来克服通道不匹配问题</strong>，并将知识从一个大的数据集转移到一个小的队列中来研究单通道输入下的自动睡眠分期。我们采用最先进的SeqSleepNet并在源域（即大数据集）中训练网络。然后，在目标域（即小群体）中对预训练网络进行微调，完成知识转移。我们研究了源域和目标域之间存在轻微和严重通道不匹配的两种迁移学习场景。我们还研究微调完全或部分预训练的网络是否会影响目标域上睡眠分段的性能。<br>​    本研究以蒙特利尔睡眠研究档案馆（MASS）的200名受试者为源域，以20名受试者组成的Sleep-EDF扩展数据库作为目标域，我们的实验结果表明，所提出的深度转移学习方法在睡眠分期方面有显著的改善。此外，这些结果也揭示了微调预训练网络的特征学习部分以绕过信道失配问题的必要性。</p>
 <h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Automatic sleep staging, deep learning, transfer learning, SeqSleepNet</strong></p>
 <h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><h3 id="深度学习的缺陷"><a href="#深度学习的缺陷" class="headerlink" title="深度学习的缺陷"></a>深度学习的缺陷</h3><p>深度学习已经成功地应用于许多领域，并受到睡眠研究界的广泛关注。深度学习具有自动表示学习理解大数据集的能力，显著提高了自动睡眠分期的性能，准确率达到睡眠专家手动评分的水平。</p>
 <p>然而，这种专家水平的表现只有在研究群体规模较大时才能获得，即数百到数千名受试者。原因是深层神经网络通常需要大量的数据来训练。在实践中，许多睡眠研究都有一个小群体，比如几十个研究对象，有时甚至更少，尤其是那些与睡眠障碍相关的研究或探索新的通道位置。</p>
@@ -384,7 +384,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Deep-Transfer-Learning-for-Single-Channel-Automatic-Sleep-Staging-with-Channel-Mismatch"><span class="nav-number">1.</span> <span class="nav-text">Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E7%8C%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">1.1.</span> <span class="nav-text">文献信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">1.3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.4.</span> <span class="nav-text">背景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%BC%BA%E9%99%B7"><span class="nav-number">1.4.1.</span> <span class="nav-text">深度学习的缺陷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.4.2.</span> <span class="nav-text">我们的工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">1.4.3.</span> <span class="nav-text">数据集</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E6%96%87%E6%96%B9%E6%B3%95"><span class="nav-number">1.5.</span> <span class="nav-text">本文方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84"><span class="nav-number">1.5.1.</span> <span class="nav-text">模型结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%8D%B7%E7%A7%AF"><span class="nav-number">1.5.2.</span> <span class="nav-text">图卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.3.</span> <span class="nav-text">损失函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E6%8D%9F%E5%A4%B1"><span class="nav-number">1.5.3.1.</span> <span class="nav-text">分类损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%9F%E5%AF%B9%E9%BD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">1.5.3.2.</span> <span class="nav-text">域对齐损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#structure-aware-%E5%AF%B9%E9%BD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">1.5.3.3.</span> <span class="nav-text">structure-aware 对齐损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E8%B4%A8%E5%BF%83%E5%AF%B9%E9%BD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">1.5.3.4.</span> <span class="nav-text">类质心对齐损失</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">1.6.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86-1"><span class="nav-number">1.6.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.6.2.</span> <span class="nav-text">实验设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Office-31"><span class="nav-number">1.6.3.</span> <span class="nav-text">Office-31</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ImageCLEF-DA"><span class="nav-number">1.6.4.</span> <span class="nav-text">ImageCLEF-DA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Office-home"><span class="nav-number">1.6.5.</span> <span class="nav-text">Office-home</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">1.7.</span> <span class="nav-text">结论</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E7%8C%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">文献信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">4.</span> <span class="nav-text">背景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%BC%BA%E9%99%B7"><span class="nav-number">4.1.</span> <span class="nav-text">深度学习的缺陷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%91%E4%BB%AC%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.2.</span> <span class="nav-text">我们的工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">4.3.</span> <span class="nav-text">数据集</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E6%96%87%E6%96%B9%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">本文方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84"><span class="nav-number">5.1.</span> <span class="nav-text">模型结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%8D%B7%E7%A7%AF"><span class="nav-number">5.2.</span> <span class="nav-text">图卷积</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">5.3.</span> <span class="nav-text">损失函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.3.1.</span> <span class="nav-text">分类损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%9F%E5%AF%B9%E9%BD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.3.2.</span> <span class="nav-text">域对齐损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#structure-aware-%E5%AF%B9%E9%BD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.3.3.</span> <span class="nav-text">structure-aware 对齐损失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E8%B4%A8%E5%BF%83%E5%AF%B9%E9%BD%90%E6%8D%9F%E5%A4%B1"><span class="nav-number">5.3.4.</span> <span class="nav-text">类质心对齐损失</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86-1"><span class="nav-number">6.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">6.2.</span> <span class="nav-text">实验设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Office-31"><span class="nav-number">6.3.</span> <span class="nav-text">Office-31</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ImageCLEF-DA"><span class="nav-number">6.4.</span> <span class="nav-text">ImageCLEF-DA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Office-home"><span class="nav-number">6.5.</span> <span class="nav-text">Office-home</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -398,7 +398,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -411,7 +411,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -519,59 +519,6 @@
   
 
   
-      
-
-<script>
-  if (typeof MathJax === 'undefined') {
-    window.MathJax = {
-      loader: {
-        source: {
-          '[tex]/amsCd': '[tex]/amscd',
-          '[tex]/AMScd': '[tex]/amscd'
-        }
-      },
-      tex: {
-        inlineMath: {'[+]': [['$', '$']]},
-        tags: 'ams'
-      },
-      options: {
-        renderActions: {
-          findScript: [10, doc => {
-            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
-              const display = !!node.type.match(/; *mode=display/);
-              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
-              const text = document.createTextNode('');
-              node.parentNode.replaceChild(text, node);
-              math.start = {node: text, delim: '', n: 0};
-              math.end = {node: text, delim: '', n: 0};
-              doc.math.push(math);
-            });
-          }, '', false],
-          insertedScript: [200, () => {
-            document.querySelectorAll('mjx-container').forEach(node => {
-              let target = node.parentNode;
-              if (target.nodeName.toLowerCase() === 'li') {
-                target.parentNode.classList.add('has-jax');
-              }
-            });
-          }, '', false]
-        }
-      }
-    };
-    (function () {
-      var script = document.createElement('script');
-      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
-      script.defer = true;
-      document.head.appendChild(script);
-    })();
-  } else {
-    MathJax.startup.document.state(0);
-    MathJax.texReset();
-    MathJax.typeset();
-  }
-</script>
-
-    
 
   
 

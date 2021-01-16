@@ -19,12 +19,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
   </script>
 
-  <meta name="description" content="A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络  【2019,IEEE Journal of Biomedical and">
+  <meta name="description" content="基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络  【2019,IEEE Journal of Biomedical and Health Informatics】 【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】 Abstract自动睡眠分期通常提取PSG信号中的人工特征或">
 <meta property="og:type" content="article">
 <meta property="og:title" content="syd A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning">
 <meta property="og:url" content="http://example.com/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/index.html">
 <meta property="og:site_name" content="时序论文分享">
-<meta property="og:description" content="A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络  【2019,IEEE Journal of Biomedical and">
+<meta property="og:description" content="基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络  【2019,IEEE Journal of Biomedical and Health Informatics】 【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】 Abstract自动睡眠分期通常提取PSG信号中的人工特征或">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132222.png">
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132328.png">
@@ -53,7 +53,7 @@
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133627.png">
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134033.png">
 <meta property="article:published_time" content="2021-01-07T06:20:10.000Z">
-<meta property="article:modified_time" content="2021-01-16T03:26:34.521Z">
+<meta property="article:modified_time" content="2021-01-16T03:50:52.732Z">
 <meta property="article:author" content="INSIS">
 <meta property="article:tag" content="睡眠分期">
 <meta name="twitter:card" content="summary">
@@ -247,7 +247,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:26:34" itemprop="dateModified" datetime="2021-01-16T11:26:34+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:50:52" itemprop="dateModified" datetime="2021-01-16T11:50:52+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -277,13 +277,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="A-Hierarchical-Neural-Network-for-Sleep-Stage-Classification-based-on-Comprehensive-Feature-Learning-and-Multi-flow-Sequence-Learning"><a href="#A-Hierarchical-Neural-Network-for-Sleep-Stage-Classification-based-on-Comprehensive-Feature-Learning-and-Multi-flow-Sequence-Learning" class="headerlink" title="A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning"></a>A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning</h3><p>基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络</p>
+        <p>基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络</p>
 <hr>
 <p>【2019,IEEE Journal of Biomedical and Health Informatics】</p>
 <p>【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】</p>
 <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><strong>自动睡眠分期</strong>通常提取PSG信号中的人工特征或网络训练的特征，用多种分类器估计它属于哪个阶段。</p>
 <p>本文提出了基于分层神经网络的方法处理多通道PSG信号。包含<strong>两个阶段</strong>：综合特征学习阶段和序列学习阶段。第一阶段，将人工特征和网络训得的特征融合；第二阶段用多流的循环神经网络学习睡眠周期之间的时间信息，并微调第一阶段的参数。</p>
 <p>用公开数据集MASS中147份记录来评估模型，总体能达到0.878的准确率，F1-score为0.818。与目前的先进方法相比，这种方法性能<strong>更优</strong>。消融实验和模型分析证明了模型<strong>不同组成部分的有效性</strong>。该方法可以根据不同的标准、信号特征和阶段划分的多通道PSG信号对睡眠阶段进行自动分类，具有<strong>全面</strong>开发睡眠信息的潜力。</p>
+<a id="more"></a>
 <p>关键词：睡眠阶段分期；卷积神经网络；循环神经网络；EEG信号</p>
 <h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p><strong>背景：</strong>AASM标准将睡眠阶段分为五类：WAKE，REM，NREM1，NREM2，NREM3；把睡眠记录分为连续的阶段，专家根据一定标准将每个阶段划分为一个特定的睡眠阶段。为了减轻专家负担并提供辅助诊断，基于传统机器学习的方法应用了PSG信号中的典型特征（具有明显的物理意义），然后用不同的分类器进行睡眠分期。</p>
 <p><strong>存在问题：</strong></p>
@@ -484,7 +485,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#A-Hierarchical-Neural-Network-for-Sleep-Stage-Classification-based-on-Comprehensive-Feature-Learning-and-Multi-flow-Sequence-Learning"><span class="nav-number">1.</span> <span class="nav-text">A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">2.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">3.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Methodology"><span class="nav-number">4.</span> <span class="nav-text">2. Methodology</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Experiment"><span class="nav-number">5.</span> <span class="nav-text">3. Experiment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BB%93%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">5. 结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-discussion-amp-future-work"><span class="nav-number">7.</span> <span class="nav-text">5. discussion&amp;future work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">8.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Methodology"><span class="nav-number">3.</span> <span class="nav-text">2. Methodology</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Experiment"><span class="nav-number">4.</span> <span class="nav-text">3. Experiment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">5. 结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-discussion-amp-future-work"><span class="nav-number">6.</span> <span class="nav-text">5. discussion&amp;future work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">7.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -498,7 +499,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -511,7 +512,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

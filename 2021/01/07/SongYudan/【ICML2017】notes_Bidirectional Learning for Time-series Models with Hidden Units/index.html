@@ -19,12 +19,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
   </script>
 
-  <meta name="description" content="Bidirectional Learning for Time-series Models with Hidden Units【ICML，2017】 【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】 Abstract隐单元在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模">
+  <meta name="description" content="【ICML，2017】 【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】 Abstract隐单元在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是难训练的，在前向后向模型中是互补的。同时训练两个模型，提高参数学习的效">
 <meta property="og:type" content="article">
 <meta property="og:title" content="syd Bidirectional Learning for Time-series Models with Hidden Units">
 <meta property="og:url" content="http://example.com/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/index.html">
 <meta property="og:site_name" content="时序论文分享">
-<meta property="og:description" content="Bidirectional Learning for Time-series Models with Hidden Units【ICML，2017】 【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】 Abstract隐单元在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模">
+<meta property="og:description" content="【ICML，2017】 【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】 Abstract隐单元在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是难训练的，在前向后向模型中是互补的。同时训练两个模型，提高参数学习的效">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135323.png">
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135347.png">
@@ -51,7 +51,7 @@
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140139.png">
 <meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140159.png">
 <meta property="article:published_time" content="2021-01-07T06:20:10.000Z">
-<meta property="article:modified_time" content="2021-01-16T03:26:27.427Z">
+<meta property="article:modified_time" content="2021-01-16T03:50:41.861Z">
 <meta property="article:author" content="INSIS">
 <meta property="article:tag" content="时间序列">
 <meta name="twitter:card" content="summary">
@@ -245,7 +245,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:26:27" itemprop="dateModified" datetime="2021-01-16T11:26:27+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:50:41" itemprop="dateModified" datetime="2021-01-16T11:50:41+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -275,9 +275,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="Bidirectional-Learning-for-Time-series-Models-with-Hidden-Units"><a href="#Bidirectional-Learning-for-Time-series-Models-with-Hidden-Units" class="headerlink" title="Bidirectional Learning for Time-series Models with Hidden Units"></a>Bidirectional Learning for Time-series Models with Hidden Units</h2><p>【ICML，2017】</p>
+        <p>【ICML，2017】</p>
 <p>【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】</p>
 <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><strong>隐单元</strong>在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是<strong>难训练</strong>的，在前向后向模型中是<strong>互补</strong>的。同时训练两个模型，提高参数学习的效率。在带隐单元的动态玻尔兹曼机上应用了双向学习，合成/真实数据集上演示了<strong>双向学习</strong>的优势。</p>
+<a id="more"></a>
 <hr>
 <h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p>在一些时序模型中，隐单元对于时序中的长程依赖和非线性是至关重要的；但是隐单元的值只有通过观测未来值才能可靠估计，训练困难。设时序模型的参数用一个或几个矩阵$M$表示，$M_{i,j}$可能代表节点i的历史值和节点j的后续值之间的权重，其中一些隐节点j的$M_{i,j}$难估计。根据参数矩阵为$M$的时序模型，构造后向模型，参数矩阵为$M^T$。</p>
 <p><strong>contribution 1:</strong> 提出<strong>双向方法</strong>来训练带隐单元的时序模型。两个模型结构相同、训练方式相同（随机梯度方法）；前向模型用正常时序，后向模型用逆向时序，分别学习$M$和$M^T。$两个矩阵中难训练的元素是<strong>不同</strong>的，所以双向训练可以提高参数学习效率。</p>
@@ -367,8 +368,8 @@
       <i class="fa fa-chevron-left"></i> syd TWNet:a Dynamic Time Warping Network
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/" rel="next" title="">
-       <i class="fa fa-chevron-right"></i>
+    <a href="/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/" rel="next" title="gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
+      gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -428,7 +429,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bidirectional-Learning-for-Time-series-Models-with-Hidden-Units"><span class="nav-number">1.</span> <span class="nav-text">Bidirectional Learning for Time-series Models with Hidden Units</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-DyBM-with-Hidden-Units"><span class="nav-number">1.3.</span> <span class="nav-text">2. DyBM with Hidden Units</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Training-a-DyBM-with-Hidden-Units"><span class="nav-number">1.4.</span> <span class="nav-text">3. Training a DyBM with Hidden Units</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Learning-with-Reversed-Time-series"><span class="nav-number">1.5.</span> <span class="nav-text">4.  Learning with Reversed Time-series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Experiments"><span class="nav-number">1.6.</span> <span class="nav-text">5.  Experiments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">1.7.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-DyBM-with-Hidden-Units"><span class="nav-number">3.</span> <span class="nav-text">2. DyBM with Hidden Units</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Training-a-DyBM-with-Hidden-Units"><span class="nav-number">4.</span> <span class="nav-text">3. Training a DyBM with Hidden Units</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Learning-with-Reversed-Time-series"><span class="nav-number">5.</span> <span class="nav-text">4.  Learning with Reversed Time-series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Experiments"><span class="nav-number">6.</span> <span class="nav-text">5.  Experiments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">7.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -442,7 +443,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -455,7 +456,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

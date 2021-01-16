@@ -198,7 +198,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/" class="post-title-link" itemprop="url">Untitled</a>
+            <a href="/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/" class="post-title-link" itemprop="url">gs Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases</a>
         </h2>
 
         <div class="post-meta">
@@ -207,16 +207,19 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2021-01-16 11:23:08" itemprop="dateCreated datePublished" datetime="2021-01-16T11:23:08+08:00">2021-01-16</time>
+              <time title="Created: 2021-01-16 20:24:24 / Modified: 11:42:51" itemprop="dateCreated datePublished" datetime="2021-01-16T20:24:24+08:00">2021-01-16</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-12 17:04:58" itemprop="dateModified" datetime="2021-01-12T17:04:58+08:00">2021-01-12</time>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
               </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gs/" itemprop="url" rel="index"><span itemprop="name">gs</span></a>
+                </span>
+            </span>
 
           
 
@@ -229,230 +232,109 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Diagnosing-Root-Causes-of-Intermittent-Slow-Queries-in-Large-Scale-Cloud-Databases"><a href="#Diagnosing-Root-Causes-of-Intermittent-Slow-Queries-in-Large-Scale-Cloud-Databases" class="headerlink" title="Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases"></a>Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases</h1><blockquote>
+          <blockquote>
 <p>Proc. VLDB Endow. 13(8): 1176-1189 (2020)</p>
 <p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBXBF"><img src="https://s3.ax1x.com/2021/01/12/sJBXBF.png" alt="sJBXBF.png"></a></p>
 </blockquote>
-<p>tag：根因诊断，时间序列</p>
 <h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>随着云数据库市场的不断增长，检测和消除慢速查询对服务稳定性至关重要。以前的研究集中在优化由于内部原因(例如，编写得不好的sql)而导致的缓慢查询。</p>
 <p>在这项工作中，我们发现了一组不同的慢速查询，与其他慢速查询相比，这些查询对数据库用户的危害可能更大。我们将这种查询命名为<strong>间歇性慢速查询(iSQs)</strong>，因为它们通常是由外部的间歇性性能问题造成的(例如，在数据库或机器级别)。诊断iSQs的根本原因是一项艰巨但非常有价值的任务。</p>
 <p>本文提出<strong>iSQUAD（Intermittent Slow QUery Anomaly Diagnoser）</strong>，一个可以诊断iSQs的根本原因的框架，它对人工干预的需求比较松。</p>
-<p>面临的挑战：<strong>通用性、标签开销和可解释性</strong>。因此设计了四个组件：</p>
-<ul>
-<li>异常提取</li>
-<li>依赖清理</li>
-<li>面向类型的模式集成聚类(TOPIC)</li>
-<li>贝叶斯实例模型（Bayesian Case Model）</li>
-</ul>
-<p><strong>组成：</strong></p>
-<ul>
-<li>阶段一：离线聚类+解释</li>
-<li>阶段二：在线跟因诊断+更新</li>
-</ul>
-<p><strong>数据集：</strong>阿里巴巴OLTP数据库的真实数据集</p>
-<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>云数据库正在不断地发展，数据库中的服务中断或性能故障可能会导致严重的效率损失和品牌损失。因此，数据库总是处于不断的监控之中，检测和消除慢速查询对于服务的稳定性至关重要。</p>
-<p>大多数数据库系统，如MySQL、Oracle、SQL Server，会自动记录完成时间超过用户限制阈值的查询的详细信息。一些缓慢的查询是由<u>内部原因</u>造成的，比如复杂性、缺乏索引和SQL语句编写得很差，这些可以被自动分析和优化。</p>
-<p><strong>间歇性慢速查询(iSQs)：</strong>这些慢速查询是由<u>外部的</u>间歇性性能问题(例如，在数据库或机器级别)导致的。</p>
-<blockquote>
-<p><strong>造成损失严重，手动诊断费事费力</strong></p>
-<p>通常，iSQs是云数据库中性能问题甚至故障的主要症状。由于iSQs是断断续续的，服务开发人员和客户希望它们能够正常响应，而突然增加的延迟会产生巨大的影响。例如，在浏览网页时，iSQ可能导致网页加载延迟。据报道，亚马逊每0.1秒的加载延迟就会损失1%的销售额，而谷歌搜索结果每0.5秒的加载延迟就会导致的流量下降20%。我们获得了阿里巴巴OLTP数据库的数据库管理员在一年内注意到的几个性能问题记录:当一个性能问题发生时，一系列的isq持续几分钟。事实上，手动诊断iSQs的根本原因需要几十分钟，这既费时又容易出错。</p>
-</blockquote>
-<p>本文的工作目标：尽可能的减少人工干预来进行于数据库中iSQ的跟因诊断。以下是观察到的异常症状和跟因的一些记录：</p>
-<ul>
-<li><strong>数据库管理员需要扫描数百个关键性能指标来查找性能问题症状。</strong></li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBqXT"><img src="https://s3.ax1x.com/2021/01/12/sJBqXT.png" alt="sJBqXT.png"  /></a></p>
-<ul>
-<li><p><strong>性能问题异常主要包括不同的kpi模式。</strong>我们总结了三组对称的KPI模式，即，<strong>突起突降，水平漂移（向上或向下），缺失</strong>。单纯基于检测KPI异常与否，我们无法准确诊断iSQs的根本原因。</p>
-</li>
-<li><p><strong>一个异常KPI通常伴随着另一个或多个异常KPI。</strong></p>
-</li>
-<li><p><strong>类似的异常与相同的根因相关。</strong>在每个根本原因类别中，性能问题的KPI症状彼此相似。</p>
-</li>
-</ul>
-<p>提出<strong>iSQUAD（Intermittent Slow QUery Anomaly Diagnoser）</strong>，其中，我们采用异常提取和依赖清理来代替传统的异常检测方法，以解决异常多样性的挑战。为了减少标记开销，提出了面向类型的模式集成聚类(TOPIC)，将具有相同根源的iSQ聚类在一起，同时考虑KPI和异常类型。在聚类可解释性方面，利用贝叶斯实例模型为每个聚类提取基于实例的表示，便于DBAs研究。</p>
-<p><strong>组成：</strong></p>
-<ul>
-<li><p>阶段一：离线聚类+解释</p>
-<p>获得聚类和跟因，用于在线阶段的诊断。数据库管理员只需要对每个聚类标记一次，除非在线阶段出现了新的类。</p>
-</li>
-<li><p>阶段二：在线跟因诊断+更新</p>
-</li>
-</ul>
-<p><strong>工作主要贡献：</strong></p>
-<ul>
-<li><p>基于云数据库中iSQs速度慢的问题，并设计了一个名为<strong>iSQUAD的可伸缩框架</strong>，该框架可以为iSQs提供准确而有效的根因诊断。它采用了机器学习技术，克服了在通用性、标识开销和可交互性等方面的挑战。</p>
-</li>
-<li><p><strong>异常提取</strong>：使用KPIs的异常提取来代替异常检测来区分异常类型。</p>
-</li>
-<li><p><strong>聚类</strong>：提出了一种新的聚类算法TOPIC来减少标记开销。</p>
-</li>
-<li><p>最先通过<strong>贝叶斯实例模型</strong>在数据库领域中应用和改进基于实例的推理，并将实例子空间表示推给DBAs用于标记。</p>
-</li>
-<li><p>我们对iSQUAD的评估进行了大量的实验，证明了我们的方法获得了平均F1-score 80.4%，较前一种技术提高了49.2%。此外，已经在真实的云数据库服务中部署了iSQUAD的原型。iSQUAD可以帮助DBAs在80分钟内找到数百个iSQs的全部10个根因，这比传统的逐例诊断快大约30倍。</p>
-</li>
-</ul>
-<h3 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h3><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><h5 id="阿里巴巴OLTP数据库"><a href="#阿里巴巴OLTP数据库" class="headerlink" title="阿里巴巴OLTP数据库"></a>阿里巴巴OLTP数据库</h5><p>支持的服务有淘宝、天猫、钉钉和菜鸟等。这个数据库包含了跨越几十个地理区域的十万个实际运行的实体，配备有一个度量系统用于收集日志和KPIs。</p>
-<h5 id="Intermittent-Slow-Queries-iSQs"><a href="#Intermittent-Slow-Queries-iSQs" class="headerlink" title="Intermittent Slow Queries (iSQs)"></a>Intermittent Slow Queries (iSQs)</h5><p><strong>查询时间</strong>：SQL查询被提交给数据库和其结果被数据库返回之间的时间。</p>
-<p><strong>iSQ：</strong>第$t$ 个SQL语句 $Q_t$，执行时间$X_t$,当$X_t&gt;z$且$P(X_i&gt;z)&lt;\epsilon$,其中$1&lt;=t,i&lt;=T$，z是一个iSQ的阈值。对于阿里数据库管理员设置：$z=1s,\epsilon=0.01,T=10^4$</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBbcV"><img src="https://s3.ax1x.com/2021/01/12/sJBbcV.png" alt="sJBbcV.png"></a></p>
-<blockquote>
-<p>图（a） 每条语句查询时间的概率分布，iSQs的占比0.0028</p>
-<p>图（b） 每条语句查询时间的概率分布，每条SQL语句都比较慢</p>
-</blockquote>
-<p>在慢速查询中，其他类型的慢速查询主要是由任务的复杂性造成的，通常是非交互和可容忍的(约占79%)，这些慢速查询可以通过添加索引或重写SQL语句等方式来进行优化。</p>
-<p>iSQs只占1%，但其影响非常大，比例很小，但是每天都会是成千上万的，处理优化这些异常有利于调高用户体验。</p>
-<h4 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h4><p>由于当出现性能问题时，许多正常的在线服务查询会受到影响，速度会比平时慢得多，所以，理解iSQs的根本原因对于缓解慢速查询很重要。</p>
-<ul>
-<li><p><strong>（需要多变量）KPIs对于定位iSQs的根本原因非常重要。</strong>单独的KPI不能捕获所有类型的问题，不同类型的KPI才能掌握跟踪整个系统的状态。</p>
-</li>
-<li><p><strong>（以前的工作并没有关注异常类型，仅关注<u>是否异常</u>）应该注意kpi的异常类型。</strong></p>
-<p>​    突起突降、水平漂移（向上或向下）、无效（缺失或为0）</p>
-</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBH10"><img src="https://s3.ax1x.com/2021/01/12/sJBH10.png" alt="sJBH10.png"></a></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBOnU"><img src="https://s3.ax1x.com/2021/01/12/sJBOnU.png" alt="sJBOnU.png"></a></p>
-<blockquote>
-<p>异常类型与异常跟因有关</p>
-<p>case1 实例1进行数据库备份，两个实例共享IO</p>
-<p>case2 只有一个物理机器，发生总体工作负载增加（闪购时间）</p>
-</blockquote>
-<ul>
-<li><p><strong>（序列之间的相关性、依赖性）KPIs间异常是高度相关的，</strong>其关系可能是单向，也可能双向。</p>
-</li>
-<li><p><strong>类似的KPI模式与相同的根本原因相关。</strong></p>
-<blockquote>
-<p>例：DBAs将异常跟因分为了10类，每种跟因中，有些KPI异常是相似的，可以相互替换，比如 sql-update和sql-delete引起的负载异常。</p>
-</blockquote>
-</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBxAJ"><img src="https://s3.ax1x.com/2021/01/12/sJBxAJ.png" alt="sJBxAJ.png"></a></p>
-<h4 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h4><ul>
-<li>异常类型多样性</li>
-</ul>
-<blockquote>
-<p>之前的方法的局限性：目前的异常研究普遍忽略和过度概括了异常类型。这样的检测方法可能会在(监控数据)预处理阶段错误地检测出大量信息，从而降低(监控)数据集的质量。</p>
-</blockquote>
-<ul>
-<li>标签开销大：专家工作量大、过程复杂</li>
-</ul>
-<blockquote>
-<p>之前的方法的局限性：有复现跟因的方法——实际情况不允许；<u>自定义数据负载进行统计也是不现实的</u>（？）</p>
-</blockquote>
-<ul>
-<li>可解释的模型：模型的准确性和它对人类的可解释性之间存在不可避免的权衡。</li>
-</ul>
-<blockquote>
-<p>之前的方法的局限性：决策树，依赖于开始时提供精确的信息，因为即使是输入中的细微差别也可能导致大的树修改，此外，决策树还可能产生“分析瘫痪”的问题，即向决策者提供的信息过多，而不是关键要素。</p>
-</blockquote>
-<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><p>模型框架：<strong>iSQUAD (Intermittent Slow QUery Anomaly Diagnoser)</strong></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDShR"><img src="https://s3.ax1x.com/2021/01/12/sJDShR.png" alt="sJDShR.png"></a></p>
-<ul>
-<li><p>离线阶段：对iSQs进行聚类，让专家更容易的识别标记跟因。</p>
-<p>异常提取—异常KPIs离散化—依赖清理—聚类—Bayesian Case Model（一个典型的iSQ和它的基本KPI矩阵作为特征空间）</p>
-</li>
-<li><p>在线阶段：输入iSQ和其对应的KPIs—异常提取—异常KPIs离散化—依赖清理—查询匹配一个跟因类—给DBAs展示解释异常（若未匹配，则分配到一个新类）</p>
-</li>
-</ul>
-<h3 id="iSQUAD细节设计"><a href="#iSQUAD细节设计" class="headerlink" title="iSQUAD细节设计"></a>iSQUAD细节设计</h3><h4 id="离线阶段：异常提取"><a href="#离线阶段：异常提取" class="headerlink" title="离线阶段：异常提取"></a>离线阶段：异常提取</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBzN9"><img src="https://s3.ax1x.com/2021/01/12/sJBzN9.png" alt="sJBzN9.png"></a></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBH10"><img src="https://s3.ax1x.com/2021/01/12/sJBH10.png" alt="sJBH10.png"></a></p>
-<ul>
-<li><p>峰值：Robust Threshold（中位数和中位数绝对偏差值）（假设是柯西分布），时间间隔1h，阈值根据经验。</p>
-</li>
-<li><p>水平漂移：分成两个窗口，检验两个窗口分布是否相似，如果通过T-Test（一种用于测试两组平均差异的推断统计量）发现存在明显差异，则确定发生水平飘移。窗口30分钟，t值根据经验。</p>
-</li>
-</ul>
-<h4 id="离线阶段：依赖清理"><a href="#离线阶段：依赖清理" class="headerlink" title="离线阶段：依赖清理"></a>离线阶段：依赖清理</h4><p>目的：确保KPIs之间相互独立，这样就没有相关性或者过度表示。</p>
-<p><strong>相关指数（阈值）</strong>：</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJD991"><img src="https://s3.ax1x.com/2021/01/12/sJD991.png" alt="sJD991.png"></a></p>
-<blockquote>
-<p>例子：CPU（实体和物理机器）</p>
-</blockquote>
-<h4 id="离线阶段：面向类型的模式集成聚类（Type-Oriented-Pattern-Integration-Clustering，TOPIC）"><a href="#离线阶段：面向类型的模式集成聚类（Type-Oriented-Pattern-Integration-Clustering，TOPIC）" class="headerlink" title="离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）"></a>离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）</h4><blockquote>
-<p>pattern：一个iSQ的封装的KPI特定组合</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDABD"><img src="https://s3.ax1x.com/2021/01/12/sJDABD.png" alt="sJDABD.png"></a></p>
-<p>两个iSQs之间的相似度：<a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDC1x"><img src="https://s3.ax1x.com/2021/01/12/sJDC1x.png" alt="sJDC1x.png"></a>t是KPI类型数目，T是总KPI类型数目</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDijK"><img src="https://s3.ax1x.com/2021/01/12/sJDijK.png" alt="sJDijK.png"></a></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDZAH"><img src="https://s3.ax1x.com/2021/01/12/sJDZAH.png" alt="sJDZAH.png"></a></p>
-<h4 id="离线阶段：Bayesian-Case-Model-贝叶斯实例模型"><a href="#离线阶段：Bayesian-Case-Model-贝叶斯实例模型" class="headerlink" title="离线阶段：Bayesian Case Model 贝叶斯实例模型"></a>离线阶段：Bayesian Case Model 贝叶斯实例模型</h4><p>作用：从每个聚类中提取有用的和有启发性的信息，为DBAs打标签提供便利</p>
-<p>前提：离散化 标签（聚类的结果）</p>
-<h4 id="在线阶段：跟因检测和更新"><a href="#在线阶段：跟因检测和更新" class="headerlink" title="在线阶段：跟因检测和更新"></a>在线阶段：跟因检测和更新</h4><p>匹配：相似度最高的一个模式</p>
-<p>更新：匹配失败后，交给DBAs处理</p>
-<h3 id="评估"><a href="#评估" class="headerlink" title="评估"></a>评估</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p><strong>iSQs数据集</strong> 阿里OLTP数据集（随机的，一个任意一天的数据集 两个 周数据集）（一个实体上的每个时间戳只选一个iSQ）</p>
-<p><strong>KPIs数据集</strong> 发生在iSQ前后一小时的数据，粒度5秒</p>
-<p><strong>人工标记标记 （DBAs）</strong></p>
-<ul>
-<li>三个数据集上随机选取319个iSQs标记跟因 </li>
-</ul>
-<h4 id="评估分数"><a href="#评估分数" class="headerlink" title="评估分数"></a>评估分数</h4><ul>
-<li>F1-Score</li>
-<li>Weighted Average F1-score</li>
-<li>Clustering Accuracy </li>
-<li>Normalized Mutual Information （归一化互信息）</li>
-</ul>
-<h4 id="iSQUAD的准确性和效率"><a href="#iSQUAD的准确性和效率" class="headerlink" title="iSQUAD的准确性和效率"></a>iSQUAD的准确性和效率</h4><blockquote>
-<p>设置：对174个iSQs进行聚类，得到10个聚类，对剩下145进行测试</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDPc6"><img src="https://s3.ax1x.com/2021/01/12/sJDPc6.png" alt="sJDPc6.png"></a></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDknO"><img src="https://s3.ax1x.com/2021/01/12/sJDknO.png" alt="sJDknO.png"></a></p>
-<blockquote>
-<p>iSQUAD在四个方面优于DBSherlock</p>
-<p>1）DBSherlock需要用户自定义或自动生成KPI的异常和正常间隔。其旨在解释异常间隔，而非时间戳</p>
-<p>2）DBSherlock根据<strong>平均值</strong>的差异是否超过一个阈值来区分两个部分，iSQUAD具有利用不同波动的异常提取功能</p>
-<p>3）DBSherlock不能消除KPIs之间的依赖关系</p>
-<p>4）DBSherlock利用因果模型提供纯文本解释不同，忽略了一部分异常类型和模式；iSQUAD使用了贝叶斯实例模型，以向DBAs显示可理解的实例子空间表示。</p>
-</blockquote>
-<h4 id="异常提取的性能"><a href="#异常提取的性能" class="headerlink" title="异常提取的性能"></a>异常提取的性能</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDeNd"><img src="https://s3.ax1x.com/2021/01/12/sJDeNd.png" alt="sJDeNd.png"></a></p>
-<blockquote>
-<p>时间计算：执行一个iSQ</p>
-<p>性能优的原因：包容性和通用性</p>
-</blockquote>
-<h4 id="依赖清理精度"><a href="#依赖清理精度" class="headerlink" title="依赖清理精度"></a>依赖清理精度</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDu9I"><img src="https://s3.ax1x.com/2021/01/12/sJDu9I.png" alt="sJDu9I.png"></a></p>
-<h4 id="TOPIC评估"><a href="#TOPIC评估" class="headerlink" title="TOPIC评估"></a>TOPIC评估</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJD1u8"><img src="https://s3.ax1x.com/2021/01/12/sJD1u8.png" alt="sJD1u8.png"></a></p>
-<blockquote>
-<p>层次聚类容易产生离群值效应，新模式的iSQ会被归类为离群值，而非新的一类。层次聚类需要预先设定聚类中心的个数。</p>
-<p>K-means集群也需要预先限定的集群数量。此外，它高度依赖于初始iSQ模式，因此不稳定。</p>
-<p>DBSCAN产生的集群是严重倾斜和分散</p>
-</blockquote>
-<h4 id="BCM评估"><a href="#BCM评估" class="headerlink" title="BCM评估"></a>BCM评估</h4><p><strong>BCM的影响：</strong>使用了iSQUAD后，减少了DBAs需要考虑的KPIs数量。减少诊断时间，是以前的30倍。</p>
-<p><strong>可视化平台：</strong>将贝叶斯实例模型嵌入可视化平台中，该可视化平台可以显示iSQ类的实例子空间表示及其跟因。在DBA选择iSQ类之后，该平台会立即显示相应的KPI，并输出这个iSQ类的根因。</p>
-<p><strong>用户研究</strong></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDK3t"><img src="https://s3.ax1x.com/2021/01/12/sJDK3t.png" alt="sJDK3t.png"></a></p>
-<h3 id="案例及讨论"><a href="#案例及讨论" class="headerlink" title="案例及讨论"></a>案例及讨论</h3><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDMgP"><img src="https://s3.ax1x.com/2021/01/12/sJDMgP.png" alt="sJDMgP.png"></a></p>
-<blockquote>
-<p>人工：18min</p>
-<p>框架：40s</p>
-</blockquote>
-<p><strong>多跟因</strong>：1）挖掘更深层次的原因 2）多跟因的发生概率很小</p>
-<p><strong>iSQUAD的普遍性</strong> 很多场景适用</p>
-<p><strong>对不同原因的操作</strong></p>
-<p>（1）Scaling(#1，#2，#3，#5，#6)：增大资源</p>
-<p>（2）Limiting (#4, #8)：限制速率</p>
-<p>（3）Optimizing (#7, #9, #10)</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDQjf"><img src="https://s3.ax1x.com/2021/01/12/sJDQjf.png" alt="sJDQjf.png"></a></p>
-<h3 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h3><ul>
-<li><p>Slow Query Analysis</p>
-<p>自动化索引修改、机器学习算法调优数据库参数、深度学习提升查询</p>
-</li>
-<li><p>Anomaly Extraction</p>
-<p>二分类（即异常、正常）的异常检测方法：</p>
-<blockquote>
-<p>Opprentice</p>
-<p>dSPOT </p>
-<p>iSST </p>
-<p>雅虎的EGADS</p>
-<p>推特的S-H-ESD </p>
-<p>Netflix的RPCA</p>
-</blockquote>
-</li>
-<li><p>Clustering Algorithm</p>
-</li>
-<li><p>Root Cause Diagnosis</p>
-</li>
-</ul>
-<h3 id="未来工作"><a href="#未来工作" class="headerlink" title="未来工作"></a>未来工作</h3><p>作为未来的工作，我们的目标是在iSQUAD的基础上开发一个更通用的、更有能力的框架，自动化故障诊断和系统恢复。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
 
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/" class="post-title-link" itemprop="url">gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-16 20:24:24 / Modified: 11:42:43" itemprop="dateCreated datePublished" datetime="2021-01-16T20:24:24+08:00">2021-01-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gs/" itemprop="url" rel="index"><span itemprop="name">gs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>Zhang C, Song D, Chen Y, et al. A deep neural network for unsupervised anomaly detection and diagnosis in multivariate time series data[C]//Proceedings of the AAAI Conference on Artificial Intelligence. 2019, 33: 1409-1416.</p>
+</blockquote>
+<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>目前，多变量时间序列数据在各种现实系统中越来越受到重视，如发电厂等。</p>
+<p>多变量时间序列异常检测与诊断是指在一定的时间步长中<strong>识别异常状态</strong>，找出<strong>异常的根本原因</strong>。</p>
+<p>然而，建立这样一个系统是具有挑战性的：</p>
+<ul>
+<li>需要捕获每个时间序列中的时间依赖性</li>
+<li>需要对不同时间序列对之间的相互关系进行编码</li>
+<li>该系统应该对噪声具有鲁棒性</li>
+<li>根据不同事件的严重程度为操作员提供不同级别的异常评分</li>
+<li>需要面对标签稀缺的问题</li>
+</ul>
+<p>尽管已经开发了大量的非监督异常检测算法，但其中很少有能够共同应对这些挑战的。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -502,7 +384,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:26:27" itemprop="dateModified" datetime="2021-01-16T11:26:27+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:50:41" itemprop="dateModified" datetime="2021-01-16T11:50:41+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -525,77 +407,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Bidirectional-Learning-for-Time-series-Models-with-Hidden-Units"><a href="#Bidirectional-Learning-for-Time-series-Models-with-Hidden-Units" class="headerlink" title="Bidirectional Learning for Time-series Models with Hidden Units"></a>Bidirectional Learning for Time-series Models with Hidden Units</h2><p>【ICML，2017】</p>
+          <p>【ICML，2017】</p>
 <p>【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】</p>
 <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><strong>隐单元</strong>在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是<strong>难训练</strong>的，在前向后向模型中是<strong>互补</strong>的。同时训练两个模型，提高参数学习的效率。在带隐单元的动态玻尔兹曼机上应用了双向学习，合成/真实数据集上演示了<strong>双向学习</strong>的优势。</p>
-<hr>
-<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p>在一些时序模型中，隐单元对于时序中的长程依赖和非线性是至关重要的；但是隐单元的值只有通过观测未来值才能可靠估计，训练困难。设时序模型的参数用一个或几个矩阵$M$表示，$M_{i,j}$可能代表节点i的历史值和节点j的后续值之间的权重，其中一些隐节点j的$M_{i,j}$难估计。根据参数矩阵为$M$的时序模型，构造后向模型，参数矩阵为$M^T$。</p>
-<p><strong>contribution 1:</strong> 提出<strong>双向方法</strong>来训练带隐单元的时序模型。两个模型结构相同、训练方式相同（随机梯度方法）；前向模型用正常时序，后向模型用逆向时序，分别学习$M$和$M^T。$两个矩阵中难训练的元素是<strong>不同</strong>的，所以双向训练可以提高参数学习效率。</p>
-<p><strong>contribution 2: </strong>在<strong>带隐单元DyBM</strong>上应用双向学习。分析了带隐单元的DyBM，阐释了参数学习的<strong>困难性</strong>；通过双向学习，学习历史可见值和后续隐值之间的权值，学习过去的哪些值对于预测是重要的。</p>
-<p><strong>相关但不同的模型：</strong></p>
-<p>双向训练&amp;BRNN: BRNN的双向模型没有共享参数，而双向训练会<strong>共享参数</strong>。动机不同，BRNN使用双向模型训练、预测，用前面、后面的值来估计中间的值；而双向训练只用双向模型进行训练，预测时还是<strong>只用历史值</strong>。</p>
-<p>双向训练&amp;FBLG：FBLG（Forward Backward Lasso Granger，包括前向VAR和后向VAR，得到平均模型）中没有隐单元，而双向训练是为了训练<strong>带隐单元</strong>的时序模型。</p>
-<p>双向训练&amp;考虑隐变量的VAR模型或线性动态系统：后者是通过隐变量估计可见变量之间的关系；双向学习是为了学习可见单元和隐单元之间的关系。</p>
-<h3 id="2-DyBM-with-Hidden-Units"><a href="#2-DyBM-with-Hidden-Units" class="headerlink" title="2. DyBM with Hidden Units"></a>2. DyBM with Hidden Units</h3><p><strong>玻尔兹曼机：</strong>一种随机递归神经网络，可以看作是一种随机的Hopfield网络，通过学习数据的固有内在表示，来解决困难学习问题。一般BM可见单元和隐单元之间的<strong>能量函数</strong>为：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135323.png" style="zoom:67%;" /></p>
-<p>BM通过调整各神经元之间的权值，使模型的概率分布等于训练样本集的概率分布，使<strong>出现概率最高的全局状态得到最低的能量</strong>，最终转换为<strong>最大化似然函数</strong>。</p>
-<p><strong>DyBM:</strong> 结合<strong>STDP</strong>的特殊结构的玻尔兹曼机，是一个多维时间序列的随机模型</p>
-<p><strong>STDP:</strong> spike-timing dependent plasticity，脉冲时间相关的突触可塑性；它根据神经元学习的先后顺序，<strong>调整神经元之间连接的强弱</strong>。STDP可以说是Hebb学习的一种延伸，Hebb学习提出如果两个神经元常常一起活动，则二者之间的连接会增强。STDP则是进一步提出，两个神经元之间的活动，如果其他神经元的信息在本身活动产生之前，则两神经元之间的连接会增强。如果神经元本身产生活动之后才接受其他神经元传来的信息，则两神经元之间的连接会减弱。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135347.png" style="zoom:67%;" /></p>
-<p>图1给出了针对时序的特殊结构化的玻尔兹曼机，时序长T+1，水平有T+1层；每层都有隐藏部分和可见部分，第$\delta$层可见部分$x^{[t-\delta]}$代表时序$t-\delta$时刻的值。图1的BM偏置为b，权重参数为$(U,V,W,Z)$，$\theta=(V,W,b)$是和可见单元$x^{[t]}$相关的参数，$\phi=（U,Z）$是隐单元参数。DyBM的能量如下：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135409.png" style="zoom:67%;" /></p>
-<p>其中</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135433.png" style="zoom:67%;" /></p>
-<p>同理定义第二项。</p>
-<p>研究这种情况：$W=(W^{\delta})_{1&lt;=\delta&lt;=T}$，$\delta&gt;=d$时满足以下条件（衰减）：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135456.png" style="zoom:67%;" /></p>
-<p>其中$\lambda$是衰减率，T趋向于无穷时，式（2）的<strong>能量如下</strong>：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135514.png" style="zoom:67%;" /></p>
-<p>第二项同理，其中</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135531.png" style="zoom:67%;" /></p>
-<p>式（5）的能量给出了，<strong>给出$x^{[&lt;t]}$,$h^{[&lt;t]}$下$x^{[t]}$的条件概率分布</strong>，对二进制时序中任意的$x^{[t]}$，有：<br><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135550.png" style="zoom:67%;" /></p>
-<p>其中Z是使概率之和为1的归一化因子。</p>
-<h3 id="3-Training-a-DyBM-with-Hidden-Units"><a href="#3-Training-a-DyBM-with-Hidden-Units" class="headerlink" title="3. Training a DyBM with Hidden Units"></a>3. Training a DyBM with Hidden Units</h3><p><strong>推导可见单元参数$\theta$的学习规则，这个规则不适用于$\phi$</strong>。</p>
-<p>带隐单元的DyBM给出了时序的概率：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135616.png" style="zoom:67%;" /><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135633.png" alt=""></p>
-<p>其中：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135633.png" style="zoom:67%;" /></p>
-<p>通过最大化Jensen不等式给出的下界，来<strong>最大化给定x的对数似然函数</strong>，</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135653.png" style="zoom:67%;" /></p>
-<p>其中</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135732.png" style="zoom:67%;" /><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135749.png" alt=""></p>
-<p>下界对$\theta$的梯度是：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135749.png" style="zoom:67%;" /></p>
-<p>随机梯度的方法：每一步t，根据概率取样出$h^{[t-1]}$然后基于它的梯度来更新$\theta$:</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135826.png" style="zoom:67%;" /></p>
-<p>下界对$\phi$的梯度：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135904.png" style="zoom:67%;" /></p>
-<p>根据概率取样出$h^{[t-1]}$然后基于它的梯度来更新$\phi$:</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135923.png" style="zoom:67%;" /></p>
-<p>式27的计算复杂度随时序长度线性增长，<strong>计算效率低</strong>；而式17的复杂度和长度无关。可用递归方式近似计算G：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135949.png" style="zoom:67%;" /></p>
-<p>式26中存在一个<strong>对数似然和梯度的乘积</strong>，如果不依赖于对数似然函数，它的学习规则就与可见单元是相同的。而这两项相乘是不可避免的，因为隐单元的特定值是否有利于预测未来值，只有在看到未来值之后才能知道。</p>
-<h3 id="4-Learning-with-Reversed-Time-series"><a href="#4-Learning-with-Reversed-Time-series" class="headerlink" title="4.  Learning with Reversed Time-series"></a>4.  Learning with Reversed Time-series</h3><p>$\phi$的随机梯度需要近似，$\theta$不需要，所以参数$\phi$的学习不像$\theta$一样高效。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140009.png" style="zoom:67%;" /></p>
-<p>图2是后向DyBM，和前向DyBM有共同的参数集，它是由前向DyBM得到的，结构相同，参数矩阵转置，只是逆序处理时序。前向模型中$\theta=(V,W,b)$，$\phi=（U,Z）$，后向模型中$\theta’=(U^T,W^T,b)$, $\phi’=(V^T,Z^T)$, $U$在前向模型中是比较难学习的，而在后向模型中是相对好学习的。</p>
-<h3 id="5-Experiments"><a href="#5-Experiments" class="headerlink" title="5.  Experiments"></a>5.  Experiments</h3><p><strong>5.1 具体学习算法</strong></p>
-<p>三种训练模式：不带隐单元的DyBM；带隐单元的DyBM只进行前向学习；带隐单元的DyBM的双向学习。</p>
-<p>双向学习：前$T_0$轮迭代进行双向学习，每$F+1$步进行后向学习，剩余的迭代中只进行前向学习。前向学习时不更新U，后向学习时不更新V。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140036.png" style="zoom:67%;" /></p>
-<p><strong>5.2 合成数据</strong></p>
-<p>在<strong>一维带噪声锯齿波</strong>合成数据上实验，探究双向训练的有效性。锯齿波在每个阶段末端都存在很强的不连续性，所以隐单元对于学习是至关重要的。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140103.png" style="zoom:67%;" /></p>
-<p>训练了带一个隐藏单元/没有隐藏单元的DyBM，前一半迭代$T/2$进行双向学习。</p>
-<p>图3a、c是训练过程，RMSE评估预测误差。在图3c中，从T0时刻（双向学习结束之后），RMSE的下降开始加速，<strong>说明通过双向学习学到合适的U之后，更有利于学习其余参数（V W b）</strong>。虽然双向学习有助于学到合适的U，但是不一定优化DyBM的所有参数，后向DyBM和逆时序的DyBM不同。</p>
-<p>图3b、d给出了预测结果。<strong>双向学习的DyBM和真实值接近，可以很好的预测到每一个周期结尾的大幅下降</strong>，而基线在这里比较平滑。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140139.png" style="zoom:67%;" /></p>
-<p><strong>5.3 真实数据</strong></p>
-<p>每月太阳黑子数：一维，2820步；每周汽油柴油零售价：八维，1223步；2：1划分；NOAA全球表面温度：391维，1635步，4：1划分；数据进行归一化。</p>
-<p>测试了带4个隐单元/不带隐单元的DyBM，设置不同的$T_0$和d，前d步进行前向学习和后d步进行后向学习。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140159.png" alt=""></p>
-<p>对于太阳黑子数据，双向学习没有提高，但是隐藏单元能得到更低的RMSE。对于价格和温度数据，T0轮之后，双向学习效果优于基线，并且另外两种情况会<strong>过拟合</strong>。<strong>双向学习会减慢RMSE的下降，但是停止双向训练后，会加速RMSE的下降，双向学习最终的RMSE更低</strong>。</p>
-<h3 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h3><p>提出了带隐单元时序模型的双向学习，前向模型（训练前向序列）和后向模型（训练后向序列）有相同的参数集，<strong>一个模型中比较难学习的参数在另一个模型中可能是比较好学习的</strong>。分析了带隐单元的<strong>DyBM</strong>，可见单元$\theta(V,W,b)$和隐单元$\phi(U,Z)$的<strong>梯度不同</strong>，不能用同样的方式学习权重。所以双向学习可以提高参数学习效率，在合成/真实数据集上进行了实验，实验证明双向学习还可以<strong>避免过拟合</strong>。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -645,7 +467,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:26:42" itemprop="dateModified" datetime="2021-01-16T11:26:42+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:51:04" itemprop="dateModified" datetime="2021-01-16T11:51:04+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -668,100 +490,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="DTWNet-a-Dynamic-Time-Warping-Network"><a href="#DTWNet-a-Dynamic-Time-Warping-Network" class="headerlink" title="DTWNet:  a Dynamic Time Warping Network"></a>DTWNet:  a Dynamic Time Warping Network</h1><p>【NIPS2019】</p>
+          <p>【NIPS2019】</p>
 <p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134144.png" style="zoom: 67%;" /></p>
 <hr>
 <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>DTW常用于相似性度量，由于DTW对时间轴的规整不变性，可以提供信号间的<strong>差异测量</strong>。本文提出了ANN的新组件，利用DTW进行<strong>特征提取</strong>（以往常用DTW作为损失函数）。从理论上分析了DTW损失，用随机反向传播机制来提高DTW学习的准确率和效率。所提出的框架可用作数据分析工具，进行<strong>数据分解</strong>。</p>
-<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p>相似性度量很重要，闵可夫斯基距离比较常用，$dist(x,y)=(\sum_{k=1}^{d}|x_k-y_k|^p)^{1/p}$（p=1，曼哈顿距离；p=2，欧氏距离）；马氏距离是扭曲的欧氏距离，$dist(x,y)=((x-y)^T\sum^{-1}(x-y))^{1/2}$。闵可夫斯基距离和马氏距离不能反应序列数据之间的<strong>真正相似性</strong>，DTW具有对时间规整的<strong>不变性</strong>。DTW还可作为<strong>特征提取</strong>工具，可以通过DTW计算定义预定义模式，后续可以用这些模式对时间数据进行分类。</p>
-<p>DTW通过cost矩阵C、动态规划得到最佳归整路径：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134212.png" style="zoom:80%;" /></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134237.png" style="zoom:80%;" /></p>
-<p>DTW虽然可以进行相似性评估、特征提取，但是对<strong>深度学习领域</strong>没有很大贡献。好的特征提取器是ANN的关。DTW有非线性变换特性（规整），提供了针对多普勒效应的目标总结，是潜在的ANN特征提取器。本文提出了DTWNet，<strong>有可学习DTW核的神经网络。</strong></p>
-<p>主要贡献：</p>
-<ol>
-<li>在神经网络中应用<strong>可学习的DTW核</strong>来表现多普勒不变性；</li>
-<li>采用基于规整路径的<strong>随机反向传播</strong>来计算动态规划的梯度，进而学习DTW核；给出了反向传播的<strong>收敛性</strong>分析；</li>
-<li>首次对<strong>DTW损失函数</strong>进行理论分析；</li>
-<li>提出了一种<strong>可微流DTW学习</strong>，来克服由标准DTW的全局对齐导致的局部特征缺失问题；</li>
-<li>实证研究表明，该方法是有效的，并成功地利用<strong>DTW核捕获特征</strong>，还演示了一个<strong>数据分解</strong>应用。</li>
-</ol>
-<h3 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h3><p><strong>2.1 DTW简介</strong></p>
-<p>DTW由于多普勒效应不变性，适于处理声学数据；处理ECG、EEG等生物信号来发现潜在疾病。DTW与预定义模式结合，是时序分类任务中一个强大的特征提取器。</p>
-<p>DP时间复杂度高，而且DP是顺序过程，所以DTW计算不能并行，已有一些加速计算的技巧。</p>
-<p>2-D DTW：DTW扩展到二维可用于图像匹配</p>
-<p><strong>2.2 SPRING算法：DTW的流版本</strong></p>
-<p>为了处理DTW度量下的流数据，[18]提出了一种DTW的变体——SPRING。原始DTW找到从两个序列<strong>起始到结束</strong>的最佳对齐；流版本试图从一个给定的序列中识别所有接近于某个给定模式的<strong>子序列</strong>。SPRING算法复杂度$O(nl)$，与标准DTW一致。</p>
-<p>SPRING核原始DTW计算有<strong>两个不同</strong>：首先，它在模式前添加一个通配符（模式的起点能匹配输入序列的<strong>任何位置</strong>）；利用辅助矩阵记录动态规划矩阵中每一个入口的源，这个<strong>源矩阵</strong>记录每一条候选路径，可以从尾端回溯。</p>
-<p><strong>2.3 DTW损失函数</strong></p>
-<p>DTW是顺序过程，计算DP矩阵过程中每一步都要最小化，最小化操作是不连续的，梯度和次梯度都不好定义。可以用<strong>soft-min</strong>代替min操作，[19]给出了soft-min的梯度，用小波学习来提高测试数据有限的时序分类效果。还有研究利用DTW中最小算子的连续松弛来解决视频对齐和分割问题。采用soft-min方法，[4]说明<strong>DTW作为损失函数比欧氏距离更好</strong>。</p>
-<h3 id="3-Proposed-DTW-Layer-and-its-Backpropogation"><a href="#3-Proposed-DTW-Layer-and-its-Backpropogation" class="headerlink" title="3. Proposed DTW Layer and its Backpropogation"></a>3. Proposed DTW Layer and its Backpropogation</h3><p>DTW层包括多个提取特征的DTW核，每个核产生一个通道，产生一个DTW距离值。如果有滑窗，每个核会产生一个距离序列（像卷积核一样），DTW层可以接线形层，得到分类/回归结果。算法1给出分类任务上的DTWNet示例。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134302.png" style="zoom:80%;" /></p>
-<p><strong>梯度计算和反向传播</strong></p>
-<p>DP过程后得到规整路径，序列长n，核长l，路径最长不超过$(n+l)$，DTW距离的平方为：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134321.png" style="zoom:80%;" /></p>
-<p>路径已经确定，只需<strong>沿着路径微分</strong>，DTW距离对x求导：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134348.png" style="zoom:80%;" /></p>
-<p>min操作没有梯度，直接进行自动微分会导致很大的方差，可以用softmin来解决这个问题，soft-min复杂度$O(nl)$。只依赖于路径上的元素，无需对整个cost矩阵的所有entry进行求导，只对确定路径求导$O(n+l)$。每一次迭代DP扭曲路径不同，也会有方差，所以BP被看作一个随机过程。</p>
-<p><strong>时间复杂度：</strong>DP时间复杂度$O(nl)$，梯度计算时间复杂度$O(n+l)$</p>
-<h3 id="4-DTW-Loss-and-Convergence"><a href="#4-DTW-Loss-and-Convergence" class="headerlink" title="4. DTW  Loss and Convergence"></a>4. DTW  Loss and Convergence</h3><p>给定输入序列，目标是得到和y最佳对齐（通过最小化dtw距离）的核。核x随机初始化，通过梯度下降来学习，$d=H_yx$是动态规划得到的DTW距离。</p>
-<p><strong>定义1：</strong>所有可能的归整路径</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134415.png" style="zoom:80%;" /></p>
-<p>$H_yx$和函数空间中的某个函数$f_y^{(u)}(x)$相等，<strong>所以用函数空间中的函数集合来估计$H_yx$</strong>（每一个x对应一个样本函数）。用$f_y^{(u)}(x)$的梯度进行梯度下降，问题是它的梯度是否等于$H_yx$的梯度。</p>
-<p>$H_yx$在x的空间上不是处处光滑的，存在一些x：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134435.png" style="zoom: 80%;" /></p>
-<p>动态规划矩阵在每一步都有3个可选方向，在边界处只有1个可选方向，所以有：</p>
-<p><strong>引理1：</strong>归整路径数$|F_y|&lt;3^{n+l}$，其中n+l是最长归整路径</p>
-<p>x空间被分成区域，在某个区域，可以用$f_y^{(u)}(x)$来估计$H_yx$。用2范数的平方作为DTW loss，则$H_yx$是x的<strong>分段二次函数</strong>，如果用绝对值作为DTW loss，则$H_yx$是x的<strong>分段线性函数</strong>。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134501.png" style="zoom:80%;" /></p>
-<p>图2a，2b给出了示意。生成点来计算DTW loss，x长度为6，y长度为10，只变化x中间的两个元素，便于画出三维图像。图2a说明2范数作为DTW loss时$H_yx$是x的分段二次函数，2b是线性分段函数情况。</p>
-<p><strong>逃离局部最优</strong></p>
-<p>有一些工作给出了非凸神经网络损失函数全局收敛性的证明，本文通过利用损失函数的二次分段（线性分段），区域数上界是$O（3^{n+l}）$。先分析用<strong>标准梯度下降分析逃离u来进入它的邻域v</strong>，假设$y_{p:p+q}$和$x_k$对齐，可以得到u的局部二次函数，以及对$x_k$的偏导：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134524.png" style="zoom:80%;" /></p>
-<p>令偏导等于0，得到稳定点：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134557.png" alt=""></p>
-<p>相邻区域的函数$f_y^{v}$除了$y_{p+q+1}$的对齐外，都和$f_y^{u}$相同：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134618.png" style="zoom:80%;" /></p>
-<p>同理，该邻域左侧相邻区域的的稳定点如下：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134638.png" style="zoom:80%;" /></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134501.png" style="zoom:80%;" /></p>
-<p>考虑从u跳到v（u是碗状的，想跳出），区域v有三种情况：</p>
-<ol>
-<li>v的稳定点不在区域v内，在它的左侧。此时全局最优解一定不在v内，u内有一部分比它更小，如果跳到v，梯度会再次让它跳回u；</li>
-<li>u和v都是碗状的，需要从u到v，起点在最低点的左侧（如红色位置所示），否则会跳到w而不是v，为了保证一步跳到v，至多需要$(x_k^{(v)*}-x_{hat})$；</li>
-<li>v不是碗状的，$x_k^{(v)<em>}$在v的右端，走$(x_k^{(v)</em>}-x_{hat})$来跳到v，如果v的右邻域是碗状的，则v的右邻域更小，即使v的右邻域不是碗状的，组合区域[v, v+]也可以看作是准碗或扩展的v，所以跳到此处也是合理的。</li>
-</ol>
-<p>考虑左邻域w，w的稳定点在w内或w左侧时，稳定点肯定在起点左侧；w的稳定点在w右侧时，把[w,u]合并为u’，u’的左邻域为w‘，上述分析对这三个新的区域仍然成立，所以有以下定理：</p>
-<p><strong>定理1.</strong>假设起点在u区域（由公式5定义）内，x和y的长度分别为n和l，为了跳出u区域到达紧邻的右侧区域，步长期望满足$E(\eta)&gt;l/(2n)$</p>
-<p>有若干个y，距离函数求和，梯度求和，通过小批量随机梯度下降来更新x。随机梯度是无偏估计，方差代表跳出局部最优解的能力。</p>
-<h3 id="5-Streaming-DTW-Learning"><a href="#5-Streaming-DTW-Learning" class="headerlink" title="5. Streaming DTW Learning"></a>5. Streaming DTW Learning</h3><p>一个ECG序列有多个心跳脉冲，希望DTW核学到心跳脉冲模式，而端到端的DTW会使DTW核与<strong>整个序列</strong>对齐而不是<strong>一个脉冲</strong>。如果核很短，没学到有用的东西。为了解决这个问题，用SPRING算法来输出对齐子序列的模式（DTW核）：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134721.png" style="zoom:90%;" /></p>
-<p>其中i和y的长度待优化。</p>
-<p>流版本试图从一个给定的序列中识别所有接近于某个给定模式的<strong>子序列</strong>。SPRING给出最佳匹配的子序列以及一系列有最小DTW距离的规整路径，提出两个机制：机制一，预设常数k，让SPRING选出<strong>k个最优</strong>的归整路径（k个不同的非重叠的、与模式x的DTW距离最小的子序列）；机制二，不是指定路径数，设置参数$\epsilon$，给出<strong>距离小于$(1+\epsilon)d^*$的路径</strong>（$d^*$是最佳归整路径的DTW距离）。随机/平均作为DTW计算结果。本文中，$\epsilon$设为0.1，随机采样。</p>
-<p><strong>流DTW的正则化矩阵</strong></p>
-<p>SPRING希望核x去学习输入序列中的<strong>重复模式</strong>，对模式的长度没有限制。输入数据中总会出现没有包含太多有效信息的公共部分，不加正则化的核很容易捕捉<strong>无用模式并陷入局部最优值</strong>。加入正则化来解决这个问题：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134741.png" style="zoom:80%;" /></p>
-<p><strong>正则化会得到“完整”的模式</strong>，模式的起始相隔比较近。如图3a所示，有上半个/下半个半圆待学习，不进行正则化的话，核只能学到部分模式；加入弱正则化，学到更完整的模式；合适的$\alpha$能捕捉到完整的形状。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134810.png" style="zoom: 67%;" /></p>
-<h3 id="6-Experiments-and-Applications"><a href="#6-Experiments-and-Applications" class="headerlink" title="6. Experiments and Applications"></a>6. Experiments and Applications</h3><p>将本方法与现存的方法对比，将端到端的DTW核称为Full DTW，将流版本称为 SPRING DTW。</p>
-<p><strong>6.1 与卷积核的对比</strong></p>
-<p>类别1有<strong>半个方形</strong>信号模式，类别2有下方的<strong>三角</strong>信号模式，模式的位置和长度随机，模式不重叠，图4a给出一些样本。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134837.png" style="zoom: 77%;" /></p>
-<p>输入序列有100个点，模式长度从10-30不等，训练集100条（1：1），测试集100条（1：1），我们比较了Full DTW、SPRING DTW和卷积核，核的长度为10，再加三层线性层，</p>
-<p>图4b给出了收敛后的习得的DTW核，Full DTW试图捕捉<strong>整个</strong>序列，整个序列有两个模式，Full DTW核也有<strong>两个峰</strong>；SPRING DTW只匹配<strong>部分模式</strong>，呈扫描状；图4c和4d给出了acc和loss曲线，两个DTW的曲线几乎一致，只画出了Full DTW的图。令人意外，卷积核未能到100%，MLP表现最差。可以将这个方法扩展到多元时间序列（无需作大的修改）</p>
-<p><strong>6.2 梯度计算评估</strong></p>
-<p>进行质心计算，评估提出的<strong>BP机制的效率和准确性</strong>，使用了UCR数据集，将我们的方法和SoftDTW、DBA、SSG进行对比，5次实验取平均。</p>
-<p>质心实验旨在找到每一类输入序列的质心，计算DTW loss，loss越小，表现越好。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134920.png" style="zoom:67%;" /></p>
-<p>表1给出了实验结果，Win意思是在85个数据集上达到最小loss的次数，还给出了平均排名、平均loss，我们的方法性能比较好。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135113.png" style="zoom:67%;" /></p>
-<p><strong>6.3 DTW分解的应用</strong></p>
-<p>将DTWNet作为时间序列<strong>数据分解</strong>工具，设计五个DTW层，每层有一个DTW核。关键是将第i层的残差向前传到下一层。计算DTW距离会得到规整路径，从$y_j$中减去对应的$x_{i,j}$</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135138.png" style="zoom: 67%;" /></p>
-<p>图5阐释了分解的影响，核0-核4对应第一层到最后一层，训练目标是最小化网络输出的残差，训练一定轮数后，不同层的核形成不同的形状，核0是<strong>低频</strong>的、数据<strong>整体</strong>形状，核4形状是<strong>高频</strong>的、<strong>曲折</strong>形状。<strong>层数越深，越能学到高频的部分</strong>，可被用作分解工具，可解释性强。</p>
-<h3 id="7-Conclusions-and-Future-Work"><a href="#7-Conclusions-and-Future-Work" class="headerlink" title="7. Conclusions and Future Work"></a>7. Conclusions and Future Work</h3><p>将DTW核应用为<strong>特征提取器</strong>，提出了DTWNet框架。为了实现反向传播，通过动态规划评估了DTW距离，沿着确定规整路径的计算梯度，给出了DTW作为损失函数的理论研究，将DTW损失定义为分段二次/线性函数，描述了不同情况下的步长（为了跳出局部最优）。实验显示，在某些任务中DTW核比标准的卷积核表现好，评估了梯度计算核反向传播的有效性，给出了数据分解的应用。</p>
-<hr>
-<p>本文由腾讯AI Lab主导，与康涅狄格大学合作完成。深度神经网络在处理时间序列数据时，传统的闵可夫斯基距离不适合作为反应序列相似度的损失函数，而动态时间规整算法（DTW）可以更好地计算序列距离，<strong>因此可以用作深度网络中的损失函数和特征提取算子</strong>。<br>本文提出了一种新的估计方法，使得DTW在作为算子时可以估计输入的梯度，从而实现神经网络中的反向传播。该方法首次分析了DTW作为损失函数的函数形态和应用梯度下降法的收敛性，并且首次提出了基于部分序列匹配的DTW梯度更新算法。实验结果表明，该方法作为一种新的特征抽取手段，可以<strong>更好地提取时间序列数据中的特征</strong>。此外，本文提出的梯度估算方法在实验中展现了良好的<strong>收敛性</strong>。本文也创造性地提出了该方法在<strong>数据分解</strong>上的拓展性应用。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -811,7 +551,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:26:34" itemprop="dateModified" datetime="2021-01-16T11:26:34+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:50:52" itemprop="dateModified" datetime="2021-01-16T11:50:52+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -834,131 +574,21 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="A-Hierarchical-Neural-Network-for-Sleep-Stage-Classification-based-on-Comprehensive-Feature-Learning-and-Multi-flow-Sequence-Learning"><a href="#A-Hierarchical-Neural-Network-for-Sleep-Stage-Classification-based-on-Comprehensive-Feature-Learning-and-Multi-flow-Sequence-Learning" class="headerlink" title="A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning"></a>A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning</h3><p>基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络</p>
+          <p>基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络</p>
 <hr>
 <p>【2019,IEEE Journal of Biomedical and Health Informatics】</p>
 <p>【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】</p>
 <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><strong>自动睡眠分期</strong>通常提取PSG信号中的人工特征或网络训练的特征，用多种分类器估计它属于哪个阶段。</p>
 <p>本文提出了基于分层神经网络的方法处理多通道PSG信号。包含<strong>两个阶段</strong>：综合特征学习阶段和序列学习阶段。第一阶段，将人工特征和网络训得的特征融合；第二阶段用多流的循环神经网络学习睡眠周期之间的时间信息，并微调第一阶段的参数。</p>
 <p>用公开数据集MASS中147份记录来评估模型，总体能达到0.878的准确率，F1-score为0.818。与目前的先进方法相比，这种方法性能<strong>更优</strong>。消融实验和模型分析证明了模型<strong>不同组成部分的有效性</strong>。该方法可以根据不同的标准、信号特征和阶段划分的多通道PSG信号对睡眠阶段进行自动分类，具有<strong>全面</strong>开发睡眠信息的潜力。</p>
-<p>关键词：睡眠阶段分期；卷积神经网络；循环神经网络；EEG信号</p>
-<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p><strong>背景：</strong>AASM标准将睡眠阶段分为五类：WAKE，REM，NREM1，NREM2，NREM3；把睡眠记录分为连续的阶段，专家根据一定标准将每个阶段划分为一个特定的睡眠阶段。为了减轻专家负担并提供辅助诊断，基于传统机器学习的方法应用了PSG信号中的典型特征（具有明显的物理意义），然后用不同的分类器进行睡眠分期。</p>
-<p><strong>存在问题：</strong></p>
-<ol>
-<li><p>如何从EEG、EOG和EMG信号中提取超越现有经典特征的<strong>新的、有效的特征</strong>是一个挑战；</p>
-</li>
-<li><p>如果根据以已提供的特征，某个阶段的特征仍然难以<strong>全面描述</strong>，这个阶段就会比较难识别；</p>
-</li>
-<li>传统机器学习方法的分类器<strong>不擅长处理时间序列信号</strong>。</li>
-</ol>
-<p><strong>A. 睡眠阶段分期的深度学习方法：文献综述</strong></p>
-<p>深度学习方法在很多领域都取得巨大成功。CNN和DBN在特征提取上性能比较好，RNN适于处理时序信号。<strong>深度网络</strong>在生理信号和医学图像处理方面都表现出<strong>良好性能</strong>。</p>
-<p>睡眠分期分为两步：特征提取和序列信号分类。可以用深度网络来处理睡眠数据：CNN单通道、CNN多通道。信号越多，分类效果越好；序列分类：DBN+HMM，ReNN+LSTM，CNN+BLSTM，只用深度网络，会<strong>过度依赖于网络</strong>。</p>
-<p>PSG信号可提取出三类特征：手动设计特征（可以提取到网络提取不到的特征，但是进步缓慢），网络训得的特征（难以描述和理解，有效性有待研究），从手动设计特征得到的分层特征（忽略了直接从网络提取的特征）。这些网络架构还有很大的<strong>提升空间</strong>。</p>
-<p><strong>B. 本文目标</strong></p>
-<p>旨在提出一个更好的方法，能<strong>综合</strong>的利用睡眠阶段知识，利用深度网络的特点（把手动设计特征和网络科学地结合起来）。还要考虑所训练特征的<strong>序列相关性</strong>；可以用于多种PSG信号，<strong>泛化性</strong>强。</p>
-<p>本文中提出了基于分层网络的新的分类方法，包括两步：综合特征学习阶段（自动提取特征矩阵）&amp;序列学习阶段（BLSTM和注意力层结合的多流网络进行序列学习）</p>
-<p><strong>贡献：</strong></p>
-<ol>
-<li>提出了一种<strong>两阶段</strong>的网络结构，提高分类效果。一阶段用三级CNN学习网络特征，将其与手工特征融合；二阶段用多流RNN&amp;注意力机制发掘序列信息，建立“序列-序列”的映射，而不是睡眠阶段之间的一对一映射。</li>
-<li>为了避免样本不均衡、过拟合问题，提高泛化能力，采用了一些<strong>学习策略</strong>：focal loss function，去除无用训练轮，选择性的模型储存策略。</li>
-<li>提出的模型可以完成不同数据集、不同标准、信号特征和阶段划分的睡眠分期。在4个数据集上做了实验，证明了模型的前景和<strong>鲁棒性</strong>。</li>
-</ol>
-<h3 id="2-Methodology"><a href="#2-Methodology" class="headerlink" title="2. Methodology"></a>2. Methodology</h3><p>介绍了模型架构，手动设计特征和分层网络。</p>
-<p><strong>A. 模型架构</strong></p>
-<p>模型结构如图1，初始信号自动预处理生成网络输入，然后通过网络习得特征。特征训练过程中，从网络输入中提取手动设计特征，然后将二者融合得到综合特征。然后训练模型根据综合特征学习时间信息，将网络输入喂给模型，验证模型的可行性。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132222.png" style="zoom:67%;" /></p>
-<p><strong>B. 手动设计特征</strong></p>
-<p>根据AASM标准，连续30s长的睡眠阶段被分为WAKE，REM，NREM1，NREM2，NREM3五类。根据R&amp;K标准，连续20s或30s的睡眠阶段被分为Wake, S1, S2, S3, S4, REM六类。每个阶段有自己的特点，即<strong>物理特征（如频率范围、振幅、某些特定波的持续时间</strong>），物理特征可通过手工设计提取出来，因此，<strong>基于睡眠医学先验知识提取手工特征</strong>是区分睡眠阶段的一种快速而简单的方法。</p>
-<p>EEG EOG EMG信号去噪后进行手工特征提取，提取了122个特征（时域、频域、形态特征），如表1所示。滑窗自动提取，进行z-score归一化，以减少受试者之间生理差异和设备相关差异的影响。特征向量拼接起来，<strong>虽然网络习得的特征也很好，但是不能完全抛弃手工设计特征，因为这些特性与睡眠知识是一致的</strong>。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132328.png" alt=""></p>
-<p><strong>C. 网络结构</strong></p>
-<p>特征学习阶段（阶段1）：三个filter分别学习细节特征、结构特征、形状特征，同时提取手工特征，然后进行融合；</p>
-<p>多流序列学习阶段（阶段2）：获得混合特征矩阵，习得时序信息，如阶段转换规则；微调stage1模型，得到最终模型。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132413.png" style="zoom:67%;" /></p>
-<p><strong>1）Stage1</strong></p>
-<p>CNN可以捕捉局部相关性和空间不变性，参数共享，可用于特征提取。设计了三级CNN结构（图3），有三个分支，分别<strong>捕捉细节特征、结构特征、形状特征（对应的filter size和步长不同）</strong>。每一个分支有4个卷积层，2个最大池化层，一个dropout层。然后拼接，全连接，输出。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132455.png" alt=""></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133736.png" style="zoom:67%;" /></p>
-<p>标准化的<strong>手工特征</strong>也被加入网络中（图4，公式6-8）</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132717.png" alt=""></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132742.png" style="zoom:67%;" /></p>
-<p><strong>2）Stage2</strong></p>
-<p>睡眠阶段有内部阶段相关性。阶段2主要捕捉时序信息，调整阶段1模型。LSTM能捕获序列之间依赖，选择性传递信息，<strong>BLSTM，输出同时受前后信息的影响</strong>。</p>
-<p>样本不平衡可能导致有些阶段被<strong>忽略/错分</strong>。<strong>为了保留被忽视的阶段，采用注意力机制</strong>。注意力层可以<strong>辅助</strong>BLSTM捕捉阶段信息（如图5所示），可以加强阶段之间的联系，通过引入新训练变量来突出一些阶段。根据前面和后面的阶段来判断本阶段属于哪个类。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132831.png" style="zoom:67%;" /></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132858.png" style="zoom: 67%;" /></p>
-<p>$h_t$是序列h中第t个阶段BLSTM的输出，W和b是序列h的权值和偏置，$I_t$是$\mu_t$的权值矩阵，$\alpha_t$是第t个阶段占的比例，$v_t$是注意力层的输出。</p>
-<p>完整的阶段2如图6所示，数据分批输入。阶段2是多流结构，有3个数据通路。三个tensor（三个阶段1的输出）拼接，全连接层，BLSTM，注意力层。三个输出的维度相同，即特征提取、BLSTM、注意力层的提供相同数量的信息（在最后加权之前）。然后经过全连接、softmax提取信息，给出类别概率。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133841.png" alt=""></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132951.png" style="zoom: 67%;" /></p>
-<h3 id="3-Experiment"><a href="#3-Experiment" class="headerlink" title="3. Experiment"></a>3. Experiment</h3><p>介绍数据和训练过程。</p>
-<p><strong>A. 数据</strong></p>
-<p>用147条整晚记录来评估模型。<strong>MASS有五个子集，子集内部同质，子集之间差距较大</strong>。SS2-SS5都是健康样本，用SS2-SS5进行训练。</p>
-<p>SS2-SS5的属性如表2，选共同部分用于训练：<strong>C3 EEG，EOG，chin1 EMG</strong>（以256Hz频率采样），通过60hz陷波滤波器和带通滤波器进行去噪。所有信号被降采样到128hz，便于后续处理减少、计算复杂度。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133025.png" alt=""></p>
-<p>四个数据集的人口统计资料、五类睡眠阶段比例和总的test epoch数由表3给出。用LOSO（Leave One Subject Out ）来评估模型在四个子集上的性能。训练：验证：测试=k-2:1:1,本课题独立验证更适合实际应用场景。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133051.png" alt=""></p>
-<p><strong>B. 训练过程</strong></p>
-<p><strong>1）训练参数</strong></p>
-<p>阶段1：Adam，batchsize，lr，epochs，cross-entropy。</p>
-<p>阶段2：两层BLSTM，Adam，batchsize，epochs，SL。同时考虑阶段的时序信息，微调阶段1参数。为了避免<strong>梯度爆炸</strong>，采用启发式梯度裁剪技术；用<strong>focal loss fuction</strong>量化真实标签和预测标签之间的一致性。FL如下：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133913.png" style="zoom:70%;" /></p>
-<p>其中$p_t$是每一类的概率，权重因子$\alpha$和集中参数$\gamma$解决<strong>样本不均衡</strong>问题、区分简单/困难例子，分别设置为0.25和2。dropout，L2正则化，这些超参数的值如表4。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133940.png" style="zoom:67%;" /></p>
-<p>用全局acc、F1-score、kappa系数，精度，recall，每一类的F1-score来<strong>评估</strong>。</p>
-<p><strong>2）学习策略</strong></p>
-<p><strong>epoch removal：</strong>从训练集中剔除了代表睡眠阶段转换的两个变化期，使模型充分研究<strong>纯特征</strong>。</p>
-<p><strong>oversampling：</strong>根据最多epoch数来确定睡眠阶段，然后在训练集中重复地从小睡眠阶段中选取相同的epoch数，使得所有睡眠阶段都有<strong>相同数目的样本</strong>。所有阶段中的信息能被充分学习。</p>
-<p><strong>model storage scheme：</strong>每训练一轮，如果满足要求，储存当前模型。该方法可以在不存在过拟合现象的前提下，<strong>尽量少存储模型</strong>，减少训练时间和存储空间。</p>
-<h3 id="5-结果"><a href="#5-结果" class="headerlink" title="5. 结果"></a>5. 结果</h3><p>本文模型与目前的先进模型对比，探究模型各模块的效果。</p>
-<p><strong>A. 睡眠阶段分期表现</strong></p>
-<p>图7给出混淆矩阵，N1分类效果相对较差，</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133201.png" alt=""></p>
-<p>评估指标如表5，<strong>N1分类效果差</strong>，N1在睡眠阶段中比例相对较低，比较难分类。在SS2-SS5上总体的acc、F1-scores和kappa系数分别在0.867~0.897、0.797~0.839、0.806~0.847。kappa系数说明：分类结果和专家意见一致；acc：对于具有不同特征的四个子集，acc高且稳定；F1-score：同时兼顾精度和召回率。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133226.png" alt=""></p>
-<p>图8给出了一个样本的睡眠图，分类结果和之前提到的阶段匹配规则基本一致，错分的基本上是把N1错分为其他类（与图7显示的结果一致）。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133248.png" alt=""></p>
-<p><strong>B. 与目前先进模型对比</strong></p>
-<p>a). 三层CNN+SGD+Adam+cross entropy</p>
-<p>b). ReNN(探测特征)+LSTM（序列数据学习）+SGD+cross entropy</p>
-<p>c). CNN（表示学习模块，提取时间不变特征）+BLSTM（序列残差学习模块）+oversampling+Adam++cross entropy</p>
-<p>d). EEG features+ stacked sparse autoencoders +L-BFGS+正则化</p>
-<p>图9给出四种方法和我们的模型混淆矩阵：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133319.png" alt=""></p>
-<p>表5给出评估指标的表格：除了N1类的F1-score，其余指标都高于现有模型。结果说明：RNN适于发掘时序信息，<strong>特征提取对不同的类别贡献不同</strong>。用 Wilcoxon秩和检验探究我们的方法在acc上是否和另外四种有显著差异，表格说明我们的方法有<strong>显著提高</strong>。表6列出了反映了分类结果、时间复杂度、训练时间、测试时间的指标对比。模型越复杂，训练时间越长。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133338.png" alt=""></p>
-<p><strong>C. 模型各元素（模块）的表现</strong></p>
-<p>提出的结构有4个关键点：三级CNN，手工设计特征，BLSTM，注意力层；以及学习策略。从完整模型中提取5个模型：</p>
-<p>1). 三级CNN（没有手工设计特征）</p>
-<p>2).先提取手工设计特征，再训练网络特征，并融合</p>
-<p>3).stage1+BLSTM，无注意力层</p>
-<p>4).stage1+stage2，无学习策略</p>
-<p>5). stage1+stage2（含学习策略），即完整模型</p>
-<p>图10给出混淆矩阵结果，三级CNN是模型的<strong>基础</strong>，对分类效果有比较大的影响；模型中每个元素都能提高分类效果。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133359.png" alt=""></p>
-<p>表7是各指标结果，显示完整的模型效果最好。2、3对比：学习策略的提升效果；12对比，手工设计特征的提升效果；注意力机制有效果；学习策略有用</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133422.png" alt=""></p>
-<p><strong>D. 模型分析</strong></p>
-<p>记录融合层中的权值分布。权值为正，正面影响；权值为负，负面影响。权值绝对值越大，影响越大，全连接层中的<strong>权值绝对值可以反应传递过来的信息流</strong>。提取出特征拼接之后的<strong>全连接层的权值，初步总结两类特征的贡献</strong>。网络训得的特征信息量如下：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133443.png" style="zoom: 80%;" /></p>
-<p>每个特征平均信息量T/1000.</p>
-<p>提取了阶段2拼接之后的第一个全连接层的权值，信息总量和平均信息量如表8：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133603.png" style="zoom:67%;" /></p>
-<p><strong>网络训得的特征</strong>总量比手工设计特征，<strong>提供更多有效信息</strong>，网络训得的特征能保存形状信息（卷积核是定长一维张量），手工特征可能会忽略形状特点（压缩了信号信息）。但是<strong>平均手工特征</strong>更大，说明它<strong>也很重要</strong>。</p>
-<p>注意力机制的信息总量大于BLSTM的，说明<strong>注意力机制提供了额外的信息</strong>。网络习得的特征和手工设计特征是平行输入的，stage1、BLSTM、注意力机制是级联的。后面模块包含了前面模块的信息。</p>
-<p>加入手工设计特征后，后面的全连接层的权值被提取出来。图11给出了SS4中每个手工设计特征的相对信息量，<strong>不同滑窗大小、不同时刻下特征的贡献是相似的</strong>，MSE特征不能提供足够的信息，被过滤掉了。其中，前7个能区分五个睡眠阶段的特征是：EMG信号PSD平均功率、EMG信号峰值、肌电信号中PSD的平均功率、DFA在3个阶段上的标度指数、脑电图信号中PSD的峰值功率、脑电信号的频域差值分析、EOG信号的谱熵。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133627.png" alt=""></p>
-<p>网络习得的特征是随机抽取的，下标不固定，不能定量描述形态，很难总结每个特征的贡献。</p>
-<h3 id="5-discussion-amp-future-work"><a href="#5-discussion-amp-future-work" class="headerlink" title="5. discussion&amp;future work"></a>5. discussion&amp;future work</h3><p><strong>手工设计特征</strong>不能被完全丢弃，不同特征可以通过合适的网络有效结合。实际上手工设计特征也经过一系列线性/非线性操作，<strong>其实也是在加深网络</strong>，因为网络可以同时进行不同深度的训练。</p>
-<p>N1和N2<strong>错分</strong>，它们比较类似，专家通过前后信息来判断，所以引入<strong>序列学习</strong>可以提高分类效果。可以试图发现新的验证特征、探究N1的时间信息，或者寻找N1阶段的<strong>数据扩增</strong>方法，来提高效果。</p>
-<p>网络习得的特征比手工设计特征表现力更强。我们推测是专家主要看波形，不能发现隐藏信息。手工设计特征间接形容形态，CNN<strong>直接提取形态信息</strong>（与专家方法一致）。</p>
-<p><strong>深度学习在睡眠分期上有优势</strong>。从特征提取角度，CNN能提取不同的形态信息（与专家一致）；BLSTM更擅长发掘睡眠阶段之间的联系；结合手工设计特征，得到更全面的特征；注意力机制加强睡眠阶段之间的联系 ；各种学习策略提高模型的泛化性。</p>
-<p>表9给出了传统睡眠分期方法和本方法的全面比较结果，说明<strong>手工设计特征有待提高</strong>。传统方法分类效果也不错，但是样本数量都比较小。手工设计特征需要特征选择过程（避免过拟合）。深度学习方法需要大量数据，<strong>若数据量小，也可以考虑传统方法</strong>。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134033.png" alt=""></p>
-<p>局限性和未来方向：深度学习框架可解释性相对较差；手工设计特征需要一些<strong>睡眠医学的知识</strong>；本文选用的是正常人数据，有睡眠疾病的人睡眠结构会更复杂、分类更难，更多关注<strong>有睡眠疾病的人患者</strong>的睡眠分期方法，检测相关睡眠疾病；<strong>数据扩增</strong>（如GAN，可以人工生成睡眠阶段使得阶段样本平衡）；解码网络映射关系，探究不同的阶段哪个特征最相关（比较困难），考虑通过模型可解释性/信息追踪来解决这个问题。</p>
-<h3 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h3><p>本文利用EEG、EOG、EMG信号，基于综合特征学习和多流序列学习构造了层次神经网络来解决睡眠分期问题。第一阶段，用三级CNN提取特征，将其与手工设计特征融合；第二阶段用BLSTM和注意力机制进行分类。在四个数据集上进行实验，评估模型，acc达到0.878，F1-score达到0.818，优于目前的先进模型。分析了五个不同模块组合的模型，验证各部分的效果，说明所提出的模型是有效的，有全面地发掘睡眠信息的潜力。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1008,7 +638,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:26:20" itemprop="dateModified" datetime="2021-01-16T11:26:20+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:50:33" itemprop="dateModified" datetime="2021-01-16T11:50:33+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1031,82 +661,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="Multi-task-learning"><a href="#Multi-task-learning" class="headerlink" title="Multi-task learning"></a>Multi-task learning</h2><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a><strong>定义</strong></h4><p>Multitask Learning is an approach to inductive transfer that improves learning for one task by using the information contained in the training signals of other related tasks.</p>
+          <h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a><strong>定义</strong></h4><p>Multitask Learning is an approach to inductive transfer that improves learning for one task by using the information contained in the training signals of other related tasks.</p>
 <p>多任务学习是一种<strong>归纳迁移</strong>的方法，它通过利用<strong>其他相关任务</strong>的训练信号中所包含的信息来<strong>改善</strong>对一个任务的学习，并行学习，互相帮助学习。广义的讲，只要<strong>loss有多个</strong>就算MTL。</p>
 <p>具体地，基于共享表示（shared representation），把多个相关的任务放在一起学习。用<strong>相关任务的训练信号来提升主任务的泛化效果</strong>。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142218.png" style="zoom:80%;" /></p>
-<h4 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a><strong>挑战</strong></h4><p>与标准的单任务相比，在学习共享表示的同时训练多个任务有两个主要挑战：</p>
-<ul>
-<li><p><strong>Loss Function(how to balance tasks)：</strong>多任务学习的损失函数，对每个任务的损失进行权重分配，在这个过程中，必须保证所有任务同等重要，而不能让简单任务主导整个训练过程。手动的设置权重是低效而且不是最优的，因此，自动的学习这些权重或者设计一个对所有权重具有鲁棒性的网络是十分必要和重要的。</p>
-</li>
-<li><p><strong>Network Architecture(how to share)：</strong>一个高效的多任务网络结构，必须同时兼顾特征共享部分和任务特定部分，既需要学习任务间的泛化表示（避免过拟合），也需要学习每个任务独有的特征（避免欠拟合）。</p>
-</li>
-</ul>
-<p>一个优秀的多任务网络应该具备：(1)特征共享部分和任务特定部分都能自动学习（2）对损失函数权重的选择上更robust。</p>
-<h2 id="End-to-End-Multi-Task-Learning-with-Attention"><a href="#End-to-End-Multi-Task-Learning-with-Attention" class="headerlink" title="End-to-End Multi-Task Learning with Attention"></a>End-to-End Multi-Task Learning with Attention</h2><p><em>【CVPR 2019】</em></p>
-<p><em>【Shikun Liu，Edward Johns，Andrew J. Davison】</em></p>
-<p><em>【Department of Computing, Imperial College London】</em></p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/82234448?utm_source=wechat_session">https://zhuanlan.zhihu.com/p/82234448?utm_source=wechat_session</a></p>
-<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>提出了新的多任务学习结构，学习特定任务的、特征级别的注意力模块，即Multi-Task Attention Network（<strong>MTAN</strong>）。MTAN包括：一个带有全局特征池的<strong>共享网络</strong>，针对每个任务的<strong>soft-attention模块</strong>，从全局特征中学习特定任务的特征。该网络可以实现端到端训练，可以构建在任何前馈神经网络上。在图像预测和分类任务中作了实验，超过目前的方法，对多任务损失函数中的各种加权机制比较<strong>鲁棒</strong>。</p>
-<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>CV实际应用中，需要同时处理多任务，相关任务之间共享信息、特征。MTL中，学习共享表示的关键<strong>挑战</strong>：</p>
-<ol>
-<li>网络结构（任务<strong>共享层特征表示</strong>和<strong>特定任务的特征表示</strong>）</li>
-<li>loss function（如何<strong>平衡各个任务</strong>，自动学习权重，设计一个对不同权重具有鲁棒性的网络）</li>
-</ol>
-<p>之前的MTL只关注其中一个，本文模型同时解决了两个挑战：</p>
-<ol>
-<li><strong>自动学习</strong>任务共享特征和特定任务的特征</li>
-<li>对loss加权机制的选择具有<strong>鲁棒性</strong></li>
-</ol>
-<p>MTAN包<strong>括两部分</strong>：1.一个<strong>共享网络</strong>，学习所有任务特征的全局特征池，2.针对每个任务，在共享网络的每个卷积块上都加一个<strong>soft attention mask</strong>获取对自己有用的feature。以自监督、端到端的方式分别学习任务共享特征、特定任务特征，这种灵活性使我们能够学习到<strong>更有表现力</strong>的特征组合。自动选择任务共享特征、特定任务特征使得模型参数更少，更<strong>高效</strong>。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142244.png" style="zoom:67%;" /></p>
-<p>MTAN可应用于任何FNN，本文中<strong>基于SegNet构建MTAN</strong>，完成语义分割和深度估计（ CityScapes ），表面法线估计（NYUv2），基于Wide Residual Network完成图像分类。试验结果表明，MTAN效果超过目前的方法，同时参数效率更高，对loss funciton加权机制的选择更加鲁棒。提出了动态加权平均DWA。根据每个任务loss的变化率来调整权重。</p>
-<h3 id="Multi-Task-Attention-Network"><a href="#Multi-Task-Attention-Network" class="headerlink" title="Multi-Task Attention Network"></a>Multi-Task Attention Network</h3><p>如何基于SegNet构建MTAN</p>
-<p><strong>3.1 结构设计</strong></p>
-<p>MTAN包括：一个<strong>共享网络</strong>，K个<strong>特定任务的注意力网络</strong>，连接到共享网络。每个注意力模块对共享网络的特定层应用一个<strong>soft attention mask</strong>（可以看作特征选择器，端到端自动学习），以学习特定任务的特征；共享网络可以看做是一个跨任务的特征表示。</p>
-<p>图2给出了基于VGG16的MTAN可视化，也就是SegNet的encoder部分，每个注意力模块学习一个soft attention mask，共享网络特征和soft attention mask可以同时学习。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142836.png" style="zoom:80%;" /></p>
-<p><strong>3.2 特定任务的注意力模块</strong></p>
-<p>通过对共享网络特征应用soft attention mask, 让<strong>特定任务网络学习与任务相关的特征</strong>，共享网络第j层的特征记为$p^j$，该层中学到的第$i$个任务的attention mask记为${a}_i^{(j)}$，特定任务特征$\hat{a}_i^{(j)}$为:</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142351.png" style="zoom:80%;" /></p>
-<p>第一个注意力模块输入只有共享网络的特征，后续注意力模块输入包括共享网络特征和前一层的特定任务特征。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142408.png" style="zoom:80%;" /></p>
-<p>3.3 模型目标</p>
-<p><strong>输入X和K个标签Y，loss function如下：</strong></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142437.png" style="zoom:80%;" /></p>
-<p>是各任务loss的线性组合，具体到图像分割、深度估计、图像分类loss function不同：<br>语义分割：像素级的交叉熵损失</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142457.png" style="zoom:80%;" /></p>
-<p>深度估计：预测深度和真实深度的L1范数</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142516.png" style="zoom:80%;" /></p>
-<p>表面法线估计：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142532.png" style="zoom:80%;" /></p>
-<p>图像分类：交叉熵损失</p>
-<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p><strong>4.1 Image-to-Image Prediction (One-to-Many)</strong></p>
-<p>4.1.1 数据集</p>
-<p>数据：CityScapes，高解析度街景影像； 任务：语义分割&amp;深度检测</p>
-<p>数据：NYUv2，RGB-D室内场景图像（更复杂）； 任务：语义分割，深度估计，表面法线估计</p>
-<p>4.1.2 Baseline</p>
-<p>基于SegNet的两个单任务+三个多任务方法</p>
-<p>单任务：原始SegNet</p>
-<p>单任务：STAN（MTAN的单任务形式）</p>
-<p>多任务，Split（Wide，Deep）：标准的多任务学习，调整卷积核个数为Wide，调整卷积层数为Deep</p>
-<p>多任务，Dense：共享网络+特定任务的网络，但是任务特定的网络包括了共享网络中的全部特征，没有注意力机制</p>
-<p>多任务，Cross-Stitch（十字绣）：一种自适应多任务学习方法，构建在SegNet上</p>
-<p>4.1.3 DWA</p>
-<p>为了寻找<strong>各任务之间的平衡</strong>，提出简单有效的<strong>自适应加权方法</strong>DWA。根据GradNorm启发，考虑根据<strong>每个任务loss的变化率</strong>，随时间平均各任务权重， DWA只需要数值上的loss，比GradNorm更简单。第k个任务的权重如下：</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142551.png" style="zoom:80%;" /></p>
-<p>$w$是相对下降率；T越大，不同任务之间越平均，K是所有权值求和。</p>
-<p>4.1.4 结果（Image-to-Image Prediction）</p>
-<p>MTAN与baseline对比，加权方式对比（平均，随机，DWA）</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142608.png" style="zoom:80%;" /></p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142624.png" style="zoom:80%;" /></p>
-<p>MTAN+DWA的优势：1）参数少，效率高；2）鲁棒性：在不同的加权机制下，我们的模型表现都差不多</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142717.png" style="zoom:80%;" /></p>
-<p>4.1.5 任务复杂性效应</p>
-<p>在不同级别的语义分割任务中，2分类时，单任务训练也很好；问题变复杂时，需要共享特征、有效利用参数。<strong>随着问题变复杂，多任务模型都能提高性能</strong>，<strong>MTAN提升的最多</strong>。不同任务的attention mask作为选择器，选出来的特征是不一样的。</p>
-<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107142737.png" style="zoom:80%;" /></p>
-<h3 id="Conclusions"><a href="#Conclusions" class="headerlink" title="Conclusions"></a>Conclusions</h3><p>提出了 Multi-Task Attention Network (<strong>MTAN)</strong>，包括<strong>全局特征池</strong>，<strong>特定任务的注意力模块</strong>，以端到端模式<strong>自动学习任务共享特征、特定任务特征</strong>，效果超过了大多数现有模型。还提出了DWA（损失函数的加权机制），保证了鲁棒性，参数高效性。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/07/SongYudan/%E3%80%90CVPR%202019%E3%80%91End-To-End%20Multi-Task%20Learning%20With%20Attention/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1156,7 +721,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:25:41" itemprop="dateModified" datetime="2021-01-16T11:25:41+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:49:42" itemprop="dateModified" datetime="2021-01-16T11:49:42+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1179,7 +744,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="RAPP-NOVELTY-DETECTION-WITH-RECONSTRUCTION-ALONG-PROJECTION-PATHWAY"><a href="#RAPP-NOVELTY-DETECTION-WITH-RECONSTRUCTION-ALONG-PROJECTION-PATHWAY" class="headerlink" title="RAPP: NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY"></a>RAPP: NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY</h3><ul>
+          <ul>
 <li><p><strong>作者</strong></p>
 <p>Ki Hyun Kim, Sangwoo Shim, Yongsub Lim, Jongseob Jeon, Jeongwoo Choi, Byungchan Kim, Andre S. Yoon</p>
 </li>
@@ -1190,84 +755,14 @@
 <p>1、提出一种新的利用输入的隐藏层激活值和自编码器重构之后的隐藏层激活值异常检测方法RAPP，并且给出了识别输入异常的聚合函数</p>
 <p>2、给出了RAPP的动机，将重构的观点从输入空间扩展到隐空间。展示了重构输入之后再输入到网络的隐藏激活值与对应的原始输入的隐藏重构值是等价的。</p>
 <p>3、说明了RAPP在多个数据集上改进了基于自编码器的异常检测方法。此外，验证了RAPP的效果超过了最近的异常检测方法。</p>
-</li>
-<li><p><strong>介绍</strong></p>
-<p>​    当只有正常值信息时应该如何来识别异常？异常检测是一种来识别数据样本相对于训练数据是否为离群点额方法，常见的例子有交易欺诈检测，视频监控，医学诊断和设备异常检测。最近深度自编码器和他们的变体在发现复杂数据的简洁表示方面展示出了杰出的表现，并且重构误差被用来作为一种检测异常值的受欢迎度量。但是这种方法有一种限制，只测量了输入空间的重构误差而没有充分利用隐空间中的层次表示。</p>
-<p>​    普通的基于重构的方法是通过比较输入层的输入数据和在输出层的重构数据之间的差别，RAPP把这种比较拓展到了隐空间。首先收集一些隐藏激活值通过将原始输入喂到自编码器中，然后将自编码器的重构值输入到自编码器中计算另一份隐藏层的激活值，这个过程不需要自编码器的额外训练。接下来通过聚合这两份隐藏激活值来量化输入的异常特性。最后，开发了两种度量标准，第一种测量了输入空间和隐空间的整个重构误差数量，第二种度量标准首先标准化了重构误差，然后再求和。</p>
-<p>​    介绍了开发RAPP的动机，展示了重构输入之后再输入到网络的隐藏激活值与对应的原始输入的隐藏重构值是等价的</p>
-</li>
-<li><p><strong>RAPP</strong></p>
-<p>​    下面来介绍提出的基于自编码器的异常检测方法：RAPP，主要的思想就是比较原始输入的隐藏激活值和沿着自编码器投影路径的隐藏重构。也就是说将输入和自编码器的重构映射到隐空间来得到成对的激活值。</p>
-<ul>
-<li><p><strong>基于重构的异常检测</strong></p>
-<p>​    一个自编码器 $A$ 是一个包含编码器 $g$ 和解码器 $f$ 的神经网络 $A=f \cdot g$ 编码器 $g$ 构造的空间叫做隐空间，提供了输入数据的更简洁的表示。</p>
-<p>​    出于这种无监督表示学习的属性，自编码器广泛用于异常检测。在正常的数据样本上训练自编码器，测试样本 $x$ 是否异常通过下式的重构误差 $\varepsilon $ 来度量：</p>
-<script type="math/tex; mode=display">
-\varepsilon =||x-A(x)||_2</script><p>​    随着$\varepsilon (x)$的增大，测试样本 $x$ 更可能是一个异常，因为那意味着 $x$ 更加远离了自编码器所描述的流形。</p>
-<p>​    即使这种方法展示了在异常检测方面有前景的结果，但重构误差没有充分利用训练好的自编码器提供的信息，特别是当自编码器很深的时候。换句话说被自编码器所识别的层次信息被忽略掉了，层次表示学习是深度神经网络被证明最成功的能力之一。</p>
-</li>
-<li><p><strong>隐空间中的重构误差</strong></p>
-<p>​    令 $A=f \cdot g$表示一个已经训练好的自编码器，$l$ 是编码器 $g$ 的隐藏层数量，$g=g_l\cdot …\cdot g_1$ ，定义$g$的部分计算为：</p>
-<script type="math/tex; mode=display">
-g_{:i} = g_i...g_1</script><p>其中$1\leq i\leq l$</p>
-<p>​    令$x$是输入向量，$\widehat{x}$是通过$A$的重构：$\widehat{x}=A(x)$。除了像普通自编码器那样在输入空间中比较$x$和$\widehat{x}$，还沿着$A$的投影路径来在隐空间中比较他们，也就是将$x$和$\widehat{x}$输入到$A$，得到成对的隐空间表示$(h_i,\widehat{h}_i)$，其中</p>
-<script type="math/tex; mode=display">
-h_i(x)=g_{:i}(x) ,</script><script type="math/tex; mode=display">
-\widehat{h}_i(x)=g_{:i}(\widehat{x})=g_{:i}(A(x))</script><p>​    如下图所示，表示了计算$h_i$和$\widehat{h}_i$的过程，因此，样本$x$的异常性由公式$H(x) = \{ (h_i(x), \widehat{h}_i(x)) : 1 ≤ i ≤ l \}$来度量。</p>
-<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003151333.png" alt="微信截图_20201003151333" style="zoom:70%;" /></p>
-<p>​    注意RAPP确实是普通重构方法的一般化，通过定义$g_0$和$s_{ord}$如下</p>
-<script type="math/tex; mode=display">
-s_{ord}(H(x)) = ||h_0(x) − \widehat{h}_0(x)||_2</script><p>其中$h_0(x) = g_0(x) = x$，$\widehat{h}_0(x) = g_0(\widehat{x}) = \widehat{x}$</p>
-<p>​    在本文中定义了两个度量尺度$s_{SAP}$和$s_{NAP}$。当没有先验知识存在时，这两种度量尤其适用于选择层次以获得异常度量，注意，如果我们有关于空间的知识或者能够描述空间特征，可以设计出更精细的度量方法。</p>
-<ul>
-<li><p><strong>沿着路径的简单聚合(SAP)</strong></p>
-<p>​    这是一种最直接的定义在$H$上的度量方法，对于一个样本$x$，SAP可以定义为H中的所有pair之间的欧氏距离的平方和：</p>
-</li>
-</ul>
-<script type="math/tex; mode=display">
-s_{SAP}=\sum_{i=0}^{l}||h_i(x)-\widehat{h}_i(x)||^2_2=||\textbf{h}(x)-\widehat{\textbf{h}}(x)||^2_2</script><ul>
-<li><p><strong>沿着路径的标准化聚合(NAP)</strong></p>
-<p>​    虽然SAP很直观，但是隐空间的属性，$H$中pairs的距离分布可能由于不同隐空间而有不同，例如，</p>
-<p>距离的大小会依赖于不同的层，或者可能存在跨层的相关神经元，这些神经元无意之中在SAP中被强调。所以为了捕获更清楚的模式，通过两个步骤来标准化这些距离：正交化和缩放。</p>
-<p>​    令 $\textbf{d}(x) = \textbf{h}(x) − \widehat{\textbf{h}}(x)$ ；给定一个训练集$X$，令$\textbf{D}$表示一个矩阵，它的第$i$行对应$\textbf{d}(x_i)$，其中$x_i \in X$，令$\overline{\textbf{D}}$表示$\textbf{D}$的列优先中心(column-wise centered)矩阵，为了标准化，计算$\overline{\textbf{D}}$的SVD分解-$U\sum V^T$，得到奇异值$\sum $和右奇异向量$V$，对于一个给定的样本$x$，定义$s_{NAP}$如下</p>
-<script type="math/tex; mode=display">
-s_{NAP}(x)=||(\textbf{d}(x)-\mu_X)^TV\sum{^{-1}}||_2^2</script><p>​    其中$\mu_X$表示D的列优先的平均值，$\textbf{d}(x)$表示为一个列向量。</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p><strong>RAPP的动机</strong></p>
-<p>​    使用普通的重构方法会有一个很自然的问题：为什么只使用输入空间？或者说为什么不使用隐空间的信息？当重构误差在输入空间中广泛使用，任何类似的观点在隐空间中就都不存在。一个原因是对应的编码器层和解码器层无法保证表示出相同的空间，这是因为自编码器的目标函数没有任何涉及到中间隐藏层的激活值。因此，$f_{l:i+1}(g(x))$不能被认为是$g_{:i}(x)$的重构。</p>
-<p>​    下面会介绍一种非直接的方法来计算隐空间重构，准确的说会介绍$\widehat{h}_i(x)=g_{:i}(A(x))$确实等同于$g_{:i}(x)$的重构，整体机制如下所示</p>
-<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003201056.png" alt="微信截图_20201003201056" style="zoom:60%;" /></p>
-<ul>
-<li><p>隐空间重构的计算</p>
-<p>​    令$A=f\cdot g$为一个已经训练好的自编码器，令$M_0=\{A(x):x \in \mathbb{R}^n\}$表示为$A$所描述的低维表示，定义$M_i=\{g_{:i}(x):x \in M_0\}$为由$g_{:i}$定义的$M_0$的低维映像，$g$和$f$受限于$M_0$和$M_l$，是彼此之间的逆函数。</p>
-<p>​    <strong>量化隐空间的重构</strong>，我们首先假设存在一个解码器$\widetilde{f}=\widetilde{f}_1 \cdot… \cdot \widetilde{f}_l$，例如：</p>
-<script type="math/tex; mode=display">
-\forall x\in M_l,\widetilde{f}(x)=f(x),</script><script type="math/tex; mode=display">
-\forall a \in M_i,a=(g_i \cdot \widetilde{f}_i)(a)</script><p>​    其中第二个条件使$\widetilde{f}_{l:i+1}$成为一个对应于$g_{i+1:}$的合适的解码器，因此$\widetilde{f}$能够定义第$i$层的隐重构$\widehat{h}^{‘}_i(x)$，如下式所示：</p>
-<script type="math/tex; mode=display">
-\widehat{h}^{'}_i(x)=(\widetilde{f}_{l:i+1}\cdot g_{i+1:})(h_i(x))</script><p>最终能够得到结论$\widetilde{h}^{‘}_i(x)$等同于$\widetilde{h}_i(x)$，对于任一$x \in M_0$，如下所示：</p>
-<script type="math/tex; mode=display">
-\widehat{h}^{'}_i(x)=(\widetilde{f}_{l:i+1}\cdot g_{i+1:})(h_i(x))=(\widetilde{f}_{l:i+1}\cdot g)(x)</script><script type="math/tex; mode=display">
-\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space =(g_{:i}\cdot\widetilde{f}\cdot g)(x)</script><script type="math/tex; mode=display">
-\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space =(g_{:i} \cdot A)(x)=h_i(\widehat{x})=\widehat{h}_i(x)</script></li>
-</ul>
-</li>
-<li><p><strong>评价</strong></p>
-<p>使用了Kaggle和UCI中用来进行异常检测和多分类的数据集，如下表所示</p>
-</li>
-</ul>
-<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003230421.png" alt="微信截图_20201003230421" style="zoom:60%;" /></p>
-<p>​        为了比较RAPP和最近文章中的异常检测方法，也选取了一些基数据集来评估深度学习技术：MNIST和F-MNIST。</p>
-<p>​        使用AUROC将RAPP和其他的一些方法进行了比较，没有使用基于阈值的度量，例如F1-score，因为只允许在测试期间访问异常样本。</p>
-<p>和基线的比较：</p>
-<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003231256.png" alt="微信截图_20201003231256" style="zoom:60%;" /></p>
-<p>和最近的方法的比较：</p>
-<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003231303.png" alt="微信截图_20201003231303" style="zoom:60%;" /></p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1317,7 +812,7 @@ s_{NAP}(x)=||(\textbf{d}(x)-\mu_X)^TV\sum{^{-1}}||_2^2</script><p>​    其中$
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:25:48" itemprop="dateModified" datetime="2021-01-16T11:25:48+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:49:49" itemprop="dateModified" datetime="2021-01-16T11:49:49+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1342,48 +837,14 @@ s_{NAP}(x)=||(\textbf{d}(x)-\mu_X)^TV\sum{^{-1}}||_2^2</script><p>​    其中$
       
           <h3 id="Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations"><a href="#Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations" class="headerlink" title="Transfer Anomaly Detection by Inferring Latent Domain Representations"></a>Transfer Anomaly Detection by Inferring Latent Domain Representations</h3><h5 id="作者：Atsutoshi-Kumagai，Tomoharu-Iwata"><a href="#作者：Atsutoshi-Kumagai，Tomoharu-Iwata" class="headerlink" title="作者：Atsutoshi Kumagai，Tomoharu Iwata"></a>作者：Atsutoshi Kumagai，Tomoharu Iwata</h5><h5 id="会议：NeurIPS-2019"><a href="#会议：NeurIPS-2019" class="headerlink" title="会议：NeurIPS 2019"></a>会议：NeurIPS 2019</h5><h5 id="贡献："><a href="#贡献：" class="headerlink" title="贡献："></a>贡献：</h5><p>​        使用源域的正常和异常实例或者仅使用正常实例训练自编码器，通过引入隐域向量(<em>latent domain vector</em>)(<em>域的隐表示，由每一个域的正常实例通过神经网络得到</em>)的概念，所提出的方法可以为目标域推断出异常检测器，而不需要在目标域中重新训练。</p>
 <p>​        每一个域的隐域向量都是由每个域的正常实例来得到的，每个域的异常分数函数由自编码器的偏差来建模，并且自编码器具体的域属性由隐域向量来控制。</p>
-<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201123164447.png" alt="微信截图_20201123164447" style="zoom:67%;" /></p>
-<h5 id="准备知识："><a href="#准备知识：" class="headerlink" title="准备知识："></a>准备知识：</h5><p>​        由于AE的简洁有效性，AE在最近的半监督异常检测中广泛使用，所以本文也使用AE作为所提出方法的基础。AE的用来训练的损失函数表示如下：</p>
-<script type="math/tex; mode=display">
-L(\theta_F,\theta_G):=\frac{1}{N}\sum_{n = 1}^{N}||x_n-G_{\theta_G}(F_{\theta_F}(x_n))||^2</script><h5 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h5><h6 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h6><p>​        令$X_d^+:=\{x_{dn}^+\}_{n=1}^{N_d^+}$表示第d个域中的异常实例，其中$x_{dn}^+ \in R^M$，第d个域中第n个实例的M维特征向量，$N_d^+$是异常实例的数量，同样定义$X_d^-:=\{x_{dn}^-\}_{n=1}^{N_d^-}$。我们假设$N_d^+&lt;&lt;N_d^-$，M在所有域中都是相同的，在$D_S$个源域中有异常和正常实例，在$D_T$个目标域中有正常实例，注意本文所提出的方法也可以处理源域只有正常实例的情况。</p>
-<p>​        本文的目标是对于所有目标域获得一个领域具体的异常分数函数，用来输出实例的异常分数。</p>
-<h6 id="Domain-specific-Anomaly-Score-Function"><a href="#Domain-specific-Anomaly-Score-Function" class="headerlink" title="Domain-specific Anomaly Score Function"></a>Domain-specific Anomaly Score Function</h6><p>​        基于AE的重构误差来定义本文的领域具体的异常分数函数。假设每一个领域都有一个<strong>K</strong>维的隐藏连续变量$\bold z_d \in R^K$，在本文中称为隐域向量，对于第d个域，定义如下的异常分数函数：</p>
-<script type="math/tex; mode=display">
-s_\theta(x_{dn}|z_d):=||x_{dn}-G_{\theta_G}(F_{\theta_F}(x_{dn},z_d))||^2 \qquad(1)</script><p>​        其中的参数$\theta:=(\theta_F,\theta_G)$在所有域中共享。通过改变$z_d$的值，本文的方法可以灵活的改变异常分数函数的属性。</p>
-<h6 id="Models-for-Latent-Domain-Vectors"><a href="#Models-for-Latent-Domain-Vectors" class="headerlink" title="Models for Latent Domain Vectors"></a>Models for Latent Domain Vectors</h6><p>​        由于隐域向量无法被观测到，所以我们从数据中对其进行估计。通过给定的正常实例，建模隐域向量的条件概率为多元高斯分布：</p>
-<script type="math/tex; mode=display">
-q_\phi(z_d|X_d^-):= {\cal N}(z_d|\mu_\phi(X_d^-),diag(\sigma^2_\phi(X_d^-))) \qquad(2)</script><p>​        其中diag是对角协方差矩阵。均值$\mu_\phi(X_d^-)\in R^K$，方差$\sigma_\phi^2(X_d^-)\in R^K_+$是通过神经网络来进行建模，神经网络的参数$\phi$在所有域中共享。在这个模型中隐域向量$z_d$依赖于正常实例$X_d^-$。通过建模，当一个域的正常实例给定时，我们可以推断任何域的隐域向量。相应的就可以得到领域具体的异常分数函数，而不需要重新训练。</p>
-<h6 id="Objective-Function"><a href="#Objective-Function" class="headerlink" title="Objective Function"></a>Objective Function</h6><p>​        定义本文的目标函数，使用领域具体的异常分数函数和隐域向量。首先，对于第d个<strong>源域</strong>在隐域向量$z_d$约束下的最小化目标函数定义如下：</p>
-<script type="math/tex; mode=display">
-L_d(\theta|z_d):=\frac{1}{N_d^-}\sum_{n = 1}^{N_d^-}s_\theta(x_{dn}^-|z_d)-\frac{\lambda}{N_d^-N_d^+}\sum_{n,m = 1}^{N_d^-,N_d^+}f(s_\theta(x_{dm}^+|z_d)-s_\theta(x_{dn}^-|z_d)) \qquad (3)</script><p>​        这种形式的目标函数由二作提出(Supervised anomaly detection based on deep autoregressive density estimators.)，但是没有考虑领域差异。    </p>
-<p>​        其中超参数$\lambda\geq 0$，$f$是sigmoid函数，上式的第一项表示的是第d个域内正常实例的异常分数，因为正常实例的异常分数应该很小，所以我们最小化这一部分。上面公式的第二项是AUC的可微近似，对于类别不平衡的数据很有效，异常实例的异常分数应该比正常实例的高，$s_\theta(x_{dm}^+|z_d)&gt;s_\theta(x_{dn}^-|z_d)$对于任意的$x_{dm}^+\in X^+_d,x_{dn}^-\in X^-_d$。</p>
-<p>​        当域中没有异常，或者$\lambda=0$，上式第二项等于0，第一项保留。所以这一目标函数是AE的有监督扩展。</p>
-<p>​        由于隐域向量$z_d$具有方差$\sigma^2_\phi$的不确定性，也就是隐域向量是由数据估计的，因此估计往往具有不确定性。我们想要针对目标函数适当地考虑这一点，所以定义了如下的第d个<strong>源域</strong>的目标函数来最小化：</p>
-<script type="math/tex; mode=display">
-{\cal L}_d(\theta,\phi):=\mathbb{E}_{q_\phi(z_d|X_d^-)}[L_d(\theta|z_d)]+\beta D_{KL}(q_\phi(z_d|X_d^-)||p(z_d)) \qquad(4)</script><p>​        其中$D_{KL}(q_\phi(z_d|X_d^-)||p(z_d))$是$q_\phi(z_d|X_d^-)$和一个标准正态分布$p(z_d):= {\cal N}(0,I)$之间的KL散度，$\beta&gt;0$是一个超参。</p>
-<p>​        上式第一项是公式(3)关于$q_\phi(z_d|X_d^-)$的期望。这一期望项可以通过重新参数化(reparametrization)技巧(trick)有效地近似，即$\mathbb{E}_{q_\phi(z_d|X_d^-)}[L_d(\theta|z_d)] \approx \frac{1}{L} \sum_{l=1}^LL_d(\theta|z_d^{(l)})$，其中，$z_d^{(l)}=\mu_{\phi}(X_d^-)+\epsilon_d^{(l)} \odot \sigma_{\phi}(X_d^-),\epsilon_d^{(l)} \sim {\cal N}(0,I)$，其中$\odot$表示每个元素分别相乘，$L$为随机采样$L$次</p>
-<p>​        上式第二项是正则化项，防止隐域向量的过拟合，这种形式的正则化项在VAE中比较常见。</p>
-<p>​        对于第d个<strong>目标域</strong>的目标函数通过忽略掉公式(4)中的异常项，因为目标域中没有异常实例，也就是：</p>
-<script type="math/tex; mode=display">
-{\cal L}_d(\theta,\phi):=\mathbb{E}_{q_\phi(z_d|X_d^-)}[\frac{1}{N_d^-}\sum_{n = 1}^{N_d^-}s_\theta(x_{dn}^-|z_d)]+\beta D_{KL}(q_\phi(z_d|X_d^-)||p(z_d)) \qquad(5)</script><p>​        其中的第一项也可以按上面的方法近似。所以本文所提出的方法的目标函数也就是以下各领域目标函数的加权和，${\cal L}_d(\theta,\phi):=\sum_{d = 1}^{D_S+D_T} \alpha_d {\cal L}_d(\theta,\phi)$，其中$\alpha_d\geq 0$是超参数，通过梯度下降，目标函数可以关于$\theta,\phi$最小化</p>
-<h6 id="Inference"><a href="#Inference" class="headerlink" title="Inference"></a>Inference</h6><p>​        通过学习到的参数$(\theta_<em>,\phi_</em>)$和正常实例$X_{d’}^-$，为第$d’$个域推断特定域的异常分数函数，如下所示：</p>
-<script type="math/tex; mode=display">
-s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}\approx \frac{1}{L} \sum_{l=1}^Ls_{\theta_*}(x_{d'}|z_{d'}^{(l)})\qquad(6)</script><p>​        其中$z_{d’}^{(l)}=\mu_{\phi_<em>}(X_{d’}^-)+\epsilon_d^{(l)} \odot \sigma_{\phi_</em>}(X_{d’}^-),\epsilon_d^{(l)} \sim {\cal N}(0,I)$，$x_{d’}$是第$d’$个域的任意实例，可以得到异常分数函数，在$X_{d’}^-$没有参与到训练的情况下。</p>
-<h5 id="实验："><a href="#实验：" class="headerlink" title="实验："></a>实验：</h5><p>​        本文用到了一个合成数据集和四个类别不平衡的真实数据集。</p>
-<h6 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h6><p>​        我们创建了简单的二维数据集如下所示，此数据集由围绕(0,0)的8个双层圆(域)组成。每个双层圆有外圆和内圆，分别由正常实例和异常实例组成。使用第7个域作为目标域，其余的作为源域。使用四个真实数据集：MNIST-r, Anuran Calls, Landmine, 和 IoT。</p>
-<p>​        Synthetic, MNIST-r, Anuran Calls, Landmine, 和 IoT的平均异常比例为0.048, 0.1, 0.024, 0.062, 和 0.05</p>
-<h6 id="Comparison-Methods"><a href="#Comparison-Methods" class="headerlink" title="Comparison Methods"></a>Comparison Methods</h6><p>​        比较了本文的两个变体：ProT 和 ProS。ProT使用目标域中的正常实例以及异常和正常源实例进行训练。ProS不使用目标域正常实例进行训练，在使用源域训练完成后，ProS使用目标域的正常实例来推断目标域的异常分数函数而无需再训练。</p>
-<p>​        比较了本文的方法和其他八个方法：NN，NNAUC，AEAUC，AE，OSVM，CCSA，TOSVM，OTL，其中AE，OSVM是半监督异常检测方法，NN，NNAUC，AEAUC是监督学习方法，AEAUC和本文的方法类似，不过没有考虑隐域向量。CCSA, TOSVM, 和 OTL是迁移学习方法或者是迁移异常检测方法。</p>
-<h6 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h6><p><img src="http://echo23334.gitee.io/pic_repo/image-20201122163254167.png" alt="image-20201122163254167" style="zoom:67%;" /></p>
-<p>​        首先是合成数据集上的结果，如上Figure 2所示。2b是通过ProS估计的隐域向量(K=2)，特别的，目标域的隐域向量通过源域的隐域向量预测出来了，尽管目标域没有参与到训练。2c表示的是通过ProS得到的目标域异常分数的热力图。2d表示的是在目标域上不同$\lambda$所得到的AUC折线，使用AEAUC作为基线，因为它是由ProS忽略隐域向量得到的。</p>
-<p>​        接下来是在真实数据集上的结果。表1-4展示的是不同数据集，不同目标域上AUC的均值和标准差。</p>
-<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173008338.png" alt="image-20201122173008338" style="zoom:67%;" /></p>
-<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173025976.png" alt="image-20201122173025976" style="zoom:67%;" /></p>
-<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173041877.png" alt="image-20201122173041877" style="zoom:67%;" /></p>
-<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173053750.png" alt="image-20201122173053750" style="zoom:67%;" /></p>
-<p>​        第三，研究了该方法中考虑潜在域向量不确定性的影响，为此考虑了ProT和ProS的确定性变量，称作D-ProT和D-ProS，表5展示了结果。</p>
-<p>​        第四，研究了异常训练实例数量的影响，表-6展示了结果。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1433,7 +894,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:27:34" itemprop="dateModified" datetime="2021-01-16T11:27:34+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:51:58" itemprop="dateModified" datetime="2021-01-16T11:51:58+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1456,131 +917,18 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="Uncovering-the-structure-of-clinical-EEG-signals-with-self-supervised-learning-SSL"><a href="#Uncovering-the-structure-of-clinical-EEG-signals-with-self-supervised-learning-SSL" class="headerlink" title="Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)"></a>Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)</h1><p>用自监督学习方法揭示临床上EEG信号的结构</p>
-<p>[TOC]</p>
+          <p>用自监督学习方法揭示临床上EEG信号的结构</p>
 <blockquote>
 <p><strong>Objective:</strong> </p>
 <p>监督学习方案常常受到可用标记数据数量的限制。这种现象在临床相关数据中尤其成问题，如脑电图(EEG)，在这些数据中，根据专业知识来标记代价昂贵。目前，设计用于脑电图数据学习的深度学习架构产生了相对较浅的模型，其性能至多与传统的基于特征的方法相似。然而，在大多数情况下，会有大量没有标记的数据。通过从这些未标记的数据中提取信息，尽管无法获取标签，但仍然有可能通过深度神经网络达到竞争性能。</p>
-<p><strong>Approach:</strong></p>
-<p>本文研究了自监督学习(SSL)，一种在未标记数据中发现结构的技术，以学习脑电信号的表示。 具体来说，我们探索了两个基于时间上下文预测以及对比预测编码在两个临床相关问题的表现：基于脑电图的睡眠分期和病理检测。我们在两个拥有数千条记录的大型公共数据集上进行了实验，并用纯监督和手工设计的方法进行了baseline的比较。</p>
-<p><strong>Main results:</strong></p>
-<p>在SSL学习特征上训练的线性分类器在低标记数据系统中的性能始终优于纯监督的深层神经网络，同时在拥有所有标签时都达到有竞争力的性能。 此外，用每种方法学习的嵌入揭示了与生理和临床现象相关的明确的潜在结构，如年龄效应。</p>
-</blockquote>
-<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>​    Electroencephalography (EEG) 脑电信号作为一种重要的生理模态，在医疗场景中使用的非常广泛，如睡眠分阶、心理压力监测等。因此，设计模型可以进行分类，检测，并最终“理解”生理数据是必要的。传统上，这种类型的建模主要依赖于监督方法，其中需要大量带注释的数据集来训练具有高性能的模型。</p>
-<blockquote>
-<p><strong>当前的机器学习方法大多依赖于标注信息，这种对标注信息的过度依赖有如下危险：</strong></p>
-<ul>
-<li><strong>数据的内部结构远比标注提供的信息要丰富，因此通常需要大量的训练样本，但得到的模型有时是较为脆弱的。</strong></li>
-<li><strong>在高维分类问题上，我们不能直接依赖监督信息；同时，在增强学习等问题上，获取标签的成本非常高。</strong></li>
-<li><strong>标签信息通常适用于解决特定的任务，而不是可以做为知识一样可以重新利用。</strong></li>
-</ul>
-</blockquote>
-<p>​     “自监督学习”(SSL)是一种无监督学习方法，它从未标记的数据中学习表示，利用数据的结构来提供监督。这里介绍的自监督学习方法是通过构造辅助任务（pretext）来辅助下游任务（downstream）。下游任务是我们真正感兴趣的任务，但是没有注释或注释有限。另一方面，辅助任务必须与下游任务有充分的关联，以便使用类似的表示来训练它，重要的是，必须能够仅使用未标记的数据为这个辅助任务生成注释。</p>
-<p>在这篇论文中，我们研究自我监督的使用作为从脑电图数据学习表征的一般方法。首次对多种类型的脑电图记录进行了SSL任务的详细分析。我们的目标是回答以下问题:</p>
-<ol>
-<li>哪些好的SSL任务能够捕获脑电图数据中的相关结构?</li>
-<li>就下游分类性能而言，SSL特性与其他非监督和监督方法相比如何?</li>
-<li>SSL学到的特性是什么?具体来说，SSL能否从未标记的脑电图中捕获与生理和临床相关的结构?</li>
-</ol>
-<p>self-supervised learning两大流派</p>
-<ul>
-<li><p>构造辅助任务，辅助下游任务</p>
-<p><img src="https://i.loli.net/2020/08/25/eHAnlKa2yFwsoB5.png" alt="image-20200823201736081" style="zoom: 50%;" /></p>
-<p><img src="https://i.loli.net/2020/08/25/BePLb2DkmdKZXqV.png" alt="image-20200823205036629" style="zoom:50%;" /></p>
-</li>
-<li><p>contrastive learning</p>
-<p><img src="https://i.loli.net/2020/08/24/EGvRPnSFbx5yCeO.png" alt="image-20200824164003461"></p>
-<p><img src="https://i.loli.net/2020/08/24/srjAgPwm2tx4hYl.png" alt="image-20200824164133733"></p>
-</li>
-</ul>
-<h2 id="2-Self-supervised-learning-pretext-tasks-for-EEG"><a href="#2-Self-supervised-learning-pretext-tasks-for-EEG" class="headerlink" title="2. Self-supervised learning pretext tasks for EEG"></a>2. Self-supervised learning pretext tasks for EEG</h2><p>本文描述三种SSL 构造辅助任务的方法</p>
-<h3 id="2-1-Relative-positioning"><a href="#2-1-Relative-positioning" class="headerlink" title="2.1 Relative positioning"></a><strong>2.1 Relative positioning</strong></h3><p>对于多变量时间序列$S\in \R^{C<em>M}$, $M$表示序列长度（采样点个数），$C$表示维度（channel），用相同大小的滑窗$(x_t,x_{t^{,}})$进行截取长度为$T$的片段，$x_t,x_{t^{,}}\in \R^{C</em>T} $令第一个滑窗为anchor window, 假设时间片相近的片段应该共享同样的标签。 例如，针对睡眠阶段分类，睡眠阶段通常持续1到40分钟；因此，相近的窗口可能来自同一睡眠阶段，而相距遥远的窗口则可能来自不同的睡眠阶段。给定一个持续时间的阈值$\tau_{pos}\in N,\tau_{neg}\in N$，$y_i$为该分段的标签，对序列进行采样，于是有：</p>
-<p><img src="https://i.loli.net/2020/08/25/Wzq3SojM2r8K1Yi.png" alt="image-20200823203802037"></p>
-<p>即采样得到的一堆时间片相距小于$\tau_{pos}$还是大于$\tau_{neg}$</p>
-<p><img src="https://i.loli.net/2020/08/25/SetcyY52Gj3A1K4.png" alt="image-20200823204035561"></p>
-<p>为了学习端到端如何根据时间窗口的相对位置来区分对，我们引入了两个函数hΘ和$g_{RP}$。$h_Θ：R^{C×T}→R^{D}$是一种具有参数Θ的的特征提取器，它将窗口x映射到特征空间中的表示。 最终，我们期望hΘ学会一个  原始脑电输入的信息表示，可在不同的下游任务中重用。</p>
-<p> $g_{RP}：R^D×R^D→R^D$通过计算逐个元素绝对差，将来自窗口对的表示结合起来，$g_{RP}(hΘ(x),h_Θ(x^{,}))=|h_Θ(x))-h_Θ(x^{,})|\in R^D$。在$g_{RP}$将$h_Θ$在两个输入窗口上提取的特征向量聚合起来，并突出它们的差异，以简化对比任务。 最后，建立了线性判别模型预测相关的目标y。 利用二元逻辑损失对$g_{RP}$的预测，我们可以写出联合损失函数$L(Θ,w,w_0),y$是sign函数。</p>
-<p><img src="https://i.loli.net/2020/08/25/PSt9r5aQ2JqFG8B.png" alt="image-20200823211354219"></p>
-<h3 id="2-2-Temporal-shuffling"><a href="#2-2-Temporal-shuffling" class="headerlink" title="2.2 Temporal shuffling"></a><strong>2.2 Temporal shuffling</strong></h3><p> 我们还介绍了RP任务的一个变体，我们称之为Temporal shuffling，其中我们从正例上下文中采样了两个anchor窗口$x_t$和$x_{t^{‘’}}$，以及第三个窗口$x_{t^{,}}$ ，若在两个正例之间(视为orderd)，若在负例范围之内(视为shuffled)。 </p>
-<p><img src="https://i.loli.net/2020/08/25/Xj8PZ6W53l2vK4o.png" alt="image-20200823204112296"></p>
-<p><img src="https://i.loli.net/2020/08/25/2LRwNFluKjfh5eM.png" alt="image-20200825102353648"></p>
-<h3 id="2-3-Contrastive-predictive-coding-CPC"><a href="#2-3-Contrastive-predictive-coding-CPC" class="headerlink" title="2.3 Contrastive predictive coding(CPC)"></a><strong>2.3 Contrastive predictive coding(CPC)</strong></h3><p>CPC通过编码信息来学习表示法</p>
-<p><img src="https://i.loli.net/2020/08/24/9v5GfcAuLVOUeWy.png" alt="image-20200824164625989"></p>
-<p>事实上，CPC可以看作是RP的扩展，其中单个anchor窗口$x_t$被一系列$N_c$不重叠窗口所取代.这样，上下文中的信息可以用一个向量$c_t∈R^{D_{AR}}$表示。 例如，$g_{AR}$可以作为具有门控经常单元(GRU)的递归神经网络来实现)。</p>
-<p><img src="https://i.loli.net/2020/08/25/xqwEUJri8tHnMFX.png" alt="image-20200825103055459"></p>
-<p>整个CPC模型采用定义为的InfoNCE loss (categorical cross-entropy loss)进行端到端训练。 我们的任务是使context与正例相似度越大越好，与负例相似度越小越好。$f$用来度量context与得到的表示$h_{\theta}$之间的相似度。</p>
-<p><img src="https://i.loli.net/2020/08/25/z7IEebmfSVT4ABs.png" alt="image-20200825110944595"></p>
-<p>infoNCE定义为：</p>
-<p><img src="https://i.loli.net/2020/08/25/HjIFY9QOTasyntq.png" alt="image-20200825135316018"></p>
-<p><img src="https://i.loli.net/2020/08/24/b7xYGsqP4Oedo8Q.png" alt="image-20200823204129270"></p>
-<h2 id="3-Downstream-Tasks"><a href="#3-Downstream-Tasks" class="headerlink" title="3. Downstream Tasks"></a>3. Downstream Tasks</h2><p>我们对两个临床问题进行了基于脑电的SSL的训练，睡眠监测和病理筛查。 这两个临床问题通常导致分类任务，尽管不同的类别和不同的数据生成机制：睡眠监测是关注的  生物学事件（事件水平)，而病理筛查与单一患者相比(个体水平）。 为了能够与监督方法进行公平的比较，我们在Physionet2018， 和TUH异常脑电图数据集进行。</p>
-<p>首先，对于睡眠分阶任务，目前存在几个局限：1）专家评分存在局限（不准）；2）人工标注费时费力。睡眠分期通常会引起5个分类问题，W(清醒)，N1, N2, N3(不同的睡眠水平)和R(快速眼动期)。在这里，这项任务包括预测睡眠阶段，对应于30秒的脑电图。</p>
-<p>第二，对于病理检测任务，通常需要依赖于非常专业的诊断，如癫痫、痴呆等。在TUH数据集中，医学专家将记录标记为病理或非病理，这导致了二值分类问题。重要的是，这两种标签反映了高度异质的情况:病理记录可以反映由于各种医疗条件造成的异常。</p>
-<h2 id="4-Deep-learning-architectures"><a href="#4-Deep-learning-architectures" class="headerlink" title="4. Deep learning architectures"></a>4. Deep learning architectures</h2><p>我们在实验中使用了两种不同的深度学习体系结构作为嵌入器$h_Θ$获得embedding，如下图。 这两种结构都是由空间卷积和时间卷积层组成，分别学习典型的脑电处理流程中的空间和时间滤波操作。</p>
-<p><img src="https://i.loli.net/2020/08/24/ajGgZqCDOIzV3Yi.png" alt="image-20200824141829089"></p>
-<p>第一个网络叫StagerNet, 是一种三层卷积神经网络，用于处理30s多通道脑电波窗口。</p>
-<p>第二种嵌入器结构叫ShallowNet，直接取自以前关于TUH异常数据集的文献。</p>
-<p>另外，我们使用一个GRU，隐藏层的大小$D_{AR}=100$的CPC任务的$g_{AR}$，用于两个数据集上的实验。</p>
-<h2 id="5-Experiment"><a href="#5-Experiment" class="headerlink" title="5. Experiment"></a>5. Experiment</h2><h3 id="5-1-Data"><a href="#5-1-Data" class="headerlink" title="5.1 Data"></a>5.1 Data</h3><p><strong>Physionet Challenge 2018 dataset(PC18)</strong></p>
-<p>Recording number: 994；</p>
-<p>Sample rate: 200Hz</p>
-<p>Channel: 6</p>
-<p><strong>TUH Abnormal EEG dataset</strong></p>
-<p>这个数据集包含来自在医院环境下接受临床脑电图的2329名不同患者的15分钟或更长的记录。 每个记录都被标记为“正常”（1385次记录）或“异常”(998次记录）。</p>
-<p>Sample rate: 256Hz</p>
-<p><strong>Preprocessing</strong></p>
-<p>对于PC18，我们使用了6:2:2的随机分割，这意味着在训练、验证和测试集中分别有595、199和199条记录。 对于RP和TS，2000对或三重窗口 从每个录音中取样。 对于CPC，从每个记录中提取的批次数被计算为该记录中窗口数的0.05倍；此外，我们将批处理大小设置32</p>
-<p>PC18: 降采样成100Hz，只选用两个channel( F3-M2, F4-M1), 1个滑窗大小30s,输入（3000*2）</p>
-<p>TUHab：降采样成100Hz，选用21个channel, 1个滑窗大小6s,输入（600*21）</p>
-<h3 id="5-2-Baseline"><a href="#5-2-Baseline" class="headerlink" title="5.2 Baseline"></a>5.2 Baseline</h3><p>(1) random weights, ( 随机权重，使用一个嵌入器，其权重在随机初始化后保持不变)</p>
-<p>(2) convolutional autoencoders, </p>
-<p>(3) purely supervised learning </p>
-<p>(4) handcrafted features（传统机器学习提取手工特征）：均值、方差、偏度、峰度、标准差、（0.5、4.5、8.5、11.5、15.5、30）Hz之间的频率对数功率带及其所有可能的比值、peak-to-peak幅值……</p>
-<h3 id="5-3-Results"><a href="#5-3-Results" class="headerlink" title="5.3 Results"></a>5.3 Results</h3><ol>
-<li><p>首先，将SSL方法与基于深度学习或手工制作特性的完全监督方法进行了比较。</p>
-</li>
-<li><p>其次，我们探索了SSL学习的表示来突出临床相关的结构。</p>
-</li>
-<li><p>最后，研究了在辅助任务和下游任务中，超参选择的影响。</p>
-<h4 id="5-3-1-SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务"><a href="#5-3-1-SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务" class="headerlink" title="5.3.1 SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务"></a>5.3.1 SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务</h4><p>通过在标记示例上训练线性Logistic回归模型来评估下游任务性能，其中训练集至少包含一个和最多包含所有现有标记示例。 此外，完全监督的模型直接在标记数据上进行训练，随机森林在手工制作的特征上进行训练。标记样品数量对下游性能的影响如下图所示：</p>
-</li>
-</ol>
-<p><img src="https://i.loli.net/2020/08/24/9lo5miq6pwJ84YN.png" alt="image-20200824194133447" style="zoom:200%;" /></p>
-<p>PC18  72.3% balanced accuracy(5-class,chance=20%)    </p>
-<ul>
-<li>标签少时：RP/CPC/TS/Handcrafted feature 显著优于 full-supervision/AE/Random weights</li>
-<li>标签增多：full-supervised得到显著提高，RP/CPC/TS/Handcrafted feature依然较好</li>
-</ul>
-<p>TUHab 79.4% (2-class, chance=50%)</p>
-<ul>
-<li>总体趋势与第一个数据集表现类似</li>
-<li>每个类标签少于10000时，监督方法弱于CPC</li>
-</ul>
-<p>这些结果证明了SSL能够为我们的下游任务学习有用的表示。 其次，比较表明SSL学习的特性与其他基线相比具有竞争力，甚至可以优于监督的方法。</p>
-<h4 id="5-3-2-SSL-models-capture-physiologically-and-clinically-meaningful-features"><a href="#5-3-2-SSL-models-capture-physiologically-and-clinically-meaningful-features" class="headerlink" title="5.3.2 SSL models capture physiologically and clinically meaningful features"></a>5.3.2 SSL models capture physiologically and clinically meaningful features</h4><p>虽然SSL学习的特性在睡眠分期和病理检测任务上产生了竞争性能，但尚不清楚SSL捕获了什么样的结构。</p>
-<p>通过分析它们与临床数据集中可用的不同注释和元数据的关系来观察这种嵌入之间的关系。 因此，我们将在PC18和TUHab上获得的100维嵌入投影到一个二维表示上，使用均匀流形近似和投影(UMAP)并使用表现最好的模型。</p>
-<p><img src="https://i.loli.net/2020/08/24/upgUaXKGbcwSD3j.png" alt="image-20200824202455160"></p>
-<p>PC18数据集上SSL特性的UMAP可视化。 子图显示了5个睡眠阶段的分布，作为TS（第一行）和CPC（第二行）特征的散点图。 轮廓线对应所有阶段的分布密度水平，用作视觉参考。 最后，每个点对应于从脑电图的30s窗口提取的特征。 在这两种情况下， 有明确的结构与睡眠阶段，虽然在训练期间没有提供标签。</p>
-<p>我们认为，ssl学习特征的连续性质是所研究的神经生理现象所固有的。方便的是，这为改善生理数据的分析提供了机会。</p>
-<h4 id="5-3-3-SSL-pretext-task-hyperparameters-strongly-inflfluence-downstream-task-performance"><a href="#5-3-3-SSL-pretext-task-hyperparameters-strongly-inflfluence-downstream-task-performance" class="headerlink" title="5.3.3 SSL pretext task hyperparameters strongly inflfluence downstream task performance"></a>5.3.3 SSL pretext task hyperparameters strongly inflfluence downstream task performance</h4><p>在临床脑电图任务中，如何调整各种SSL辅助任务的超参数以充分发挥自我监督的作用?</p>
-<p><img src="https://i.loli.net/2020/08/24/FTDYcvAjf1RQmhO.png" alt="image-20200824205129040"></p>
-<p>首先，我们重点讨论了相同记录的负采样场景，其中从与anchor窗口相同的记录中采样负示例。 对于RP，随着$τ_{pos}$的增加，总是使辅助任务分类更难。 这是预料中的，因为给定是$\tau_{pos}$的时间（上下文）越大，就越有可能得到由遥远的（因此可能不相关的）的正例对。 </p>
-<p> 至于CPC，一项类似的分析表明，虽然增加了预测窗口的数量（“步数”），使辅助任务变得更加困难，但预测未来的进一步发展有助于预测，嵌入器学习更好的睡眠分期表示</p>
-<p> 在这个实验中，我们证实了我们的SSL辅助任务并是对下游任务是有影响的，并且某些辅助任务超参数对下游性能有可测量的影响。</p>
-<h3 id="6-Discussion"><a href="#6-Discussion" class="headerlink" title="6 Discussion"></a>6 Discussion</h3><h4 id="6-1-Finding-the-right-pretext-task-for-EEG"><a href="#6-1-Finding-the-right-pretext-task-for-EEG" class="headerlink" title="6.1 Finding the right pretext task for EEG"></a>6.1 Finding the right pretext task for EEG</h4><p> 随着人们所能想到的大量自我监督的借口任务，以及更多可能的脑电下游任务，我们如何选择辅助任务和超参数组合？</p>
-<ul>
-<li><p>我们引入并定制了相对定位(RP)和时间片打乱(TS)任务，依靠对脑电的先验知识。 事实上，睡眠脑电图信号具有明确的时间结构，起源于夜间睡眠阶段的连续。这意味着在时间上相近的两个窗口很可能共享相同的睡眠阶段注释和统计结构。因此，学习区分近窗和远窗应该与学习区分睡眠阶段有直观的关系。</p>
-</li>
-<li><p>选择辅助任务超参数对于选择正确的辅助任务配置至关重要。 例如，RP、TS和CPC通常产生非常相似的下游任务。 一旦选择了最佳的超参数，就可以进行性能测试。</p>
-</li>
-</ul>
-<h4 id="6-2-Limitation"><a href="#6-2-Limitation" class="headerlink" title="6.2 Limitation"></a>6.2 Limitation</h4><p>本工作的目的是引入自我监督作为脑电的一种表征学习范式，我们没有关注这两类任务与早期工作中的最先进性能的表现。</p>
-<h2 id="7-Conclusion"><a href="#7-Conclusion" class="headerlink" title="7. Conclusion"></a>7. Conclusion</h2><p>在本工作中，我们引入了SSL方法来学习EEG数据上的表示，并表明它们可以与两个大型临床数据集上的传统监督方法竞争，有时甚至优于传统的监督方法。 重要的是，SSL学习到的特征显示了一个清晰的结构，其中不同的生理量被编码，这验证了自监督学习的潜力，以捕捉重要的生理信息，即使在没有标记的数据。 未来的工作将分为以下两方面：</p>
-<ol>
-<li>证明SSL是否也可以成功地使用于其他类型的脑电图记录和任务中，如回归。</li>
-<li>更好地理解如何为特定的脑电图结构设计辅助任务，对于利用自我监督学习建立作为脑电图分析流程的关键组成部分至关重要。</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1630,7 +978,7 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:24:04" itemprop="dateModified" datetime="2021-01-16T11:24:04+08:00">2021-01-16</time>
+                <time title="Modified: 2021-01-16 11:44:47" itemprop="dateModified" datetime="2021-01-16T11:44:47+08:00">2021-01-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1653,174 +1001,18 @@ s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="A-3D-Convolutional-Neural-Network-for-Emotion-Recognition-based-on-EEG-Signals"><a href="#A-3D-Convolutional-Neural-Network-for-Emotion-Recognition-based-on-EEG-Signals" class="headerlink" title="A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals"></a>A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals</h1><p>[TOC]</p>
-<h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊: </strong> IJCNN</p>
+          <h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊: </strong> IJCNN</p>
 <p><strong>作者:</strong>  <img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006202616766.png" alt="image-20201006202616766"></p>
 <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>传统的机器学习方法使用手工提取特征和精心设计的分类器，然而提取特征局限于我们的专业领域知识。</p>
 <p>我们提出了一种三维卷积神经网络模型来自动提取脑电信号的时空特征，通过预处理信号和对电极拓扑结构的重定位，在DEAP数据集二分类任务上实现了96.61%、96.43%的ACC，四分类上实现了93.53%的ACC，在AMIGOS实现了97.52%、96.96%和95.86%ACC。</p>
-<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Emotion Recognition, Electroencephalography(EEG), 3D Convolutional Neural Network (3D CNN), Spatiotemporal Features, Deep Learning</strong></p>
-<h2 id="介绍及相关工作"><a href="#介绍及相关工作" class="headerlink" title="介绍及相关工作"></a>介绍及相关工作</h2><p>基于生理信号尤其是脑电图信号的识别方法已经成为研究热点，因为与面部表情或语音等其他信号相比，这些信号能够表征人的内在情绪状态，无法进行主观控制。</p>
-<p>传统的机器学习方法提取特征主要有</p>
-<ol>
-<li><strong>时域特征</strong>。事件相关电位ERP，信号统计(功率，均值，标准差，一阶差分，二阶差分)，高阶统计量(HOC)。</li>
-<li><strong>频域特征</strong>。功率谱密度(PSD)，高阶谱(HOS)。</li>
-<li><strong>时频特征</strong>。希尔伯特黄谱(HHS)，幅度平方相关估计(MSCE)。</li>
-</ol>
-<p>深度学习方法中，2D卷积常规方法忽略了脑电信号的空间特征，因此提出了时空特征提取方法。</p>
-<h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><h3 id="DEAP"><a href="#DEAP" class="headerlink" title="DEAP"></a>DEAP</h3><p>DEAP是一个开放的数据集，供研究人员验证他们的模型。该数据集包含<strong>32个通道的脑电信号和8个通道的其余生理信号</strong>，这些信号是在<strong>32名参与者观看40个视频</strong>(每个视频时长1分钟)时采集的。<strong>每次试验包含63s信号</strong>，<strong>前3s是baseline信号</strong>。当参与者没有受到刺激时，记录baseline信号。看完一分钟的视频后，参与者对<strong>valence、arousal、liking和dominance</strong>自我评估进行评分，评分范围从1到9。</p>
-<p>已经提供了预处理版本:数据从512赫兹下采样到128赫兹，并且应用了4.0-45.0赫兹的带通频率滤波器。DEAP的脑电数据大小为32(participants)x40(videos)x32(channels)x8064(signals)，8064信号包含384个baseline信号。</p>
-<h3 id="AMIGOS"><a href="#AMIGOS" class="headerlink" title="AMIGOS"></a>AMIGOS</h3><p>AMIGOS 是一个新开放的数据集。该数据集包含<strong>14导脑电信号和3导其余生理信号</strong>，采集于40名参与者观看20个视频(16个短视频 + 4个长视频)。每次试验首先包含5s的baseline信号，其他信号的长度取决于视频的持续时间。观看视频后，参与者还对<strong>valence、arousal、liking和dominance</strong>进行了1到9级的自我评估。</p>
-<p>已经提供了预处理版本:数据被下采样到128赫兹，并应用了4.0-45.0赫兹的带通频率滤波器。</p>
-<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h3><p>Yang报告说，在情绪识别任务中，预处理方法可以将识别准确率提高大约32%。</p>
-<p>预处理方法包括:</p>
-<ol>
-<li>从所有<strong>通道C</strong>中提取<strong>baseline信号</strong>，并将其切割成固定长度L的N段，得到N段C×L矩阵</li>
-<li>用分段数据计算baseline信号的<strong>均值</strong>，得到baseline信号均值矩阵</li>
-<li>去除baseline信号，并且<strong>减去均值</strong>后进行切割，得到预处理后的信号。</li>
-<li><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006205022755.png" alt="image-20201006205022755">因为我们要利用空间位置，所以我们自己做了一个图。把32导转换到9*9的矩阵中去。我们转换的时候使用了标准化。</li>
-</ol>
-<h3 id="3D卷积结构"><a href="#3D卷积结构" class="headerlink" title="3D卷积结构"></a>3D卷积结构</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006205211100.png" alt="image-20201006205211100"></p>
-<p>卷积结构如上，只有两个卷积层，每次卷积层跟着池化。</p>
-<p>输入为（9，9，128）。前两维是空间位置图，最后一维是时间采样点的数量，也就是Hz。</p>
-<p>卷积核的数量为32和64，大小为（3，3，4），卷积使用零填充，激活函数是relu。</p>
-<p>池化层为（1，1，2）。</p>
-<p>全连接层后跟着dropout，为0.5。</p>
-<p>学习率为0.001。</p>
-<p>batchsize为240。</p>
-<p>验证方法是十倍交叉验证。</p>
-<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h3 id="DEAP数据集结果"><a href="#DEAP数据集结果" class="headerlink" title="DEAP数据集结果"></a>DEAP数据集结果</h3><p>一次实验数据是(32×8064)，把baseline信号(32×384)切割成3段(3×32×128)，因为长3s，得到均值(1×32×128)。</p>
-<p>将没有baseline信号的脑电信号分割成60段(60×32×128)，然后减去baseline信号的均值，得到预处理后的信号(60×32×128)。</p>
-<p>对于每个时间采样点，将32路脑电信号映射成一个9x9矩阵。最终数据集是(76800×9×9×128)。76800是32个人看40个视频，每个视频1分钟。</p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211150102.png" alt="image-20201006211150102" style="zoom:50%;" /></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211158851.png" alt="image-20201006211158851" style="zoom:50%;" /></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211447565.png" alt="image-20201006211447565" style="zoom:50%;" /></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211447565.png" style="zoom:50%;" /></p>
-<h3 id="AMIGOS数据集结果"><a href="#AMIGOS数据集结果" class="headerlink" title="AMIGOS数据集结果"></a>AMIGOS数据集结果</h3><p>同上，最终有45474个样本。</p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211247669.png" alt="image-20201006211247669" style="zoom:50%;" /></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211310792.png" alt="image-20201006211310792" style="zoom:50%;" /></p>
-<h4 id=""><a href="#" class="headerlink" title=""></a><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211518043.png" alt="image-20201006211518043"></h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154305924.png" alt="image-20201006154305924"></p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文提出了一种简单有效的基于脑电信号的三维卷积神经网络模型，该模型可用于不同的任务和数据集。</p>
-<p>缺点是，相比之下，深度学习方法往往被视为一个黑箱系统，我们将努力改进模型的可解释性，找出情感识别中的重要因素。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/" class="post-title-link" itemprop="url">jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:24:29" itemprop="dateModified" datetime="2021-01-16T11:24:29+08:00">2021-01-16</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="A-Hierarchical-Bidirectional-GRU-Model-With-Attention-for-EEG-Based-Emotion-Classification"><a href="#A-Hierarchical-Bidirectional-GRU-Model-With-Attention-for-EEG-Based-Emotion-Classification" class="headerlink" title="A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification"></a>A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification</h1><p>[TOC]</p>
-<h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊: </strong>IEEE ACCESS 2019</p>
-<p><strong>作者:</strong>  <img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201005212230396.png" alt="image-20201005212230396"></p>
-<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文提出了一种层次结构双向门控递归单元(GRU)网络，用于从连续的脑电信号中进行情感分类。Attention用于EEG的samples和epochs两个级别上。</p>
-<p>我们在DEAP数据集上进行了跨受试者情感分类实验，以评估模型的性能。实验结果表明，在valence和arousal维度上，我们的1-s EEG序列分别比最佳deep baseline LSTM模型好4.2%和4.6%，比最佳shallow baseline模型好11.7%和12%。</p>
-<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Hierarchical, bidirectional GRU, attention, EEG, emotion classification</strong></p>
-<h2 id="介绍及相关工作"><a href="#介绍及相关工作" class="headerlink" title="介绍及相关工作"></a>介绍及相关工作</h2><p>由于脑电信号具有高度的时间依赖性、非平稳性和易受噪声干扰等特点，因此很难分辨和提取出脑电信号序列中情感相关性较高的关键时间点或片段。</p>
-<p>假设EEG信号是平稳的，则 <strong>Dynamic Statistical Parametric Maps (DSPM), Minimum Norm Estimation<br>(NME), Phase Shift and Vector Modulation </strong> 可以使用。滑动窗口问题在某种程度上解决了数据的非平稳性，但是它的统计效率是很低的。</p>
-<p>目前，CNN、RNN和LSTM已逐渐应用于脑电信号的建模，但研究仍处于起步阶段。</p>
-<p>这些方法在一定程度上提高了脑电情感分类的性能，但很少有模型考虑到<strong>脑电epoch和sample</strong>对序列情感类别的有不同的重要性。</p>
-<p>此外，目前的研究主要集中在依赖受试者的脑电数据的情感分类上，而非<strong>独立于受试者</strong>的脑电数据。我们不打算为每个用户单独训练一个模型，而是通过微调来预测用户的情感状态。</p>
-<p>我们提出了一种具有注意机制的分层双向门控递归单元(GRU)网络，称为H-ATT-BGRU。</p>
-<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="双向GRU编码器"><a href="#双向GRU编码器" class="headerlink" title="双向GRU编码器"></a>双向GRU编码器</h3><p>GRU模型比标准的LSTM模型更简单、更快。特别是在训练大数据时，与标准LSTM模型相比，性能差异小，可以节省大量时间。对于许多序列建模任务来说，了解未来和过去的序列是有益的。然而，标准GRU网络按时间顺序处理序列，它们忽略了上下文。</p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006140501283.png" alt="image-20201006140501283"></p>
-<h3 id="层次的Attention结构"><a href="#层次的Attention结构" class="headerlink" title="层次的Attention结构"></a>层次的Attention结构</h3><p>为了应用好我们的模型，我们把样本分成epoch，每个epoch有多个sample。</p>
-<h4 id="sample-encoder"><a href="#sample-encoder" class="headerlink" title="sample encoder"></a>sample encoder</h4><p>我们首先将sample进行编码，使用的是双向GRU。</p>
-<h4 id="sample-attention"><a href="#sample-attention" class="headerlink" title="sample attention"></a>sample attention</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006145907433.png" alt="image-20201006145907433"></p>
-<script type="math/tex; mode=display">
-\begin{aligned} u_{j t} &=\tanh \left(W_{s} h_{j t}+b_{s}\right) \\ \alpha_{j t} &=\frac{\exp \left(u_{j t}^{T} u_{s}\right)}{\sum_{t} \exp \left(u_{j t}^{T} u_{s}\right)} \\ e_{j} &=\sum_{t} \alpha_{j t} h_{j t} \end{aligned}</script><p>$u_{s}$随机初始化，并在过程中进行调整。</p>
-<h4 id="epoch-encoder"><a href="#epoch-encoder" class="headerlink" title="epoch encoder"></a>epoch encoder</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006150436115.png" alt="image-20201006150436115"></p>
-<h4 id="epoch-decoder"><a href="#epoch-decoder" class="headerlink" title="epoch decoder"></a>epoch decoder</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006150443547.png" alt="image-20201006150443547"></p>
-<h4 id="sequence-classification"><a href="#sequence-classification" class="headerlink" title="sequence classification"></a>sequence classification</h4><p>结果输出</p>
-<script type="math/tex; mode=display">
-p=\operatorname{softmax}\left(W_{c} v+b_{c}\right)</script><p>损失函数</p>
-<script type="math/tex; mode=display">
-\mathrm{E} \Theta=-\frac{1}{N} \sum_{n=1}^{N} Y_{n} \log \left(\tilde{Y}_{n}\left(X_{n}, \theta\right)\right)+\frac{\lambda}{2}|| \theta||_{2}^{2}</script><h3 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006151353306.png" alt="image-20201006151353306" style="zoom:67%;" /></p>
-<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>伦敦玛丽皇后大学的研究人员开发了DEAP数据集，这是一个大型的开源数据集，包含多种带有情绪评估的生理信号。该数据集记录了32名受试者在观看40个1分钟的具有不同情绪倾向的音乐视频时的脑电图、心电图、肌电图和其他生物电信号。然后，受试者的情绪用从1到9对看视频的感受进行衡量，包括valence，arousal，liking，dominance，familiarity。评级值从小到大表示各指数由负到正或由弱到强。这40个刺激视频由20个valence/arousal视频和20个valence/arousal视频组成。</p>
-<h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><ol>
-<li>32导EEG被下采样到128赫兹。使用4-47Hz的带通滤波器来消除噪音。使用盲源分离取均值到参考值，并且去除了EOG伪影。</li>
-<li>预处理后的脑电信号总长度为63-s，包括看视频的60-s和看前的3-s。然后，我们从观看视频的60秒脑电图信号(7680次读数)中去除3秒基本信号的平均值，并对跨通道数据进行归一化。</li>
-<li>每个受试者数据为 40(trials)×60(epochs)×128 (samples)×32(channels)，大于5的标为1，小于等于5的标为0。</li>
-<li>其余划分方式<img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153106754.png" alt="image-20201006153106754"></li>
-</ol>
-<h4 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h4><p>batchsize为60，学习率为0.05。</p>
-<p>数据则选择25%为训练集，GRU隐藏单元个数为64，双向拼接为128。</p>
-<h3 id="Baseline"><a href="#Baseline" class="headerlink" title="Baseline"></a>Baseline</h3><h4 id="shallow-baseline"><a href="#shallow-baseline" class="headerlink" title="shallow baseline"></a>shallow baseline</h4><p>我们使用AR和PSD来提取特征值，送入BT和SVM中进行分类。</p>
-<h4 id="deep-baseline"><a href="#deep-baseline" class="headerlink" title="deep baseline"></a>deep baseline</h4><p>CNN</p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153551794.png" alt="image-20201006153551794"></p>
-<p>LSTM</p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153607719.png" alt="image-20201006153607719"></p>
-<h3 id="实验效果"><a href="#实验效果" class="headerlink" title="实验效果"></a>实验效果</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154225760.png" alt="image-20201006154225760"></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154247800.png" alt="image-20201006154247800"></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154305924.png" alt="image-20201006154305924"></p>
-<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154317371.png" alt="image-20201006154317371"></p>
-<h4 id="Attention-权重"><a href="#Attention-权重" class="headerlink" title="Attention 权重"></a>Attention 权重</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006155249282.png" alt="image-20201006155249282"></p>
-<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文提出了一种具有注意机制的分层双向GRU模型(H-A TT-BGRU)，用于学习脑电序列特征并对其进行跨受试者情感分类。随着脑电序列epoch长度的增加，我们的模型表现出比其他baseline模型更好的分类性能，表明该模型能够有效降低长期脑电序列非平稳性的影响，提高基于脑电的情感分类的准确性和鲁棒性。该模型将应用于未来开发鲁棒的情感脑机接口的应用。</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1904,7 +1096,7 @@ p=\operatorname{softmax}\left(W_{c} v+b_{c}\right)</script><p>损失函数</p>
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1917,7 +1109,7 @@ p=\operatorname{softmax}\left(W_{c} v+b_{c}\right)</script><p>损失函数</p>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
