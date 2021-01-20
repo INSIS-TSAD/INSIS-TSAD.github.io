@@ -2792,4 +2792,129 @@ I\left(\mathbf{v}_{\mathbf{1}} ; \mathbf{y}\right)=I\left(\mathbf{v}_{\mathbf{2}
         <tag>表示学习</tag>
       </tags>
   </entry>
+  <entry>
+    <title>ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition</title>
+    <url>/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/</url>
+    <content><![CDATA[<p>[IEEE Transactions on Cybernetics 2019]</p>
+<p>Jinpeng Li, Shuang Qiu, Yuan-Yuan Shen, Cheng-Lin Liu, Fellow, IEEE, and Huiguang He, Senior Member, IEEE</p>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>​    脑电(EEG)信号，在情绪识别中得到广泛应用。由于脑电的个体差异较大，情感识别模型无法在个体间共享，需要收集新的标记数据来为新用户训练个人模型。在一些应用中，希望尽可能快地获得新的用户的模型，并减少对标记数据的需求，所以提出了一种以现有个体为源域，以新人为目标域的多源迁移(<strong>Multisource Transfer</strong>)的学习方法。</p>
+<p>​    目标数据被分开用于训练的校准过程和随后的测试过程。该方法的第一阶段是源选择，目的是选择合适的源域。第二阶段是样式转换映射(style transfer mapping)，为了减少目标与各源之间的脑电信号差异。    最后在后续过程中整合<strong>源模型</strong>来识别情绪。</p>
+<a id="more"></a>
+<h4 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h4><p>​    提出了一种迁移学习(TL)方法来探索和利用现有个体的信息，以弥补目标训练数据的不足。该方法的目标是使目标域与源域在统计上相似，从而实现源模型的共享，和传统方法不同，这里有少量的标记数据可用。</p>
+<p>​    如下图，已有多个个体和它们各自的分类器，对于一个新个体，在校准阶段选择合适的源并学习样式转化映射(style transfer mapping)，以减少目标和所选的每个源之间的差异。在随后的测试阶段通过STM进行样本映射，接着集成源域分类器来得到最终的情感标签。</p>
+<p>​    在样式转换映射中探索了两种类型的映射终点(destination)设置。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210116094954.png" alt="微信截图_20210116094954" style="zoom:75%;" /></p>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116100240.png" alt="微信截图_20210116100240" style="zoom:75%;" /></p>
+<h5 id="A-Source-Selection"><a href="#A-Source-Selection" class="headerlink" title="A. Source Selection"></a>A. Source Selection</h5><p>​        现有的研究表明，强行利用与目标域不相关的资源可能会降低迁移性能，被称为“负迁移”。为了避免负迁移，在迁移前选择合适的源。$\boldsymbol{A}_{L}^{T}$是一些来自校准阶段的标记数据，$\boldsymbol{A}_{U}^{T}$是后续阶段的无标签数据。</p>
+<p>​        由于$\boldsymbol{A}_{L}^{T}$有标签信息，所以源选择就变得很直观。枚举源域中的N个分类器来对$\boldsymbol{A}_{L}^{T}$进行分类，选取精度最高的$N_S$个分类器。将其对应的数据作为相应的数据源域。</p>
+<p>​        这背后的假设是$\boldsymbol{A}_{L}^{T}$和$\boldsymbol{A}_{U}^{T}$之间的差异不大，可以接受因为这两种数据属于同一实验的同一个体。</p>
+<h5 id="B-Style-Transfer-Mapping"><a href="#B-Style-Transfer-Mapping" class="headerlink" title="B. Style Transfer Mapping"></a>B. Style Transfer Mapping</h5><p>​        在STM中，我们将$\boldsymbol{A}^{T}$ 映射到$\boldsymbol{A}^{S p}$来联结这两个分布，不直接将$\boldsymbol{A}^{T}$ 映射到$\boldsymbol{A}^{S p}$，而是寻找一些在$\boldsymbol{A}^{S p}$的表示模式(典型的聚类中心，类均值)，在这里称$\boldsymbol{A}^{S p}$为映射“destination”终点，$\boldsymbol{A}^{T}$为“origin” 起点。</p>
+<p>​        终点的点集表示为</p>
+<p>​                                                                                    $D=\left\{d_{i} \in R^{m} \mid i=1, \ldots, n\right\}$</p>
+<p>​        STM起点的点集表示为</p>
+<p>​                                                                                    $O=\left\{o_{i} \in R^{m} \mid i=1, \ldots, n\right\}$</p>
+<p>​        从$d_{i}$ 到 $o_{i}$的改变称为概念漂移，假设$d_{i}$ 转换到 $o_{i}$有置信度$f_{i} \in[0,1]$，那么我们就可以学习一个反变换函数将$o_{i}$转换回$d_{i}$ ，$A o_{i}+b$。参数$A \in R^{m \times m}$和$b \in R^{m}$通过最小化带有正则化项的加权平方误差来避免过度迁移</p>
+<p>​                                                            $\min _{A \in R^{m \times m}, b \in R^{m}}         \sum_{i=1}^{n} f_{i}\left|A o_{i}+b-d_{i}\right|_{2}^{2}+\beta|A-I|_{F}^{2}+\gamma|b|_{2}^{2} \space\space\space(3)$</p>
+<p>​        上式是一个凸二次规划问题，它有一个封闭形式的解</p>
+<p>​                                                                                    $A=Q P^{-1}, b=\frac{1}{\hat{f}}(\hat{d}-A \hat{o})$</p>
+<p>其中</p>
+<p>​                                                                                    $Q=\sum_{i=1}^{n} f_{i} d_{i} o_{i}^{T}-\frac{1}{\hat{f}} \hat{d} \hat{o}^{T}+\beta I$<br>​                                                                                    $P=\sum_{i=1}^{n} f_{i} o_{i} o_{i}^{T}-\frac{1}{\hat{f}} \hat{o} \hat{o}^{T}+\beta I$<br>​                                                                                     $\hat{o}=\sum_{i=1}^{n} f_{i} o_{i}, \hat{d}=\sum_{i=1}^{n} f_{i} d_{i}$<br>​                                                                                    $\hat{f}=\sum_{i=1}^{n} f_{i}+\gamma$</p>
+<h5 id="C-Mapping-Origin-and-Destination"><a href="#C-Mapping-Origin-and-Destination" class="headerlink" title="C. Mapping Origin and Destination"></a>C. Mapping Origin and Destination</h5><p>​        映射的起点是$\boldsymbol{A}^{T}$，关键的任务是定义映射的终点$\boldsymbol{A}^{S p}$（也就是）。本文使用的分类器是SVM，在源域中训练好分类器之后，由于对于支持向量的分类难度很大，所以在训练好好之后将支持向量移除，即支持向量只参与推导决策边界，而不参与映射终点的推导。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116211240.png" alt="微信截图_20210116211240" style="zoom:67%;" /></p>
+<p>​        本文将探索在源域中派生映射终点的两种技术。</p>
+<h6 id="1）聚类Nearest-Prototype-原型"><a href="#1）聚类Nearest-Prototype-原型" class="headerlink" title="1）聚类Nearest Prototype(原型)"></a>1）聚类Nearest Prototype(原型)</h6><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116211711.png" alt="微信截图_20210116211711" style="zoom:67%;" /></p>
+<p>​        我们使用K-means聚类在每个类上来获取原型(代表性点)：</p>
+<p>​                                                                $p_{i j} \in R^{m}, j=i, \ldots, n_{i}, i=1, \ldots, M$</p>
+<p>​        其中$n_i$表示每个类别的原型数量，定义每个来自类别$i$的样本的最近原型如下所示：</p>
+<p>​                                                            $N(x, i)=p_{i j},$ where $j=\arg \min _{j^{\prime}=1}^{n_{i}}\left|x-p_{i j^{\prime}}\right|_{2}^{2}$</p>
+<p>​        目标域$\boldsymbol{A}^{T}$中的样本$x$的终点就定义为离其真实类(标记数据)或推导类(未标记数据)最近的原型</p>
+<p>​                                                                            $D_{\text {proto }}(x, y)=N(x, y)$ </p>
+<h6 id="2）Gaussian-Model"><a href="#2）Gaussian-Model" class="headerlink" title="2）Gaussian Model"></a>2）Gaussian Model</h6><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116211718.png" alt="微信截图_20210116211718" style="zoom:67%;" /></p>
+<p>​        高斯模型假设条件密度是服从高斯分布的，上图展示了基于高斯模型的终点，其中均值是$\mu_i$，协方差矩阵是$\Sigma_{i}$，定义了$x$的映射模式在类别$i$上的马氏距离</p>
+<p>​                                                                $P(x, i)=\mu_{i}+\min \left\{1, \frac{\rho}{d(x, i)}\right\}$</p>
+<p>其中$d(x, i)=\sqrt{\left(x-\mu_{i}\right)^{T} \Sigma_{i}^{-1}\left(x-\mu_{i}\right)}$是类别$i$的马氏距离，在目标域$\boldsymbol{A}^{T}$样本的终点可以被定义为对真实类(标记数据)或推导类(未标记数据)的投影$D_{\text {gauss }}(x, y)=P(x, y)$。</p>
+<h5 id="D-Confidence-Setup"><a href="#D-Confidence-Setup" class="headerlink" title="D. Confidence Setup"></a>D. Confidence Setup</h5><p>​        这里有两种策略来计算STM，（1）有监督的方法，在校准阶段只使用有标签数据$\boldsymbol{A}^{T}_L$，这是一种inductive的迁移方法。（2）半监督的方法使用$\boldsymbol{A}^{T}_L$和测试数据$\boldsymbol{A}^{T}_U$来学习STM，这是一种transductive的方法。</p>
+<p>​        在有监督方法中就没有必要设置置信度了，或者说置信度设置为1，而在半监督方法中设置置信度就很重要了。对于$\boldsymbol{A}^{T}$中一个没有标签的数据，我们推导它的标签，并在相应的类中找到映射终点。标签推测不是绝对可靠的。如果推断的标签是错误的，STM将把数据映射到一个错误的类。因此，我们用一个置信度值标记每个转换，出现在公式(3)的第一项中。样本的置信度越高，对STM计算的影响越大，反之亦然。置信度的设置在这里就不再展开。</p>
+<h4 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h4><p>​        本文使用的数据集为<strong>SEED</strong>数据集，一个用于通过观看电影片段后的感情变化来进行情感分类数据集。</p>
+<h5 id="源域数量评估"><a href="#源域数量评估" class="headerlink" title="源域数量评估"></a>源域数量评估</h5><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117111319.png" alt="微信截图_20210117111319" style="zoom:67%;" /></p>
+<h5 id="使用一个统一的源来进行迁移"><a href="#使用一个统一的源来进行迁移" class="headerlink" title="使用一个统一的源来进行迁移"></a>使用一个统一的源来进行迁移</h5><p>​        STM与多源框架相关联，其中每个个体都被视为一个独立的源。我们可以将所有可用的受试者的数据合并为一个统一的源域。我们比较了多源方法和统一源方法的精度。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117111732.png" alt="微信截图_20210117111732" style="zoom:67%;" /></p>
+<h5 id="置信度评估"><a href="#置信度评估" class="headerlink" title="置信度评估"></a>置信度评估</h5><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117113501.png" alt="微信截图_20210117113501" style="zoom:67%;" /></p>
+<p>​        评估了本文提出的置信度设置方法和之前的两种置信度设置方法之间的效果。</p>
+<h5 id="个体表现"><a href="#个体表现" class="headerlink" title="个体表现"></a>个体表现</h5><p>​                                    <img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117113702.png" alt="微信截图_20210117113702" style="zoom:67%;" /></p>
+]]></content>
+      <categories>
+        <category>ssk</category>
+      </categories>
+      <tags>
+        <tag>迁移学习</tag>
+        <tag>EEG</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>xw caNet:Frequency Channel Attention Networks</title>
+    <url>/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/</url>
+    <content><![CDATA[<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote>
+<p>注意机制，特别是通道注意，在计算机视觉领域取得了巨大的成功。许多研究集中在如何设计有效的通道注意机制，而忽略了一个基本问题，即使用全局平均池化(GAP)是否存在问题。在这项工作中，本文从一个不同的视角出发，用频率分析重新思考通道注意。<strong>在频域分析的基础上，用数学方法证明了全局平均池化(GAP)是频域特征分解的一种特例。通过证明，自然地将通道注意机制的预处理推广到了频域，并提出了一种新的多谱通道注意网络。</strong>该方法简单有效。只修改计算中的一行代码，以在现有的通道注意方法中实现本文的方法。在图像分类、目标检测和实例分割等任务上，与其他通道注意方法相比，该方法取得了最先进的效果。与基线SENet50相比，在相同的参数数量和计算成本下，本文的方法在ImageNet上的Top-1精度提高了1.8%。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p><strong>作者信息</strong></p>
+<p>浙江大学（李玺团队）</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210112162526585.png" alt="image-20210112162526585"></p>
+<h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><ol>
+<li>通道注意力大都通过GAP实现，尽管GAP(global average pooling)算法简单有效，但它存在一个潜在的问题，即不能很好地捕捉到丰富的输入模式信息，从而在处理不同的输入时缺乏特征多样性。因此，出现了一个自然的问题，是否均值信息仅足以代表渠道注意中的各种渠道。</li>
+</ol>
+<h3 id="Contribution"><a href="#Contribution" class="headerlink" title="Contribution"></a>Contribution</h3><ol>
+<li>证明了GAP是离散余弦变换(DCT)的一个特例，等价于离散余弦变换(DCT)的最低频率，仅使用GAP等价于丢弃特征信道中包含大量有用信息的其他频率分量。在此基础上，本文将通道注意推广到频域，提出了具有多谱通道注意框架的FcaNet。</li>
+<li>提出了一种选择频率分量的两步准则，探讨了使用不同数量的频率分量及其不同组合的效果。</li>
+<li>方法简单，改进一行代码即可。</li>
+</ol>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><h3 id="Revisiting-Channel-Attention-and-DCT"><a href="#Revisiting-Channel-Attention-and-DCT" class="headerlink" title="Revisiting Channel Attention and DCT"></a>Revisiting Channel Attention and DCT</h3><h4 id="Channel-Attention"><a href="#Channel-Attention" class="headerlink" title="Channel Attention"></a>Channel Attention</h4><p><strong>输入</strong></p>
+<script type="math/tex; mode=display">
+X \in \mathbb{R}^{C \times H \times W}</script><p><em>C是通道数</em></p>
+<p><strong>注意力</strong></p>
+<script type="math/tex; mode=display">
+a t t=\operatorname{sigmoid}(f c(\operatorname{gap}(X)))</script><script type="math/tex; mode=display">
+att\in \mathbb{R}^{C}</script><p><strong>注意力机制输出</strong></p>
+<script type="math/tex; mode=display">
+\widetilde{X}_{:, i,:,:}=a t t_{i} X_{:, i,:,:}, \quad \text { s.t. } \quad i \in\{0,1, \cdots, C-1\}</script><p><img src="https://pic4.zhimg.com/v2-77affb3d6037ab0fa4f564f30c38031b_r.jpg" alt="img"></p>
+<h4 id="Discrete-Cosine-Transform-DCT"><a href="#Discrete-Cosine-Transform-DCT" class="headerlink" title="Discrete Cosine Transform (DCT)"></a>Discrete Cosine Transform (DCT)</h4><p><strong>一维DCT</strong></p>
+<script type="math/tex; mode=display">
+f_{k}=\sum_{i=0}^{L-1} x_{i} \cos \left(\frac{\pi k}{L}\left(i+\frac{1}{2}\right)\right), \text { s.t. } k \in\{0,1, \cdots, L-1\}</script><p>输入：$x \in \mathbb{R}^{L}$</p>
+<p>离散余弦转换频谱：$f \in \mathbb{R}^{L}$</p>
+<p><strong>二维DCT</strong></p>
+<script type="math/tex; mode=display">
+\begin{array}{l}f_{h, w}^{2 d}=\sum_{i=0}^{H-1} \sum_{j=0}^{W-1} x_{i, j}^{2 d} \underbrace{\cos \left(\frac{\pi h}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\pi w}{W}\left(j+\frac{1}{2}\right)\right)}_{\text {DCT weights }}, \\ \text { s.t. } h \in\{0,1, \cdots, H-1\}, w \in\{0,1, \cdots, W-1\}\end{array}</script><p>反变换</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}x_{i, j}^{2 d}=\sum_{h=0}^{H-1} \sum_{w=0}^{W-1} f_{h, w}^{2 d} \underbrace{\cos \left(\frac{\pi h}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\pi w}{W}\left(j+\frac{1}{2}\right)\right)}_{\text {DCT weights }} \\ \text { s.t. } i \in\{0,1, \cdots, H-1\}, j \in\{0,1, \cdots, W-1\}\end{array}</script><p><strong>GAP</strong></p>
+<script type="math/tex; mode=display">
+\begin{aligned} f_{0,0}^{2 d} &=\sum_{i=0}^{H-1} \sum_{j=0}^{W-1} x_{i, j}^{2 d} \cos \left(\frac{0}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\theta}{W}\left(j+\frac{1}{2}\right)\right) \\ &=\sum_{i=0}^{H-1} \sum_{j=0}^{W-1} x_{i, j}^{2 d} \\ &=g a p\left(x^{2 d}\right) H W \end{aligned}</script><p>由上可见全局平均池化(GAP)是频域特征分解的一种特例（只保留低频信息）</p>
+<script type="math/tex; mode=display">
+B_{h, w}^{i, j}=\cos \left(\frac{\pi h}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\pi w}{W}\left(j+\frac{1}{2}\right)\right)</script><script type="math/tex; mode=display">
+X=\underbrace{\operatorname{gap}(X) H W B_{0,0}^{i, j}}_{\text {utilized }}+\underbrace{f_{0,1}^{2 d} B_{0,1}^{i, j}+\cdots+f_{H-1, W-1}^{2 d} B_{H-1, W-1}^{i, j}}_{\text {discarded }}</script><h4 id="Multi-Spectral-Channel-Attention"><a href="#Multi-Spectral-Channel-Attention" class="headerlink" title="Multi-Spectral Channel Attention"></a>Multi-Spectral Channel Attention</h4><p>现有的通道注意所使用的信息不足，而通道注意间GAP预处理方法是二维DCT的特例。这样就可以很自然地将GAP推广到2D  DCT中更多的频率分量，引入更多的信息来解决信道注意信息不足的问题。</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120005612174.png" alt="image-20210120005612174"></p>
+<script type="math/tex; mode=display">
+\begin{aligned} F r e q^{i} &=2 \mathrm{DDCT}^{u, v}\left(X^{i}\right) \\ &=\sum_{h=0}^{H-1} \sum_{w=0}^{W-1} X_{:, h, w}^{i} B_{h, w}^{u, v} \\ & \text { s.t. } i \in\{0,1, \cdots, n-1\} \end{aligned}</script><p>将通道C划分成多个C’的通道，分别进行不同频率分量的DCT运算</p>
+<p>主要思想是首先确定每个频率分量的重要性，然后确定使用不同数量的频率分量一起使用的效果。</p>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p><strong>在ImageNet上使用不同频率分量的频道注意的最高精度</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120010126425.png" alt="image-20210120010126425" style="zoom:50%;" /></p>
+<p>确定每个频率分量的重要性（性能）</p>
+<p><strong>选择不同数目频率分量的准确性</strong></p>
+<p>选取性能最高的K个频率分量</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120010237029.png" alt="image-20210120010237029" style="zoom:50%;" /></p>
+<p><strong>ImageNet</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120133711682.png" alt="image-20210120133711682" style="zoom:50%;" /></p>
+<p><strong>COCO</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120133733751.png" alt="image-20210120133733751" style="zoom:50%;" /></p>
+<p><strong>研究更多的频率组合</strong></p>
+<p>选取Top-k频率分量的最优结果:78.52%</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120135835661.png" alt="image-20210120135835661"></p>
+]]></content>
+      <categories>
+        <category>xw</category>
+      </categories>
+      <tags>
+        <tag>Attention</tag>
+      </tags>
+  </entry>
 </search>
