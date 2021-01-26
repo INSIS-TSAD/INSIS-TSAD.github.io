@@ -202,6 +202,26 @@
 
       <div class="post-meta">
         <time itemprop="dateCreated"
+              datetime="2021-01-26T15:00:24+08:00"
+              content="2021-01-26">
+          01-26
+        </time>
+      </div>
+
+      <div class="post-title">
+          <a class="post-title-link" href="/2021/01/26/DengJiaoxue/2021-1-18%20%E5%9F%BA%E4%BA%8EECG%E6%95%B0%E6%8D%AE%E6%83%85%E6%84%9F%E8%AF%86%E5%88%AB%E7%9A%84%E8%87%AA%E7%9B%91%E7%9D%A3%E6%A8%A1%E5%9E%8B%20/" itemprop="url">
+            <span itemprop="name">djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型</span>
+          </a>
+      </div>
+
+    </header>
+  </article>
+
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <div class="post-meta">
+        <time itemprop="dateCreated"
               datetime="2021-01-07T14:20:10+08:00"
               content="2021-01-07">
           01-07
@@ -288,14 +308,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">31</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -402,6 +422,26 @@
 
 
 
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
 
 
 
