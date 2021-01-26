@@ -209,7 +209,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-01-26 21:24:24 / Modified: 19:50:27" itemprop="dateCreated datePublished" datetime="2021-01-26T21:24:24+08:00">2021-01-26</time>
+              <time title="Created: 2021-01-26 21:24:24 / Modified: 20:06:47" itemprop="dateCreated datePublished" datetime="2021-01-26T21:24:24+08:00">2021-01-26</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -233,6 +233,7 @@
 
       
           <h4 id="gun"><a href="#gun" class="headerlink" title="gun"></a>gun</h4><div class="pdfobject-container" data-target="./gun.pdf" data-height="800px"></div>
+<div class="pdfobject-container" data-target="https://arxiv.org/pdf/2002.03898.pdf" data-height="800px"></div>
       
     </div>
 
@@ -1153,26 +1154,6 @@
 
 
 
-<script>
-document.querySelectorAll('.pdfobject-container').forEach(element => {
-  let url = element.dataset.target;
-  let pdfOpenParams = {
-    navpanes : 0,
-    toolbar  : 0,
-    statusbar: 0,
-    pagemode : 'thumbs',
-    view     : 'FitH'
-  };
-  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
-  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
-
-  if (NexT.utils.supportsPDFs()) {
-    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
-  } else {
-    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
-  }
-});
-</script>
 
 
 
