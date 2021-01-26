@@ -2918,37 +2918,15 @@ X=\underbrace{\operatorname{gap}(X) H W B_{0,0}^{i, j}}_{\text {utilized }}+\und
       </tags>
   </entry>
   <entry>
-    <title>test</title>
+    <title>MTDNN</title>
     <url>/2021/01/26/ZhangYafei/MTDNN/</url>
-    <content><![CDATA[<p><br></p>
-<div class="pdfobject-container" data-target="./MTDNN.pdf" data-height="800px"></div>
-<p><br></p>
-]]></content>
+    <content><![CDATA[<object data="./MTDNN.pdf" type="application/pdf" width="100%" height="877px">]]></content>
       <categories>
         <category>zyf</category>
       </categories>
       <tags>
-        <tag>异常检测</tag>
-        <tag>多变量时间序列</tag>
-        <tag>生成式模型</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>gun</title>
-    <url>/2021/01/26/ZhangYafei/gun/</url>
-    <content><![CDATA[<h4 id="gun"><a href="#gun" class="headerlink" title="gun"></a>gun</h4><div class="pdfobject-container" data-target="https://arxiv.org/pdf/2002.03898.pdf" data-height="800px"></div>
-<div class="pdfobject-container" data-target="./gun.pdf" data-height="800px"></div>
-<p>object</p>
-<object data="./gun.pdf" type="application/pdf" width="100%" height="877px">
-
-<object data="https://arxiv.org/pdf/2002.03898.pdf" type="application/pdf" width="100%" height="877px">]]></content>
-      <categories>
-        <category>zyf</category>
-      </categories>
-      <tags>
-        <tag>异常检测</tag>
-        <tag>多变量时间序列</tag>
-        <tag>生成式模型</tag>
+        <tag>时序预测</tag>
+        <tag>金融时序</tag>
       </tags>
   </entry>
   <entry>
