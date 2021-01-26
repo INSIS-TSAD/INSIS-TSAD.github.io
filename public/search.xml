@@ -2923,7 +2923,9 @@ X=\underbrace{\operatorname{gap}(X) H W B_{0,0}^{i, j}}_{\text {utilized }}+\und
     <content><![CDATA[<p>MTDNN</p>
 <p>金融时序预测</p>
 <a id="more"></a>
-<object data="./MTDNN.pdf" type="application/pdf" width="100%" height="100%">]]></content>
+<object data="./MTDNN.pdf" type="application/pdf" width="100%" height="500px">
+
+]]></content>
       <categories>
         <category>zyf</category>
       </categories>
