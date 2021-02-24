@@ -3090,4 +3090,232 @@ X=\underbrace{\operatorname{gap}(X) H W B_{0,0}^{i, j}}_{\text {utilized }}+\und
         <tag>多任务学习</tag>
       </tags>
   </entry>
+  <entry>
+    <title>gs CTF:Anomaly Detection in High-Dimensional Time Series with Coarse-to-Fine Model Transfer</title>
+    <url>/2021/02/24/GongSa/%5BINFOCOM21%5D%20CTF%20%20Anomaly%20Detection%20in%20High-Dimensional%20Time%20Series%20with%20Coarse-to-Fine%20Model%20Transfer%20/</url>
+    <content><![CDATA[<p><a href="https://imgtu.com/i/yObyUH"><img src="https://s3.ax1x.com/2021/02/24/yObyUH.png" alt="yObyUH.png"></a></p>
+<p>[INFOCOM2021]</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文提出了一个基于粗到细模型迁移的<code>CTF</code>框架，以实现可扩展和准确的数据中心规模的异常检测。CTF预先训练一个粗粒度模型，使用该模型提取每台机器的特征并计算其分布，根据分布对机器进行聚类，并进行模型迁移以对每个类簇模型进行微调以获得较高的精度。文中还对聚类算法、距离度量等设计进行了证明，以达到最佳的精度，并在生产数据上进行实验，验证了其可扩展性和准确性。</p>
+<p>关键字：异常检测，高维，时间序列，大规模</p>
+<a id="more"></a>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>背景：大规模数据中心的异常检测监控</p>
+<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><h4 id="1-基于深度学习的算法面临的挑战：维度爆炸"><a href="#1-基于深度学习的算法面临的挑战：维度爆炸" class="headerlink" title="1 基于深度学习的算法面临的挑战：维度爆炸"></a>1 基于深度学习的算法面临的挑战：<strong>维度爆炸</strong></h4><ul>
+<li>机器数量</li>
+<li>检测指标数量（KPI）</li>
+<li>时间粒度细（30s）</li>
+</ul>
+<p>对于每个机器构建一个模型，能够确保精确度，但是不能保证效率</p>
+<p>因此提出，先对机器进行<strong>聚类</strong>，对每一类的机器使用一个模型。</p>
+<h4 id="2-引出另一个挑战：直接对机器的高维KPI进行聚类，会由于高维引起的维度灾难，带来计算效率低的问题"><a href="#2-引出另一个挑战：直接对机器的高维KPI进行聚类，会由于高维引起的维度灾难，带来计算效率低的问题" class="headerlink" title="2 引出另一个挑战：直接对机器的高维KPI进行聚类，会由于高维引起的维度灾难，带来计算效率低的问题"></a>2 引出另一个挑战：直接对机器的高维KPI进行聚类，会由于高维引起的维度灾难，带来计算效率低的问题</h4><p>因此提出，对高维KPI做一个降维表示</p>
+<h3 id="进一步构建框架的挑战"><a href="#进一步构建框架的挑战" class="headerlink" title="进一步构建框架的挑战"></a>进一步构建框架的挑战</h3><h4 id="1-RNN-VAE模型的训练和聚类之间存在依赖关系"><a href="#1-RNN-VAE模型的训练和聚类之间存在依赖关系" class="headerlink" title="1 RNN-VAE模型的训练和聚类之间存在依赖关系"></a>1 RNN-VAE模型的训练和聚类之间存在依赖关系</h4><p>要聚类的前提是有训练好的模型获得低维潜在表示，但训练一个RNN-VAE模型只用没聚类的高维时间序列数据很难准确且高效</p>
+<p><strong>解决办法：</strong>提出一个 coarse-to-fine model transfer framework </p>
+<h4 id="2-time-domain-：-潜在表示仍然是高维时间序列"><a href="#2-time-domain-：-潜在表示仍然是高维时间序列" class="headerlink" title="2 time domain ： 潜在表示仍然是高维时间序列"></a>2 time domain ： 潜在表示仍然是高维时间序列</h4><p>这样对聚类很不友好</p>
+<p><strong>解决办法：</strong>将时间序列转换成分布，这既提高了效率，也提高了准确性</p>
+<h4 id="3-要对模型迁移策略、聚类算法、距离度量进行选择"><a href="#3-要对模型迁移策略、聚类算法、距离度量进行选择" class="headerlink" title="3 要对模型迁移策略、聚类算法、距离度量进行选择"></a>3 要对模型迁移策略、聚类算法、距离度量进行选择</h4><h3 id="框架：CTF"><a href="#框架：CTF" class="headerlink" title="框架：CTF"></a>框架：CTF</h3><p>离线训练分为四步：</p>
+<ul>
+<li>采样部分数据训练粗粒度模型</li>
+<li>使用粗粒度模型将每台机器的多变量时序转化为低维潜在表示</li>
+<li>基于潜在表示的分布对机器进行聚类</li>
+<li>对每个聚类的机器fine-tune模型</li>
+</ul>
+<p>我们的评估表明，当CTF使用OmniAnomaly算法，CTF可以将模型训练时间从两个月左右减少到4.40小时（6台计算服务器，一个数据中心10万台机器），F1score-0.830（loss0.012）</p>
+<h3 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h3><ul>
+<li><p>我们提出了一个基于coarse-to-fine model transfer  的框架，该框架可以在机器、KPI和时间域上具有高维的庞大操作数据集上执行异常检测。其核心技术如下：</p>
+<ul>
+<li>第一次综合了模型训练和机器聚类，并对两者进行了加速；</li>
+<li>第一次利用潜在表示的分布进行聚类，加速了对距离的计算；</li>
+<li>第一次对RNN-VAE模型应用微调策略，验证其在准确性和效率方面的好处；</li>
+</ul>
+</li>
+<li><p>在全球顶级互联网公司的大规模数据集上使用最先进的异常检测算法对CTF进行了实现和评估，展示了CTF在实际基础设施中的有效性和可扩展性。</p>
+</li>
+<li>开源了多变量时间序列的<a href="https://github.com/NetManAIOps/label-tool">标记工具</a>和<a href="https://github.com/NetManAIOps/CTF data">标记的数据集</a></li>
+</ul>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><h3 id="问题陈述"><a href="#问题陈述" class="headerlink" title="问题陈述"></a>问题陈述</h3><p><a href="https://imgtu.com/i/yOb65d"><img src="https://s3.ax1x.com/2021/02/24/yOb65d.png" alt="yOb65d.png"></a></p>
+<p><a href="https://imgtu.com/i/yObDbD"><img src="https://s3.ax1x.com/2021/02/24/yObDbD.png" alt="yObDbD.png"></a></p>
+<p><a href="https://imgtu.com/i/yObBDO"><img src="https://s3.ax1x.com/2021/02/24/yObBDO.png" alt="yObBDO.png"></a></p>
+<p><a href="https://imgtu.com/i/yObsVe"><img src="https://s3.ax1x.com/2021/02/24/yObsVe.png" alt="yObsVe.png"></a></p>
+<p><a href="https://imgtu.com/i/yObR2t"><img src="https://s3.ax1x.com/2021/02/24/yObR2t.png" alt="yObR2t.png"></a></p>
+<p><strong>动机：</strong>我们观察到基于RNN-VAE的算法可以利用VAE的典型结构将每个高维KPI向量(L)压缩为低维潜在表示(C)。</p>
+<p><strong>挑战</strong></p>
+<ul>
+<li><strong>聚类与模型训练之间的相互依赖性</strong></li>
+</ul>
+<blockquote>
+<p>解决：（1）先采样部分数据，对粗粒度模型进行预训练；（2）使用粗粒度模型将每台机器的MTS转换为潜在表示；（3）利用潜在表示的分布将机器分类成K个簇；（4）将粗粒度模型迁移到每个类簇，并对每个类簇的细粒度模型进行微调；</p>
+<p>聚类算法：Hierarchical Agglomerative Clustering.  （HAC）</p>
+<p>优点：</p>
+<ol>
+<li>不需要初始参数（聚类数和距离阈值等）</li>
+<li>它对距离测量算法不敏感，因为它是基于距离的排序而不是值进行聚类</li>
+<li>不同层次之间的关系是明显的，便于我们可视化聚类结果</li>
+</ol>
+</blockquote>
+<ul>
+<li><strong>The high dimension of the time domain</strong>  </li>
+</ul>
+<blockquote>
+<p>解决：对潜在表示序列进行抽样，得到分布，并在聚类中利用分布进行距离计算。</p>
+<p>距离度量：Wasserstein distance  </p>
+<p><a href="https://imgtu.com/i/yObgPA"><img src="https://s3.ax1x.com/2021/02/24/yObgPA.png" alt="yObgPA.png"></a></p>
+<p>在两个分布之间的重叠较少或没有重叠时特别有用</p>
+</blockquote>
+<ul>
+<li><strong>神经网络训练方法的选择</strong></li>
+</ul>
+<blockquote>
+<p>在新数据集中训练旧模型的所有神经网络层，<strong>在新数据集中训练旧模型的部分层(即微调)</strong></p>
+<p>微调dense layers</p>
+</blockquote>
+<h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><h3 id="数据预处理"><a href="#数据预处理" class="headerlink" title="数据预处理"></a>数据预处理</h3><ul>
+<li>缺失值填充（previously observed value）</li>
+<li>Data normalization  </li>
+</ul>
+<p><a href="https://imgtu.com/i/yOb28I"><img src="https://s3.ax1x.com/2021/02/24/yOb28I.png" alt="yOb28I.png"></a></p>
+<h3 id="离线模型训练"><a href="#离线模型训练" class="headerlink" title="离线模型训练"></a>离线模型训练</h3><p>1）预训练粗粒度模型</p>
+<p>2）特征提取</p>
+<blockquote>
+<p>抽取部分KPI进行降维表示，学习分布</p>
+</blockquote>
+<p>3）机器聚类</p>
+<blockquote>
+<p>子集上进行聚类中心计算</p>
+</blockquote>
+<p>4）模型迁移</p>
+<blockquote>
+<p>冻结RNN层</p>
+<p>The reason is that RNN layers are shallow and deterministic, and thus, they extract general time-series features in the coarse-grained model, which could contribute to the model generalization  </p>
+</blockquote>
+<h2 id="在线检测"><a href="#在线检测" class="headerlink" title="在线检测"></a>在线检测</h2><p><strong>异常分数：</strong>重构概率（KPI接近normal行为的概率）</p>
+<p><strong>阈值选择：</strong>Peaks-Over-Threshold (POT)  </p>
+<blockquote>
+<p>1）POT对整个群体中某一低分位数以下的样本记性过滤，用Generalized Pareto Distribution (GPD) 拟合，获得GPD函数；</p>
+<p><a href="https://imgtu.com/i/yObOx0"><img src="https://s3.ax1x.com/2021/02/24/yObOx0.png" alt="yObOx0.png"></a></p>
+<p>2）利用函数和整个群体中的一个异常分位（q）数来确定阈值</p>
+<p>优点：①没对整个总体分布进行假设 ②低分位数和q ③实际效率高</p>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p><a href="https://imgtu.com/i/yObWxP"><img src="https://s3.ax1x.com/2021/02/24/yObWxP.png" alt="yObWxP.png"></a></p>
+<p><a href="https://imgtu.com/i/yOb5qS"><img src="https://s3.ax1x.com/2021/02/24/yOb5qS.png" alt="yOb5qS.png"></a></p>
+<p><strong>功能</strong></p>
+<ol>
+<li>加载、可视化、拖动、放大/缩小时间序列，使用户可以概览整个序列的形状，并定位某个片段的细节</li>
+<li>可以折叠和展开几个KPI维度，为用户提供更好的视图</li>
+<li>对异常进行标记或取消。用户可以选择间隔的开始和结束，并将其保存为异常</li>
+<li>实时收集并更新异常间隔(如计数、百分比)的统计信息。</li>
+</ol>
+<h2 id="评估"><a href="#评估" class="headerlink" title="评估"></a>评估</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><ul>
+<li>533机器实体</li>
+<li>每个机器49条KPI</li>
+<li>采样间隔30s</li>
+<li>13天数据（from April 18th to April 30th）</li>
+</ul>
+<h3 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h3><p>预训练采样实体数：100</p>
+<p>预训练采样KPI数：每个实体的10%</p>
+<p>聚类数：5</p>
+<p>低分位数：0.01， 0.02， 0.03</p>
+<p>q：$10^{-5}$</p>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><p><a href="https://imgtu.com/i/yObhKf"><img src="https://s3.ax1x.com/2021/02/24/yObhKf.png" alt="yObhKf.png"></a></p>
+<p><a href="https://imgtu.com/i/yOb4r8"><img src="https://s3.ax1x.com/2021/02/24/yOb4r8.png" alt="yOb4r8.png"></a></p>
+<p><a href="https://imgtu.com/i/yOboVg"><img src="https://s3.ax1x.com/2021/02/24/yOboVg.png" alt="yOboVg.png"></a></p>
+<blockquote>
+<p>we tune alerting policy cross-time: at least N consecutive anomalous points will be considered as anomalies (e.g., N = 5 in our scenario).  </p>
+</blockquote>
+<p><a href="https://imgtu.com/i/yObTaQ"><img src="https://s3.ax1x.com/2021/02/24/yObTaQ.png" alt="yObTaQ.png"></a></p>
+<p><a href="https://imgtu.com/i/yOb75j"><img src="https://s3.ax1x.com/2021/02/24/yOb75j.png" alt="yOb75j.png"></a></p>
+<blockquote>
+<p>特征表示</p>
+</blockquote>
+<p><a href="https://imgtu.com/i/yObbPs"><img src="https://s3.ax1x.com/2021/02/24/yObbPs.png" alt="yObbPs.png"></a></p>
+<p><a href="https://imgtu.com/i/yObqGn"><img src="https://s3.ax1x.com/2021/02/24/yObqGn.png" alt="yObqGn.png"></a></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文提出了一个基于粗到细模型迁移的<code>CTF</code>框架，以实现可扩展和准确的数据中心规模的异常检测，离线模型训练分四步进行，每一步的设计提高精度且提高性能，更是公开了数据集和开源了标签工具。另外，该框架可以扩展到大规模时序预测或分类。</p>
+]]></content>
+      <categories>
+        <category>gs</category>
+      </categories>
+      <tags>
+        <tag>异常检测</tag>
+        <tag>多变量时间序列</tag>
+        <tag>大规模异常检测</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion</title>
+    <url>/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/</url>
+    <content><![CDATA[<h1 id="基于量化的最小误差熵准则的格兰杰因果分析"><a href="#基于量化的最小误差熵准则的格兰杰因果分析" class="headerlink" title="基于量化的最小误差熵准则的格兰杰因果分析"></a>基于量化的最小误差熵准则的格兰杰因果分析</h1><p><a href="https://academic.microsoft.com/journal/120629676">2019 IEEE Signal Processing Letters </a>Volume: 26, Issue: 2, pp 347-351 <a href="https://doi.org/10.1109/LSP.2019.2890973"> DOI: 10.1109/LSP.2019.2890973</a></p>
+<p> <a href="https://academic.microsoft.com/author/2473510192/publication?paperId=3105268574">Badong Chen</a>1,       <a href="https://academic.microsoft.com/author/2899149957/publication?paperId=3105268574">Rongjin Ma</a> 1,       <a href="https://academic.microsoft.com/author/2886285899/publication?paperId=3105268574">Siyu Yu</a> 1,          <a href="https://academic.microsoft.com/author/2109410961/publication?paperId=3105268574">Shaoyi Du</a> 1,        <a href="https://academic.microsoft.com/author/2679377637/publication?paperId=3105268574">Jing Qin</a> 2</p>
+<p>1 <a href="https://academic.microsoft.com/institution/87445476">Xi’an Jiaotong University</a> ,             2 <a href="https://academic.microsoft.com/institution/14243506">Hong Kong Polytechnic University</a></p>
+<p>摘要：</p>
+<p>基于均方误差标准（MSE) 的线性回归模型（LRM) 被广泛应用于Granger因果分析中。然而，当信号被非高斯噪声污染的情况下，基于MSE的线性回归模型（LRM) 的系数就难以精确的估计，也就从而影响Granger因果分析的准确性。最小误差熵(MEE)标准可以取代MSE标准来解决非高斯噪声环境下的问题，但是它也因为信号过多产生了计算效率上的瓶颈。为了解决前面的这些问题，本文提出了量化的最小误差熵准则（QMEE) ，分别比较了传统的GC和GC—MEE以及GC—QMEE，通过模拟数据集，还有EEG数据集上的实验，表明GC—QMEE在非高斯噪声领域的优势以及QMEE相比MEE大大减少了计算复杂度。</p>
+<p>作者对于非高斯噪声的举例：多模的，重尾的，离散的，等等。</p>
+<a id="more"></a>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>在信息理论学习（ITL) 中，大量的有监督或无监督的学习算法都与信息论的测量的优化相关，例如熵，互信息以及信息散度等。其中的最小误差熵（MEE) 已经被成功地用在回归，分类，自适应系统训练等领域上。</p>
+<p>MEE的基础思想就是利用熵（不确定度）代表假定模型和实验数据对应真实模型的差异。一般常用的均方误差（MSE）只依赖于预测误差的二阶矩，而误差熵则能考虑到更高阶的矩，因此在非高斯分布以及极大的异常点的问题上有更佳的表现。以及已经有一些数值实验证明了MEE的更强的鲁棒性。</p>
+<p>本文作者的另一篇文章也就MEE在最简单的情形下优于MSE的结果给出了理论上的数学证明。</p>
+<h6 id="具体介绍——"><a href="#具体介绍——" class="headerlink" title="具体介绍——"></a>具体介绍——</h6><p>A.最小误差熵</p>
+<p>在ITL（ J. C. Principe, Information theoretic learning: Renyi’s entropy and kernel perspectives. Springer Science and Business Media, 2010.）中，瑞丽（Renyi）熵被用作损失函数，其定义为</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220160836459.png" alt="image-20210220160836459"></p>
+<p>Renyi熵在$\alpha\rightarrow1$的时候就变成熟知的香农熵。这里$p(e)$表示误差变量$e$的概率密度函数（PDF）。</p>
+<p>为了估计$p(e)$，这里使用了Parzen窗方法：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220161635411.png" alt="image-20210220161635411"></p>
+<script type="math/tex; mode=display">
+这里G_{\sigma}(e,e_i)表示高斯核函数：G_{\sigma}(e,e_i)=\frac{1}{\sqrt{2\pi}\sigma}exp[-\frac{(e-e_i)^2}{2{\sigma}^2}]\</script><p>因为$\alpha$是可变的，在本文中设置$\alpha=2$，就能推导出具体表达式</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220162820224.png" alt="image-20210220162820224"></p>
+<p>最终上式就是理论上的用于计算的损失函数，这里$N$表示样本点个数，通过两个求和符号可以估计它的计算复杂度是O($N^2$)，这对于庞大的数据集来说不适用。</p>
+<p>B.量化方法</p>
+<p>提出一种MEE的量化算法，保留它的优点同时减少它的计算复杂度。</p>
+<p>量化算法：</p>
+<p>输入——误差样本：$\{e_i\}_{i=1}^N$</p>
+<p>输出——量化误差：$\{Q(e_i)\}_{i=1}^N$以及codebook：$\{c_i\}_{i=1}^M$</p>
+<ol>
+<li><p>参数设置：阈值$\epsilon$</p>
+</li>
+<li><p>初始条件：设置$c_1=\{e_1\}$，这里$c_i$表示第i次迭代时的codebook</p>
+</li>
+<li><p>for $i=2,3,…,N$  do</p>
+<p>​       计算$e_i$和$c_{i-1}$之间的距离：$dis(e_i,c_{i-1})=|e_i-c_{i-1}(j^*)|$</p>
+<p>​       这里$j^*=\operatorname{argmin}_{}|e_i-c_{i-1}(j)|$表示$c_{i-1}$中的第$j$个元素。即距离定义为最小距离</p>
+<p>​       if    $dis(e_i,c_{i-1})\le \epsilon$    then</p>
+<p>​              codebook保持不变：$c_i=c_{i-1}$  并且$Q(e_i)=c_{i-1}(j^*)$；</p>
+<p>​       else    </p>
+<p>​              更新codebook：$c_i=\{c_{i-1},e_i\}$  并且$Q(e_i)=e_i$；</p>
+</li>
+</ol>
+<p>​              end  if</p>
+<p>​        end  for</p>
+<p>$Q(·)$表示量化算子，最终得到N个误差样本$\{e_i\}_{i=1}^N$对应的$\{Q(e_i)\}_{i=1}^N$，和codebook：$\{c_i\}_{i=1}^M$</p>
+<p>量化的误差熵：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220181846008.png" alt="image-20210220181846008"></p>
+<p>里面的$M$远小于$N$时，可以看出计算复杂度降低很多。$A_m$表示$c_m$中元素的个数。</p>
+<p>这就是最后用于计算的函数。</p>
+<p>C.传统granger因果</p>
+<p>一种基于线性回归模型的方法，通过比较两个模型的预测能力判断一对时间序列间的关系。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220183303520.png" alt="image-20210220183303520"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220183332611.png" alt="image-20210220183332611"></p>
+<p>如果时间序列x的过去值对y的预测有帮助，则认为x对y有Granger因果影响。</p>
+<p>直观上即比较$Var(e_{21})$和$Var(e_{22})$的大小</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220183816295.png" alt="image-20210220183816295"></p>
+<h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><strong>模拟实验</strong></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220184734621.png" alt="image-20210220184734621"></p>
+<p>$\varphi_t$服从$[-2,2]$均匀分布，$\psi_t$是噪声分别服从以下四个情况里的分布：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220185220761.png" alt="image-20210220185220761"></p>
+<p>结果如下表：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220185542260.png" alt="image-20210220185542260"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220185711137.png" alt="image-20210220185711137"></p>
+<p>文章没有深入讨论在高斯噪声下QMEE比MSE优越多少，但是在混合高斯噪声和$\alpha$稳态噪声下QMEE和MEE有更强的鲁棒性。</p>
+<p><strong>EEG数据集实验</strong></p>
+<p>该数据集由9名受试者使用3个电极（C3，Cz，C4）进行记录</p>
+<p>受试者为右撇子，视力正常或矫正视力正常。运动想象任务分为左脑运动想象任务和右脑运动想象任务。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220191919234.png" alt="image-20210220191919234"></p>
+<p>t是100次替代数据实验中满足Granger因果指数大于原序列实验的Granger因果指数这一条件的实验的相对频率</p>
+<p>t越小说明Granger因果越显著</p>
+<p>实验结果展示了右撇子的大脑不对称性对有效连接网络的影响，与之前的研究结果相符。</p>
+<h4 id="感想："><a href="#感想：" class="headerlink" title="感想："></a>感想：</h4><p>本文展示了QMEE和MEE准则在非高斯噪声环境下比一般的MSE准则得到的结果更加精确的优势。文章只是提出了线性回归模型上的方案，对于非线性的情况可以使用神经网络进行预测，而且损失函数可以换成QMEE标准下的函数。对于在真实数据集上的神经网络的应用在MSE标准下效果不佳的时候也可以考虑使用QMEE/MEE准则。</p>
+]]></content>
+      <categories>
+        <category>cyf</category>
+      </categories>
+      <tags>
+        <tag>可解释</tag>
+      </tags>
+  </entry>
 </search>
