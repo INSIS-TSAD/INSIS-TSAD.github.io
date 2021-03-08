@@ -19,38 +19,38 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
   </script>
 
-  <meta name="description" content="Time-Series Anomaly Detection Service at Microsoft | [KDD’ 2019]摘要：大型公司需要实时监视其应用程序和服务中的各种指标（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于谱残差（SR">
+  <meta name="description" content="摘要：大型公司需要实时监视其应用程序和服务中的各种指标（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于谱残差（SR）和卷积神经网络（CNN）的新算法。我们的工作是尝试将视觉显着性检测域中的SR模型首次迁移到时间序列异常检测中。此外，我们创新地">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mpt Time-Series Anomaly Detection Service at Microsoft">
-<meta property="og:url" content="http://example.com/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft[KDD'%202019]/index.html">
+<meta property="og:title" content="mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft">
+<meta property="og:url" content="http://example.com/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft[KDD'%202019](1)/index.html">
 <meta property="og:site_name" content="时序论文分享">
-<meta property="og:description" content="Time-Series Anomaly Detection Service at Microsoft | [KDD’ 2019]摘要：大型公司需要实时监视其应用程序和服务中的各种指标（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于谱残差（SR">
+<meta property="og:description" content="摘要：大型公司需要实时监视其应用程序和服务中的各种指标（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于谱残差（SR）和卷积神经网络（CNN）的新算法。我们的工作是尝试将视觉显着性检测域中的SR模型首次迁移到时间序列异常检测中。此外，我们创新地">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208094008458.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208102604733.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208150037836.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208150528569.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208152131806.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208160558625.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208160936734.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208163331524.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208171907400.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208183856551.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208184848486.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208205104410.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208205121958.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208205210287.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208210054695.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208210742680.png">
-<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208211105819.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/cNpflAV6J3F1xHo.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/caw1ZMfeRuphg6P.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/z2HOqcCpFP1BmuJ.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/5RkuY4CtfGj8Jdx.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/V5LAztJYjRNlham.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/xPInZirH7Mfwy9Y.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/lpcir5GQTfZy6te.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/nsQogbBD6KJ1xAa.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/PtLV6iWZfUl8IOT.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/HerS3NzkLgCtBAb.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/fqZvglCbpXFVxDd.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/UnPMkTLxZhbFQf2.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/JeVHF8ORzpIDjQC.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/WYIxbS9gPqroFHd.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/prGeImt13YganCh.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/vFNodC6PbTBSkAZ.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/04/TWywFoQZ3hnlaYq.png">
 <meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
-<meta property="article:modified_time" content="2021-01-16T03:49:09.265Z">
+<meta property="article:modified_time" content="2021-03-08T05:25:00.502Z">
 <meta property="article:author" content="INSIS">
 <meta property="article:tag" content="异常检测">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20201208094008458.png">
+<meta name="twitter:image" content="https://i.loli.net/2021/03/04/cNpflAV6J3F1xHo.png">
 
-<link rel="canonical" href="http://example.com/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft[KDD'%202019]/">
+<link rel="canonical" href="http://example.com/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft[KDD'%202019](1)/">
 
 
 <script id="page-configurations">
@@ -63,7 +63,7 @@
   };
 </script>
 
-  <title>mpt Time-Series Anomaly Detection Service at Microsoft | 时序论文分享</title>
+  <title>mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft | 时序论文分享</title>
   
 
 
@@ -208,7 +208,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft[KDD'%202019]/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft[KDD'%202019](1)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -221,7 +221,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          mpt Time-Series Anomaly Detection Service at Microsoft
+          mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft
         </h1>
 
         <div class="post-meta">
@@ -238,7 +238,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-01-16 11:49:09" itemprop="dateModified" datetime="2021-01-16T11:49:09+08:00">2021-01-16</time>
+                <time title="Modified: 2021-03-08 13:25:00" itemprop="dateModified" datetime="2021-03-08T13:25:00+08:00">2021-03-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -268,17 +268,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Time-Series-Anomaly-Detection-Service-at-Microsoft-KDD’-2019"><a href="#Time-Series-Anomaly-Detection-Service-at-Microsoft-KDD’-2019" class="headerlink" title="Time-Series Anomaly Detection Service at Microsoft | [KDD’ 2019]"></a>Time-Series Anomaly Detection Service at Microsoft | <strong>[KDD’ 2019]</strong></h1><p><strong>摘要：</strong>大型公司需要实时监视其应用程序和服务中的各种<code>指标</code>（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于<strong>谱残差（SR）</strong>和<strong>卷积神经网络（CNN）</strong>的新算法。我们的工作是尝试将<strong>视觉显着性检测域中</strong>的SR模型首次迁移到时间序列异常检测中。此外，我们创新地将SR和CNN结合在一起以改善SR模型的性能。与公共数据集和Microsoft数据集的最新基准（只使用了周期相关的历史数据，没有使用上同周期相邻时刻的历史数据）模型相比，我们的方法获得了优异的实验结果。</p>
+        <p><strong>摘要：</strong>大型公司需要实时监视其应用程序和服务中的各种<code>指标</code>（例如，“页面浏览量”和“收入”）。在Microsoft，我们开发了时间序列异常检测服务，该服务可帮助客户不断的监视时间序列并及时提醒潜在的事件。在本文中,为了解决时间序列异常检测的问题，我们提出了一种基于<strong>谱残差（SR）</strong>和<strong>卷积神经网络（CNN）</strong>的新算法。我们的工作是尝试将<strong>视觉显着性检测域中</strong>的SR模型首次迁移到时间序列异常检测中。此外，我们创新地将SR和CNN结合在一起以改善SR模型的性能。与公共数据集和Microsoft数据集的最新基准（只使用了周期相关的历史数据，没有使用上同周期相邻时刻的历史数据）模型相比，我们的方法获得了优异的实验结果。</p>
+<p>关键词：异常检测，无监督，时间序列</p>
 <a id="more"></a>
 <h2 id="论文背景与意义"><a href="#论文背景与意义" class="headerlink" title="论文背景与意义"></a>论文背景与意义</h2><p><strong>异常检测</strong>旨在发现意外事件或数据中的稀有项。它在许多工业(以盈利为主的)应用中都很流行，并且它也是数据挖掘中的重要研究领域。准确的异常检测可以触发及时的故障排除，从而避免企业亏损，并维护了公司的声誉和品牌。为此，大公司开始建立异常检测服务来监视其业务，产品和服务的健康状况。例如，雅虎发布了EGADS系统 ，可以自动监视数百万个不同Yahoo属性的时间序列并发出警报。在Microsoft，我们构建了异常检测服务来监视例如Bing，Office和Azure等应用的数百万个指标，这使工程师能够更快地解决问题。然而在设计时序异常检测的工业服务时面临了许多挑战：</p>
 <p><strong>挑战1：缺乏标签</strong>。为了给单个业务场景提供异常检测服务，系统必须同时处理<strong>数百万</strong>个时间序列。用户没有简单的方法能够手动标记每个时间序列。而且，时间序列的数据分布是<strong>不断变化</strong>的，这要求系统能识别出以前从未出现过类似数据的模式。这使得有监督模型在工业场景中应用不足。</p>
 <p><strong>挑战2：泛化</strong>。需要监视来自<strong>不同业务场景</strong>的各种时间序列。如图1所示，有几种典型的时间序列模式类别。对于工业异常检测服务来说，在各种模式下正常工作是非常的重要。然而，对于不同的模式，现有的方法还没有得到足够的概括。例如，<code>Holt winters模型</code>（基于时间序列中当前已有的数据来预测其之后的走势）在（b）和（c）中总是表现出差的结果。 <code>Spot模型</code> 在（a）中总是表现出差的结果。因此，我们需要找到通用性更好的解决方案。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208094008458.png" alt="image-20201208094008458"></p>
+<p><img src="https://i.loli.net/2021/03/04/cNpflAV6J3F1xHo.png" alt="image-20201208094008458.png"></p>
 <p><strong>挑战3：效率</strong>。在应用程序中，监视系统必须几乎<strong>实时处理</strong>数百万甚至数十亿个时间序列。特别是对于<strong>分钟级别</strong>的时间序列，异常检测过程需要在有限的时间内完成。因此，效率是在线异常检测服务的主要前提之一。即使具有<strong>较大时间复杂度的模型</strong>在<strong>准确性方面</strong>表现出色，但在在线情况下它们通常很少使用。</p>
 <h2 id="论文的目标"><a href="#论文的目标" class="headerlink" title="论文的目标"></a><strong>论文的目标</strong></h2><p>为了解决上述问题，我们的<strong>目标</strong>是开发一种<strong>准确，高效且通用</strong>的异常检测方法。传统的统计模型由于准确性不高，不足以用于工业应用。有监督模型的准确性更高，但是由于缺少标记数据（<strong>人工标记的开销太大</strong>），在我们的场景中它们也是不足的。还有一些无监督的方法，例如<code>Luminol</code>（用于时间序列数据分析的python库。将时间序列分为多个块，并使用相似块的频率来计算异常分数）和<code>DONUT</code>（一种基于<strong>变分自动编码器</strong>（<strong>VAE</strong>）的无监督异常检测方法）。但是，这些方法太耗时或参数敏感。因此，我们旨在以另一种无监督的方式开发一种同时兼顾准确性，效率和通用性的模型。</p>
 <h2 id="异常检测系统架构"><a href="#异常检测系统架构" class="headerlink" title="异常检测系统架构"></a>异常检测系统架构</h2><p>整个系统由三个主要部分组成：数据提取，实验平台和在线计算。</p>
 <p>首先介绍整个流程。用户可以将时间序列导入到系统来注册监视任务。支持从不同的数据源（包括Azure存储，数据库和在线流数据）提取时间序列。提取人员负责根据指定的粒度（例如分钟，小时或天）更新每个时间序列。时间序列点通过<strong>Kafka</strong>进入流传输管道，并存储到<strong>时间序列数据库</strong>中。<strong>异常检测处理器</strong>在线计算传入的时间序列点的异常状态。在监视业务指标的常见方案中，用户也可以查看时间序列数据。例如，Bing团队提取了表示不同市场和平台使用情况的时间序列。发生事件时，警报服务会整理相关时间序列的异常，然后通过电子邮件和传呼服务将其发送给用户。整合的异常事件总体状态信息将帮助用户缩短诊断问题的时间。下图展示了系统的总体流水线。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208102604733.png" alt="image-20201208102604733"></p>
+<p><img src="https://i.loli.net/2021/03/04/caw1ZMfeRuphg6P.png" alt="image-20201208102604733.png"></p>
 <p>2.1数据提取</p>
 <p>用户可以通过创建数据源来注册监视任务。每个数据点均由“连接字符串”和“粒度”标识。连接字符串用于将用户的存储系统连接到异常检测服务。粒度表示数据Feed（采集）的更新频率；最小粒度为一分钟。提取任务将根据给定的粒度把时间序列的数据点提取到系统中。例如，如果用户将分钟设置为粒度，则提取模块将每分钟创建一个任务来提取一个新的数据点。时间序列点被吸收到influxDB（时间序列数据库）和Kafka（流处理管道）中。该模块的吞吐量达到每秒10,000到100,000个数据点左右。</p>
 <p>2.2在线计算</p>
@@ -292,24 +293,24 @@
 <p><strong>例子：</strong>Outlook反垃圾邮件团队曾经利用基于规则的方法来监视其垃圾邮件检测系统的有效性。但是，此方法不易于维护，并且在某些地理位置有很差的效果。因此，他们将关键指标纳入我们的异常检测服务，以监控其垃圾邮件检测模型在不同地理位置的有效性。通过我们的API，他们已将异常检测功能集成到Office DevOps平台中。通过使用此自动检测服务，与原始的基于规则的解决方案相比，他们覆盖了更多的地理位置，并且收到的误报案件更少。</p>
 <h2 id="为什么要使用SR-CNN"><a href="#为什么要使用SR-CNN" class="headerlink" title="为什么要使用SR-CNN"></a>为什么要使用SR-CNN</h2><p>正如引言中所强调的，我们的挑战是开发一种没有标签数据的高效通用算法。受计算机视觉领域的启发，我们采用谱残差（SR）模型，这是一种基于<strong>快速傅立叶变换</strong>（FFT）的方法。  SR方法是无监督的，并且已被证明在视觉显着性检测应用中非常有效。因为异常点在视觉上通常很明显，因此我们认为<strong>视觉显着性检测任务</strong>和<strong>时间序列异常检测任务</strong>在本质上是相似的。此外，最近的显着性检测研究表示当有足够的标签数据可用时<strong>更倾向于</strong>使用卷积神经网络（CNN）进行端到端训练。然而，由于难以在线收集大规模的标签数据，因此单独使用CNN模型对我们的应用来说是不可行的。作为一种折衷，我们提出了一种新的方法SR-CNN，该方法将CNN直接应用于SR模型的输出。  CNN负责学习区分规则，以替换原始SR解决方案中采用单个阈值来判断异常。在SR结果上学习CNN模型比在原始输入序列上学习问题要容易得多。在以下小节中，我们分别介绍SR和SR-CNN方法的细节。</p>
 <h2 id="SR（谱残差）"><a href="#SR（谱残差）" class="headerlink" title="SR（谱残差）"></a>SR（<strong>谱残差</strong>）</h2><p>SR算法包括三个主要步骤：（1）傅里叶变换以获得对数幅度谱； （2）频谱残差的计算； （3）傅立叶逆变换，将序列变换回空间域。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208150037836.png" alt="image-20201208150037836"></p>
+<p><img src="https://i.loli.net/2021/03/04/z2HOqcCpFP1BmuJ.png" alt="image-20201208150037836.png"></p>
 <p>数学上，给定序列x，我们有</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208150528569.png" alt="image-20201208150528569">分别表示<strong>傅立叶变换</strong>(<strong>时域到频域的变换，而这种变换是通过一组特殊的正交基来实现的</strong>)和<strong>傅立叶逆变换</strong>。x是形状为n×1(n维向量)的输入序列；<code>A(f)</code>是序列x的<strong>幅度谱</strong>；<code>P(f)</code>是序列x的<strong>相位谱</strong>；<code>L(f)</code>是A(f)的对数表示（对幅度谱取对数）；<code>AL(f)</code>是L(f)的<strong>平均对数谱</strong>，可以通过用<code>hq(f)</code><strong>卷积（两个相同大小的矩阵对应元素相乘后求和，乘积的和就生成了feature map中的一个像素，当一个像素计算完毕后，移动一个像素取下一个区块执行相同的运算。当无法再移动取得新区块的时候，对feature map的计算就结束了）</strong>输入序列来近似得出。其中hq(f)是一个q×q矩阵，定义为：</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208152131806.png" alt="image-20201208152131806"></p>
+<p><img src="https://i.loli.net/2021/03/04/5RkuY4CtfGj8Jdx.png" alt="image-20201208150528569.png">分别表示<strong>傅立叶变换</strong>(<strong>时域到频域的变换，而这种变换是通过一组特殊的正交基来实现的</strong>)和<strong>傅立叶逆变换</strong>。x是形状为n×1(n维向量)的输入序列；<code>A(f)</code>是序列x的<strong>幅度谱</strong>；<code>P(f)</code>是序列x的<strong>相位谱</strong>；<code>L(f)</code>是A(f)的对数表示（对幅度谱取对数）；<code>AL(f)</code>是L(f)的<strong>平均对数谱</strong>，可以通过用<code>hq(f)</code><strong>卷积（两个相同大小的矩阵对应元素相乘后求和，乘积的和就生成了feature map中的一个像素，当一个像素计算完毕后，移动一个像素取下一个区块执行相同的运算。当无法再移动取得新区块的时候，对feature map的计算就结束了）</strong>输入序列来近似得出。其中hq(f)是一个q×q矩阵，定义为：</p>
+<p><img src="https://i.loli.net/2021/03/04/V5LAztJYjRNlham.png" alt="image-20201208152131806.png"></p>
 <p><code>R(f)</code>是谱残差，即对数谱L(f)减去平均对数谱AL(f)。利用<strong>剩余谱和相位谱</strong>进行傅立叶逆变换将序列转移回空间域，得到序列<code>S(x)</code>称为<strong>显著图(saliency map)</strong>。<strong>（傅里叶变换一般涉及到复数，也就是说一个实数被变换为一个具有实部和虚部的复数。通常虚部只在一部分领域有用，比如将频域变换回到时域和空域（像素域）上）</strong></p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208160558625.png" alt="image-20201208160558625"></p>
+<p><img src="https://i.loli.net/2021/03/04/xPInZirH7Mfwy9Y.png" alt="image-20201208160558625.png"></p>
 <p><strong>图4</strong>显示了经过SR处理后的原始时间序列和相应的显著性图的示例。如图所示，显著性图中的变化点（以红色显示）比原始输入中的变化点明显得多。基于显著性图，很容易利用简单的规则正确注释异常点。我们采用简单的<strong>阈值τ</strong>表示异常点。给定显著性图<code>S(x)</code>，输出序列<code>O(x)</code>的计算公式为：</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208160936734.png" alt="image-20201208160936734"></p>
+<p><img src="https://i.loli.net/2021/03/04/lpcir5GQTfZy6te.png" alt="image-20201208160936734.png"></p>
 <p>其中xi表示序列x中的任意点； S(xi)是显著图中的对应点； S(xi) ba 是S(xi)之前z个点的局部平均值。</p>
 <p>在实际应用中，FFT(快速傅里叶变换)操作是在序列的<strong>滑动窗口</strong>内进行的。此外，我们希望该算法能够发现<strong>低延迟的异常点</strong>。也就是说，给定流x1，x2，…，xn，其中xn是最近的点，我们想尽快分辨xn是否是一个异常点。但是，如果目标点（想要分辨的点）位于滑动窗口的中心，则SR方法效果更好。因此，在将序列输入到SR模型之前，我们在xn之后添加了几个<strong>估计点</strong>。估计点xn+1的值由下式计算：</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208163331524.png" alt="image-20201208163331524"></p>
+<p><img src="https://i.loli.net/2021/03/04/nsQogbBD6KJ1xAa.png" alt="image-20201208163331524.png"></p>
 <p>其中g(xi，xj)表示点xi和xj两点之间的直线的斜率; g ba表示先前点的平均<strong>斜率</strong>（从1到m的xi和xj之间的平均斜率）。m是前面考虑的添加点的个数，我们在实现中将m=5。我们发现，第一个估计点起着决定性的作用。因此,我们复制K次点xn+1，然后把它添加到序列的尾部。总而言之,SR算法只包含3个超参数,即<strong>滑动窗口</strong>大小ω,<strong>估计点</strong>个数κ,<strong>异常检测阈值</strong>τ。我们根据经验设置了它们，并在实验中展示了它们的鲁棒性。因此，SR算法对于<strong>在线异常检测服务</strong>来说是一种很好的选择。</p>
 <h2 id="SR-CNN"><a href="#SR-CNN" class="headerlink" title="SR-CNN"></a>SR-CNN</h2><p>原始的SR方法利用显著性图上的<strong>单个阈值</strong>来检测异常点，如上图所定义。然而，该规则过于简单，人们自然会寻求更复杂的决策规则。我们的理念是在精心设计的合成数据上训练一个<strong>判别模型</strong>作为异常检测器。通过将<strong>不包含</strong>在评估数据中的异常点注入到显著性图集合中，来生成合成数据。注入点标记为异常，其他点标记为正常。具体地说，我们在时间序列中随机选取几个点，计算注入值来代替原始点，得到其显著性图。异常点值的计算方法为:</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208171907400.png" alt="image-20201208171907400"></p>
+<p><img src="https://i.loli.net/2021/03/04/PtLV6iWZfUl8IOT.png" alt="image-20201208171907400.png"></p>
 <p>其中x ba是前几个点的局部平均值；<strong>mean</strong>(均值)和<strong>var</strong>(方差)是当前滑动窗口内所有点的均值和方差；r〜N（0,1）是随机抽样的。我们选择CNN作为我们的判别模型架构。<strong>CNN</strong>是用于显著性检测的常用监督模型。但是，由于我们的场景中没有足够的标记数据，因此我们基于显著图而不是原始输入来应用CNN，这使得异常标注问题变得更加容易。在实践中，我们收集合成异常的生产时间序列作为训练数据。好处是检测器可以适应时间序列分布的变化，而无需人工标记的数据。在我们的实验中，我们总共使用了6,500万个点进行训练。  SR-CNN的体系结构如图5所示。该网络由两个<strong>一维卷积层</strong>（<strong>滤波器</strong>大小等于<strong>滑动窗口</strong>大小ω）和两个<strong>全连接层</strong>组成。第一个卷积层的信道大小等于ω；而在第二个卷积层中，通道大小增加了一倍。在输出<strong>Sigmoid</strong>之前，要堆叠两个全连接层。<strong>交叉熵</strong>被用作损失函数。训练过程中使用了<strong>SGD（随机梯度下降）优化器</strong>。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208183856551.png" alt="image-20201208183856551"></p>
+<p><img src="https://i.loli.net/2021/03/04/HerS3NzkLgCtBAb.png" alt="image-20201208183856551.png"></p>
 <h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><p>使用三个数据集来评估了SR-CNN模型。<code>KPI</code>和<code>Yahoo</code>是常用于<strong>评价时间序列异常检测性能</strong>的公共数据集;而<code>Microsoft</code>是在产品中收集的内部数据集。这些数据集涵盖了不同时间间隔的时间序列。在这些数据集中，<strong>异常点</strong>标记为<strong>正样本</strong>，<strong>正常点</strong>标记为<strong>负样本</strong>。这些数据集的统计数据如表1所示。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208184848486.png" alt="image-20201208184848486"></p>
+<p><img src="https://i.loli.net/2021/03/04/fqZvglCbpXFVxDd.png" alt="image-20201208184848486.png"></p>
 <p><code>KPI</code>由<strong>AIOps</strong>发布。该数据集由多条带有异常标签的KPI曲线组成，大部分KPI曲线相邻两个数据点之间的间隔为1分钟，部分KPI曲线的间隔为5分钟。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">数据集</span><br><span class="line">http:<span class="comment">//iops.ai/dataset_detail/?id=10</span></span><br><span class="line"></span><br><span class="line">http:<span class="comment">//iops.ai/competition_detail/?competition_id=5&amp;flag=1</span></span><br></pre></td></tr></table></figure>
 <p><code>Yahoo</code>是 <strong>Ya-hoo lab</strong>发布的用于异常检测的开放数据集。时间序列曲线中的一部分是人工合成的(即模拟的)，另一部分来自雅虎服务的真实流量。模拟曲线中的异常点由算法生成，真实交通曲线中的异常点由编辑人员手动标注。所有时间序列的间隔为一小时。</p>
@@ -329,15 +330,15 @@
 <h2 id="SR-SR-CNN实验"><a href="#SR-SR-CNN实验" class="headerlink" title="SR/SR-CNN实验"></a>SR/SR-CNN实验</h2><p>我们将<strong>SR和SR-CNN</strong>与最新的无监督时间序列异常检测方法进行了比较。<strong>基线模型</strong>包括FFT(快速傅立叶变换)、Twitter-AD(推特异常检测)、Luminol(LinkedIn异常检测)、DONUT、SPOT和DSPOT。在这些方法中，FFT、Twitter-AD和Luminol不需要额外的数据就可以启动，所以我们将所有的时间序列作为测试数据，在<strong>冷启动</strong>（没有任何先验知识，协同过滤推荐算法中被广泛关注的一个经典问题）的情况下对这些模型进行了比较。另一方面，Spot、DSPOT和Donut需要额外的数据来训练他们的模型。因此，我们将每个时间序列的点按时间顺序一分为二。前半部分用来训练无监督模型，后半部分用来进行评估，Donut可以利用额外的标记数据来提高异常检测性能。然而，由于我们的目标是在完全无监督的情况下获得公平的比较，所以我们在实现中不使用额外的标记数据。</p>
 <p>对于SR和SR-CNN，我们对超参数进行了<strong>经验设置</strong>。在SR中，Hq(f)中q被设置为3，z的局部平均数z被设置为21，阈值τ被设置为3，估计点数κ被设置为5，对于滑动窗口大小ω，KPI设置为1440，雅虎设置为64，微软设置为30。对于SR-CNN，q、z、κ和ω被设置为相同的值。</p>
 <p>我们分别报告(1)F1-score；(2)Precision；(3)Recall；(4)每个数据集的CPU执行时间。我们可以看到，SR的性能明显优于当前最先进的无监督模型。此外，SR-CNN在三个数据集上都取得了进一步的改进，这表明了用CNN鉴别器取代单一阈值的优势。<strong>表2</strong>显示了冷启动情况下FFT、Twitter-AD和 Luminol的比较结果。与基准解决方案获得的最佳结果相比，我们在KPI数据集、Yahoo数据集和Microsoft数据集上的F1-score分别提高了36.1%、68.8%和21.2%。<strong>表3</strong>展示了那些需要在数据集的前半部分(不包括标签)上训练的无监督模型的比较结果。如表3所示，与最先进的结果相比，F1-Score在KPI数据集上提高了48.0%，在Yahoo数据集上提高了92.9%，在Microsoft数据集上提高了57.0%。此外，表2和表3中的总CPU执行时间表明，SR是最有效的方法。为了进行通用性比较，我们在人工分类为三类的Yahoo数据集的后半部分上进行了实验。<strong>表4</strong>分别报告了<strong>Yahoo数据集不同类别</strong>的<strong>F1-score</strong>。SR和SR-CNN在不同的时间序列模式上取得了突出的结果。SR是这三个类别中最稳定的一个。SR-CNN也表现出良好的泛化能力。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208205104410.png" alt="image-20201208205104410"></p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208205121958.png" alt="image-20201208205121958"></p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208205210287.png" alt="image-20201208205210287"></p>
+<p><img src="https://i.loli.net/2021/03/04/UnPMkTLxZhbFQf2.png" alt="image-20201208205104410.png"></p>
+<p><img src="https://i.loli.net/2021/03/04/JeVHF8ORzpIDjQC.png" alt="image-20201208205121958.png"></p>
+<p><img src="https://i.loli.net/2021/03/04/WYIxbS9gPqroFHd.png" alt="image-20201208205210287.png"></p>
 <h2 id="SR-DNN"><a href="#SR-DNN" class="headerlink" title="SR+DNN"></a>SR+DNN</h2><p>在先前的实验中，我们可以看到SR模型在<strong>无监督的异常检测</strong>情况下表现出了很好的结果。但是，在其他人已完成的工作表明，当<strong>异常标签可用</strong>时，我们可以获得更令人满意的结果，因此，我们想知道我们的方法是否<strong>有助于监督模型</strong>。具体而言，我们将SR的<strong>中间结果</strong>作为监督异常检测模型中的附加功能。我们对AIOPS中对KPI数据集进行了广泛的研究后，采用基于DNN的有监督模型，该模型是AIOPS数据竞赛的第一名。  <strong>DNN体系结构</strong>由输入层，输出层和两个隐藏层组成。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208210054695.png" alt="image-20201208210054695"></p>
+<p><img src="https://i.loli.net/2021/03/04/prGeImt13YganCh.png" alt="image-20201208210054695.png"></p>
 <p>我们在第二个隐藏层之后增加了一个<strong>dropout layer</strong>（丢弃层），并将丢弃率设置为0.5。此外，我们将L1 = L2 =  0.0001正则化所有层的权重。由于模型的输出表示数据点异常的可能性，因此我们在训练集上学习最佳阈值。</p>
 <p>实验结果如<strong>表7</strong>所示。我们可以看到，SR功能为DNN模型带来了F1-score提高1.6％的效果。尤其是，基于SR的DNN模型在KPI数据集上建立了一个最先进的模型。据我们所知，这是迄今为止KPI数据集上报告的迄今为止最好的结果。此外，我们绘制了SR  + DNN和DNN方法的<strong>P-R曲线（右上凸效果越好）</strong>。如图8所示，在各种阈值上，SR + DNN始终优于DNN。</p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208210742680.png" alt="image-20201208210742680"></p>
-<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20201208211105819.png" alt="image-20201208211105819"></p>
+<p><img src="https://i.loli.net/2021/03/04/vFNodC6PbTBSkAZ.png" alt="image-20201208210742680.png"></p>
+<p><img src="https://i.loli.net/2021/03/04/TWywFoQZ3hnlaYq.png" alt="image-20201208211105819.png"></p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>时间序列异常检测是保证在线服务质量的关键模块。在实际应用中，一个高效、通用、准确的异常检测系统是必不可少的。在本文中，我们介绍了微软的一项时序异常检测服务。在生产过程中，每分钟最多可从400万个时间序列中检测到异常。此外，我们还首次将谱残差模型应用于时序异常检测任务，并创新性地将谱残差模型与CNN模型相结合，取得了较好的效果。</p>
 
     </div>
@@ -357,8 +358,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/06/HuGanghui/Adversarial%20Graph%20Representation%20Adaptation%20for%20Cross-Domain%20Facial%20Expression%20Recognition/" rel="prev" title="hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition">
-      <i class="fa fa-chevron-left"></i> hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition
+    <a href="/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/" rel="prev" title="ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结">
+      <i class="fa fa-chevron-left"></i> ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结
     </a></div>
       <div class="post-nav-item">
     <a href="/2021/01/06/JiaoZehui/Transfer%20Learning%20for%20EEG-Based%20Brain-Computer%20Interfaces%20A%20Review%20of%20Progress%20Made%20Since%202016/" rel="next" title="jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016">
@@ -422,7 +423,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Time-Series-Anomaly-Detection-Service-at-Microsoft-KDD%E2%80%99-2019"><span class="nav-number">1.</span> <span class="nav-text">Time-Series Anomaly Detection Service at Microsoft | [KDD’ 2019]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%83%8C%E6%99%AF%E4%B8%8E%E6%84%8F%E4%B9%89"><span class="nav-number">1.1.</span> <span class="nav-text">论文背景与意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E7%9A%84%E7%9B%AE%E6%A0%87"><span class="nav-number">1.2.</span> <span class="nav-text">论文的目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84"><span class="nav-number">1.3.</span> <span class="nav-text">异常检测系统架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8SR-CNN"><span class="nav-number">1.4.</span> <span class="nav-text">为什么要使用SR-CNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR%EF%BC%88%E8%B0%B1%E6%AE%8B%E5%B7%AE%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">SR（谱残差）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR-CNN"><span class="nav-number">1.6.</span> <span class="nav-text">SR-CNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">1.7.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E6%A0%87"><span class="nav-number">1.8.</span> <span class="nav-text">指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR-SR-CNN%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.9.</span> <span class="nav-text">SR&#x2F;SR-CNN实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR-DNN"><span class="nav-number">1.10.</span> <span class="nav-text">SR+DNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.11.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E8%83%8C%E6%99%AF%E4%B8%8E%E6%84%8F%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">论文背景与意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E7%9A%84%E7%9B%AE%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text">论文的目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84"><span class="nav-number">3.</span> <span class="nav-text">异常检测系统架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8SR-CNN"><span class="nav-number">4.</span> <span class="nav-text">为什么要使用SR-CNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR%EF%BC%88%E8%B0%B1%E6%AE%8B%E5%B7%AE%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">SR（谱残差）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR-CNN"><span class="nav-number">6.</span> <span class="nav-text">SR-CNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E6%A0%87"><span class="nav-number">8.</span> <span class="nav-text">指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR-SR-CNN%E5%AE%9E%E9%AA%8C"><span class="nav-number">9.</span> <span class="nav-text">SR&#x2F;SR-CNN实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SR-DNN"><span class="nav-number">10.</span> <span class="nav-text">SR+DNN</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -436,7 +437,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">34</span>
+          <span class="site-state-item-count">38</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -449,7 +450,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
