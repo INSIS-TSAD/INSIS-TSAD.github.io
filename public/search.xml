@@ -3544,4 +3544,217 @@ m_{j i}=\frac{\exp \left(\mathrm{X} 1_{i} \cdot \mathrm{X} 2_{j}\right)}{\sum_{i
         <tag>异常检测</tag>
       </tags>
   </entry>
+  <entry>
+    <title>hgh 【ISSRE-2019】Unsupervised Detection of Microservice Trace Anomalies through Service-Level Deep Bayesian Networks</title>
+    <url>/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/</url>
+    <content><![CDATA[<p>关键词：微服务； 异常检测； 根因分析</p>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><h3 id="本文旨在解决微服务调用跟踪异常"><a href="#本文旨在解决微服务调用跟踪异常" class="headerlink" title="本文旨在解决微服务调用跟踪异常"></a>本文旨在解决微服务调用跟踪异常</h3><ul>
+<li><p>挑战</p>
+<ul>
+<li>底层微服务数量众多</li>
+<li>它们之间的调用关系复杂</li>
+<li>响应时间和调用路径之间的相互依赖性</li>
+</ul>
+</li>
+<li><p>TraceAnomaly 核心理念</p>
+<ul>
+<li><p>在定期的离线训练中，使用机器学习来自动学习轨迹的整体正常模式</p>
+<ul>
+<li>新颖的痕迹表示和设计的深度贝叶斯网络后验流</li>
+</ul>
+</li>
+<li><p>在线异常检测中，一个带有小异常分数(根据学习到的正态模式计算)的新轨迹被认为是异常</p>
+</li>
+</ul>
+</li>
+<li><p>效果</p>
+<ul>
+<li>某公司已在18个在线服务上部署了TraceAnomaly</li>
+<li><p>详细评估四大在线服务包含数百个microservices和实验包含41 microservices</p>
+<ul>
+<li>表明TraceAnomaly的查全率和查准率都高于0.97,优于现有的方法(硬编码规则)19.6%和7.1%</li>
+<li>和其他七个基线平均57.0%和41.6%。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="具有相同uuid的所有消息构成一个微服务调用跟踪"><a href="#具有相同uuid的所有消息构成一个微服务调用跟踪" class="headerlink" title="具有相同uuid的所有消息构成一个微服务调用跟踪"></a>具有相同uuid的所有消息构成一个微服务调用跟踪</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Figure1"></p>
+<h3 id="解决挑战"><a href="#解决挑战" class="headerlink" title="解决挑战"></a>解决挑战</h3><ul>
+<li><p>以一种可解释的方式统一跟踪的响应时间和调用路径，用于异常检测</p>
+<ul>
+<li>由于不同的调用路径会导致不同的响应时间，因此对响应时间的建模需要一定需要考虑调用路径</li>
+<li>由于调用的频繁程度，对于每个单个的path的响应时间进行单独的时序异常检测也是不现实的</li>
+<li>并且当异常路径被检测到，需要快速的定位到根因，因此需要这种统一表示的方式有一定的可解释性</li>
+<li><p>核心思想</p>
+<ul>
+<li>将每个服务的trace作为一个训练样本，并使用机器学习来捕捉服务跟踪的整体模式。因此，每个服务都有一个模型</li>
+<li>将调用路径和响应时间构建成一个向量 STV（service trace verctor），然后交给深度学习算法</li>
+<li>通过STV，也可以很轻松的帮助后续的根因的确定</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>设计一个精确的、健壮的、无监督的学习体系结构，以捕获复杂的痕迹模式的特征，并有合理的训练开销</p>
+<ul>
+<li>正如挑战1中所描述的，微服务的响应时间与它本身和它的调用路径有关。因此需要在它们的调用路径上有条件地学习数百个响应时间分布。</li>
+<li>有了这样的复杂性，就需要一个大容量的模型，并且标签难以获得，就必须使用无监督算法</li>
+<li><p>符合上述条件的就是深度贝叶斯网络</p>
+<ul>
+<li>同时希望模型对超参数不敏感。应对这一挑战的核心思想是应用后验流（posterior flow），它可以使用非线性映射来增加贝叶斯网络中潜在变量的复杂性，允许模型以稳健、准确和无监督的方式捕捉复杂模式。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="贡献点"><a href="#贡献点" class="headerlink" title="贡献点"></a>贡献点</h3><ul>
+<li><p>提出STV</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig4"></p>
+<ul>
+<li>相信除了本文提出的算法外，STV还可以作为其他基于ml的跟踪异常检测和定位算法的跟踪表示。</li>
+<li>第一种被实际部署应用的基于机器学习的trace异常检测方法</li>
+<li>提出一种基于STV根源定位算法，该算法成功地对来自4个大型服务的所有73个异常跟踪进行了正确的根源定位，其定位精度比3个基线的测试结果高出55%。</li>
+</ul>
+</li>
+</ul>
+<h2 id="TRACEANOMALY-OVERVIEW-SERVICE-TRACE-VECTOR-CONSTRUCTION-AND-LOCALIZATION-ALGORITHM"><a href="#TRACEANOMALY-OVERVIEW-SERVICE-TRACE-VECTOR-CONSTRUCTION-AND-LOCALIZATION-ALGORITHM" class="headerlink" title="TRACEANOMALY OVERVIEW, SERVICE TRACE VECTOR CONSTRUCTION AND LOCALIZATION ALGORITHM"></a>TRACEANOMALY OVERVIEW, SERVICE TRACE VECTOR CONSTRUCTION AND LOCALIZATION ALGORITHM</h2><h3 id="异常检测"><a href="#异常检测" class="headerlink" title="异常检测"></a>异常检测</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig3"></p>
+<ul>
+<li><p>VAE + Posterior Flow</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig8"></p>
+<ul>
+<li><p>一个标准化流作用在一个简单分布上，经过 k个可逆的函数变换后得到一个复杂的分布，基于流的生成模型即用 pk(zk)来模拟训练数据的分布</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Flow"></p>
+</li>
+<li><p>进而得到训练数据在这个分布下的似然，然后按着最大似然准则对标准流进行优化</p>
+</li>
+</ul>
+</li>
+<li><p>使用KDE而不是简单阈值来判断某个样本是否是异常</p>
+<ul>
+<li>设定p-value的显著性水平为0.001，一个常用的值</li>
+</ul>
+</li>
+</ul>
+<h3 id="根因定位"><a href="#根因定位" class="headerlink" title="根因定位"></a>根因定位</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig7"></p>
+<ul>
+<li>3-sigma原则</li>
+</ul>
+<h2 id="IMPLEMENTATION-AND-DEPLOYMENT"><a href="#IMPLEMENTATION-AND-DEPLOYMENT" class="headerlink" title="IMPLEMENTATION AND DEPLOYMENT"></a>IMPLEMENTATION AND DEPLOYMENT</h2><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig8.png" alt="Fig9"></p>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig8"></p>
+<p>TraceAnomaly和Multimodal LSTM无法区分异常类型(响应时间异常或调用路径异常)，因此无法计算响应时间异常和调用路径异常的精度。实际上，异常跟踪通常包含响应时间异常和调用路径异常。它在试验台的区别只是为了评价的目的。</p>
+]]></content>
+      <categories>
+        <category>hgh</category>
+      </categories>
+      <tags>
+        <tag>异常检测</tag>
+        <tag>微服务</tag>
+        <tag>根因分析</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</title>
+    <url>/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/</url>
+    <content><![CDATA[<p>关键词： 元学习；迁移学习</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
+<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
+<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
+<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
+<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
+</ul>
+<a id="more"></a>
+<p>IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI) 2019,<br>（由CVPR 2019《Meta-transfer learning for few-shot learning》扩充）</p>
+<hr>
+<p>作者：Qianru Sun, Yaoyao Liu, Zhaozheng Chen, Tat-Seng Chua, and Bernt Schiele, <em>Fellow, IEEE</em></p>
+<p>机构：新加坡管理大学、马克斯·普朗克信息研究所、新加坡国立大学</p>
+<p>Code: <a href="https://github.com/yaoyao-liu/meta-transfer-learning">https://github.com/yaoyao-liu/meta-transfer-learning</a></p>
+<hr>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>样本过少的情况下→数据增强 / 元学习→现阶段MAML仍有缺点</p>
+<ul>
+<li>元学习被应用于小样本学习：关键的想法是利用大量相似的小样本任务来学习如何使基础学习器适应一个新的任务</li>
+<li>元学习是一种基于任务级优化的方法。其目的是从相似的小样本学习任务中转移经验，相关方法遵循一个包含两个循环的统一训练过程。内循环学习一个基础学习器(base learner)完成一个单独的任务，外循环使用学习基础学习器的验证性能来优化元学习器。</li>
+<li><p>一种先进的代表性方法称为模型不可知元学习（MAML），它学习寻找最佳的初始化状态，使基础学习器可以快速适应新的任务</p>
+<ul>
+<li>i）这些方法通常需要大量类似的元训练任务，成本高昂；</li>
+<li>ii）每个任务通常由一个低复杂度的基础学习器建模，如浅层神经网络（SNN），避免模型过拟合到实拍训练数据，从而无法部署更深入、更强大的体系结构</li>
+</ul>
+</li>
+<li><p>传统的meta-batch包含许多随机任务，没有考虑不同任务的困难程度。</p>
+</li>
+<li><p>最近的一些工作尝试使用在大规模数据集上预先训练的DNN，但大多是以直接的方式，例如：①将其权重作为元训练的热启动；②冻结其卷积层作为基础学习器的特征提取器。</p>
+</li>
+<li></li>
+</ul>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h4 id="总体框架"><a href="#总体框架" class="headerlink" title="总体框架"></a>总体框架</h4><p>(a) 在大规模数据上的DNN预训练，即使用整个训练数据集</p>
+<p>(b) 在预训练的特征提取器的基础上学习缩放和移位（SS）参数的元转移学习（MTL）<br>这一步使用 HT meta-batch 进行，并由元梯度正则化（第4.3节）正则化</p>
+<p>(c) 是对不可见任务的元测试，其处理包括基本学习器（分类器）的微调（FT）阶段和最终评估阶段</p>
+<p><strong>这篇文章里 meta-learner(外层优化) 指的是SS，base-learner(内层优化) 指的是classifier，还包含后期固定的feature extractor。</strong></p>
+<ul>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134342770.png" alt="image-20210310134342770"></li>
+</ul>
+<h4 id="Meta-transfer-learning-MTL"><a href="#Meta-transfer-learning-MTL" class="headerlink" title="Meta-transfer learning (MTL)"></a>Meta-transfer learning (MTL)</h4><p>元任务的训练集用来训练基础学习器，基础学习器（分类器）θ’的更新规则：（$\Phi_S$是SS的权重）</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134112665.png" alt="image-20210310134112665"></p>
+<p>$\Phi_{S_1}$初始化为1，$\Phi_{S_2}$初始化为0，并按下式更新：</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134137972.png" alt="image-20210310134137972"></p>
+<p>使用元任务的测试机损失及梯度，用于元参数 $\theta$ 的更新：</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134151472.png" alt="image-20210310134151472"></p>
+<p>$\Phi_S$是SS的权重，元训练期间冻结不予更新。</p>
+<p>SS相对于“遗忘”问题有明显优势，避免以往学习的经验丢失；由大规模训练的DNN初始化，可以快速拟合；参数量少。</p>
+<p>通过SS和FT（精细调整）进行更新的区别如下图：</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134203234.png" alt="image-20210310134203234"></p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134320887.png" alt="image-20210310134320887" style="zoom: 80%;" /></p>
+<h4 id="Hard-task-HT-meta-batch"><a href="#Hard-task-HT-meta-batch" class="headerlink" title="Hard task (HT) meta-batch"></a>Hard task (HT) meta-batch</h4><p>对于元任务集合$\tau$，在每次更新后，选择最低的精度排序来确定当前系统中最困难的分类样本进行任务的重新采样</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134301082.png" alt="image-20210310134301082" style="zoom: 80%;" /></p>
+<h4 id="Meta-gradient-regularization"><a href="#Meta-gradient-regularization" class="headerlink" title="Meta-gradient regularization"></a>Meta-gradient regularization</h4><ul>
+<li>使元学习器减少对先前情节的遗忘</li>
+</ul>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310134243426.png" alt="image-20210310134243426" style="zoom:80%;" /></p>
+<h4 id="整体算法"><a href="#整体算法" class="headerlink" title="整体算法"></a>整体算法</h4><ul>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310152106130.png" alt="image-20210310152106130" style="zoom: 80%;" /></li>
+</ul>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p><strong>数据集</strong>：<em>mini</em>ImageNet，<em>tiered</em>ImageNet， Fewshot-CIFAR100(FC100) </p>
+<h4 id="基线对比"><a href="#基线对比" class="headerlink" title="基线对比"></a>基线对比</h4><ul>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135000286.png" alt="image-20210310135000286" style="zoom: 67%;" /></li>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135021985.png" alt="image-20210310135021985" style="zoom:67%;" /></li>
+</ul>
+<h4 id="组件验证（SS与FT对比）"><a href="#组件验证（SS与FT对比）" class="headerlink" title="组件验证（SS与FT对比）"></a>组件验证（SS与FT对比）</h4><ul>
+<li><p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135041309.png" alt="image-20210310135041309" style="zoom: 80%;" /></p>
+</li>
+<li><p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135057179.png" alt="image-20210310135057179" style="zoom: 80%;" /></p>
+</li>
+</ul>
+<h4 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h4><ul>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310154557787.png" alt="image-20210310154557787" style="zoom:80%;" /></li>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135155191.png" alt="image-20210310135155191" style="zoom: 80%;" /></li>
+</ul>
+<p><strong>MTL vs. No meta-learning. </strong> 表6在最上面的块中显示了无元学习方法的结果。本文提出的方法取得了明显更好的性能。</p>
+<p><strong>SS[Θ;θ]works better than light-weight FT variants.</strong> 表6显示使用SS[Θ;θ]的方法在所有设置中均达到了最佳性能，且SS始终优于FT。</p>
+<p><strong>Meta-gradient regularization is effective.</strong> 表6最后两行显示了有效性。正则化迫使元学习器减少对先前情节的遗忘，并稳定元梯度。</p>
+<p><strong>Accuracy gain by HT meta-batch.</strong> 表7、图4显示：HT meta batch可以提高模型的准确率。</p>
+<p><strong>Speed of convergence of MTL with HT meta-batch.</strong>  (a)~(d)中HT mete-batch仅需1~4k次迭代达到很好的性能，而没有进行深度预训练网络的MAML需要200k次迭代。</p>
+<ul>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135139161.png" alt="image-20210310135139161" style="zoom: 80%;" /></li>
+</ul>
+<h4 id="SS统计分析"><a href="#SS统计分析" class="headerlink" title="SS统计分析"></a>SS统计分析</h4><p>表8中提供了有关学习到的SS权重的统计信息。 (a)和(b)中的每个点表示这些数字的分布，与高斯分布（红色）很好地匹配。</p>
+<ul>
+<li><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210310135217125.png" alt="image-20210310135217125" style="zoom: 80%;" /></li>
+</ul>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>事实证明，MTL在预训练的DNN神经元上的关键操作对于使学习经验适应未知任务非常有效。</p>
+<ul>
+<li><p><strong>MTL</strong>的持续改进证明了大规模预训练有素的深度网络可以提供良好的“知识基础”，以进行有效的一次性学习。</p>
+</li>
+<li><p>就学习方案而言，<strong>HT meta-batch</strong>对于消融模型始终表现出良好的性能，而且对提高收敛速度特别有用。</p>
+</li>
+</ul>
+<p>展望：本文模型独立于任何特定的模型或体系结构，并且只要在在线迭代中易于评估任务的难度即可很好地推广。</p>
+]]></content>
+      <categories>
+        <category>ssk</category>
+      </categories>
+      <tags>
+        <tag>迁移学习</tag>
+        <tag>元学习</tag>
+      </tags>
+  </entry>
 </search>
