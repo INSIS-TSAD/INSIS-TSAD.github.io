@@ -3825,7 +3825,7 @@ m_{j i}=\frac{\exp \left(\mathrm{X} 1_{i} \cdot \mathrm{X} 2_{j}\right)}{\sum_{i
   </entry>
   <entry>
     <title>gs CTF:Anomaly Detection in High Dimensional Time Series with Coarse to Fine Model Transfer</title>
-    <url>/2021/02/24/GongSa/CTF_Anomaly%20Detection%20in%20High%20Dimensional%20Time%20Series%20with%20Coarse%20to%20Fine%20Model%20Transfer/</url>
+    <url>/2021/02/24/GongSa/aa/</url>
     <content><![CDATA[<p><a href="https://imgtu.com/i/yObyUH"><img src="https://s3.ax1x.com/2021/02/24/yObyUH.png" alt="yObyUH.png"></a></p>
 <p>[INFOCOM2021]</p>
 <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文提出了一个基于粗到细模型迁移的<code>CTF</code>框架，以实现可扩展和准确的数据中心规模的异常检测。CTF预先训练一个粗粒度模型，使用该模型提取每台机器的特征并计算其分布，根据分布对机器进行聚类，并进行模型迁移以对每个类簇模型进行微调以获得较高的精度。文中还对聚类算法、距离度量等设计进行了证明，以达到最佳的精度，并在生产数据上进行实验，验证了其可扩展性和准确性。</p>
