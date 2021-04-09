@@ -4477,4 +4477,105 @@ g(\Lambda)=\sum_{k=0}^{K-1} \theta_{k}^{\prime} \Lambda^{k} \simeq \sum_{k=0}^{K
         <tag>图神经网络</tag>
       </tags>
   </entry>
+  <entry>
+    <title>lwh 时序数据库</title>
+    <url>/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/</url>
+    <content><![CDATA[<h2 id="1-时序场景特点"><a href="#1-时序场景特点" class="headerlink" title="1.时序场景特点"></a>1.时序场景特点</h2><ul>
+<li>写入平稳、高并发高吞吐：时序数据的产生通常是以一个固定的时间频率产生，不会受其他因素的制约，其数据生成的速度是相对比较平稳的。时序数据是由每个个体独立生成，所以当个体数量众多时，写入的并发和吞吐量都是很高的</li>
+<li>数据量大：每天可能会有TB，PB级的数据需要存储</li>
+<li>写多读少：监控的指标很多，但是通常只关心几个特定的指标、特定的场景。</li>
+<li>实时写入：时序数据的写入是实时的，且每次写入都是最近生成的数据。因为其数据生成是随着时间推进的，很少有更新删除的操作。</li>
+<li>近期数据的关注度更高，时间久远的数据极少被访问，冷热分明</li>
+<li>多维查询、分析</li>
+</ul>
+<a id="more"></a>
+<h2 id="2-对时序数据库的要求"><a href="#2-对时序数据库的要求" class="headerlink" title="2.对时序数据库的要求"></a>2.对时序数据库的要求</h2><ul>
+<li>高吞吐、高并发的写入能力：时序数据具有典型的写多读少特征，在读和写上，首要权衡的是写的能力。对于数据库的高并发、高吞吐写入能力有很高的要求。</li>
+<li>高可用：分布式架构，系统要具有水平扩展的能力。</li>
+<li>数据分级存储 ：将最近小时级别的数据放到内存中，将最近天级别的数据放到SSD，更久远的数据放到更加廉价的HDD或者直接使用TTL过期淘汰掉。</li>
+<li>高压缩率：一方面是节省成本，另一个方面是压缩后的数据可以更容易保证存储到内存中</li>
+<li>多维度查询、聚合：交互级的查询延迟，并且是在数据基数（TB级）较大的情况下，也能够达到很低的查询延迟。在很大的数据量的基础上将满足条件的原始数据查询出来并聚合，原始值可能因为时间比较久远而不在内存。</li>
+</ul>
+<h2 id="3-时序建模"><a href="#3-时序建模" class="headerlink" title="3.时序建模"></a>3.时序建模</h2><h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><ul>
+<li>metric   采集的数据指标</li>
+<li>tag    标签</li>
+<li>field    域</li>
+<li>timestamp    时间戳</li>
+</ul>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210405164517997.png" alt=""></p>
+<h3 id="按数据源建模"><a href="#按数据源建模" class="headerlink" title="按数据源建模"></a>按数据源建模</h3><p><img src="C:\Users\16281\AppData\Roaming\Typora\typora-user-images\image-20210407153555192.png" alt="image-20210407153555192" style="zoom: 80%;" /><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407153555192.png" alt=""></p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/v2-a9b615e76149a9ef71b3ab67c3d0fb58_r.jpg" style="zoom: 50%;" /></p>
+<h3 id="按指标建模"><a href="#按指标建模" class="headerlink" title="按指标建模"></a>按指标建模</h3><p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407153430628.png" style="zoom:50%;" /></p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/v2-4eabe030c388f195f9a04674da5a86c5_r.jpg" style="zoom:50%;" /></p>
+<h2 id="4-时序数据库分类"><a href="#4-时序数据库分类" class="headerlink" title="4.时序数据库分类"></a>4.时序数据库分类</h2><p>第一种，在关系数据库基础上进行改进的时序数据库，比如基于PG开发的Timescale。</p>
+<p>第二种，在KV数据库的基础之上进行改进的时序数据库，比如，基于HBase开发的OpenTSDB、基于Cassandra的KairosDB</p>
+<p>第三种，为时序数据量身定制的时序数据库，InfluxDB、ApacheIoTDB等</p>
+<h2 id="5-时序数据为什么不适合存在关系型数据库"><a href="#5-时序数据为什么不适合存在关系型数据库" class="headerlink" title="5.时序数据为什么不适合存在关系型数据库"></a>5.时序数据为什么不适合存在关系型数据库</h2><ul>
+<li>存储成本大 对时序数据的压缩不佳</li>
+<li>维护成本高 单机系统</li>
+<li>写入吞吐差 单机写入吞吐低，无法满足千万级的写入压力</li>
+<li>查询性能差  适用于交易处理，海量数据的聚合能力差</li>
+</ul>
+<p><strong>基于B/B+树</strong>:造成很多随机IO 存储的地址不连续-&gt;关系型数据库写入速度慢</p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/v2-467b2c27f41bad29b01be13e1e5cd1bb_b.gif" alt=""></p>
+<p>如果一个节点已经写入磁盘了，后面树形发生变化之后，节点分裂，原先存储到一个磁盘块的数据，就会分开存储到2个新的磁盘块，那么原先的磁盘块就要删除。这样反复的操作，那就造成了Btree/B+tree很多的随机IO</p>
+<h2 id="6-LSM-tree"><a href="#6-LSM-tree" class="headerlink" title="6.LSM tree"></a>6.LSM tree</h2><p><strong>核心思路：</strong>假定内存足够大，因此不需要每次有数据更新就必须将数据写入到磁盘中，而可以先将最新的数据驻留在内存中，等到积累到足够多之后，再使用归并排序的方式将内存内的数据合并追加到磁盘队尾。放弃部分读能力，换取写能力。</p>
+<p><strong>WAL</strong> 预写log 。当插入一条数据时，数据先顺序写入 WAL 文件中，之后插入到内存中的 MemTable 中。这样就保证了数据的持久化，不会丢失数据，并且都是顺序写，速度很快。</p>
+<p><strong>MemTable: </strong>对应的就是 WAL 文件，是该文件内容在内存中的存储结构。写入操作会直接将数据写入到Memtable后返回。读取操作又会首先尝试从Memtable中进行查询，允许写入和读取。当Memtable写入的数据占用内存到达指定数量，则自动转换为Immutable Memtable，等待Dump到磁盘中，系统会自动生成新的Memtable供写操作写入新数据。</p>
+<p><strong>SSTable:</strong> 是 MemTable 中的数据在磁盘上的有序存储，其内部数据是根据 key 从小到大排列的。通常为了加快查找的速度，需要在 SSTable 中加入数据索引，可以快读定位到指定的 k-v 数据</p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/1329243358-5d94891acb4a2_fix732" alt=""></p>
+<h2 id="7-基于kv"><a href="#7-基于kv" class="headerlink" title="7.基于kv"></a>7.基于kv</h2><p>​    基于LSM设计的面向分布式场景的HBase，再基于HBase设计了openTSDB。这类时序数据库都是采用了一个比较成熟的数据库来作为底层存储引擎。自己的主要逻辑仅仅是在存储引擎层之上很薄的一个逻辑层</p>
+<h4 id="基于HBase的数据库的问题？"><a href="#基于HBase的数据库的问题？" class="headerlink" title="基于HBase的数据库的问题？"></a><strong>基于HBase的数据库的问题？</strong></h4><ul>
+<li>为了套用HBase结构，存储中有很多无用的信息。Rowkey里面的metric是一个业务字符串，这些数据在实际存储过程中很多冗余，造成存储成本的浪费</li>
+<li>数据采集指标冗余</li>
+<li>HBase是弱类型问题，不能对Value部分根据业务的不同字段类型进行专门的压缩</li>
+<li>Rowkey部分包含很多tag信息，没有对Rowkey和tag进行倒排索引，不能完全保证多维度的查询能力</li>
+</ul>
+<h4 id="openTSDB的优化："><a href="#openTSDB的优化：" class="headerlink" title="openTSDB的优化："></a><strong>openTSDB的优化：</strong></h4><ul>
+<li>时间粒度为小时，每次读一个小时</li>
+<li>将业务字符串映射为uid，简化存储</li>
+</ul>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/td6.png" alt=""></p>
+<h2 id="8-原生时序数据库"><a href="#8-原生时序数据库" class="headerlink" title="8.原生时序数据库"></a>8.原生时序数据库</h2><p>基于LSM设计面向时序数据的influxDb,ioTDB</p>
+<h4 id="influxdb-tsm"><a href="#influxdb-tsm" class="headerlink" title="influxdb(tsm)"></a>influxdb(tsm)</h4><ul>
+<li><p>tags不再冗余存储 metric+tag -&gt; series key</p>
+</li>
+<li><p>数据分区：按不同的时间范围划分为不同的分区（Shard），写入通常是在最新的分区，而不会散列到多个分区。分区的优点是数据回收的物理删除非常简单，直接把整个分区删除即可</p>
+</li>
+<li><p>针对时序和不同类型的压缩方案 delta-delta</p>
+<ul>
+<li><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210406103056005.png" alt=""></li>
+<li><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210406103123647.png" alt=""></li>
+<li>时间戳8byte-&gt; 64bit 最大间隔3600秒-&gt;13bit</li>
+<li>delta 64 + 13 *7 = 155bit</li>
+<li>delta of delta 64 + 9 <em> 4 + 1 </em> 3 = 103bit</li>
+</ul>
+</li>
+<li><p>倒排索引 高效查找 </p>
+</li>
+<li><p>对cache的设计：Cache内部提供了一个ring结构，取series key前8个bit进行hash,来对数据进行分桶/分区管理，降低读写时候锁的竞争。确保连续数据存储在一个磁盘块。</p>
+<ul>
+<li><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407155516363.png" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li><p>对于时序实用的功能:</p>
+<ul>
+<li>ContinuousQueries，每小时触发一次，每次待计算数据区间是90分钟，分组区间是30分钟</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>时序数据库技术体系－时序数据存储模型设计:<a href="http://hbasefly.com/2017/11/19/timeseries-database-2/">http://hbasefly.com/2017/11/19/timeseries-database-2/</a></p>
+<p>No.1-时序数据库随笔 - Time Series DBMS 综述:<a href="https://developer.aliyun.com/article/782579?spm=a2c6h.13262185.0.0.60b372994locIc">https://developer.aliyun.com/article/782579?spm=a2c6h.13262185.0.0.60b372994locIc</a></p>
+<p>Writing a Time Series Database from Scratch:<a href="https://fabxc.org/tsdb/">https://fabxc.org/tsdb/</a></p>
+<p>时间序列数据的存储和计算 - 概述:<a href="https://zhuanlan.zhihu.com/p/32709932">https://zhuanlan.zhihu.com/p/32709932</a></p>
+<p>B+tree:<a href="https://zhuanlan.zhihu.com/p/149287061">https://zhuanlan.zhihu.com/p/149287061</a></p>
+<p>delta-of-delta编码:<a href="https://blog.csdn.net/yapuge/article/details/102765248">https://blog.csdn.net/yapuge/article/details/102765248</a></p>
+]]></content>
+      <categories>
+        <category>lwh</category>
+      </categories>
+      <tags>
+        <tag>时间序列</tag>
+      </tags>
+  </entry>
 </search>
