@@ -184,6 +184,200 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/14/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/14/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/" class="post-title-link" itemprop="url">Untitled</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-14 22:30:26 / Modified: 17:28:08" itemprop="dateCreated datePublished" datetime="2021-04-14T22:30:26+08:00">2021-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="潜在的收敛交叉映射"><a href="#潜在的收敛交叉映射" class="headerlink" title="潜在的收敛交叉映射"></a>潜在的收敛交叉映射</h1><p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210410230057988.png" alt="image-20210410230057988"></p>
+<p>2021的国际学习表征会议，作者来自比利时鲁汶大学。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>一般来说，利用干预是最好的揭示因果机制的方式，因为它能得到一个直观且鲁棒的因果概念。然而，只有当观测数据可获得的时候，我们才有显著的辨明因果依赖性的需求，这些数据必须具有实用性，并且收集成本较低（例如，在还没有介入临床试验之前，必须依靠观察性研究）。然而，与临床试验相比，来自较少控制的环境的真实数据给我们的分析带来了许多挑战。如果不可能进行干预，则无法确定某些因果结构。重要的是，真实数据的主要问题是缺失值。特别是，当收集纵向数据时，所得到的时间序列通常是零星的:采样在时间上是不规律的，并且跨维度导致了在任何给定时间上的一个给定变量的观察值和多个缺失的观察值之间的时间间隔的变化。这一问题普遍存在于各个领域，例如医疗保健，气候科学或者航空航天。</p>
+<p>收敛交叉映射算法(CCM)基于混沌的动态系统理论，尤其是Takens嵌入定理，能够适用于变量不可分离的场景以及弱耦合的系统。然而因为这种方法依赖时间序列的延迟嵌入，所以它对序列的值的缺失高度敏感并且要求时间序列有一定长度且不受干扰。因此这种方法不适用于反复的短的零星的时间序列，而在许多的实际情况中都会出现。为了攻克这个限制，我们提出了学习时间序列间的因果依赖性的方案，那就是在时间序列的潜在过程中证实交叉收敛映射的存在。在零星观测到的时间序列的所有片段上建立一个联合模型，并且命令该模型学习数据的内在的动态系统。我们证明了此方法可以根据短且零星的时间序列中检测到因果关系，而不需要计算延迟嵌入。为了学习系统的相空间的一个连续时间的潜在表征，我们使用GRU-ODE-Bayes(D Brouwer et al., 2019)，它是近来提出的神经ODE模型(2018)的扩展模型。对于因果推断来说，重要的是，模型的过滤特征确保了未来的信息不会泄露到过去，然后我们检验学习到的潜在表征之间的连续映射的存在性，并据此判断因果关系的方向。</p>
+<h2 id="相关研究"><a href="#相关研究" class="headerlink" title="相关研究"></a>相关研究</h2><p>收敛交叉映射算法近来的发展</p>
+<p>短且零星的时序的因果推断：短的时间序列在实践中十分常见，有许多基于相空间重构的短时序的因果研究方法被提出。交叉映射光滑性(2014)，多空间的收敛交叉映射(2015)。相比之下，在解决不规律采样的基础上，本文的方法通过在所有数据段之间共享的模型来计算含更多信息的相空间表示。而在不完整的时序上推断因果关系的技术已经被提出过，但是它们都基于Granger因果的框架，这使得它们不适用于变量不可分离场景。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+X[t+1]&=X[t]Y[t] \\
+X[t+1]&=X[t]+Y[t]
+\end{align}</script><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>我们考虑两个多维度的时间序列$X[t]\in \boldsymbol{R}^{d_X}$，$Y[t]\in \boldsymbol{R}^{d_Y}$，我们要在它们的几个片段上探测这两个时间变量的因果关系。我们假定$X[t],Y[t]$由一个未知动态系统生成。作为一个例子，考虑如下能表示X和Y的动态系统的ODE方程：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411141140752.png" alt="image-20210411141140752"></p>
+<p>为了考虑更广泛的场景，我们假设这些时序都是仅仅在有限的区间内观测到的片段。$X[t]$和$Y[t]$各自包括N个的短时间序列$(X^1[t],…,X^N[t])$和$(Y^1[t],…,Y^N[t])$。重点在X和Y的每个部分都是同时观测的。这些时间序列中每一个也是零星的，即不是规律采样的且每次不是所有维度都能观测到。</p>
+<h3 id="收敛交叉映射和Takens嵌入定理"><a href="#收敛交叉映射和Takens嵌入定理" class="headerlink" title="收敛交叉映射和Takens嵌入定理"></a>收敛交叉映射和Takens嵌入定理</h3><p>CCM算法是通过验证一个时间序列的相空间里的动态性能否从另一个反应，来探究这两个时间变量间的因果方向。如果X因果影响了Y，那么X是被包含在Y的动态系统中的并且我们有可能从Y的动态系统中获得关于X的动态系统的一个表示。</p>
+<p>令$X[t] \in \boldsymbol{R}^{d_X}$对应一个混沌动态系统，这个动态系统有一个计算盒维数为$d_M$的吸引子$\cal{M}$，而吸引子被认为是一个混沌动态系统趋向于向其演化的流形。利用在$\cal{M}$的一个流来对应系统的动力学特性</p>
+<script type="math/tex; mode=display">
+\phi_{(\cdot)}(\cdot):\boldsymbol{R} \times \cal{M} \to \cal{M} \\
+\phi_{\tau}(\cal{M}_{t})=\cal{M}_{t+\tau}</script><p>$\cal{M}_t$表示流形上时间指标为t的某个点。这样的流被编码进了系统的ODE中。观测的时间序列$X[t]$由观测函数获得，即$f_{obs}(\cdot):X[t]=f_{obs}(\cal{M}_t).$。Takens嵌入定理：一个延迟嵌入$\Phi$，延迟$\tau$以及嵌入维数$k$</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411155057665.png" alt="image-20210411155057665"></p>
+<p>是吸引子$\cal{M}$的一个拓扑不变意义下的嵌入如果$k&gt;2d_M$，而且$\alpha:\cal{R}^{d_M}\to \cal{R}$是一个二阶可微的观测函数。具体来说，嵌入映射$\Phi$保证原始吸引子流形$\cal{M}$和由延迟嵌入生成的阴影流形$\cal{M}’$之间的微分同胚性。在此假定下，在理论上我们能通过延迟嵌入的表示重构出原始时间序列。</p>
+<p>最简单的观测函数$\alpha$是简单地取动态系统观测值中的某一个维度。记$X_i[t]$表示$X[t]$的第i个维度，Takens定理确保由$X’[t]=(X_i[t],…,X_i[t-k\tau])$生成的阴影流形$\cal{M}’$与整个动态系统的原始流形之间是微分同胚的。因此，我们可以在阴影流形上研究子系统之间的耦合关系。</p>
+<p>CCM算法首先对系统X和Y进行相空间重构以获得阴影流形$\cal{M}’_X$和$\cal{M}’_Y$。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411161615961.png" alt="image-20210411161615961"></p>
+<p>我们使用皮尔逊相关系数来评价估计结果的好坏。</p>
+<p>因为时序的样本长度决定了重构出的阴影流形里轨线的密集程度，长度越长，流形越密集，则近邻点越靠近，从而估计(预测)值越精准，这意味着我们计算出的相关系数随时序长度增加呈现收敛态势。显著的高的相关系数和收敛性是我们判断因果关系的重要依据。</p>
+<h3 id="神经ODEs"><a href="#神经ODEs" class="headerlink" title="神经ODEs"></a>神经ODEs</h3><p>许多连续时间的确定性动态系统都能够用常微分方程组(ODEs)描述。但通常来说，不是动态系统的所有维度都能被观测到，这使得一个系统更好地表示形式应该是，（在观测值$X[t]$被生成的条件下）一个在连续的潜在过程$H(t)$上的ODE。例如，当只观测到2维动态系统的一个维度时，我们不能在一个单维度变量上确定一个流$\phi_t(X)$，但我们可以确定一个潜在过程$H(t)$。然后我们有如下的动态系统表述形式：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411163834868.png" alt="image-20210411163834868"></p>
+<p>$\theta$表示ODE的参数，$f_{\theta}(\cdot)$是一个Lipschitz连续函数，$g(\cdot)$是一个连续函数。动态系统的学习在于从过程X的观测值组成的一个有限集合中确定参数$\theta$。神经ODEs(2018)通过一个神经网络实现对这个函数的参数化。</p>
+<p><strong>摘自《Neural Ordinary Differential Equations》的内容</strong></p>
+<p>诸如残差网络和递归神经网络的解码器和正则化流是通过构成一个隐藏层状态的转换序列来构建复杂的转换</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411175033475.png" alt="image-20210411175033475"></p>
+<p>这些迭代更新可以视作连续变换的欧拉离散化。如果我们加入更多的层和更短的时间步，在极限状态，我们参数化了这样的隐藏层单元的连续动态系统通过使用一个由神经网络指定的常微分方程(ODE)：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411175715109.png" alt="image-20210411175715109"></p>
+<p>从输入层$\mathbf{h}(0)$开始，我们能定义输出层$\mathbf{h}(T)$为这个ODE初值问题在某个时间T的解。而这个值可以通过一个黑盒的微分方程求解器进行计算，该求解器可在任何需要的地方估计隐藏层单元的动态系统$f$以确定所需的精度。</p>
+<p>这种方式的好处有：</p>
+<p>1.存储效率——连续深度模型具有恒定的存储成本 </p>
+<p>2.现今的ODE求解技术为逼近误差的增长提供保证，能动态调整其估计策略以达到要求的精度水平</p>
+<p>3.当隐藏层的单元的动态系统参数化地变为一个连续的时间函数时，附近层的参数自动捆绑到一起，这将减少了监督学习所需的参数数量</p>
+<p>4.变量公式的变化更容易计算。避免了正则化流的单一单元的瓶颈且可以通过极大似然进行直接训练</p>
+<p>5.连续定义的动态系统可以自然地合并在任意时刻到达的数据</p>
+<h3 id="使用潜在的CCM进行因果推断"><a href="#使用潜在的CCM进行因果推断" class="headerlink" title="使用潜在的CCM进行因果推断"></a>使用潜在的CCM进行因果推断</h3><p>CCM算法的关键步骤是计算时间序列的延迟嵌入：$\Phi(X[t])$和$\Phi(Y[t])$。然而，当数据仅在不规律的区间上零星地被观测到时，对任意的t来说观测到整个延迟样本$X_i[t],X_i[t-\tau],…,X_i[t-k\tau]$的概率几乎为0。$X’[t]=(X_i[t],…,X_i[t-k\tau])$和$Y’[t]$不能被完整观测到（实际上仅有一个维度被观测到）并且不能执行最邻近点的预测。而且，短的时间序列也妨碍我们使用足够的嵌入维数（k）和时间延迟（$\tau$）来计算延迟嵌入。代替计算延迟嵌入，我们利用一个被神经ODE参数化的连续时间的隐藏层过程来学习动态系统，并且使用这种隐藏层的表示作为一个完整的相空间的表示。因此，它不再要求进行延迟嵌入，CCM也不再强调长的，稳定采样的时间序列。下面通过一个图展示这个方法</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411205148120.png" alt="image-20210411205148120"></p>
+<p>为推断X[t]和Y[t]之间的因果关系，首先对两个GRU-ODE-Bayes模型进行训练（一种神经ODEs的扩展）。作为一种滤波方法，GRU-ODE-Bayes保证了未来的信息不会向后泄露，这与我们的因果概念——因一定发生在果之前相符合。潜在过程的连续性也是重要的，因为它使得动态系统的吸引子具有更大的范围。事实上，在观测值之间的一个恒定的潜在过程（例如用GRU等经典的循环神经网络获得的过程）会导致较少的独特的潜在过程观测。</p>
+<p>同样的模型被用在每个时序的所有片段上，并且经过训练使得预测误差最小化。我们学习观测函数$g$，ODE$f_{\theta}$以及连续时间的潜在过程$H(t)$。我们把来自时序X的所有片段上的潜在向量的结果空间写成$\mathcal{H}_{X}$。</p>
+<p>通过验证在$\mathcal{H}_{X}$和$\mathcal{H}_{Y}$之间的连续映射的存在性，我们可以做出因果关系的判断。与CCM类似，如果$\mathcal{H}_{X}$和$\mathcal{H}_{Y}$之间存在一个连续映射的话，我们考虑X是Y的因。实际$\mathcal{H}_{X}$代替了延迟嵌入$\Phi_X$，我们进行因果推断的方式和CCM是相似的。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411211642840.png" alt="image-20210411211642840"></p>
+<p>后续的过程和CCM一样，连续映射的存在性通过相关性来体现。例如，对于$X \to Y$，我们计算实际的$\mathcal{H}_X$和基于$\mathcal{H}_Y$获得的$\mathcal{H}_X$的预测值之间的相关性。</p>
+<p>它的代码是公开的： https: //github.com/edebrouwer/latentCCM</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>对应上面的示意图，本文用了一个物理的系统：双摆系统</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411213159189.png" alt="image-20210411213159189"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411214112681.png" alt="image-20210411214112681"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411214325246.png" alt="image-20210411214325246"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210414110403624.png" alt="image-20210414110403624"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210414155800140.png" alt="image-20210414155800140"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>神经ODEs是一种能够处理不规律采样的时间序列的深度网络，本文也是使用了它的扩展形式GRU-ODE-Bayes学习潜在过程得到的结果空间$\mathcal{H}$代替了最初的延迟嵌入的相空间，成功处理了短的采样不规律的时序数据的因果探测问题。实际上其它的研究领域也可能存在数据零星的问题，可以考虑使用神经ODEs这种新型的网络。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p><strong>《神经ODEs》论文的摘要</strong></p>
+<p>我们引入了一种新的深度神经网络模型。我们不用指定一个离散的隐藏层序列，而是使用神经网络参数化隐藏状态的导数。网络的输出使用黑盒的微分方程求解器计算。这些连续深度模型具有恒定的存储成本，根据每个输入调整其评估策略，并可以明确地以数值精度换取速度。我们在连续深度残差网络和连续时间潜在变量模型中证明了这些性质。我们还构造了连续正则化流，这是一个生成模型，可以通过最大似然进行训练，而无需对数据维度进行划分或排序。作为训练，我们展示了如何通过任何ODE求解器进行可伸缩的反向传播，而不需要访问其内部操作。这允许在更大的模型中对ode进行端到端的训练。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/" class="post-title-link" itemprop="url">gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-14 20:24:24 / Modified: 22:29:12" itemprop="dateCreated datePublished" datetime="2021-04-14T20:24:24+08:00">2021-04-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><strong>关键词</strong>：时间序列预测，进化状态图，图网络</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>为了对时序数据中未来事件做到精确且可解释的预测，需要捕获具有代表性的模式(state)。以前的研究都主要关注对模式的表示和识别，忽视了变化中的过渡关系。</p>
+<p>本文使用一种演化状态图，节点表示模式，边表示演化关系。</p>
+<p>提出了<code>Evolutionary State Graph Network(EvoNet)</code>，对进化状态图进行编码，以便准确和可解释的时间序列事件预测，<code>EvoNet</code>对节点与节点和图级别传播（segment 2 segment）进行建模，同时捕获节点与图随时间交互的信息。</p>
+<p>基于5个真实世界数据集的实验结果表明，与11个基线相比，我们的方法不仅取得了明显的改进，而且为解释事件预测的结果提供了更多的见解。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -821,163 +1015,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/24/WuTao/informer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/03/24/WuTao/informer/" class="post-title-link" itemprop="url">wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-03-24 16:20:10 / Modified: 22:42:43" itemprop="dateCreated datePublished" datetime="2021-03-24T16:20:10+08:00">2021-03-24</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/wt/" itemprop="url" rel="index"><span itemprop="name">wt</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>关键词：时间序列预测；</p>
-<h3 id="1摘要"><a href="#1摘要" class="headerlink" title="1摘要"></a>1摘要</h3><p>Informer的主要工作是使用Transfomer实现长序列预测（Long Sequence Time-Series Forecasting）,以下称为LSTF。针对Transfomer在长序列预测中的不足（平方时间复杂度、高内存占用和现有编解码结构的局限性），提出ProbSparse注意力机制、自注意力蒸馏技术和生成式解码器等模块解决或缓解上述问题。</p>
-<ol>
-<li>首先，LSTF任务具有重要研究意义，对政策计划和投资避险等多种需要长时预测的任务至关重要；</li>
-<li>目前现有方法多专注于短期预测，模型缺乏长期预测能力；</li>
-<li>Transformer具有较强捕获长距离依赖的能力，但是，在计算时间复杂度和空间复杂度以及如何加强长序列输入和输出关联上都需要优化；</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/03/24/WuTao/informer/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/" class="post-title-link" itemprop="url">syd 【AAAI 2021】Maximum Roaming Multi-Task Learning</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-03-17 16:20:10 / Modified: 21:21:29" itemprop="dateCreated datePublished" datetime="2021-03-17T16:20:10+08:00">2021-03-17</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>关键词：多任务学习</p>
-<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>多任务参数<strong>联合优化</strong>是MTL中一个活跃的研究问题，对不同任务的参数进行<strong>划分</strong>（不相交或有重叠），可以放宽共享权值的优化约束，但是这种方法会<strong>削弱</strong>多任务产生的inductive bias（MTL的思想）。本文提出了新的划分参数空间的方法（Maximum Roaming），且不会削弱inductive bias。该方法受dropout启发，<strong>随机</strong>改变参数分区，迫使参数在规定的频率下尽可能<strong>多</strong>地查看任务，使网络全面适应每次更新。实验表明，与普通的分区优化策略相比，roaming带来的正则化对性能的影响更大，且整体方法灵活、易于应用。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1047,7 +1084,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-count">53</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>

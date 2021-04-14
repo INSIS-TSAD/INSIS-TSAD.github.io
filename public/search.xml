@@ -4681,4 +4681,212 @@ g(\Lambda)=\sum_{k=0}^{K-1} \theta_{k}^{\prime} \Lambda^{k} \simeq \sum_{k=0}^{K
         <tag>自监督学习</tag>
       </tags>
   </entry>
+  <entry>
+    <title></title>
+    <url>/2021/04/14/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/</url>
+    <content><![CDATA[<h1 id="潜在的收敛交叉映射"><a href="#潜在的收敛交叉映射" class="headerlink" title="潜在的收敛交叉映射"></a>潜在的收敛交叉映射</h1><p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210410230057988.png" alt="image-20210410230057988"></p>
+<p>2021的国际学习表征会议，作者来自比利时鲁汶大学。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>一般来说，利用干预是最好的揭示因果机制的方式，因为它能得到一个直观且鲁棒的因果概念。然而，只有当观测数据可获得的时候，我们才有显著的辨明因果依赖性的需求，这些数据必须具有实用性，并且收集成本较低（例如，在还没有介入临床试验之前，必须依靠观察性研究）。然而，与临床试验相比，来自较少控制的环境的真实数据给我们的分析带来了许多挑战。如果不可能进行干预，则无法确定某些因果结构。重要的是，真实数据的主要问题是缺失值。特别是，当收集纵向数据时，所得到的时间序列通常是零星的:采样在时间上是不规律的，并且跨维度导致了在任何给定时间上的一个给定变量的观察值和多个缺失的观察值之间的时间间隔的变化。这一问题普遍存在于各个领域，例如医疗保健，气候科学或者航空航天。</p>
+<p>收敛交叉映射算法(CCM)基于混沌的动态系统理论，尤其是Takens嵌入定理，能够适用于变量不可分离的场景以及弱耦合的系统。然而因为这种方法依赖时间序列的延迟嵌入，所以它对序列的值的缺失高度敏感并且要求时间序列有一定长度且不受干扰。因此这种方法不适用于反复的短的零星的时间序列，而在许多的实际情况中都会出现。为了攻克这个限制，我们提出了学习时间序列间的因果依赖性的方案，那就是在时间序列的潜在过程中证实交叉收敛映射的存在。在零星观测到的时间序列的所有片段上建立一个联合模型，并且命令该模型学习数据的内在的动态系统。我们证明了此方法可以根据短且零星的时间序列中检测到因果关系，而不需要计算延迟嵌入。为了学习系统的相空间的一个连续时间的潜在表征，我们使用GRU-ODE-Bayes(D Brouwer et al., 2019)，它是近来提出的神经ODE模型(2018)的扩展模型。对于因果推断来说，重要的是，模型的过滤特征确保了未来的信息不会泄露到过去，然后我们检验学习到的潜在表征之间的连续映射的存在性，并据此判断因果关系的方向。</p>
+<h2 id="相关研究"><a href="#相关研究" class="headerlink" title="相关研究"></a>相关研究</h2><p>收敛交叉映射算法近来的发展</p>
+<p>短且零星的时序的因果推断：短的时间序列在实践中十分常见，有许多基于相空间重构的短时序的因果研究方法被提出。交叉映射光滑性(2014)，多空间的收敛交叉映射(2015)。相比之下，在解决不规律采样的基础上，本文的方法通过在所有数据段之间共享的模型来计算含更多信息的相空间表示。而在不完整的时序上推断因果关系的技术已经被提出过，但是它们都基于Granger因果的框架，这使得它们不适用于变量不可分离场景。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+X[t+1]&=X[t]Y[t] \\
+X[t+1]&=X[t]+Y[t]
+\end{align}</script><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>我们考虑两个多维度的时间序列$X[t]\in \boldsymbol{R}^{d_X}$，$Y[t]\in \boldsymbol{R}^{d_Y}$，我们要在它们的几个片段上探测这两个时间变量的因果关系。我们假定$X[t],Y[t]$由一个未知动态系统生成。作为一个例子，考虑如下能表示X和Y的动态系统的ODE方程：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411141140752.png" alt="image-20210411141140752"></p>
+<p>为了考虑更广泛的场景，我们假设这些时序都是仅仅在有限的区间内观测到的片段。$X[t]$和$Y[t]$各自包括N个的短时间序列$(X^1[t],…,X^N[t])$和$(Y^1[t],…,Y^N[t])$。重点在X和Y的每个部分都是同时观测的。这些时间序列中每一个也是零星的，即不是规律采样的且每次不是所有维度都能观测到。</p>
+<h3 id="收敛交叉映射和Takens嵌入定理"><a href="#收敛交叉映射和Takens嵌入定理" class="headerlink" title="收敛交叉映射和Takens嵌入定理"></a>收敛交叉映射和Takens嵌入定理</h3><p>CCM算法是通过验证一个时间序列的相空间里的动态性能否从另一个反应，来探究这两个时间变量间的因果方向。如果X因果影响了Y，那么X是被包含在Y的动态系统中的并且我们有可能从Y的动态系统中获得关于X的动态系统的一个表示。</p>
+<p>令$X[t] \in \boldsymbol{R}^{d_X}$对应一个混沌动态系统，这个动态系统有一个计算盒维数为$d_M$的吸引子$\cal{M}$，而吸引子被认为是一个混沌动态系统趋向于向其演化的流形。利用在$\cal{M}$的一个流来对应系统的动力学特性</p>
+<script type="math/tex; mode=display">
+\phi_{(\cdot)}(\cdot):\boldsymbol{R} \times \cal{M} \to \cal{M} \\
+\phi_{\tau}(\cal{M}_{t})=\cal{M}_{t+\tau}</script><p>$\cal{M}_t$表示流形上时间指标为t的某个点。这样的流被编码进了系统的ODE中。观测的时间序列$X[t]$由观测函数获得，即$f_{obs}(\cdot):X[t]=f_{obs}(\cal{M}_t).$。Takens嵌入定理：一个延迟嵌入$\Phi$，延迟$\tau$以及嵌入维数$k$</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411155057665.png" alt="image-20210411155057665"></p>
+<p>是吸引子$\cal{M}$的一个拓扑不变意义下的嵌入如果$k&gt;2d_M$，而且$\alpha:\cal{R}^{d_M}\to \cal{R}$是一个二阶可微的观测函数。具体来说，嵌入映射$\Phi$保证原始吸引子流形$\cal{M}$和由延迟嵌入生成的阴影流形$\cal{M}’$之间的微分同胚性。在此假定下，在理论上我们能通过延迟嵌入的表示重构出原始时间序列。</p>
+<p>最简单的观测函数$\alpha$是简单地取动态系统观测值中的某一个维度。记$X_i[t]$表示$X[t]$的第i个维度，Takens定理确保由$X’[t]=(X_i[t],…,X_i[t-k\tau])$生成的阴影流形$\cal{M}’$与整个动态系统的原始流形之间是微分同胚的。因此，我们可以在阴影流形上研究子系统之间的耦合关系。</p>
+<p>CCM算法首先对系统X和Y进行相空间重构以获得阴影流形$\cal{M}’_X$和$\cal{M}’_Y$。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411161615961.png" alt="image-20210411161615961"></p>
+<p>我们使用皮尔逊相关系数来评价估计结果的好坏。</p>
+<p>因为时序的样本长度决定了重构出的阴影流形里轨线的密集程度，长度越长，流形越密集，则近邻点越靠近，从而估计(预测)值越精准，这意味着我们计算出的相关系数随时序长度增加呈现收敛态势。显著的高的相关系数和收敛性是我们判断因果关系的重要依据。</p>
+<h3 id="神经ODEs"><a href="#神经ODEs" class="headerlink" title="神经ODEs"></a>神经ODEs</h3><p>许多连续时间的确定性动态系统都能够用常微分方程组(ODEs)描述。但通常来说，不是动态系统的所有维度都能被观测到，这使得一个系统更好地表示形式应该是，（在观测值$X[t]$被生成的条件下）一个在连续的潜在过程$H(t)$上的ODE。例如，当只观测到2维动态系统的一个维度时，我们不能在一个单维度变量上确定一个流$\phi_t(X)$，但我们可以确定一个潜在过程$H(t)$。然后我们有如下的动态系统表述形式：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411163834868.png" alt="image-20210411163834868"></p>
+<p>$\theta$表示ODE的参数，$f_{\theta}(\cdot)$是一个Lipschitz连续函数，$g(\cdot)$是一个连续函数。动态系统的学习在于从过程X的观测值组成的一个有限集合中确定参数$\theta$。神经ODEs(2018)通过一个神经网络实现对这个函数的参数化。</p>
+<p><strong>摘自《Neural Ordinary Differential Equations》的内容</strong></p>
+<p>诸如残差网络和递归神经网络的解码器和正则化流是通过构成一个隐藏层状态的转换序列来构建复杂的转换</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411175033475.png" alt="image-20210411175033475"></p>
+<p>这些迭代更新可以视作连续变换的欧拉离散化。如果我们加入更多的层和更短的时间步，在极限状态，我们参数化了这样的隐藏层单元的连续动态系统通过使用一个由神经网络指定的常微分方程(ODE)：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411175715109.png" alt="image-20210411175715109"></p>
+<p>从输入层$\mathbf{h}(0)$开始，我们能定义输出层$\mathbf{h}(T)$为这个ODE初值问题在某个时间T的解。而这个值可以通过一个黑盒的微分方程求解器进行计算，该求解器可在任何需要的地方估计隐藏层单元的动态系统$f$以确定所需的精度。</p>
+<p>这种方式的好处有：</p>
+<p>1.存储效率——连续深度模型具有恒定的存储成本 </p>
+<p>2.现今的ODE求解技术为逼近误差的增长提供保证，能动态调整其估计策略以达到要求的精度水平</p>
+<p>3.当隐藏层的单元的动态系统参数化地变为一个连续的时间函数时，附近层的参数自动捆绑到一起，这将减少了监督学习所需的参数数量</p>
+<p>4.变量公式的变化更容易计算。避免了正则化流的单一单元的瓶颈且可以通过极大似然进行直接训练</p>
+<p>5.连续定义的动态系统可以自然地合并在任意时刻到达的数据</p>
+<h3 id="使用潜在的CCM进行因果推断"><a href="#使用潜在的CCM进行因果推断" class="headerlink" title="使用潜在的CCM进行因果推断"></a>使用潜在的CCM进行因果推断</h3><p>CCM算法的关键步骤是计算时间序列的延迟嵌入：$\Phi(X[t])$和$\Phi(Y[t])$。然而，当数据仅在不规律的区间上零星地被观测到时，对任意的t来说观测到整个延迟样本$X_i[t],X_i[t-\tau],…,X_i[t-k\tau]$的概率几乎为0。$X’[t]=(X_i[t],…,X_i[t-k\tau])$和$Y’[t]$不能被完整观测到（实际上仅有一个维度被观测到）并且不能执行最邻近点的预测。而且，短的时间序列也妨碍我们使用足够的嵌入维数（k）和时间延迟（$\tau$）来计算延迟嵌入。代替计算延迟嵌入，我们利用一个被神经ODE参数化的连续时间的隐藏层过程来学习动态系统，并且使用这种隐藏层的表示作为一个完整的相空间的表示。因此，它不再要求进行延迟嵌入，CCM也不再强调长的，稳定采样的时间序列。下面通过一个图展示这个方法</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411205148120.png" alt="image-20210411205148120"></p>
+<p>为推断X[t]和Y[t]之间的因果关系，首先对两个GRU-ODE-Bayes模型进行训练（一种神经ODEs的扩展）。作为一种滤波方法，GRU-ODE-Bayes保证了未来的信息不会向后泄露，这与我们的因果概念——因一定发生在果之前相符合。潜在过程的连续性也是重要的，因为它使得动态系统的吸引子具有更大的范围。事实上，在观测值之间的一个恒定的潜在过程（例如用GRU等经典的循环神经网络获得的过程）会导致较少的独特的潜在过程观测。</p>
+<p>同样的模型被用在每个时序的所有片段上，并且经过训练使得预测误差最小化。我们学习观测函数$g$，ODE$f_{\theta}$以及连续时间的潜在过程$H(t)$。我们把来自时序X的所有片段上的潜在向量的结果空间写成$\mathcal{H}_{X}$。</p>
+<p>通过验证在$\mathcal{H}_{X}$和$\mathcal{H}_{Y}$之间的连续映射的存在性，我们可以做出因果关系的判断。与CCM类似，如果$\mathcal{H}_{X}$和$\mathcal{H}_{Y}$之间存在一个连续映射的话，我们考虑X是Y的因。实际$\mathcal{H}_{X}$代替了延迟嵌入$\Phi_X$，我们进行因果推断的方式和CCM是相似的。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411211642840.png" alt="image-20210411211642840"></p>
+<p>后续的过程和CCM一样，连续映射的存在性通过相关性来体现。例如，对于$X \to Y$，我们计算实际的$\mathcal{H}_X$和基于$\mathcal{H}_Y$获得的$\mathcal{H}_X$的预测值之间的相关性。</p>
+<p>它的代码是公开的： https: //github.com/edebrouwer/latentCCM</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>对应上面的示意图，本文用了一个物理的系统：双摆系统</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411213159189.png" alt="image-20210411213159189"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411214112681.png" alt="image-20210411214112681"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411214325246.png" alt="image-20210411214325246"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210414110403624.png" alt="image-20210414110403624"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210414155800140.png" alt="image-20210414155800140"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>神经ODEs是一种能够处理不规律采样的时间序列的深度网络，本文也是使用了它的扩展形式GRU-ODE-Bayes学习潜在过程得到的结果空间$\mathcal{H}$代替了最初的延迟嵌入的相空间，成功处理了短的采样不规律的时序数据的因果探测问题。实际上其它的研究领域也可能存在数据零星的问题，可以考虑使用神经ODEs这种新型的网络。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p><strong>《神经ODEs》论文的摘要</strong></p>
+<p>我们引入了一种新的深度神经网络模型。我们不用指定一个离散的隐藏层序列，而是使用神经网络参数化隐藏状态的导数。网络的输出使用黑盒的微分方程求解器计算。这些连续深度模型具有恒定的存储成本，根据每个输入调整其评估策略，并可以明确地以数值精度换取速度。我们在连续深度残差网络和连续时间潜在变量模型中证明了这些性质。我们还构造了连续正则化流，这是一个生成模型，可以通过最大似然进行训练，而无需对数据维度进行划分或排序。作为训练，我们展示了如何通过任何ODE求解器进行可伸缩的反向传播，而不需要访问其内部操作。这允许在更大的模型中对ode进行端到端的训练。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph</title>
+    <url>/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/</url>
+    <content><![CDATA[<p><strong>关键词</strong>：时间序列预测，进化状态图，图网络</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>为了对时序数据中未来事件做到精确且可解释的预测，需要捕获具有代表性的模式(state)。以前的研究都主要关注对模式的表示和识别，忽视了变化中的过渡关系。</p>
+<p>本文使用一种演化状态图，节点表示模式，边表示演化关系。</p>
+<p>提出了<code>Evolutionary State Graph Network(EvoNet)</code>，对进化状态图进行编码，以便准确和可解释的时间序列事件预测，<code>EvoNet</code>对节点与节点和图级别传播（segment 2 segment）进行建模，同时捕获节点与图随时间交互的信息。</p>
+<p>基于5个真实世界数据集的实验结果表明，与11个基线相比，我们的方法不仅取得了明显的改进，而且为解释事件预测的结果提供了更多的见解。</p>
+<a id="more"></a>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>时间序列数据中未来事件(如异常)的预测一直是时间数据挖掘的重要任务。</p>
+<h4 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h4><ol>
+<li>一个常见的方法是<strong>使用隐空间状态的模型</strong>，像HMM、RNN和RNN的变体等，使用一系列潜在表示对时序数据进行编码，但这个编码是个黑盒操作，并不能直接捕获一些具有实际物理意义的典型模式，比如通过健身追踪设备观察对的步行或跑步。</li>
+</ol>
+<ul>
+<li>对噪声敏感</li>
+<li>可解释性差</li>
+<li>出现问题时很难调试</li>
+</ul>
+<ol>
+<li>另外的工作：对时间序列进行离散化并寻找其底层状态，采用序列<strong>聚类</strong>、<strong>字典</strong>(例如SAX)等方法和<strong>shapelets</strong>。</li>
+</ol>
+<ul>
+<li>有效处理噪声和提供更好的可解释性</li>
+<li>只找到这些状态，并没有关注状态之间的关系的潜在影响</li>
+</ul>
+<ol>
+<li><p><strong>图结构(graph structures)</strong>模型，<code>GCN-LSTM</code> 、 <code>Time2Graph</code> 。</p>
+<p><code>GCN-LSTM</code> 需要一个显示的图作为输入，这个一般很难从时间序列数据直接得到</p>
+<p><code>Time2Graph</code> 使用shapelets发现states和relations，但是图在全局是一个静态的，在实际中，这个图是随时间变化的。</p>
+</li>
+</ol>
+<p>时序往往受到不同的状态的共同影响，特别是状态关系的变化的影响。</p>
+<blockquote>
+<p>:one: 在健康追踪设备的连续观察中，在高强度跑步后停止运动可能会导致昏厥事件，而如果一个人在慢跑后停止运动，监测数据看起来是正常的</p>
+<p>:two:从网上购物记录来看，从电子产品到化妆品的突然兴趣转变可能比从化妆品到时尚的平稳转变更令人怀疑</p>
+</blockquote>
+<p><a href="https://imgtu.com/i/ccItf0"><img src="https://z3.ax1x.com/2021/04/14/ccItf0.png" alt="ccItf0.png"></a></p>
+<p>方法：基于潜在的状态对时间序列进行建模，为了从原始时间序列数据中保留更多的信息，我们将每个时间序列段建模为属于多个具有不同权值的状态，并利用有向图来建模相邻段之间的状态之间的过渡关系。</p>
+<blockquote>
+<p>1)时间序列演化可以转化为不同层次的图动态</p>
+<p>2)当事件发生时，时间序列波动可以表示为图结构的迁移，特别是连接某些状态的一些边的动态</p>
+</blockquote>
+<h4 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h4><ul>
+<li>通过对实际数据的分析，我们发现状态间的时变关系对于时间序列事件的预测很重要</li>
+<li>我们提出了演化状态图来捕捉状态之间的动态关系，并基于进演化状态图开发<code>EvoNet</code>来提高事件预测的性能</li>
+<li>我们在5个数据集上进行了大量的实验，以证明我们的方法可以做出更准确的预测，并为解释它们提供更多的见解</li>
+</ul>
+<h3 id="背景及问题定义"><a href="#背景及问题定义" class="headerlink" title="背景及问题定义"></a>背景及问题定义</h3><h4 id="时间序列事件预测"><a href="#时间序列事件预测" class="headerlink" title="时间序列事件预测"></a>时间序列事件预测</h4><p><a href="https://imgtu.com/i/ccId6U"><img src="https://z3.ax1x.com/2021/04/14/ccId6U.png" alt="ccId6U.png"></a></p>
+<p>$\tau$：滑窗大小（表示某种物理意义，比如24h）</p>
+<p>$d$：dimension</p>
+<p><a href="https://imgtu.com/i/ccIalT"><img src="https://z3.ax1x.com/2021/04/14/ccIalT.png" alt="ccIalT.png"></a></p>
+<h4 id="状态-State"><a href="#状态-State" class="headerlink" title="状态 State"></a>状态 State</h4><p>状态集合（典型模式片段集合）：$\Theta _v\in R^{\tau \times d}$</p>
+<p>提取方式：Symbolic Aggregate Approximation, Bag of Patterns, Shapelets, sequence clustering</p>
+<h4 id="Segment-to-state-representation"><a href="#Segment-to-state-representation" class="headerlink" title="Segment-to-state representation"></a>Segment-to-state representation</h4><p><a href="https://imgtu.com/i/ccIUpV"><img src="https://z3.ax1x.com/2021/04/14/ccIUpV.png" alt="ccIUpV.png"></a></p>
+<h3 id="EvoNet框架"><a href="#EvoNet框架" class="headerlink" title="EvoNet框架"></a><code>EvoNet</code>框架</h3><h4 id="Evolutionary-State-Graph-演化状态图"><a href="#Evolutionary-State-Graph-演化状态图" class="headerlink" title="Evolutionary State Graph  演化状态图"></a>Evolutionary State Graph  演化状态图</h4><p>图结构：$G_{(t)} = \{V, E^{(t)}, M^{(t)}\}$表示从$X_{t-1}$到$X_{t }$的状态</p>
+<p><a href="https://imgtu.com/i/ccIBm4"><img src="https://z3.ax1x.com/2021/04/14/ccIBm4.png" alt="ccIBm4.png"></a></p>
+<p><a href="https://imgtu.com/i/ccIr79"><img src="https://z3.ax1x.com/2021/04/14/ccIr79.png" alt="ccIr79.png"></a></p>
+<p><a href="https://imgtu.com/i/ccID0J"><img src="https://z3.ax1x.com/2021/04/14/ccID0J.png" alt="ccID0J.png"></a></p>
+<ul>
+<li>异常时刻时图会更加稠密</li>
+<li>异常时节点对应的的in-degree会增加</li>
+</ul>
+<h4 id="Evolutionary-State-Graph-Network-演化状态图网络"><a href="#Evolutionary-State-Graph-Network-演化状态图网络" class="headerlink" title="Evolutionary State Graph Network  演化状态图网络"></a>Evolutionary State Graph Network  演化状态图网络</h4><p>网络利用状态演化图来捕获一下两种信息：</p>
+<p><strong>局部结构影响</strong>：状态与状态之间局部变化的影响（例子：跑步）</p>
+<p><strong>时间影响</strong>：先前状态的转换将影响当前观测数据</p>
+<blockquote>
+<p>例如，(高强度跑步→慢跑)→···→停止运动)和(慢跑→慢跑→···→停止运动)会产生不同的健身效果。</p>
+</blockquote>
+<p>在演化状态中的表现：</p>
+<ul>
+<li>局部结构影响-&gt;图中的每个节点之间的局部成对关系 ——&gt;local information aggregation</li>
+<li>时间影响-&gt;不同图上的演化 ——&gt;temporal graph propagation</li>
+</ul>
+<p><a href="https://imgtu.com/i/ccI6t1"><img src="https://imgtu.com/i/ccIcfx" alt="ccIcfx.png](https://z3.ax1x.com/2021/04/14/ccIcfx.png)"></a></p>
+<h5 id="Local-information-aggregation"><a href="#Local-information-aggregation" class="headerlink" title="Local information aggregation"></a><strong>Local information aggregation</strong></h5><p><a href="https://imgtu.com/i/ccIykR"><img src="https://z3.ax1x.com/2021/04/14/ccIykR.png" alt="ccIykR.png"></a></p>
+<p><a href="https://imgtu.com/i/ccI2p6"><img src="https://z3.ax1x.com/2021/04/14/ccI2p6.png" alt="ccI2p6.png"></a></p>
+<h5 id="Temporal-graph-propagation"><a href="#Temporal-graph-propagation" class="headerlink" title="Temporal graph propagation"></a>Temporal graph propagation</h5><p><a href="https://imgtu.com/i/ccIq9P"><img src="https://z3.ax1x.com/2021/04/14/ccIq9P.png" alt="ccIq9P.png"></a></p>
+<p><a href="https://imgtu.com/i/ccIR1K"><img src="https://z3.ax1x.com/2021/04/14/ccIR1K.png" alt="ccIR1K.png"></a></p>
+<p><a href="https://imgtu.com/i/ccIW6O"><img src="https://z3.ax1x.com/2021/04/14/ccIW6O.png" alt="ccIW6O.png"></a></p>
+<p><a href="https://imgtu.com/i/ccIfXD"><img src="https://z3.ax1x.com/2021/04/14/ccIfXD.png" alt="ccIfXD.png"></a></p>
+<h5 id="End-to-End-Model-Learning-端到端的模型学习"><a href="#End-to-End-Model-Learning-端到端的模型学习" class="headerlink" title="End-to-End Model Learning  端到端的模型学习"></a>End-to-End Model Learning  端到端的模型学习</h5><p><a href="https://imgtu.com/i/ccI4ne"><img src="https://z3.ax1x.com/2021/04/14/ccI4ne.png" alt="ccI4ne.png"></a></p>
+<p><strong>训练一个分类器</strong>（<code>NN</code> or <code>XGBoost</code>）</p>
+<p><a href="https://imgtu.com/i/ccI50H"><img src="https://z3.ax1x.com/2021/04/14/ccI50H.png" alt="ccI50H.png"></a></p>
+<blockquote>
+<p>where Yˆ𝑡+1 ∈ {0, 1} is the ground truth that indicating whether a future event will occur.   </p>
+</blockquote>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p><a href="https://imgtu.com/i/ccII7d"><img src="https://imgtu.com/i/ccITAA" alt="ccITAA.png](https://z3.ax1x.com/2021/04/14/ccITAA.png)"></a></p>
+<ul>
+<li><strong>DJIA 30 Stock Time Series (DJIA30)</strong>  ：三种交易价格和一个交易数字；目标是基于最近50周的数据预测下一周是否有异常的价格波动</li>
+<li><strong>Web Traffic Time Series Forecasting (WebTraffic)  </strong>：目标是根据12月的数据预测未来一个月是否出现快速增长</li>
+<li><strong>Information Networks Supervision (NetFlow)  </strong>：由中国电信提供。小时粒度；流入与流出（两维）；15天预测两天；</li>
+<li><strong>Watt-hour Meter Clock Error (ClockErr)  </strong>：由中国国家电网提供。每个读数记录电能表的偏差时间和延迟时间；当偏差时间超过120时，表示仪表异常；我们的目标是根据过去12个月的记录预测下个月的异常情况；</li>
+<li><strong>Abnormal Server Response (AbServe)  </strong>:本数据集由阿里巴巴云提供。每个系列记录不同指标的详细读数(例如:CPU、磁盘、内存等)。当服务器无法响应时，日志将记录异常。我们的目标是根据前一小时的记录预测未来五分钟内的异常情况。</li>
+</ul>
+<h4 id="BaseLine"><a href="#BaseLine" class="headerlink" title="BaseLine"></a>BaseLine</h4><ul>
+<li><p><strong>基于特征的模型</strong></p>
+<p>Bag of Patterns (BoP), Vector Space Model using SAX (SAX-VSM) and Fast Shapelet (FS)  </p>
+<blockquote>
+<p>这些方法捕获不同的状态表示，这些状态表示作为事件预测的特征</p>
+</blockquote>
+</li>
+<li><p><strong>序列模型</strong></p>
+<ul>
+<li><p>switching-time-series model (S-HMM)   ：建模状态序列的马尔可夫依赖</p>
+</li>
+<li><p>multiscale recurrent neural network (MRNN)   ：以$X_t \oplus Y_t$作为输入，学习隐空间表示来做预测</p>
+</li>
+<li><p>hierarchical recurrent neural network (HRNN)   ：学习更多$X_t $和$ Y_t$的相关性</p>
+</li>
+</ul>
+</li>
+<li><p><strong>基于图的模型</strong></p>
+<ul>
+<li><p>gated graph neural network (GGNN)  ：使用one-hot对$h_0$进行初始化，局部信息传递使用GGNN，节点级传播是用GRU</p>
+</li>
+<li><p>GCN-LSTM ：使用$\Theta$对$h_0$进行初始化，局部信息传递使用GCN，节点级传播是用LSTM</p>
+</li>
+<li><p>EvolveGCN ：将RNN和GCN结合起来的多层动态图神经网络，关注的节点级的传播</p>
+</li>
+<li><p>ST-MGCN  ：时空多图卷积网络，使用$ Y_t$作为传播的上下文信息，它直接将上下文信息融合到节点级表示中，而不是学习图级表示并对节点-图交互进行建模</p>
+</li>
+<li><p>Time2Graph  ：将不同时间的图形聚合成静态图，并进行DeepWalk来学习图形的表示，然后作为事件预测的特征</p>
+</li>
+</ul>
+</li>
+<li><p><strong><code>EvoNet</code>变体</strong></p>
+<p><code>EvoNet w/o G</code>：不使用演化状态图，使用状态序列直接建模（LSTM）</p>
+<p><code>EvoNet w/o A</code>：不使用时间注意力机制</p>
+</li>
+</ul>
+<p><a href="https://imgtu.com/i/ccIOc8"><img src="https://z3.ax1x.com/2021/04/14/ccIOc8.png" alt="ccIOc8.png"></a></p>
+<p><code>Q1</code>: How does <code>EvoNet</code> perform on the time-series prediction task, compared with other baselines from the state-of-the-art?  </p>
+<p><code>Q2</code>: How does the proposed <code>EvoBlock</code> effectively bridge the graph-level and node-level information over time?</p>
+<p><code>Q3</code>: How do different configurations, e.g., state number, segmentation length, implementation of state recognition and message passing, influence the performance?  </p>
+<p><a href="https://imgtu.com/i/ccIHht"><img src="https://z3.ax1x.com/2021/04/14/ccIHht.png" alt="ccIHht.png"></a></p>
+<h4 id="Case-Study"><a href="#Case-Study" class="headerlink" title="Case Study"></a>Case Study</h4><p><a href="https://imgtu.com/i/ccI7tI"><img src="https://z3.ax1x.com/2021/04/14/ccI7tI.png" alt="ccI7tI.png"></a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文研究状态之间的关系如何反映时间数据的演化问题。我们提出了一种新的表示方法——演化状态图，来表示时间序列状态之间的时变关系。为了捕获这些有效的模式用于下游任务，我们进一步提出了基于<code>GNN</code>的<code>EvoNet</code>模型来进行动态图建模。为了验证<code>EvoNet</code>的有效性，我们在五个真实世界的数据集上进行了大量的实验。实验结果表明，我们的模型明显优于11种最先进的基准测试方法。在此基础上，我们可以发现状态之间的一些有意义的关系，使我们能够理解时间数据。</p>
+]]></content>
+      <categories>
+        <category>djx</category>
+      </categories>
+      <tags>
+        <tag>EEG</tag>
+        <tag>自监督学习</tag>
+      </tags>
+  </entry>
 </search>
