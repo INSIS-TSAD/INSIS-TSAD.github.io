@@ -5359,4 +5359,93 @@ s_{i, j} \mid \tilde{\alpha}_{i, j} \sim \mathcal{N}\left(\tilde{\alpha}_{i, j} 
         <tag>元学习</tag>
       </tags>
   </entry>
+  <entry>
+    <title>djx 【ICLR2021】Contrastive Learning with Hard Negative Samples</title>
+    <url>/2021/07/14/DengJiaoxue/Contrastive%20Learning%20with%20Hard%20Negative/</url>
+    <content><![CDATA[<p>​        作者认为 negative sample 对于表征学习是有很大益处的，对于 negative sample 最主要的挑战就是不能采用现有使用真实相似度信息的负采样策略。因此，本文开发了无监督采样方法来选择 harder negative samples， 并且 user 可以控制 hardness。这种抽样结果的一个极限情况是将每个类紧密地聚在一起，并将不同的类尽可能地分开。该方法提高了跨多模式的下游性能。</p>
+<a id="more"></a>
+<h4 id="1、Introduction"><a href="#1、Introduction" class="headerlink" title="1、Introduction"></a><strong>1、Introduction</strong></h4><p>对比学习依赖于两个关键因素：正样本对与负样本对的定义，</p>
+<p>informative negative ：mapped nearby but should be far apart</p>
+<p>好的negative sample：与原始样本标签不同，与原始样本相似</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172640277.png" alt="image-20210714172640277"></p>
+<p>动机：寻找更好的negative samples，本文构建了一个可调的采样分布，该分布倾向于描述当前表示（与锚样本）十分相似的负样本对。</p>
+<p>挑战：1）无监督条件下无法获得任何真实的相似或不相似信息。2）可调分布需要合适的采样策略。针对挑战1）参考无标签正样本学习，针对挑战2）设计一种抽样技术：需要满足高效、易于实现、不增加计算开销。</p>
+<p>理论分析表明，本文提出的方法的最佳表现是将相似的输入归类在紧密的簇中，同时将簇间隔尽可能远。从经验上看，我们的hard negative sampling策略改善了图像、图形和文本数据的下游任务性能，这足以说明我们的negative samples具有更丰富的信息。</p>
+<p><strong>贡献</strong>：</p>
+<p>1、我们提出了一个关于负样本对的简单分布，用于对比学习，并推导了一种实用的importance sampling 策略。这种策略考虑到了真实不相似信息的缺乏并且计算开销为0。</p>
+<p>2、从理论上分析了hard negative客观和最优的表示，理论上说明了hard negative 可以捕获理想状态的泛化性质。</p>
+<p>3、经验上观察到本文提出的抽样方法可以提高下游任务性能。</p>
+<h4 id="2、对比学习背景"><a href="#2、对比学习背景" class="headerlink" title="2、对比学习背景"></a>2、对比学习背景</h4><p>介绍对比表示学习的背景：</p>
+<ul>
+<li><p>我们希望学习一个嵌入层：$f:\chi \rightarrow S^{d-1}/t $ ，$S^{d-1}/t $ 是一个半径为$1/t$的超球面，$t$是超参数</p>
+<p>假设有一组离散的潜在类$C$表示语义内容，相似样本对$(x,x^{+})$对应相同的潜在类。</p>
+<p>对于$c\in C$，定义其分布$\rho(c)$，联合分布 $p_{(x,c)}(x,c)=p(x|c)\rho(c)$ ——条件概率分布变形；</p>
+</li>
+</ul>
+<p>​                                                           边际分布 $ p(x)=\int_{c}p_{(x,c)}(x,c)dc$  简写为  $p$</p>
+<p>​        假设 $supp(p(x))=\chi$ ，意思是$p(x)$的支撑集是全集 $\Leftrightarrow$   $p(x)\neq 0  $   $\forall x\in \chi$</p>
+<p>​        为简单起见，假设$p(c)=\tau^{+}$为均匀分布，$\tau^{-}=1-\tau^{+}$     $\tau$是超参数。</p>
+<ul>
+<li><p>$h:\chi \rightarrow C$ 为输入$x$分配标签的真实潜在假设</p>
+<p>如果$h(x)=h(x’)$，我们规定$x$与$x’$来自同一类，定义为 $x \thicksim x’$</p>
+<p>定义 $P^{+}_{x}(x’)$为标签与$x$相同点的分布 $P^{+}_{x}(x’)=P(x’|h(x’)=h(x))$</p>
+<p>定义 $P^{-}_{x}(x’)$为标签与$x$不同点的分布 $P^{-}_{x}(x’)=P(x’|h(x’)\neq h(x))$</p>
+</li>
+<li><p>NCE：noise-contrastive estimation</p>
+<p>对于$\forall x \thicksim p$，NCE融合了正样本$x^{+}$和N个负样本${x^{-}_{i}}^{N}_{i=1}$，负样本采样自q</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172701989.png" alt="image-20210714172701989"></p>
+<p>【q通常被选为边际分布$p(x)$，实际操作中也常用经验近似】</p>
+</li>
+</ul>
+<p>问题：q是否有更好的分布描述负样本？</p>
+<h4 id="3、Hard-negative-sample"><a href="#3、Hard-negative-sample" class="headerlink" title="3、Hard negative sample"></a>3、Hard negative sample</h4><p>在本节中，将描述本文的hard negative sampling。我们首先要问，什么是好的negative sample？我们采取以下两条指导原则来回答这个问题:</p>
+<p>1、q应当只能抽取真正与锚窗口标签不同的负样本$x_{i}^{-}$</p>
+<p>2、最有用的负样本是目前被认为与锚窗口最相似的负样本</p>
+<p>简而言之，与锚点有不同标签但嵌入在附近的负样本可能是最有用的，并在训练过程中提供显著的梯度信息。</p>
+<ul>
+<li>定义负样本分布：$q^{-}_{\beta}$ </li>
+</ul>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172736879.png" alt="image-20210714172736879"></p>
+<ul>
+<li>结合PU-learning的思想，Positive-Unlabeled Learning：</li>
+</ul>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172802177.png" alt="image-20210714172802177"></p>
+<p> $q_{\beta}$ 和 $q^{+}_{\beta}$ 都是可得到的分布，通过p得到$q_{\beta}$，通过一个保持语义的变换得到$q^{+}_{\beta}$。</p>
+<hr>
+<ul>
+<li><p>为获得来自 $q_{\beta}$ 和 $ q^{+}_{\beta}$的样本，本文采用的是重要抽样法【(importance sampling method)是最有效的蒙特卡罗技巧之一，其主要思想是，它不从给定的概率分布函数中进行抽样，而是对所给定的概率分布进行修改，使得对模拟结果有重要贡献的部分多出现，从而达到提高效率，减少模拟的时间，以及缩减方差的目的】</p>
+<p>首先固定（1）式中的Q，并将N趋向于正无穷：</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172901804.png" alt="image-20210714172901804"></p>
+<p>将选择负样本分布$q^{-}_{\beta}$当作公式中的q，将（2）式代入得到（4）:</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172844973.png" alt="image-20210714172844973"></p>
+<p>从4式，可以看到我们只需要近似估计期望$E_{x \thicksim q_{\beta}}[e^{f^{T}(x)f(x^{-})}]$和$E_{v \thicksim q^{+}_{\beta}}[e^{f^{T}(x)f(v)}]$。</p>
+<p>通过Monte-Carlo Importance sampling技术，可以求得上面两个期望：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172920914.png" alt="image-20210714172920914"></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172931852.png" alt="image-20210714172931852"></p>
+<h4 id="实验部分"><a href="#实验部分" class="headerlink" title="实验部分"></a>实验部分</h4><p>​        接下来，对我们的hard negative sampling 方法进行了实例评估，在所有的实验中，β都被视为一个超参数(消融实验结果显示在图2)。实验前需要提前确定$\tau^{+}$的值。选择类的先验信息$\tau^{+}$可以通过两种方式进行:1）从数据中估算，要求具有标记数据，2）将其视为超参数。</p>
+<h5 id="Image-Representation"><a href="#Image-Representation" class="headerlink" title="Image Representation"></a>Image Representation</h5><p>数据集：STL10，CIFAR100，CIFAR10</p>
+<p>baseline：simCLR、Debiased（2020）</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714172955351.png" alt="image-20210714172955351"></p>
+<h5 id="Graph-Representation"><a href="#Graph-Representation" class="headerlink" title="Graph Representation"></a>Graph Representation</h5><p>数据集：图示中的八个</p>
+<p>baseline：InfoGraph 方法（2020）</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714173011134.png" alt="image-20210714173011134"></p>
+<p>八个cases里面有六个的效果是优于baseline的</p>
+<h5 id="Sentence-Representaton"><a href="#Sentence-Representaton" class="headerlink" title="Sentence Representaton"></a>Sentence Representaton</h5><p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714173033008.png" alt="image-20210714173033008"></p>
+<h5 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h5><p>1、$ \beta$  越大越好吗？</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714173046987.png" alt="image-20210714173046987"></p>
+<p>​        从结果可以看出过大的$\beta$ 反而对结果有负面影响，但是从第二张图的对比中看出，当正样本对采用的是真实信息的时候，结果会$\beta$ 的增加而增加。这个现象是可以在一定程度上解释过大的$\beta$ 为什么会降低准确度：因为，我们实际上是使用一种变换近似估计的$q^{+}_{\beta}$，只能部分纠正与 $ x$ 标签相同的负样本 $x^{-}$，而$\beta$ 的增加意味着学习机制更倾向于$f(x^{-})$ 接近于 $f(x)$，因此会造成更多与 $ x$ 标签相同的负样本 $x^{-}$ 没有被纠正。</p>
+<p>2、避免错误负样本是否会改善hard sampling？</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210714173147439.png" alt="image-20210714173147439"></p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>​        本文提出了一种 hard negative sampling 方法，并通过实验论证了 hard negative 在对比表示学习中的价值。本文的工作将对比学习与度量学习中的负样本挖掘（negative mining）联系起来，差异在于度量学习中的负挖掘是以成对的相似信息作为核心，而对比学习是无监督的。本文所提的方法有如下优点：1、易于实现 2、不引入额外的计算开销 3、具有理论意义。</p>
+]]></content>
+      <categories>
+        <category>djx</category>
+      </categories>
+      <tags>
+        <tag>自监督</tag>
+        <tag>表示学习</tag>
+      </tags>
+  </entry>
 </search>
