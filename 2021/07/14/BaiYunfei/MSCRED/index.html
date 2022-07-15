@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta property="og:type" content="article">
+<meta property="og:title" content="byf 【AAAI-2019】A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
+<meta property="og:url" content="http://example.com/2021/07/14/BaiYunfei/MSCRED/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/Rsvfcq.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsvcNQ.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsvcNQ.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsvcNQ.png">
+<meta property="og:image" content="http://example.com/Users/baiyunfei/Library/Application%20Support/typora-user-images/image-20210623150200440.png">
+<meta property="og:image" content="http://example.com/Users/baiyunfei/Library/Application%20Support/typora-user-images/image-20210623150230881.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/Rsvwct.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RDxubF.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RrC1cn.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RriyFO.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RrApz4.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RrZ3wR.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RrnkeH.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsvttH.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsWvo8.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/Rshl9g.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsblXF.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsbIBQ.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/Rsqcb4.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/Rsq526.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsLqyT.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsLLOU.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/07/01/RsOnfI.png">
+<meta property="article:published_time" content="2021-07-14T06:20:10.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:27:50.930Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="多变量时间序列">
+<meta property="article:tag" content="时间序列分类">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/07/01/Rsvfcq.png">
+
+<link rel="canonical" href="http://example.com/2021/07/14/BaiYunfei/MSCRED/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>byf 【AAAI-2019】A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/14/BaiYunfei/MSCRED/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          byf 【AAAI-2019】A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-14 14:20:10 / Modified: 17:27:50" itemprop="dateCreated datePublished" datetime="2021-07-14T14:20:10+08:00">2021-07-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/byf/" itemprop="url" rel="index"><span itemprop="name">byf</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/Rsvfcq"><img src="https://z3.ax1x.com/2021/07/01/Rsvfcq.png" alt="Rsvfcq.png"></a></p>
+<a id="more"></a>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p><strong>定义：</strong>多元时间序列中的异常检测和诊断是指<strong>识别特定时间步长的异常状态并查明根本原因。</strong></p>
+<p><strong>挑战：</strong>构建多元时序异常检测系统具有挑战性</p>
+<p>$\bull$不仅需要捕获每个时间序列中的时间依赖性，还需要对不同时间序列对之间的<strong>相关性</strong>进行编码。</p>
+<p>$\bull$系统应具有<strong>抗噪声能力</strong>，并根据不同事件的严重性为操作员提供不同级别的异常评分。</p>
+<p><strong>本文解决方案：</strong>提出了一种多尺度卷积循环编码器-解码器 <strong>(MSCRED)</strong>，以在多元时间序列数据中执行异常检测和诊断。</p>
+<p>$\bull$构造多尺度（分辨率）<strong>特征矩阵</strong>(signature matrices)来表征不同时间步长中系统状态的多个级别。</p>
+<p>$\bull$给定特征矩阵，使用<strong>卷积编码器对传感器间（时间序列）相关性进行编码</strong>，并开发基于注意力的卷积长短期记忆（ConvLSTM）网络来捕获时间模式。</p>
+<p>$\bull$基于对传感器间相关性和时间信息进行编码的特征图，<strong>卷积解码器用于重建输入特征矩阵</strong>，并进一步利用<strong>残差特征矩阵</strong>来检测和诊断异常。</p>
+<p><strong>实验结果：</strong>基于<strong>合成数据集和真实发电厂数据集</strong>的大量实证研究表明，MSCRED 可以胜过最先进的基线方法。</p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>复杂系统在现代制造业和信息服务中无处不在。管理这些系统的一项关键任务是检测<strong>(1)特定时间步长</strong>的异常情况，以便操作员可以采取进一步行动来解决潜在问题。此外，查明根本原因，即<strong>(2)识别导致异常的传感器</strong>（系统组件），可以帮助系统操作员及时进行系统诊断和修复。</p>
+<p>在现实世界的应用中，由于现代系统的自动恢复能力和稳健性，由<strong>时间动荡或系统状态切换引起的短期异常可能最终不会导致真正的系统故障</strong>，这是很常见的。因此，如果异常检测算法可以<strong>(3)根据各种事件的严重程度为操作员提供不同级别的异常分数</strong>，那将是很重要的。</p>
+<p>为简单起见，本文假定<strong>事件的严重性与这项工作中异常的持续时间成正比</strong>。图 1(a) 说明了多元时间序列数据中的两个异常，即红色虚线圆圈标记的 A1(黄色) 和 A2(黑色)。 A2 的持续时间<strong>(严重性级别)</strong>大于 A1。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsvcNQ"><img src="https://z3.ax1x.com/2021/07/01/RsvcNQ.png" alt="RsvcNQ.png"></a></p>
+<p>==先前研究==</p>
+<p>为了构建一个可以自动检测和诊断异常的系统，一个主要问题是<strong>历史数据中很少甚至没有异常标签可用，这使得监督算法不可行</strong>。 在过去的几年中，已经开发出了大量无监督的异常检测方法。 最突出的技术包括距离/聚类方法(KNN)、分类方法(OC-SVM)、概率方法、密度估计方法(DAGMM)、时间预测方法(ARMA、基于LSTM的方法)以及最近的深度学习技术。</p>
+<p>==缺陷==</p>
+<p>尽管存在内在的无监督设置，但由于以下原因，它们中的大多数仍可能无法有效检测异常：</p>
+<p><strong>多变量时间序列数据存在时间依赖性。</strong> 由于这个原因，需要使用距离/聚类方法，分类方法和密度估计方法，可能表现不佳，因为它们<strong>无法捕获不同时间步长的时间依赖性。</strong></p>
+<p><strong>多元时间序列数据在实际应用中通常包含噪声。</strong> 当噪声变得相对严重时，可能会<strong>影响</strong>时间预测模型的概括能力，以及<strong>增加误报</strong>。根据不同事件的严重程度为运营商提供不同级别的异常评分是有意义的， 现有的根因分析方法，例如(RCA) 对噪声敏感，无法处理这个问题。</p>
+<hr>
+<p>在本文中，提出了一种多尺度卷积循环编码器-解码器（MSCRED）来共同考虑上述问题。</p>
+<p>(1)MSCRED 首先构建多尺度（分辨率）特征矩阵来表示不同时间步长的系统状态的多个级别(系统状态的不同级别用于指示不同异常事件的严重程度)。</p>
+<p>(2)给定特征矩阵，使用卷积编码器对传感器间（时间序列）相关模式进行编码，并开发基于注意力的卷积长短期记忆（ConvLSTM）网络来捕获时间模式。</p>
+<p>(3)利用对传感器间相关性和时间信息进行编码的特征图，卷积解码器用于重建特征矩阵，并进一步利用残差特征矩阵来检测和诊断异常。</p>
+<hr>
+<p>==如果 MSCRED 之前从未观察到类似的系统状态，它可能无法很好地重建特征矩阵==</p>
+<p>例如，图 1(b) 显示了正常和异常期间的特征矩阵$M<em>{normal}$和$M</em>{abnormal}$。理想情况下，MSCRED 不能很好地重建 $M<em>{abnormal}$，因为训练矩阵（例如，$M</em>{normal}$）与 $M_{abnormal}$不同。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsvcNQ"><img src="https://z3.ax1x.com/2021/07/01/RsvcNQ.png" alt="RsvcNQ.png"></a></p>
+<hr>
+<p>总而言之，我们工作的<strong>主要贡献</strong>是：</p>
+<p>(1)我们将异常检测和诊断问题制定<strong>为三个基本任务</strong>，即==异常检测、根因识别和异常严重程度解释==。 </p>
+<p>(2)我们引入了系统特征矩阵的概念，开发了 MSCRED 以通过卷积编码器对传感器间相关性进行编码，将时间模式与基于注意力的 ConvLSTM 网络相结合，并通过卷积解码器重建签名矩阵。 据我们所知，MSCRED 是第一个考虑多元时间序列之间相关性进行异常检测的模型，可以共同解决所有三个任务。==特征抽取、重构、评估==</p>
+<p>(3)我们对综合数据集和电厂数据集进行广泛的经验研究。 我们的结果证明了 MSCRED 的性能优于最先进的基线方法。</p>
+<hr>
+<h1 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h1><p>多变量时间序列数据的无监督异常检测是一项具有挑战性的任务，过去几年已经开发了各种类型的方法。</p>
+<p><strong>一种传统类型是距离方法</strong>。KNN,OC-SVM,ARMA,集成方法等。</p>
+<p><strong>基于深度学习的无监督异常检测算法</strong>。DAGMM, LSTM等。</p>
+<h1 id="MSCRED框架"><a href="#MSCRED框架" class="headerlink" title="MSCRED框架"></a>MSCRED框架</h1><h2 id="问题陈述"><a href="#问题陈述" class="headerlink" title="问题陈述"></a>问题陈述</h2><p>给定长度为T的n个时间序列的历史数据，即$\mathbf{X}=(\mathbf{x}_1,…,\mathbf{x}_n)^T\in \mathbb{R}^{n<em>T}$，假设数据中<em>*不存在异常</em></em>，我们的目标是：</p>
+<p>$\bull$检测T之后的异常</p>
+<p>$\bull$给出异常的程度</p>
+<h2 id="使用特征矩阵表明状态"><a href="#使用特征矩阵表明状态" class="headerlink" title="使用特征矩阵表明状态"></a>使用特征矩阵表明状态</h2><p>先前的研究表明，不同时间序列对之间的相关性对于表征系统状态至关重要。为了表示从$t−w$到 $t$ 的多元时间序列片段中不同时间序列对之间的相关性，基于该时间段内两个时间序列的成对内积构建了一个$n*n$特征矩阵$M^t$。例子如图1(b):</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsvcNQ"><img src="https://z3.ax1x.com/2021/07/01/RsvcNQ.png" alt="RsvcNQ.png"></a></p>
+<p>具体来说，给定多元时间序列段$X^w$中的两个时间序列==错误==<img src="/Users/baiyunfei/Library/Application Support/typora-user-images/image-20210623150200440.png" alt="image-20210623150200440" style="zoom:50%;" /></p>
+<p>和<img src="/Users/baiyunfei/Library/Application Support/typora-user-images/image-20210623150230881.png" alt="image-20210623150230881" style="zoom:50%;" />，它们的相关性$m_{ij}^t\in M^t$计算为：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/Rsvwct"><img src="https://z3.ax1x.com/2021/07/01/Rsvwct.png" alt="Rsvwct.png"></a></p>
+<p>其中$\mathcal{k}=w$，特征矩阵，即$M^t$，不仅可以捕捉两个时间序列之间的<strong>形状相似性和值尺度相关性</strong>，而且对输入<strong>噪声具有鲁棒性</strong>，因为某些时间序列的噪声对特征矩阵的影响很小。</p>
+<p>在本文中，两段之间的<strong>间隔设置为10</strong>，此外，为了表征不同尺度的系统状态，我们在每个时间步构建了$s(s = 3) $个不同长度 $(w = 10, 30, 60)$ 的特征矩阵。==异常严重程度解释==</p>
+<h2 id="卷积编码器"><a href="#卷积编码器" class="headerlink" title="卷积编码器"></a>卷积编码器</h2><p>采用<strong>全卷积编码器对系统特征矩阵的空间模式进行编码</strong>。具体来说，我们将不同尺度的$M^t$连接为张量$\mathcal{X}^{t,0}\in \mathbb{R}^{n<em>n</em>s}$，然后将其馈送到多个卷积层。假设$\mathcal{X}^{t,l-1}\in \mathbb{R}^{n<em>{l-1}*n</em>{l-1}*d_{l-1}}$表示第$(l-1)$层中的特征图，则第$l$层的输出由下式给出：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RDxubF"><img src="https://z3.ax1x.com/2021/07/01/RDxubF.png" alt="RDxubF.png"></a></p>
+<p>$f(.)$是激活函数，$W^l\in \mathbb{R}^{k<em>l<em>k_l</em>d</em>{l-1}<em>d_l}$表示大小为$k_l</em>k<em>l*d</em>{l-1}$的卷积核，$b^l\in \mathbb{R}^{d<em>l}$是一个偏置项，$\mathcal{X}^{t,l}\in \mathbb{R}^{n</em>{l}<em>n_{l}</em>d_{l}}$表示第$l$层的输出特征图。</p>
+<p>使用缩放指数型线性单元 <strong>(SELU) 作为激活函数和 4 个卷积层</strong>，Conv1-Conv4 具有 32 个大小为 3 × 3 × 3 的内核、64 个大小为3×3×32 的内核、128 个大小为 2×2×64 的内核和 256 个大小为 2×2×128 的内核以及分别为1×1、2×2、2×2 和 2×2 步幅。</p>
+<p>图 2(a) 说明了特征矩阵的详细编码过程。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RrC1cn"><img src="https://z3.ax1x.com/2021/07/01/RrC1cn.png" alt="RrC1cn.png"></a></p>
+<h2 id="基于注意力的ConvLSTM"><a href="#基于注意力的ConvLSTM" class="headerlink" title="基于注意力的ConvLSTM"></a>基于注意力的ConvLSTM</h2><p>卷积编码器生成的空间特征图在时间上取决于之前的时间步长。 </p>
+<p>ConvLSTM已被开发用于捕获视频序列中的时间信息，但其性能可能会随着<strong>序列长度的增加而恶化</strong>。 为了解决这个问题，开发了一种基于注意力的 ConvLSTM，它可以跨不同时间步自适应地选择相关的隐藏状态（特征图）。具体来说，给定来自第$l$个卷积层的特征图$\mathcal{X}^{t,l}$和先前的隐藏状态$\mathcal{H}^{t-1,l}\in \mathbb{R}^{n<em>{l}*n</em>{l}*d_{l}}$，当前隐藏状态$\mathcal{H}^{t,l}$更新为$\mathcal{H}^{t,l}=ConvLSTM(\mathcal{X}^{t,l},\mathcal{H}^{t-1,l})$，其中 ConvLSTM单元被表述为：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RriyFO"><img src="https://z3.ax1x.com/2021/07/01/RriyFO.png" alt="RriyFO.png"></a></p>
+<p>$\circ$代表 Hadamard 积，$\sigma$是 sigmoid 函数，</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RrApz4"><img src="https://z3.ax1x.com/2021/07/01/RrApz4.png" alt="RrApz4.png"></a></p>
+<p>由于最佳实证性能，我们调整步长h(即先前段的数量)并将其设置<strong>为5</strong>。此外，考虑到并非所有先前的步骤都与当前状态$\mathcal{H}^{t,l}$同等相关，我们采用时间注意机制来自适应地选择与当前步骤相关的步骤，并聚合这些信息特征图的表示以形成精炼的输出特征图$\hat{\mathcal{H}}^{t,l}$ ，由下式给出：==归一化==</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RrZ3wR"><img src="https://z3.ax1x.com/2021/07/01/RrZ3wR.png" alt="RrZ3wR.png"></a></p>
+<p>其中 Vec(·) 表示向量,$\mathcal{X}$是重新缩放因子 $(\mathcal{X}=5.0)$。 也就是说，我们将最后一个隐藏状态$\mathcal{H}^{t,l}$作为上下文向量，并通过 softmax 函数测量前面步骤的重要性权重$\alpha_i$。本质上，基于注意力的 ConvLSTM 联合建模特征矩阵的空间模式和每个卷积层的时间信息。图 2(b) 说明了时间建模过程。</p>
+<h2 id="卷积解码器"><a href="#卷积解码器" class="headerlink" title="卷积解码器"></a>卷积解码器</h2><p>为了解码上一步获得的特征图并获得重建的特征矩阵，我们设计了一个卷积解码器，其公式如下：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RrnkeH"><img src="https://z3.ax1x.com/2021/07/01/RrnkeH.png" alt="RrnkeH.png"></a></p>
+<p>$\circledast$表示去卷积操作，$\oplus$代表连接操作，$f(.)$是激活单元，$\hat{W}^l,\hat{b}^l$是第$l$层反卷积层的滤波器核和偏置参数。</p>
+<p>具体来说，我们按照相反的顺序将第$l$个 ConvLSTM 层的$\hat{\mathcal{H}}^{t,l}$馈送到反卷积神经网络。输出特征图$\hat{\mathcal{X}}^{t,l-1}$与前一个 ConvLSTM 层的<strong>输出连接</strong>，使解码器过程堆叠。连接后的表示被进一步送入<strong>下一个反卷积层</strong>。最终输出$\hat{\mathcal{X}}^{t,0}$（具有相同大小的输入矩阵）表示重构特征矩阵。</p>
+<p>因此，我们使用了 4 个反卷积层：DeConv4-DeConv1 具有 128 个大小为 2×2×256 的内核、64 个大小为 2×2×128 的内核、32 个大小为 3×3×64 的内核和 3个大小为3×3×64的内核 , 以及2×2,2×2,2 × 2, 和1 × 1 步幅。</p>
+<p>解码器能够在不同的反卷积和 ConvLSTM 层合并特征图，这可以有效提高异常检测性能，我们将在实验中证明。 图 2(c) 说明了解码过程。</p>
+<h2 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h2><p>对于 MSCRED，目标定义为矩阵上的特征误差，即</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsvttH"><img src="https://z3.ax1x.com/2021/07/01/RsvttH.png" alt="RsvttH.png"></a></p>
+<p>$\mathcal{X}_{:,:,c}^{t,0}\in\mathbb{R}^{n*n}$。我们采用小批量随机梯度下降法和 Adam 优化器来最小化上述损失。 </p>
+<p>在足够数量的训练时期后，利用学习到的神经网络参数来推断验证和测试数据的重建特征矩阵。 最后，我们基于残差特征矩阵进行异常检测和诊断。</p>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><p>在本节中，我们进行了大量实验来回答以下研究问题：</p>
+<p>• 异常检测。 在多元时间序列$(RQ1)$中，MSCRED 是否可以胜过基线方法的异常检测？ MSCRED 的每个组件如何影响其性能$(RQ2)$？<br>• 异常诊断。 MSCRED 是否可以有效地执行根因识别$(RQ3)$和异常严重程度（持续时间）解释$(RQ4)$？<br>• 抗噪能力强。 与基线方法相比，MSCRED 是否对输入噪声$(RQ5)$具有更强的鲁棒性？</p>
+<h2 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsWvo8"><img src="https://z3.ax1x.com/2021/07/01/RsWvo8.png" alt="RsWvo8.png"></a></p>
+<p><strong>合成数据集</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/Rshl9g"><img src="https://z3.ax1x.com/2021/07/01/Rshl9g.png" alt="Rshl9g.png"></a></p>
+<p>其中$s_{rand}$是 0 或 1 的随机种子。</p>
+<p>上面的公式捕获了多元时间序列的三个属性：$(a) $三角函数 (C1) 模拟时间模式；$(b)$ 时间延迟$t_0\in[50,100]$和频率$ω \in[40, 50] (C2) $模拟各种周期循环；$(c)$ 由因子$ λ = 0.3 (C3) $缩放的随机高斯噪声$ \varepsilon\in N(0,1)$模拟各种形状的数据噪声。</p>
+<p>此外，如果两个正弦波的频率相似且几乎同相，则它们具有高相关性。 通过随机选择每个时间序列的频率和相位，我们期望一些对具有高相关性，而一些具有低相关性。 我们随机生成 30 个时间序列，每个序列包含 20000 个点。 此外，在测试期间将5个类似冲击波的异常（具有相似的正常数据值范围）随机注入3个随机时间序列（根本原因）中。 每个异常的持续时间属于三个尺度之一，即 30、60、90。</p>
+<p><strong>真实的发电厂数据</strong></p>
+<p>包含一个由系统操作员识别的异常，我们在测试期间随机注入 4 个额外的异常（类似于我们在合成数据中所做的）以进行评估。</p>
+<h3 id="基线"><a href="#基线" class="headerlink" title="基线"></a>基线</h3><p><strong>分类模型：</strong> OC-SVM；<strong>密度估计模型：</strong>DAGMM(能量分数作为异常分数)；</p>
+<p><strong>预测模型：</strong> 它对训练数据的时间依赖性进行建模并预测测试数据的值。 我们采用了三种方法：HA、ARMA、LSTM-ED。 异常分数被定义为所有时间序列的平均预测误差。</p>
+<p><strong>MSCRED变体：</strong></p>
+<p>$CNN_{ConvLSTM}^{ED(4)}:$注意力模块和最后一层ConvLSTM;</p>
+<p><strong>$CNN_{ConvLSTM}^{ED(3,4)}:$</strong>注意力模块和第3,4层ConvLSTM;</p>
+<p><strong>$CNN_{ConvLSTM}^{ED}:$</strong>无注意力模块；</p>
+<p><strong>异常分数：</strong>残差特征矩阵中值大于给定阈值$θ$的数量，$θ $是在不同的数据集上凭经验确定的。</p>
+<h3 id="评估方法"><a href="#评估方法" class="headerlink" title="评估方法"></a>评估方法</h3><p>$P，R，F1$</p>
+<p>阈值设定(专家建议)：$\tau=\beta·max{s(t)<em>{valid}}$,  $s(t)</em>{valid}$是验证阶段的异常分数，$\beta \in [1,2]$是验证期间最大的F1分数。测试期间的召回和精确度分数是根据此阈值计算的。 </p>
+<p>(1)在两个数据集上的实验重复 5 次，并报告平均结果以供比较。</p>
+<p>(2)三个通道，使用最小的一个 $(w = 10) $进行以下异常检测和根因识别评估。 还将提供三个通道结果的性能比较，用于异常严重程度的解释。</p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>异常检测结果$（RQ1、RQ2）$。 表 2 报告了用于异常检测的不同方法的性能，其中最佳分数以粗体突出显示，最佳基线分数以下划线表示。 最后一行报告了 MSCRED 相对于最佳基线方法的改进 (%)。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsblXF"><img src="https://z3.ax1x.com/2021/07/01/RsblXF.png" alt="RsblXF.png"></a></p>
+<p><strong>RQ1：与基线的比较</strong></p>
+<p>(a)时间预测模型比分类和密度估计模型表现更好，表明两个数据集都具有<strong>时间依赖性</strong>；</p>
+<p>(b) LSTM-ED的性能优于 ARMA，表明深度学习模型可以比传统方法捕获数据中<strong>更复杂的关系</strong>； </p>
+<p>(c)MSCRED 表现最佳，对最佳基线的改进范围从 13.3% 到 30.0%。因为它可以有效地对多变量时间序列的传感器间相关性和时间依赖性进行建模。</p>
+<p>图 3 提供了两个数据集的 MSCRED 和两种最佳基线方法（即 ARMA 和 LSTM-ED）的案例研究。 我们可以观察到 <strong>ARMA 的异常分数不稳定，结果包含很多误报和漏报</strong>。 同时，LSTM-ED 的异常分数比 ARMA 更平滑，但仍<strong>包含一些误报和漏报。</strong> MSCRED 可以检测所有异常，没有任何假阳性和假阴性。</p>
+<p>为了证明更令人信服的评估，我们对另一个具有 10 个异常的合成数据进行了实验。MSCRED 的平均召回率和准确率得分（5 次重复实验）为 (0.84, 0.95)，而 LSTM-ED 的值为 (0.64, 0.87)。 此外，我们还对另一个大型电厂数据进行了实验，该数据具有 920 个传感器和 11 个标记异常。 MSCRED 的召回率和准确率得分为 (7/11, 7/13)，而 LSTM-ED 的值为 (5/11, 5/17)。 所有评估结果都表明了我们模型的有效性。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsbIBQ"><img src="https://z3.ax1x.com/2021/07/01/RsbIBQ.png" alt="RsbIBQ.png"></a></p>
+<p><strong>RQ2(各个模块的重要性)：与模型变体的比较</strong></p>
+<p>在表 2 中，我们还观察到通过<strong>增加</strong> ConvLSTM 层的数量，MSCRED 的性能有所提高。</p>
+<p>为了进一步证明<strong>注意力模块的有效性</strong>，图 4 报告了在最后两个 ConvLSTM 层上 5 个先前时间步长上注意力权重的平均分布。 结果是使用<strong>发电厂数据</strong>获得的。 我们分别计算正常时期段和异常时期段的<strong>平均注意力权重分布</strong>。 请注意，在后一种分布中，较旧的时间步长（第 1 步或第 2 步）往往仍处于正常状态，因此与当前时间步长（第 5 步）处于不同的系统状态，其分配的权重低于正常段分布中的权重 . 换句话说，<strong>注意力模块对系统状态变化表现出很高的敏感性，因此有利于异常检测</strong>。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/Rsqcb4"><img src="https://z3.ax1x.com/2021/07/01/Rsqcb4.png" alt="Rsqcb4.png"></a></p>
+<p><strong>RQ3:根因识别结果。</strong></p>
+<p>作为异常诊断任务之一，根因识别依赖于良好的异常检测性能。 因此，我们比较了 MSCRED 和最佳基线（即 LSTM-ED）的性能。对于每个异常事件，我们按异常分数对所有时间序列进行排名，并将前 k 个序列确定为根本原因。 图 5 显示了 5 次重复实验中的平均召回率(k = 3)。 MSCRED 在合成数据和发电厂数据中分别以 25.9% 和 32.4% 的幅度优于 LSTM-ED。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/Rsq526"><img src="https://z3.ax1x.com/2021/07/01/Rsq526.png" alt="Rsq526.png"></a></p>
+<p><strong>RQ4：异常严重性（持续时间）解释。</strong> </p>
+<p>MSCRED 的特征矩阵包括$s$个通道（在当前实验中$ s = 3$），它们以不同的尺度捕获系统状态。为了解释异常严重程度，我们首先根据三个通道的残差特征矩阵<strong>计算不同的异常分数</strong>，分段大小分别为 $w = 10、30 和 60$，并将它们表示为 MSCRED(S)、MSCRED(M) 和 MSCRED(L)。然后，我们<strong>独立评估</strong>他们在三种类型的异常上的表现。</p>
+<p>图6(a)报告了对两个数据集进行 5 次重复实验的<strong>平均召回率分数</strong>。我们可以观察到 MSCRED(S) 能够检测所有类型的异常，而 MSCRED(M) 可以检测中长期异常。相反，MSCRED(L) 只能检测长时间异常。因此，我们可以通过<strong>联合考虑三个异常分数来解释异常严重程度。</strong>如果可以在所有三个通道中检测到异常，则该异常更有可能持续很长时间。否则，可能是短期或中期异常。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsLqyT"><img src="https://z3.ax1x.com/2021/07/01/RsLqyT.png" alt="RsLqyT.png"></a></p>
+<p>为了更好地展示 MSCRED 的有效性，图 7 提供了发电厂数据异常诊断的案例研究。在这种情况下，MSCRED(S) 检测到所有 5 个异常，包括 3 个短、1 个中和 1 个持续时间长的异常。 MSCRED(M) 错过了两个短持续时间的异常，而 MSCRED(L) 只检测到长持续时间的异常。此外，注入异常事件的四个残差特征矩阵显示了根本原因识别结果。在这种情况下，我们可以准确地查明超过一半的异常根本原因（红色矩形突出显示的行/列）。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsLLOU"><img src="https://z3.ax1x.com/2021/07/01/RsLLOU.png" alt="RsLLOU.png"></a></p>
+<p><strong>RQ5:对噪声的鲁棒性。</strong> </p>
+<p>多变量时间序列在实际应用中通常包含噪声，因此异常检测算法对输入噪声的鲁棒性很重要。 为了研究 MSCRED 在异常检测方面的稳健性，我们通过在公式 7 中添加各种噪声因子 λ 在不同的合成数据集中进行实验。图 8 显示了$ λ $对 MSCRED、ARMA 和 LSTM-ED 性能的影响。我们可以观察到，当噪声范围从 0.2 到 0.45 变化时，MSCRED 始终优于 ARMA 和 LSTM-ED。 这表明，与 ARMA 和 LSTM-ED 相比，MSCRED 对输入噪声的鲁棒性更强。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/RsOnfI"><img src="https://z3.ax1x.com/2021/07/01/RsOnfI.png" alt="RsOnfI.png"></a></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在本文中，我们制定了异常检测和诊断问题，并开发了一种创新模型 MSCRED 来解决它。 MSCRED 采用多尺度（分辨率）系统特征矩阵来表征整个系统在不同时间段的状态，并采用深度编码器-解码器框架来生成重建的特征矩阵。 该框架能够对多变量时间序列的传感器间相关性和时间依赖性进行建模。 残差特征矩阵进一步用于检测和诊断异常。 对合成数据集和发电厂数据集的广泛实证研究表明，MSCRED 可以胜过最先进的基线方法。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E5%8F%98%E9%87%8F%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 多变量时间序列</a>
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E7%B1%BB/" rel="tag"># 时间序列分类</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/14/SongYudan/%E3%80%90ICML2020%E3%80%91Which%20Tasks%20Should%20Be%20Learned%20Together%20in%20Multi-task%20Learning/" rel="prev" title="syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning?">
+      <i class="fa fa-chevron-left"></i> syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning?
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/14/DengJiaoxue/Contrastive%20Learning%20with%20Hard%20Negative/" rel="next" title="djx 【ICLR2021】Contrastive Learning with Hard Negative Samples">
+      djx 【ICLR2021】Contrastive Learning with Hard Negative Samples <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MSCRED%E6%A1%86%E6%9E%B6"><span class="nav-number">4.</span> <span class="nav-text">MSCRED框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E9%99%88%E8%BF%B0"><span class="nav-number">4.1.</span> <span class="nav-text">问题陈述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%89%B9%E5%BE%81%E7%9F%A9%E9%98%B5%E8%A1%A8%E6%98%8E%E7%8A%B6%E6%80%81"><span class="nav-number">4.2.</span> <span class="nav-text">使用特征矩阵表明状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">4.3.</span> <span class="nav-text">卷积编码器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84ConvLSTM"><span class="nav-number">4.4.</span> <span class="nav-text">基于注意力的ConvLSTM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E8%A7%A3%E7%A0%81%E5%99%A8"><span class="nav-number">4.5.</span> <span class="nav-text">卷积解码器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">4.6.</span> <span class="nav-text">损失函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">5.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">实验设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">5.1.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E7%BA%BF"><span class="nav-number">5.1.2.</span> <span class="nav-text">基线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95"><span class="nav-number">5.1.3.</span> <span class="nav-text">评估方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">5.1.4.</span> <span class="nav-text">实验结果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="用自监督学习方法揭示临床上EEG信号的结构  Objective:  监督学习方案常常受到可用标记数据数量的限制。这种现象在临床相关数据中尤其成问题，如脑电图(EEG)，在这些数据中，根据专业知识来标记代价昂贵。目前，设计用于脑电图数据学习的深度学习架构产生了相对较浅的模型，其性能至多与传统的基于特征的方法相似。然而，在大多数情况下，会有大量没有标记的数据。通过从这些未标记的数据中提取信息，尽管无">
+<meta property="og:type" content="article">
+<meta property="og:title" content="yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)">
+<meta property="og:url" content="http://example.com/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="用自监督学习方法揭示临床上EEG信号的结构  Objective:  监督学习方案常常受到可用标记数据数量的限制。这种现象在临床相关数据中尤其成问题，如脑电图(EEG)，在这些数据中，根据专业知识来标记代价昂贵。目前，设计用于脑电图数据学习的深度学习架构产生了相对较浅的模型，其性能至多与传统的基于特征的方法相似。然而，在大多数情况下，会有大量没有标记的数据。通过从这些未标记的数据中提取信息，尽管无">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/eHAnlKa2yFwsoB5.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/BePLb2DkmdKZXqV.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/EGvRPnSFbx5yCeO.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/srjAgPwm2tx4hYl.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/Wzq3SojM2r8K1Yi.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/SetcyY52Gj3A1K4.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/PSt9r5aQ2JqFG8B.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/Xj8PZ6W53l2vK4o.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/2LRwNFluKjfh5eM.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/9v5GfcAuLVOUeWy.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/xqwEUJri8tHnMFX.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/z7IEebmfSVT4ABs.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/25/HjIFY9QOTasyntq.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/b7xYGsqP4Oedo8Q.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/ajGgZqCDOIzV3Yi.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/9lo5miq6pwJ84YN.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/upgUaXKGbcwSD3j.png">
+<meta property="og:image" content="https://i.loli.net/2020/08/24/FTDYcvAjf1RQmhO.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:51:58.778Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="自监督">
+<meta property="article:tag" content="EEG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/08/25/eHAnlKa2yFwsoB5.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL) | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:51:58" itemprop="dateModified" datetime="2021-01-16T11:51:58+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/yjn/" itemprop="url" rel="index"><span itemprop="name">yjn</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>用自监督学习方法揭示临床上EEG信号的结构</p>
+<blockquote>
+<p><strong>Objective:</strong> </p>
+<p>监督学习方案常常受到可用标记数据数量的限制。这种现象在临床相关数据中尤其成问题，如脑电图(EEG)，在这些数据中，根据专业知识来标记代价昂贵。目前，设计用于脑电图数据学习的深度学习架构产生了相对较浅的模型，其性能至多与传统的基于特征的方法相似。然而，在大多数情况下，会有大量没有标记的数据。通过从这些未标记的数据中提取信息，尽管无法获取标签，但仍然有可能通过深度神经网络达到竞争性能。</p>
+<a id="more"></a>
+<p><strong>Approach:</strong></p>
+<p>本文研究了自监督学习(SSL)，一种在未标记数据中发现结构的技术，以学习脑电信号的表示。 具体来说，我们探索了两个基于时间上下文预测以及对比预测编码在两个临床相关问题的表现：基于脑电图的睡眠分期和病理检测。我们在两个拥有数千条记录的大型公共数据集上进行了实验，并用纯监督和手工设计的方法进行了baseline的比较。</p>
+<p><strong>Main results:</strong></p>
+<p>在SSL学习特征上训练的线性分类器在低标记数据系统中的性能始终优于纯监督的深层神经网络，同时在拥有所有标签时都达到有竞争力的性能。 此外，用每种方法学习的嵌入揭示了与生理和临床现象相关的明确的潜在结构，如年龄效应。</p>
+</blockquote>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>​    Electroencephalography (EEG) 脑电信号作为一种重要的生理模态，在医疗场景中使用的非常广泛，如睡眠分阶、心理压力监测等。因此，设计模型可以进行分类，检测，并最终“理解”生理数据是必要的。传统上，这种类型的建模主要依赖于监督方法，其中需要大量带注释的数据集来训练具有高性能的模型。</p>
+<blockquote>
+<p><strong>当前的机器学习方法大多依赖于标注信息，这种对标注信息的过度依赖有如下危险：</strong></p>
+<ul>
+<li><strong>数据的内部结构远比标注提供的信息要丰富，因此通常需要大量的训练样本，但得到的模型有时是较为脆弱的。</strong></li>
+<li><strong>在高维分类问题上，我们不能直接依赖监督信息；同时，在增强学习等问题上，获取标签的成本非常高。</strong></li>
+<li><strong>标签信息通常适用于解决特定的任务，而不是可以做为知识一样可以重新利用。</strong></li>
+</ul>
+</blockquote>
+<p>​     “自监督学习”(SSL)是一种无监督学习方法，它从未标记的数据中学习表示，利用数据的结构来提供监督。这里介绍的自监督学习方法是通过构造辅助任务（pretext）来辅助下游任务（downstream）。下游任务是我们真正感兴趣的任务，但是没有注释或注释有限。另一方面，辅助任务必须与下游任务有充分的关联，以便使用类似的表示来训练它，重要的是，必须能够仅使用未标记的数据为这个辅助任务生成注释。</p>
+<p>在这篇论文中，我们研究自我监督的使用作为从脑电图数据学习表征的一般方法。首次对多种类型的脑电图记录进行了SSL任务的详细分析。我们的目标是回答以下问题:</p>
+<ol>
+<li>哪些好的SSL任务能够捕获脑电图数据中的相关结构?</li>
+<li>就下游分类性能而言，SSL特性与其他非监督和监督方法相比如何?</li>
+<li>SSL学到的特性是什么?具体来说，SSL能否从未标记的脑电图中捕获与生理和临床相关的结构?</li>
+</ol>
+<p>self-supervised learning两大流派</p>
+<ul>
+<li><p>构造辅助任务，辅助下游任务</p>
+<p><img src="https://i.loli.net/2020/08/25/eHAnlKa2yFwsoB5.png" alt="image-20200823201736081" style="zoom: 50%;" /></p>
+<p><img src="https://i.loli.net/2020/08/25/BePLb2DkmdKZXqV.png" alt="image-20200823205036629" style="zoom:50%;" /></p>
+</li>
+<li><p>contrastive learning</p>
+<p><img src="https://i.loli.net/2020/08/24/EGvRPnSFbx5yCeO.png" alt="image-20200824164003461"></p>
+<p><img src="https://i.loli.net/2020/08/24/srjAgPwm2tx4hYl.png" alt="image-20200824164133733"></p>
+</li>
+</ul>
+<h2 id="2-Self-supervised-learning-pretext-tasks-for-EEG"><a href="#2-Self-supervised-learning-pretext-tasks-for-EEG" class="headerlink" title="2. Self-supervised learning pretext tasks for EEG"></a>2. Self-supervised learning pretext tasks for EEG</h2><p>本文描述三种SSL 构造辅助任务的方法</p>
+<h3 id="2-1-Relative-positioning"><a href="#2-1-Relative-positioning" class="headerlink" title="2.1 Relative positioning"></a><strong>2.1 Relative positioning</strong></h3><p>对于多变量时间序列$S\in \R^{C<em>M}$, $M$表示序列长度（采样点个数），$C$表示维度（channel），用相同大小的滑窗$(x<em>t,x</em>{t^{,}})$进行截取长度为$T$的片段，$x<em>t,x</em>{t^{,}}\in \R^{C</em>T} $令第一个滑窗为anchor window, 假设时间片相近的片段应该共享同样的标签。 例如，针对睡眠阶段分类，睡眠阶段通常持续1到40分钟；因此，相近的窗口可能来自同一睡眠阶段，而相距遥远的窗口则可能来自不同的睡眠阶段。给定一个持续时间的阈值$\tau<em>{pos}\in N,\tau</em>{neg}\in N$，$y_i$为该分段的标签，对序列进行采样，于是有：</p>
+<p><img src="https://i.loli.net/2020/08/25/Wzq3SojM2r8K1Yi.png" alt="image-20200823203802037"></p>
+<p>即采样得到的一堆时间片相距小于$\tau<em>{pos}$还是大于$\tau</em>{neg}$</p>
+<p><img src="https://i.loli.net/2020/08/25/SetcyY52Gj3A1K4.png" alt="image-20200823204035561"></p>
+<p>为了学习端到端如何根据时间窗口的相对位置来区分对，我们引入了两个函数hΘ和$g<em>{RP}$。$h</em>Θ：R^{C×T}→R^{D}$是一种具有参数Θ的的特征提取器，它将窗口x映射到特征空间中的表示。 最终，我们期望hΘ学会一个  原始脑电输入的信息表示，可在不同的下游任务中重用。</p>
+<p> $g<em>{RP}：R^D×R^D→R^D$通过计算逐个元素绝对差，将来自窗口对的表示结合起来，$g</em>{RP}(hΘ(x),h<em>Θ(x^{,}))=|h</em>Θ(x))-h<em>Θ(x^{,})|\in R^D$。在$g</em>{RP}$将$h<em>Θ$在两个输入窗口上提取的特征向量聚合起来，并突出它们的差异，以简化对比任务。 最后，建立了线性判别模型预测相关的目标y。 利用二元逻辑损失对$g</em>{RP}$的预测，我们可以写出联合损失函数$L(Θ,w,w_0),y$是sign函数。</p>
+<p><img src="https://i.loli.net/2020/08/25/PSt9r5aQ2JqFG8B.png" alt="image-20200823211354219"></p>
+<h3 id="2-2-Temporal-shuffling"><a href="#2-2-Temporal-shuffling" class="headerlink" title="2.2 Temporal shuffling"></a><strong>2.2 Temporal shuffling</strong></h3><p> 我们还介绍了RP任务的一个变体，我们称之为Temporal shuffling，其中我们从正例上下文中采样了两个anchor窗口$x<em>t$和$x</em>{t^{‘’}}$，以及第三个窗口$x_{t^{,}}$ ，若在两个正例之间(视为orderd)，若在负例范围之内(视为shuffled)。 </p>
+<p><img src="https://i.loli.net/2020/08/25/Xj8PZ6W53l2vK4o.png" alt="image-20200823204112296"></p>
+<p><img src="https://i.loli.net/2020/08/25/2LRwNFluKjfh5eM.png" alt="image-20200825102353648"></p>
+<h3 id="2-3-Contrastive-predictive-coding-CPC"><a href="#2-3-Contrastive-predictive-coding-CPC" class="headerlink" title="2.3 Contrastive predictive coding(CPC)"></a><strong>2.3 Contrastive predictive coding(CPC)</strong></h3><p>CPC通过编码信息来学习表示法</p>
+<p><img src="https://i.loli.net/2020/08/24/9v5GfcAuLVOUeWy.png" alt="image-20200824164625989"></p>
+<p>事实上，CPC可以看作是RP的扩展，其中单个anchor窗口$x<em>t$被一系列$N_c$不重叠窗口所取代.这样，上下文中的信息可以用一个向量$c_t∈R^{D</em>{AR}}$表示。 例如，$g_{AR}$可以作为具有门控经常单元(GRU)的递归神经网络来实现)。</p>
+<p><img src="https://i.loli.net/2020/08/25/xqwEUJri8tHnMFX.png" alt="image-20200825103055459"></p>
+<p>整个CPC模型采用定义为的InfoNCE loss (categorical cross-entropy loss)进行端到端训练。 我们的任务是使context与正例相似度越大越好，与负例相似度越小越好。$f$用来度量context与得到的表示$h_{\theta}$之间的相似度。</p>
+<p><img src="https://i.loli.net/2020/08/25/z7IEebmfSVT4ABs.png" alt="image-20200825110944595"></p>
+<p>infoNCE定义为：</p>
+<p><img src="https://i.loli.net/2020/08/25/HjIFY9QOTasyntq.png" alt="image-20200825135316018"></p>
+<p><img src="https://i.loli.net/2020/08/24/b7xYGsqP4Oedo8Q.png" alt="image-20200823204129270"></p>
+<h2 id="3-Downstream-Tasks"><a href="#3-Downstream-Tasks" class="headerlink" title="3. Downstream Tasks"></a>3. Downstream Tasks</h2><p>我们对两个临床问题进行了基于脑电的SSL的训练，睡眠监测和病理筛查。 这两个临床问题通常导致分类任务，尽管不同的类别和不同的数据生成机制：睡眠监测是关注的  生物学事件（事件水平)，而病理筛查与单一患者相比(个体水平）。 为了能够与监督方法进行公平的比较，我们在Physionet2018， 和TUH异常脑电图数据集进行。</p>
+<p>首先，对于睡眠分阶任务，目前存在几个局限：1）专家评分存在局限（不准）；2）人工标注费时费力。睡眠分期通常会引起5个分类问题，W(清醒)，N1, N2, N3(不同的睡眠水平)和R(快速眼动期)。在这里，这项任务包括预测睡眠阶段，对应于30秒的脑电图。</p>
+<p>第二，对于病理检测任务，通常需要依赖于非常专业的诊断，如癫痫、痴呆等。在TUH数据集中，医学专家将记录标记为病理或非病理，这导致了二值分类问题。重要的是，这两种标签反映了高度异质的情况:病理记录可以反映由于各种医疗条件造成的异常。</p>
+<h2 id="4-Deep-learning-architectures"><a href="#4-Deep-learning-architectures" class="headerlink" title="4. Deep learning architectures"></a>4. Deep learning architectures</h2><p>我们在实验中使用了两种不同的深度学习体系结构作为嵌入器$h_Θ$获得embedding，如下图。 这两种结构都是由空间卷积和时间卷积层组成，分别学习典型的脑电处理流程中的空间和时间滤波操作。</p>
+<p><img src="https://i.loli.net/2020/08/24/ajGgZqCDOIzV3Yi.png" alt="image-20200824141829089"></p>
+<p>第一个网络叫StagerNet, 是一种三层卷积神经网络，用于处理30s多通道脑电波窗口。</p>
+<p>第二种嵌入器结构叫ShallowNet，直接取自以前关于TUH异常数据集的文献。</p>
+<p>另外，我们使用一个GRU，隐藏层的大小$D<em>{AR}=100$的CPC任务的$g</em>{AR}$，用于两个数据集上的实验。</p>
+<h2 id="5-Experiment"><a href="#5-Experiment" class="headerlink" title="5. Experiment"></a>5. Experiment</h2><h3 id="5-1-Data"><a href="#5-1-Data" class="headerlink" title="5.1 Data"></a>5.1 Data</h3><p><strong>Physionet Challenge 2018 dataset(PC18)</strong></p>
+<p>Recording number: 994；</p>
+<p>Sample rate: 200Hz</p>
+<p>Channel: 6</p>
+<p><strong>TUH Abnormal EEG dataset</strong></p>
+<p>这个数据集包含来自在医院环境下接受临床脑电图的2329名不同患者的15分钟或更长的记录。 每个记录都被标记为“正常”（1385次记录）或“异常”(998次记录）。</p>
+<p>Sample rate: 256Hz</p>
+<p><strong>Preprocessing</strong></p>
+<p>对于PC18，我们使用了6:2:2的随机分割，这意味着在训练、验证和测试集中分别有595、199和199条记录。 对于RP和TS，2000对或三重窗口 从每个录音中取样。 对于CPC，从每个记录中提取的批次数被计算为该记录中窗口数的0.05倍；此外，我们将批处理大小设置32</p>
+<p>PC18: 降采样成100Hz，只选用两个channel( F3-M2, F4-M1), 1个滑窗大小30s,输入（3000*2）</p>
+<p>TUHab：降采样成100Hz，选用21个channel, 1个滑窗大小6s,输入（600*21）</p>
+<h3 id="5-2-Baseline"><a href="#5-2-Baseline" class="headerlink" title="5.2 Baseline"></a>5.2 Baseline</h3><p>(1) random weights, ( 随机权重，使用一个嵌入器，其权重在随机初始化后保持不变)</p>
+<p>(2) convolutional autoencoders, </p>
+<p>(3) purely supervised learning </p>
+<p>(4) handcrafted features（传统机器学习提取手工特征）：均值、方差、偏度、峰度、标准差、（0.5、4.5、8.5、11.5、15.5、30）Hz之间的频率对数功率带及其所有可能的比值、peak-to-peak幅值……</p>
+<h3 id="5-3-Results"><a href="#5-3-Results" class="headerlink" title="5.3 Results"></a>5.3 Results</h3><ol>
+<li><p>首先，将SSL方法与基于深度学习或手工制作特性的完全监督方法进行了比较。</p>
+</li>
+<li><p>其次，我们探索了SSL学习的表示来突出临床相关的结构。</p>
+</li>
+<li><p>最后，研究了在辅助任务和下游任务中，超参选择的影响。</p>
+<h4 id="5-3-1-SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务"><a href="#5-3-1-SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务" class="headerlink" title="5.3.1 SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务"></a>5.3.1 SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务</h4><p>通过在标记示例上训练线性Logistic回归模型来评估下游任务性能，其中训练集至少包含一个和最多包含所有现有标记示例。 此外，完全监督的模型直接在标记数据上进行训练，随机森林在手工制作的特征上进行训练。标记样品数量对下游性能的影响如下图所示：</p>
+</li>
+</ol>
+<p><img src="https://i.loli.net/2020/08/24/9lo5miq6pwJ84YN.png" alt="image-20200824194133447" style="zoom:200%;" /></p>
+<p>PC18  72.3% balanced accuracy(5-class,chance=20%)    </p>
+<ul>
+<li>标签少时：RP/CPC/TS/Handcrafted feature 显著优于 full-supervision/AE/Random weights</li>
+<li>标签增多：full-supervised得到显著提高，RP/CPC/TS/Handcrafted feature依然较好</li>
+</ul>
+<p>TUHab 79.4% (2-class, chance=50%)</p>
+<ul>
+<li>总体趋势与第一个数据集表现类似</li>
+<li>每个类标签少于10000时，监督方法弱于CPC</li>
+</ul>
+<p>这些结果证明了SSL能够为我们的下游任务学习有用的表示。 其次，比较表明SSL学习的特性与其他基线相比具有竞争力，甚至可以优于监督的方法。</p>
+<h4 id="5-3-2-SSL-models-capture-physiologically-and-clinically-meaningful-features"><a href="#5-3-2-SSL-models-capture-physiologically-and-clinically-meaningful-features" class="headerlink" title="5.3.2 SSL models capture physiologically and clinically meaningful features"></a>5.3.2 SSL models capture physiologically and clinically meaningful features</h4><p>虽然SSL学习的特性在睡眠分期和病理检测任务上产生了竞争性能，但尚不清楚SSL捕获了什么样的结构。</p>
+<p>通过分析它们与临床数据集中可用的不同注释和元数据的关系来观察这种嵌入之间的关系。 因此，我们将在PC18和TUHab上获得的100维嵌入投影到一个二维表示上，使用均匀流形近似和投影(UMAP)并使用表现最好的模型。</p>
+<p><img src="https://i.loli.net/2020/08/24/upgUaXKGbcwSD3j.png" alt="image-20200824202455160"></p>
+<p>PC18数据集上SSL特性的UMAP可视化。 子图显示了5个睡眠阶段的分布，作为TS（第一行）和CPC（第二行）特征的散点图。 轮廓线对应所有阶段的分布密度水平，用作视觉参考。 最后，每个点对应于从脑电图的30s窗口提取的特征。 在这两种情况下， 有明确的结构与睡眠阶段，虽然在训练期间没有提供标签。</p>
+<p>我们认为，ssl学习特征的连续性质是所研究的神经生理现象所固有的。方便的是，这为改善生理数据的分析提供了机会。</p>
+<h4 id="5-3-3-SSL-pretext-task-hyperparameters-strongly-inflfluence-downstream-task-performance"><a href="#5-3-3-SSL-pretext-task-hyperparameters-strongly-inflfluence-downstream-task-performance" class="headerlink" title="5.3.3 SSL pretext task hyperparameters strongly inflfluence downstream task performance"></a>5.3.3 SSL pretext task hyperparameters strongly inflfluence downstream task performance</h4><p>在临床脑电图任务中，如何调整各种SSL辅助任务的超参数以充分发挥自我监督的作用?</p>
+<p><img src="https://i.loli.net/2020/08/24/FTDYcvAjf1RQmhO.png" alt="image-20200824205129040"></p>
+<p>首先，我们重点讨论了相同记录的负采样场景，其中从与anchor窗口相同的记录中采样负示例。 对于RP，随着$τ<em>{pos}$的增加，总是使辅助任务分类更难。 这是预料中的，因为给定是$\tau</em>{pos}$的时间（上下文）越大，就越有可能得到由遥远的（因此可能不相关的）的正例对。 </p>
+<p> 至于CPC，一项类似的分析表明，虽然增加了预测窗口的数量（“步数”），使辅助任务变得更加困难，但预测未来的进一步发展有助于预测，嵌入器学习更好的睡眠分期表示</p>
+<p> 在这个实验中，我们证实了我们的SSL辅助任务并是对下游任务是有影响的，并且某些辅助任务超参数对下游性能有可测量的影响。</p>
+<h3 id="6-Discussion"><a href="#6-Discussion" class="headerlink" title="6 Discussion"></a>6 Discussion</h3><h4 id="6-1-Finding-the-right-pretext-task-for-EEG"><a href="#6-1-Finding-the-right-pretext-task-for-EEG" class="headerlink" title="6.1 Finding the right pretext task for EEG"></a>6.1 Finding the right pretext task for EEG</h4><p> 随着人们所能想到的大量自我监督的借口任务，以及更多可能的脑电下游任务，我们如何选择辅助任务和超参数组合？</p>
+<ul>
+<li><p>我们引入并定制了相对定位(RP)和时间片打乱(TS)任务，依靠对脑电的先验知识。 事实上，睡眠脑电图信号具有明确的时间结构，起源于夜间睡眠阶段的连续。这意味着在时间上相近的两个窗口很可能共享相同的睡眠阶段注释和统计结构。因此，学习区分近窗和远窗应该与学习区分睡眠阶段有直观的关系。</p>
+</li>
+<li><p>选择辅助任务超参数对于选择正确的辅助任务配置至关重要。 例如，RP、TS和CPC通常产生非常相似的下游任务。 一旦选择了最佳的超参数，就可以进行性能测试。</p>
+</li>
+</ul>
+<h4 id="6-2-Limitation"><a href="#6-2-Limitation" class="headerlink" title="6.2 Limitation"></a>6.2 Limitation</h4><p>本工作的目的是引入自我监督作为脑电的一种表征学习范式，我们没有关注这两类任务与早期工作中的最先进性能的表现。</p>
+<h2 id="7-Conclusion"><a href="#7-Conclusion" class="headerlink" title="7. Conclusion"></a>7. Conclusion</h2><p>在本工作中，我们引入了SSL方法来学习EEG数据上的表示，并表明它们可以与两个大型临床数据集上的传统监督方法竞争，有时甚至优于传统的监督方法。 重要的是，SSL学习到的特征显示了一个清晰的结构，其中不同的生理量被编码，这验证了自监督学习的潜力，以捕捉重要的生理信息，即使在没有标记的数据。 未来的工作将分为以下两方面：</p>
+<ol>
+<li>证明SSL是否也可以成功地使用于其他类型的脑电图记录和任务中，如回归。</li>
+<li>更好地理解如何为特定的脑电图结构设计辅助任务，对于利用自我监督学习建立作为脑电图分析流程的关键组成部分至关重要。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3/" rel="tag"># 自监督</a>
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/" rel="prev" title="ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结">
+      <i class="fa fa-chevron-left"></i> ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/" rel="next" title="ssk Transfer Anomaly Detection by Inferring Latent Domain Representations">
+      ssk Transfer Anomaly Detection by Inferring Latent Domain Representations <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Self-supervised-learning-pretext-tasks-for-EEG"><span class="nav-number">2.</span> <span class="nav-text">2. Self-supervised learning pretext tasks for EEG</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Relative-positioning"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Relative positioning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Temporal-shuffling"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Temporal shuffling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Contrastive-predictive-coding-CPC"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 Contrastive predictive coding(CPC)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Downstream-Tasks"><span class="nav-number">3.</span> <span class="nav-text">3. Downstream Tasks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Deep-learning-architectures"><span class="nav-number">4.</span> <span class="nav-text">4. Deep learning architectures</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Experiment"><span class="nav-number">5.</span> <span class="nav-text">5. Experiment</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-Data"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 Data</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-Baseline"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 Baseline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-Results"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 Results</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-1-SSL%E6%A8%A1%E5%9E%8B%E5%AD%A6%E4%B9%A0%E8%84%91%E7%94%B5%E5%9B%BE%E7%9A%84%E8%A1%A8%E7%A4%BA%EF%BC%8C%E5%B9%B6%E5%88%A9%E7%94%A8%E6%9C%89%E9%99%90%E7%9A%84%E6%B3%A8%E9%87%8A%E6%95%B0%E6%8D%AE%E4%BF%83%E8%BF%9B%E4%B8%8B%E6%B8%B8%E4%BB%BB%E5%8A%A1"><span class="nav-number">5.3.1.</span> <span class="nav-text">5.3.1 SSL模型学习脑电图的表示，并利用有限的注释数据促进下游任务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-2-SSL-models-capture-physiologically-and-clinically-meaningful-features"><span class="nav-number">5.3.2.</span> <span class="nav-text">5.3.2 SSL models capture physiologically and clinically meaningful features</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-3-SSL-pretext-task-hyperparameters-strongly-inflfluence-downstream-task-performance"><span class="nav-number">5.3.3.</span> <span class="nav-text">5.3.3 SSL pretext task hyperparameters strongly inflfluence downstream task performance</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Discussion"><span class="nav-number">5.4.</span> <span class="nav-text">6 Discussion</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-Finding-the-right-pretext-task-for-EEG"><span class="nav-number">5.4.1.</span> <span class="nav-text">6.1 Finding the right pretext task for EEG</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-Limitation"><span class="nav-number">5.4.2.</span> <span class="nav-text">6.2 Limitation</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Conclusion"><span class="nav-number">6.</span> <span class="nav-text">7. Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

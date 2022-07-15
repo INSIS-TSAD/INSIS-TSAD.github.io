@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="摘要脑机接口(BCI)使用户能够直接使用脑信号与计算机交流。 最常见的模式是非侵入性BCI，使用的是脑电图，它对噪声和伪影较为敏感，并且受试者之间和受试者内部的信号也是非平稳的。因此很难用基于脑电图的BCI系统建立通用模式的识别模型，该模型对于不同的受试者、不同的会话、不同的设备和任务是最优的。 一般情况下，会通过收集受试者的一部分数据来进行校准和微调，这既耗时又对用户不友好。迁移学习的出现就是为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016">
+<meta property="og:url" content="http://example.com/2021/01/06/JiaoZehui/Transfer%20Learning%20for%20EEG-Based%20Brain-Computer%20Interfaces%20A%20Review%20of%20Progress%20Made%20Since%202016/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="摘要脑机接口(BCI)使用户能够直接使用脑信号与计算机交流。 最常见的模式是非侵入性BCI，使用的是脑电图，它对噪声和伪影较为敏感，并且受试者之间和受试者内部的信号也是非平稳的。因此很难用基于脑电图的BCI系统建立通用模式的识别模型，该模型对于不同的受试者、不同的会话、不同的设备和任务是最优的。 一般情况下，会通过收集受试者的一部分数据来进行校准和微调，这既耗时又对用户不友好。迁移学习的出现就是为">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201008171654892.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/20190612220640186.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/fnins-13-01275-g002.jpg">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201213210516371.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/1-s2.0-S0010482516302797-gr4.jpg">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201212132725108.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201011225415624.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201011225406068.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201013163034315.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/v2-217ddc7463ae8f0d8841281eb2a9623f_b.jpg">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201013211610080.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201013211910093.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014205256724.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014210423768.png">
+<meta property="og:image" content="c:/Users/Jiao/AppData/Roaming/Typora/typora-user-images/image-20201014212450581.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014212501856.png">
+<meta property="og:image" content="c:/Users/Jiao/AppData/Roaming/Typora/typora-user-images/image-20201014212706543.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014212728106.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090159077.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090254303.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090318136.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090529076.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090739457.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090746191.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201213151121047.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015092536466.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015092436525.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201213214724283.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214110743576.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214112431471.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214150233408.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214151247980.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214152815040.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214161755724.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214162748737.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201215131702024.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:47:00.107Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201008171654892.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/JiaoZehui/Transfer%20Learning%20for%20EEG-Based%20Brain-Computer%20Interfaces%20A%20Review%20of%20Progress%20Made%20Since%202016/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/Transfer%20Learning%20for%20EEG-Based%20Brain-Computer%20Interfaces%20A%20Review%20of%20Progress%20Made%20Since%202016/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:47:00" itemprop="dateModified" datetime="2021-01-16T11:47:00+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>脑机接口(BCI)使用户能够直接使用脑信号与计算机交流。</p>
+<p>最常见的模式是<strong>非侵入性BCI</strong>，使用的是脑电图，它对噪声和伪影较为敏感，并且受试者之间和受试者内部的信号也是非平稳的。因此很难用基于脑电图的BCI系统建立通用模式的识别模型，该模型对于不同的受试者、不同的会话、不同的设备和任务是最优的。</p>
+<p>一般情况下，会通过收集受试者的一部分数据来进行校准和微调，这既耗时又对用户不友好。<strong>迁移学习</strong>的出现就是为了减少校准微调的工作量，它利用<strong>相似或相关</strong>的受试者/会话/设备/任务的数据来促进对新受试者/会话/设备/任务的学习。</p>
+<p>本文回顾了自2016年有关EEG的BCI期刊论文，其中有六种范式和应用</p>
+<ol>
+<li>motor imagery</li>
+<li>event-related potentials </li>
+<li>steady-state visual evoked potentials</li>
+<li>affective BCIs</li>
+<li>regression problems</li>
+<li>adversarial attacks</li>
+</ol>
+<p>我们回顾这些话题，给出一些观察结果和结论</p>
+<a id="more"></a> 
+<h2 id="文献信息"><a href="#文献信息" class="headerlink" title="文献信息"></a>文献信息</h2><p><strong>期刊：</strong> IEEE Transactions on Cognitive and Developmental Systems</p>
+<p><strong>作者：</strong> </p>
+<ol>
+<li>Dongrui Wu, Senior Member，IEEE，Huazhong University of Science and Technology</li>
+<li>Yifan Xu, Student Member，IEEE，Huazhong University of Science and Technology</li>
+<li>Bao-Liang Lu，Senior Member，IEEE，Shanghai Jiao Tong University</li>
+</ol>
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Brain-computer interfaces, EEG, transfer learning, domain adaptation, affective BCI, adversarial attacks</strong></p>
+<h2 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h2><h3 id="BCI"><a href="#BCI" class="headerlink" title="BCI"></a>BCI</h3><p>BCI这个术语在1973年被提出，最初为残疾人提出，但是现在的应用范围早已扩展。</p>
+<p>BCI被分为三种类型：</p>
+<ol>
+<li>非侵入性BCI，主要采集的信号是<strong>脑电图EEG</strong>和<strong>功能性近红外光谱fNIRS</strong></li>
+<li>侵入性BCI，需要手术植入传感器或者电极，收集大脑的尖峰信号和局部场电位。</li>
+<li>半侵入性BCI，传感器植入在大脑外部，颅骨的内部。</li>
+</ol>
+<p>本文主要介绍的还是非侵入性BCI，尤其是EEG，因为它安全、低成本、方便。</p>
+<h3 id="BCI系统流程"><a href="#BCI系统流程" class="headerlink" title="BCI系统流程"></a>BCI系统流程</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201008171654892.png" alt="image-20201008171654892" style="zoom:67%;" /></p>
+<p>上图流程：</p>
+<ol>
+<li>信号采集：从头皮收集脑电信号，早期使用有线连接或者凝胶来增强导电性，目前无线连接和干式电极越来越受欢迎。</li>
+<li>信号处理：包括<strong>时间滤波和空间滤波</strong>。前者主要是为了减少干扰，例如伪影、直流漂移、眨眼。后者通过结合不同的导，增加信号的信噪比。空间滤波器主要有公共空间模式，独立成分分析，盲源分离，xDAWN等。</li>
+<li>特征提取：时域、频域、时频、黎曼空间或者功能性大脑连接（functional brain connectivity）。</li>
+<li>模式识别：分类或者回归</li>
+<li>控制器：输出命令或者改变行动。</li>
+</ol>
+<h3 id="存在的问题和破解方法"><a href="#存在的问题和破解方法" class="headerlink" title="存在的问题和破解方法"></a>存在的问题和破解方法</h3><ol>
+<li>脑电图信号很弱，容易受到干扰和噪声的污染。</li>
+<li>脑电图信号对于同一受试者来说是不稳定的，并且在不同的受试者和会话之间是不同的。</li>
+</ol>
+<p>一般情况下，会通过收集受试者的一部分数据来进行校准和微调。因此，减少这种对特定受试者的校准对于基于EEG的BCI的市场成功至关重要。</p>
+<p>迁移学习和主动学习已经开始着手解决这问题，其中迁移学习更有前途，因为它利用了相似的信息。除此以外，迁移学习还能和其它技术结合。</p>
+<h3 id="BCI经典范例"><a href="#BCI经典范例" class="headerlink" title="BCI经典范例"></a>BCI经典范例</h3><ol>
+<li><strong>motor imagery</strong>，由于不同的MI影响大脑的不同区域，BCI可以从脑电图中解码出来，映射到特定的运动。</li>
+<li><strong>event-related potentials</strong>，事件相关电位是一种特殊的脑诱发电位，通过有意地赋予刺激以特殊的心理意义，利用多个或多样的刺激所引起的脑的电位。最常用的是P300。</li>
+<li><strong>steady-state visual evoked potentials</strong>，脑电图在特定频率下以与视觉刺激相同(或数倍)的频率振荡，通常在3.5至75赫兹之间。</li>
+</ol>
+<p><strong>基于情感的BCI</strong>，也叫作aBCI，已经成为了一种新兴领域。</p>
+<p><strong>BCI的回归问题</strong>，例如驾驶员的睡意估计，用户反映时间估计。</p>
+<p><strong>BCI的对抗攻击</strong>，故意设计的微小扰动被添加到脑电图试验中，来欺骗机器模型。</p>
+<h3 id="迁移学习定义"><a href="#迁移学习定义" class="headerlink" title="迁移学习定义"></a>迁移学习定义</h3><script type="math/tex; mode=display">
+\mathcal{D}=\{\mathcal{X}, P(X)\}, \text { where } X \in \mathcal{X}\\\mathcal{T}=\{\mathcal{Y},f(X)\}</script><p>公式1，我们得到了$\mathcal{D<em>{s}}$和 $\mathcal{D</em>{t}}$，<strong>源域和目标域不同</strong>，因为他们的特征空间不同或者概率分布不同。</p>
+<p>公式2，我们得到了标签空间和预测函数，也有了任务$\mathcal{T<em>{s}}$和$\mathcal{T</em>{t}}$，<strong>源域任务和目标域任务不同</strong>，因为标签空间不同或者条件概率不同。</p>
+<p>给定源域$\mathcal{D}<em>{s}=\left{\left(X</em>{s}^{i}, y<em>{s}^{i}\right)\right}</em>{i=1}^{N}$，目标域 $\mathcal{D}<em>{t}$$\left{\left(X</em>{t}^{i}, y<em>{t}^{i}\right)\right}</em>{i=1}^{N<em>{l}}$，$\left{X</em>{t}^{i}\right}<em>{i=N</em>{l}+1}^{N<em>{l}+N</em>{u}}$，$N<em>{l}、N</em>{u}$分别是有标签的和无标签的，去学习$f: X<em>{t} \mapsto y</em>{t}$，使得在 $\mathcal{D}_{t}$上有较低的误差。当然了，因为是迁移学习，所以至少有源域和目标域不同或者源域任务和目标域任务不同。</p>
+<h4 id="迁移学习分类"><a href="#迁移学习分类" class="headerlink" title="迁移学习分类"></a>迁移学习分类</h4><h4 id="迁移学习分类-1"><a href="#迁移学习分类-1" class="headerlink" title="迁移学习分类"></a>迁移学习分类</h4><ol>
+<li>inductive transfer learning，也叫归纳迁移学习，推导迁移学习。此时，$N_{l}&gt;0$，我们根据源域数据的情况进行进一步分类。</li>
+</ol>
+<ul>
+<li>源域数据有标注，此时迁移学习类似多任务学习，区别在于我们只关注目标任务，多任务学习则是同时关注源任务和目标任务。</li>
+<li>源域数据没有标注，此时迁移学习类似自我学习。</li>
+</ul>
+<ol>
+<li>transductive transfer learning，也叫转导迁移学习或者直推式迁移学习。当$N_{l}=0$时，也就是我们没有目标域的标签。协变量偏移和域自适应是其中的两种情况。</li>
+</ol>
+<ul>
+<li><p>域自适应：定义类似迁移学习，但是我们假设</p>
+<script type="math/tex; mode=display">
+\mathcal{X}_{s}=\mathcal{X}_{t} \text { and } \mathcal{Y}_{s}=\mathcal{Y}_{t}\\  P_{s}(X) \neq P_{t}(X) \text { and/or } P_{s}(y \mid X) \neq P_{t}(y \mid X)</script></li>
+<li><p>协变量偏移：定义类似迁移学习，但是我们假设</p>
+</li>
+</ul>
+<script type="math/tex; mode=display">
+\mathcal{X}_{s}=\mathcal{X}_{t} \text { and } \mathcal{Y}_{s}=\mathcal{Y}_{t} \text { and }P_{s}(X) = P_{t}(X) \\ P_{s}(y \mid X) \neq P_{t}(y \mid X)</script><ol>
+<li><p>unsupervised transfer learning，也叫无监督迁移学习。源域和目标域都没有标注。无监督迁移学习专注于解决目标域中的无监督学习问题，如聚类、降维、密度估计。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/20190612220640186.png" alt="在这里插入图片描述"></p>
+</li>
+</ol>
+<h3 id="BCI的迁移学习场景"><a href="#BCI的迁移学习场景" class="headerlink" title="BCI的迁移学习场景"></a>BCI的迁移学习场景</h3><ol>
+<li>Cross-subject TL，跨受试者迁移学习。通常，我们的任务和EEG的设备是一致的。</li>
+<li>Cross-session TL，跨会话迁移学习。通常，我们的受试者、任务和EEG的设备是一致的。</li>
+<li>Cross-device TL，跨设备迁移学习。通常，我们的任务和EEG的设备是一致的。</li>
+<li>Cross-task TL，跨任务迁移学习。例如，来自左右手的运动想象的数据用于校准脚和舌运动想象。通常，受试者和EEG设备是一致的的。</li>
+</ol>
+<p>1和2本质上是相同的，3和4因为更困难，所以研究更少。</p>
+<h2 id="迁移学习在BCI的应用"><a href="#迁移学习在BCI的应用" class="headerlink" title="迁移学习在BCI的应用"></a>迁移学习在BCI的应用</h2><h3 id="MI"><a href="#MI" class="headerlink" title="MI"></a>MI</h3><h4 id="Cross-Subject-Session-TL"><a href="#Cross-Subject-Session-TL" class="headerlink" title="Cross-Subject/Session TL"></a>Cross-Subject/Session TL</h4><ol>
+<li><blockquote>
+<p>Transfer kernel common spatial patterns for motor imagery brain-computer interface classifification</p>
+<p><em>Computational and Mathematical Methods in Medicine</em> 2018</p>
+<p>M. Dai, D. Zheng, S. Liu, and P. Zhang</p>
+<p>Dai等人提出了转移核公共空间模式（TKCSP）方法，将核公共空间模式（KCSP）和转移核学习（TKL）结合起来，用于跨受试者MI分类中的EEG试验空间滤波。它首先用TKL计算一个域不变核，然后将其应用到KCSP方法中，进一步找到两类之间能量差最大的分量。注意，TL用于脑电信号处理（空间滤波）而不是分类。</p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>A parallel multiscale fifilter bank convolutional neural networks for motor imagery EEG classifification</p>
+<p>H. Wu, F. Li, Y. Li, B. Fu, G. Shi, M. Dong, and Y. Niu</p>
+<p><em>Frontiers in Neuroscience</em> 2019</p>
+<p>Wu等人[70]提出了一种并行多尺度滤波器CNN用于MI分类。它由三个层次组成：一个从脑电信号中提取时间和空间特征的CNN，一个具有平方和对数非线性函数的特征约简层，然后是池化和droput层。dense层进行微调。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/fnins-13-01275-g002.jpg" alt=""></p>
+</blockquote>
+</li>
+</ol>
+<h4 id="Cross-Device-TL"><a href="#Cross-Device-TL" class="headerlink" title="Cross-Device TL"></a>Cross-Device TL</h4><ol>
+<li><blockquote>
+<p>Xu等人[71]研究了跨数据集TL中深度学习的性能。考虑了8个公开可用的MI数据集。虽然不同的数据集使用不同的脑电图设备、通道和MI任务，但他们只选择了三个常见的通道（C3、CZ、C4）以及左手和右手MI任务。他们通过在线递归计算黎曼平均值并将其作为EA方法中的参考矩阵，将在线预对准策略应用于每个受试者的每次脑电图试验。他们发现在线预对准显著提高了跨数据集TL中深度学习模型的性能</p>
+</blockquote>
+</li>
+</ol>
+<h4 id="方法总结"><a href="#方法总结" class="headerlink" title="方法总结"></a>方法总结</h4><h5 id="Euclidean-Alignment-EA"><a href="#Euclidean-Alignment-EA" class="headerlink" title="Euclidean Alignment (EA)"></a><em>Euclidean Alignment (EA)</em></h5><script type="math/tex; mode=display">
+\bar{R}_{s}=\frac{1}{N_{s}} \sum_{n=1}^{N_{s}} X_{s}^{n}\left(X_{s}^{n}\right)^{\top}
+\\\tilde{X}_{s}^{n}=\bar{R}_{s}^{-1 / 2} X_{s}^{n}</script><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201213210516371.png" alt="image-20201213210516371"></p>
+<h5 id="CSP"><a href="#CSP" class="headerlink" title="CSP"></a>CSP</h5><p>CSP对EEG进行有监督的空间滤波，目的是找到一组空间滤波器来最大化两类之间的方差比。</p>
+<p><em>Combined CSP (CCSP)</em> 是对CSP在无标签上数据集使用。</p>
+<p><em>Regularized CSP (RCSP)</em> </p>
+<h3 id="ERP"><a href="#ERP" class="headerlink" title="ERP"></a>ERP</h3><h3 id="SSVEP"><a href="#SSVEP" class="headerlink" title="SSVEP"></a>SSVEP</h3><h3 id="ABCI"><a href="#ABCI" class="headerlink" title="ABCI"></a>ABCI</h3><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>情绪可以分为离散的类别（快乐、悲伤、生气等）或者2D的连续值（arousal和valence）、3D的连续值（arousal，valence，dominance）。所以，aBCI可以是回归问题，也可以是分类问题。但是目前的研究基本将它看作分类问题。</p>
+<p>常用的数据集是DEAP和SEED。</p>
+<ol>
+<li>DEAP：DEAP由32名受试者在观看1分钟长的音乐视频时，通过BioSemi ActiveTwo设备记录的32通道脑电图组成。</li>
+<li>SEED：SEED由15名受试者在观看4分钟电影剪辑时，通过ESI NeuroScan设备记录的62通道脑电图组成。</li>
+</ol>
+<p>Zheng等人，利用微分熵特征，发现在不同的session和subjet中stable pattern确实存在。</p>
+<h4 id="Cross-Subject-Session-TL-1"><a href="#Cross-Subject-Session-TL-1" class="headerlink" title="Cross-Subject/Session TL"></a>Cross-Subject/Session TL</h4><ol>
+<li><blockquote>
+<p>A Fast, Efficient Domain Adaptation Technique for Cross-Domain Electroencephalography(EEG)-Based Emotion Recognition</p>
+<p>Sensors 2017</p>
+<p>Chai Xin</p>
+<p>方法：adaptive subspace feature matching (ASFM)，使用的是微分熵特征。</p>
+<ol>
+<li>利用PCA对进行降维。</li>
+<li>源域投影到$Z<em>{s} Z</em>{s}^{\mathrm{T}} Z<em>{t}$，目标域投影到$Z</em>{t}$。</li>
+<li>利用迭代伪标签和真实标签训练逻辑回归器。</li>
+</ol>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Improving EEG-Based Emotion Classification Using Conditional Transfer Learning</p>
+<p>Frontiers in Human Neuroscience, 2017</p>
+<p>Yuan-Pin Lin</p>
+<p>本研究提出了一个条件迁移(cTL)框架，以促进每个个体的正迁移。通过对26的个体进行实验，相比仅仅利用自身的数据，在valence分类上提升了15%，在arousal分类上提升了26%。</p>
+<p>简单来讲，cTL设置了一个阈值，如果准确率不高，则可以考虑迁移学习(利用其他相似个体的数据)，否则没必要进行迁移学习。</p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Incorporation of multiple-days information to improve the generalization of EEG-based emotion recognition over time</p>
+<p><em>Frontiers in Human Neuroscience</em> 2018</p>
+<p>S. Liu</p>
+<p>方法：我们将60导的数据δ、θ、α、β、低和高γ波段的光谱功率，作为初始特征。利用递归特征消除来选择特征。使用SVM进行分类。他们发现，脑电图的变异性会显著削弱情绪分类的表现，而在训练期间使用更多天的数据可以显著提高泛化能力。</p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Unsupervised domain adaptation techniques based on auto-encoder for non-stationary EEG-based emotion recognition</p>
+<p>Computers in Biology and Medicine 2016</p>
+<p>XinChai</p>
+<p>首先，使用堆叠自动编码器将来自两个域的差分熵特征转换成域不变子空间。然后，利用核主成分分析、图正则化和最大均值差异来减小两个域之间的特征分布差异。之后，在源域中训练的分类器可以直接应用于目标域。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/1-s2.0-S0010482516302797-gr4.jpg" alt="Fig. 4"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Cross-session classifification of mental workload levels using EEG and an adaptive deep learning model</p>
+<p>Biomedical Signal Processing and Control 2017</p>
+<p>Zhong Yina, Jianhua Zhang </p>
+<p>Yin和Zhang提出了一种自适应叠加去噪自动编码器（SDAE），用于从EEG中对精神负荷水平进行跨会话二分类。在测试阶段，利用增加的测试样本及其伪标签，自适应地更新SDAE浅隐神经元的权值。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201212132725108.png" alt="image-20201212132725108"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Inter-subject Transfer Learning with End-to-end Deep Convolutional Neural Network for EEG-based BCI </p>
+<p>Journal of Neural Engineering 2019</p>
+<p>Fatemeh Fahimi</p>
+<p>我们开发了一个端到端的深度CNN来解码来自EEG时间序列的注意力信息。我们还通过向网络中输送三种不同的脑电图表示来探索输入表示对深层CNN性能的影响。为了加快训练速度，利用cross-subject的迁移策略作为分类依据。</p>
+<p>数据处理：50%重叠的2s滑动窗口分割数据，滤波到0.5Hz以上。</p>
+<p>数据表达:</p>
+<ol>
+<li>DR1：原始数据</li>
+<li>DR2：带通滤波0.5-40Hz</li>
+<li>DR3：提取五个频率带的信号</li>
+</ol>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201011225415624.png" alt="image-20201011225415624"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201011225406068.png" alt="image-20201011225406068"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>From Regional to Global Brain: A Novel Hierarchical Spatial-Temporal Neural Network Model for EEG Emotion Recognition</p>
+<p><em>IEEE Trans. on Affective Computing</em> 2019</p>
+<p>Yang Li</p>
+<p>方法：R2G-STNN，R2G-STNN由空间和时间神经网络层组成，具有区域到全局(R2G)的特征学习过程层次，以捕捉不同大脑区域的情绪反应和结构关系，从而学习有区别的时空脑电特征。</p>
+<ol>
+<li>特征提取：用双向LSTM提取脑区内和脑区间的时空特征，使用Attention来给脑区贡献权重。</li>
+<li>分类器和判别器：判别器来缓解源域数据和目标域数据之间的域偏移，这将使分层特征学习过程能够生成判别性的情感但域自适应的脑电特征。</li>
+</ol>
+<p>研究过程：</p>
+<p><strong>空间特征提取</strong>：$\mathbf{X}=\left[\mathbf{x}<em>{1}, \mathbf{x}</em>{2}, \cdots, \mathbf{x}<em>{T}\right] \in \mathbb{R}^{d \times n \times T}$  ，T=9，此时已经不是时间序列，而是人工提取的特征。然后我们把特征${x}</em>{i}$分成区域，我们人为划分了16个区域，每个区域由多个导组成。然后送入双向LSTM^1^中，注意，此时的LSTM不是按照时间，而是按照区域内的顺序。我们获得了对应${x}_{i}$局部空间特征。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201013163034315.png" alt="image-20201013163034315" style="zoom:33%;" /></p>
+<p>然后利用Attention来对LSTM的最后的隐藏状态赋予权值，因为认为不同区域有不同的权重。</p>
+<p>然后每个区域的加权特征，送入双向LSTM^2^来学习全局的空间特征。然后用类似全连接的方式，将LSTM^2^的16个输出变成K个。我们就构造了对应${x}_{i}$的全局特征。</p>
+<p><strong>时域特征提取：</strong> </p>
+<p>前文已经得到了对应${x}_{i}$局部空间特征，具体来讲是获得了16个区域的局部空间特征，对这些区域分别走双向LSTM^3^，此时T=9，得到了局部时域特征。</p>
+<p>全局特征提取类似，只需要走一个LSTM^4^即可，T=9。</p>
+<p>我们拼接16个局部时域特征和一个全局特征作为最后分类。</p>
+<p><strong>分类器和判别器：</strong></p>
+<p>分类器比较简单，一个全连接接softmax。</p>
+<p>损失函数为交叉熵函数。</p>
+<p>训练样本和测试样本可能来自不同的域，例如不同的受试者，这时候训练集的模型用来测试不一定有好的效果，我们引入了一个鉴别器，来生成域不变的特征。</p>
+<script type="math/tex; mode=display">
+L_{d}\left(\mathbf{X}_{i}^{S}, \mathbf{X}_{j}^{T} ; \theta_{f}, \theta_{d}\right)=-\sum_{i=1}^{M_{1}} \log P\left(0 \mid \mathbf{X}_{i}^{S}\right)-\sum_{j=1}^{M_{2}} \log P\left(1 \mid \mathbf{X}_{j}^{T}\right)</script><p>最大化损失函数，我们可以得到域不变的特征。</p>
+<p>最终损失函数</p>
+<script type="math/tex; mode=display">
+\begin{aligned} L\left(\mathbf{X}^{S}, \mathbf{X}^{T} \mid \theta_{f}, \theta_{c}, \theta_{d}\right)=& L_{c}\left(\mathbf{X}^{S} ; \theta_{f}, \theta_{c}\right) \\ &-L_{d}\left(\mathbf{X}^{S}, \mathbf{X}^{T} ; \theta_{f}, \theta_{d}\right) \end{aligned}</script><p>引入了GRL，即梯度反转层。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/v2-217ddc7463ae8f0d8841281eb2a9623f_b.jpg" alt="img"></p>
+<p>数据采用SEED数据集，62导，15个受试者，每个受试者3个session，1个session有15次实验，一次实验有200个样本左右，一个session共有3200个样本，标签为3类，积极、中性和消极。</p>
+<p><strong>依赖（非独立）受试者的情感识别：</strong></p>
+<p>训练集和测试集，我们选择了相同的受试者，但是来自不同的实验（trials）。</p>
+<p>15个实验中，9个作为训练集，6个作为测试集。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201013211610080.png" alt="image-20201013211610080"></p>
+<p><strong>独立受试者的情感识别：</strong></p>
+<p>留一法进行测试。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201013211910093.png" alt="image-20201013211910093"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>A Bi-hemisphere Domain Adversarial Neural Network Model for EEG Emotion Recognition</p>
+<p>Li Yang</p>
+<p><em>IEEE Trans. on Affective Computing</em> 2018</p>
+<p>研究表明，左额叶皮层的脑电图信号与积极情绪密切相关，而右额叶皮层的脑电图信号与消极情绪有关。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014205256724.png" alt="image-20201014205256724" style="zoom:33%;" /></p>
+<p><strong>特征提取：</strong> 首先提取五个频带的信息，使用差分熵DE，共310维的特征向量，T=9，所以输入特征为[310,9]</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014210423768.png" alt="image-20201014210423768" style="zoom:50%;" /></p>
+<p><strong>baseline:</strong></p>
+<p><img src="C:\Users\Jiao\AppData\Roaming\Typora\typora-user-images\image-20201014212450581.png" alt="image-20201014212450581" style="zoom:33%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014212501856.png" alt="image-20201014212501856" style="zoom:33%;" /></p>
+<p><strong>result:</strong></p>
+<p><img src="C:\Users\Jiao\AppData\Roaming\Typora\typora-user-images\image-20201014212706543.png" alt="image-20201014212706543" style="zoom:33%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201014212728106.png" alt="image-20201014212728106" style="zoom:33%;" /></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Domain Adaptation for EEG Emotion Recognition Based on Latent Representation Similarity</p>
+<p>Jinpeng Li</p>
+<p>IEEE Transactions on Cognitive and Developmental Systems 2019</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090159077.png" alt="image-20201015090159077" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090254303.png" alt="image-20201015090254303" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090318136.png" alt="image-20201015090318136"></p>
+<p>多对一迁移：</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090529076.png" alt="image-20201015090529076" style="zoom:33%;" /></p>
+<p>一对一迁移：</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090739457.png" alt="image-20201015090739457" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015090746191.png" alt="image-20201015090746191" style="zoom:50%;" /></p>
+</blockquote>
+</li>
+</ol>
+<h4 id="Cross-Device-TL-1"><a href="#Cross-Device-TL-1" class="headerlink" title="Cross-Device TL"></a>Cross-Device TL</h4><ol>
+<li><blockquote>
+<p>Domain Adaptation Techniques for EEG-Based Emotion Recognition: A Comparative Study on Two Public Datasets</p>
+<p>Zirui Lan ,Olga Sourina ,Lipo Wang ,Reinhold Scherer ,Gernot R. Muller-Putz</p>
+<p>2019 IEEE Transactions on Cognitive and Developmental Systems</p>
+<p>考虑了DEAP和SEED之间的跨数据集转移，这两个数据集具有不同的受试者数量，并使用不同的脑电图设备和不同的电极数进行记录。我们只使用了三个试验（一个是阳性的，一个是中性的，一个是阴性的）来自DEAP的14个被选者，并且只有两个数据集之间的32个公共通道。从每个通道中提取5个不同频带（delta、theta、alpha、beta和gamma）的5个差分熵特征，并作为特征串接。实验表明，与基线相比，域自适应，特别是转移分量分析[106]和最大独立度主适应[107]，可以有效地提高分类精度。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201213151121047.png" alt="image-20201213151121047"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Constructing a Personalized Cross-Day EEG-Based Emotion-Classification Model Using Transfer Learning</p>
+<p>BIOMEDICAL AND HEALTH BIOMEDICAL AND HEALTH INFORMATICS 2020</p>
+<p>提出了一种基于个体间差异的个性化分类方法。源数据集包括使用14通道Emotiv-EPOC设备的12名受试者，目标数据集包括使用30通道Neuroscan Quik-Cap的26名不同受试者。<br>首先选择Quik-Cap的26个通道中的12个与EPOC设备中14个通道中的12个对齐。Quik-Cap脑电信号进行了下采样和滤波，以匹配EPOC装置的信号。从六个左右声道对（例如，AF3-AF4，F7-F8），四个前后声道对（例如AF3-O1，F7-P7）和12个选定的通道中提取五个频带（delta、theta、alpha、beta、gamma）特征，得到每个试验的120D特征向量。特征矩阵的稀疏RPCA矩阵被用作最终特征。计算每个源受试者与目标受试者试验之间的黎曼距离作为相异测度，选择最相似的源受试者，将其试验与目标受试者的试验相结合，训练支持向量机分类器。</p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Utilizing Deep Learning Towards Multi-modal Bio-sensing and Vision-based Affective Computing</p>
+<p><em>IEEE Trans. on Affective Computing</em>, 2020</p>
+<p>Siddharth, Siddharth，Jung, Tzyy-Ping，Sejnowski, Terrence J.</p>
+<p>Siddharth进行了多模态（如EEG、ECG、面部等）跨数据集情感分类，例如DEAP培训和MAHNOB-HCI数据库。该方法适用于具有不同电极数目和位置、不同采样率等的数据集。每次试验使用θ、α和β波段的EEG功率谱密度（PSD）绘制三个拓扑图。然后，将每个地形视为彩色图像的一个组成部分，并通过α混合的比率加权形成彩色图像。通过这种方法，每次试验获得一张代表PSD地形图的彩色图像，并可将不同脑电设备获得的图像直接组合或比较。使用预先训练的VGG-16网络从每幅图像中提取4096个特征，然后通过PCA将其减少到30个。最后采用极端学习机作为分类器进行最终分类。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015092536466.png" alt="image-20201015092245803"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201015092436525.png" alt="image-20201015092436525"></p>
+</blockquote>
+</li>
+</ol>
+<h3 id="REGRESSION"><a href="#REGRESSION" class="headerlink" title="REGRESSION"></a>REGRESSION</h3><h3 id="ADVERSARIAL-ATTACKS"><a href="#ADVERSARIAL-ATTACKS" class="headerlink" title="ADVERSARIAL ATTACKS"></a>ADVERSARIAL ATTACKS</h3><h3 id="Sleep-Stage-Classification-And-Other"><a href="#Sleep-Stage-Classification-And-Other" class="headerlink" title="Sleep Stage Classification And Other"></a>Sleep Stage Classification And Other</h3><ol>
+<li><blockquote>
+<p>Transfer Learning Convolutional Neural Network for Sleep Stage Classification Using Two-Stage Data Fusion Framework</p>
+<p>2020 IEEE ACESS</p>
+<p>MEHDI ABDOLLAHPOUR , TOHID YOUSEFI REZAII, ALI FARZAMNIA,(Senior Member, IEEE), AND ISMAIL SAAD (Member, IEEE)</p>
+<p>本文介绍了一种新的融合方法，将脑电图（EEG）和眼电图（EOG）两种信息源融合起来，在睡眠分期分类中取得了很好的效果。该方法从EEG和EOG信号中提取特征，将其分为两个特征集，分别由EEG特征和EEG与EOG的融合特征组成。然后，将每个特征集转化为水平可视图（HVG）。在一种新的框架下生成HVG图像，并用提出的传递学习卷积神经网络（TLCNN-DF）进行分类。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201213214724283.png" alt="image-20201213214724283"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Automatic sleep stage classification using time–frequency images of CWT and transfer learning using convolution neural network</p>
+<p>Biocybernetics and Biomedical Engineering 2020</p>
+<p>Pankaj  Jadhav Gaurav  Rajguru  Debabrata Datta  Siddhartha Mukhopadhyay </p>
+<p>本文的目标是开发一种基于深度学习的方法，利用单通道脑电图（EEG）自动地利用EEG信号的时频谱，而不需要人工提取特征。采用连续小波变换（CWT）提取脑电信号时频RGB彩色图像。利用预训练的卷积神经网络的传递学习，将连续小波变换图像分为不同的睡眠阶段。<br>该方法使用一个公开可用的physoninet睡眠EDFx数据集，使用单通道EEG-Fpz-Cz通道进行评估。评价结果表明，即使使用单通道脑电信号，该方法也能达到接近技术水平的精度。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214110743576.png" alt="image-20201214110743576"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Towards More Accurate Automatic Sleep Staging via Deep Transfer Learning</p>
+<p>IEEE TRANSACTIONS ON BIOMEDICAL ENGINEERING 2020</p>
+<p>Huy Phan , Oliver Y. Chen, Philipp Koch, Zongqing Lu, Ian McLoughlin, Alfred Mertins and Maarten De Vos</p>
+<p>我们从一个通用的端到端深度学习框架开始，用于序列到序列的睡眠分期，并衍生出两个网络作为转移学习的手段。首先在源域（即大型数据库）中训练网络。然后在目标域（即小群体）中对预训练网络进行微调，完成知识转移。我们使用蒙特利尔睡眠研究档案（MASS）数据库（由200名受试者组成）作为源域，研究三个不同目标域的深度转移学习：Sleep-EDF扩展数据库的Sleep-case子集和Sleep-Telemetry子集，以及Surrey-cEEGrid数据库。有目的地采用目标域来覆盖与源域不同程度的数据不匹配。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214112431471.png" alt="image-20201214112431471" style="zoom:67%;" /></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>EEG-Based Sleep Quality Evaluation with Deep Transfer Learning</p>
+<p>Xing-Zan Zhang, Wei-Long Zheng, and Bao-Liang Lu</p>
+<p>在这篇论文中，我们提出了一个与受试者无关的深度转移学习方法来评估昨晚的睡眠质量。为了减少脑电信号采集过程中脑电数据的内在跨受试者差异和背景噪声的变化，我们采用了两类转移学习方法来建立与主题无关的分类标准。</p>
+<p>一种方法是利用矩阵分解和正则化理论寻找子空间，另一种方法是利用深度自动编码器学习通用的共享结构。</p>
+<p>实验结果表明，与基线支持向量机（65.74%）相比，深度转移学习模型的平均分类准确率为82.16%，优于其他转移学习方法。我们的实验结果还表明，不同睡眠质量的神经模式是有区别的和稳定的：当睡眠被部分剥夺时，delta反应增加，α反应减少，4小时睡眠和6小时睡眠的神经模式与8小时睡眠更相似。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214150233408.png" alt="image-20201214150233408"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Deep Transfer Learning for Cross-domain Activity Recognition</p>
+<p><em>International Conference on Crowd Science and Engineering</em> 2018</p>
+<p>Jindong Wang Vincent W. Zheng Yiqiang Chen Meiyu Huang</p>
+<p>本文提出了一种有效的活动识别无监督源选择算法（USSAR）。USSAR能够从可用域列表中选择最相似的K源域。在此基础上，我们提出了一种有效的转移神经网络来进行活动识别的知识转移（TNNAR）。TNNAR可以在知识转移的同时捕捉到活动之间的时间和空间关系。在三个公共活动识别数据集上的实验表明：1）USSAR 算法在选择最佳源域方面是有效的。2） TNNAR方法在进行活动知识转移时可以达到较高的准确度</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214151247980.png" alt="image-20201214151247980"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Stratifified Transfer Learning for Cross-domain Activity Recognition</p>
+<p>International Conference on Pervasive Computing and Communications 2018</p>
+<p>Jindong Wang, Yiqiang Chen, Lisha Hu, Xiaohui Peng, Philip S. Yu</p>
+<p>本文提出了一种新的、通用的跨域学习框架，利用类间的亲和力进行类内知识转移。</p>
+<p>该框架被称为分层转移学习（STL），可以显著提高跨域活动识别的分类精度。具体来说，STL首先通过多数投票技术获得目标域的伪标签。然后，迭代地进行类内知识转移，将两个域转化为相同的子空间。最后通过第二次标注得到目标域的标签。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214152815040.png" alt="image-20201214152815040"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Importance Weighting with Adversarial Network for Large-Scale Sleep Staging</p>
+<p>ICML 2020 Workshop LifelongML Blind Submission</p>
+<p><strong>Samaneh Nasiri</strong> <strong>Gari Clifford</strong> </p>
+<p>这项工作联合学习患者不变的表示和加权特征（谱图系数），以增强相关特征在最终模型中的贡献，并使用无监督方法减少无关特征的影响。该方法利用了从训练集到测试集的可转换和可分辨知识。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214161755724.png" alt="image-20201214161755724"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Tri-FeatureNet: an Adversarial Learning-Based Invariant Feature Extraction for Sleep Staging Using Single-Channel EEG</p>
+<p>Yiqiao Liao, Milin Zhang, Zhihua Wang , Xiang Xie</p>
+<p>IEEE International Symposium on Circuits and Systems (ISCAS) 2020</p>
+<p>本文提出了一种基于双向学习的特征提取算法Tri-FeatureNet，用于学习对subject和session不变性的表征。改进了算法对个体差异的鲁棒性。将不变特征与受试者特定特征和时间特征相结合，进一步补偿对抗训练过程中睡眠信息的损失。该模型同时利用了脑电信号和睡眠分期序列中的时间信息。这是第一次提出对抗性训练来提取不同受试者和不同阶段的任务相关特征。该算法已在一个便携式睡眠分级系统中实现。<br>实验结果表明，在单通道脑电信号下，82.9%的ACC在睡眠分期任务中起作用。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201214162748737.png" alt="image-20201214162748737"></p>
+</blockquote>
+</li>
+<li><blockquote>
+<p>Attentive Adversarial Network for Large-Scale Sleep Staging</p>
+<p>Proceedings of Machine Learning Research  2020</p>
+<p><strong>Samaneh Nasiri</strong> <strong>Gari D. Clifffford</strong></p>
+<p>文提出了一种基于对抗训练和注意机制的方法，从不同的数据集中提取个体间的可传递信息，同时关注更重要或相关的通道和可转移的数据部分。利用两个大型的公共脑电图数据库——Physionet 2018挑战赛（P18C）数据库中的994名患者EEG（6561小时的数据）和来自睡眠心脏健康研究（SHHS）的5793名患者（42560小时）EEG——我们证明，对手学习具有注意力机制的网络，与跨数据集场景中最先进的深度学习方法相比，显著提高了性能。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201215131702024.png" alt="image-20201215131702024"></p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{c h}=\frac{1}{K n} \sum_{k=1}^{K} \sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r} \cup \mathcal{D}_{t e}} L_{d}\left(G_{d}^{k}\left(\mathbf{f}_{i}^{k}\right), d_{i}\right)
+\\w_{i}^{k}=1-H\left(G_{d}^{k}\left(\mathbf{f}_{i}^{k}\right)\right)=1-H\left(\hat{d}_{i}^{k}\right)</script><script type="math/tex; mode=display">
+\mathcal{L}_{g}=\frac{1}{n} \sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r} \cup \mathcal{D}_{t e}} L_{d}\left(G_{d}\left(\mathbf{h}_{i}, d_{i}\right)\right)
+\\\mathcal{L}_{a}=-\frac{1}{n} \sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r} \cup \mathcal{D}_{t e}} \sum_{j=1}^{c}\left(1+H\left(\hat{d}_{i}\right)\right) \cdot \mathbf{p}_{i, j} \cdot \log \left(\mathbf{p}_{i, j}\right)</script><script type="math/tex; mode=display">
+\begin{aligned} C\left(\theta_{f}, \theta_{y}, \theta_{d},\left.\theta_{d}^{k}\right|_{k=1} ^{K}\right)=& \frac{1}{n_{t r}} \sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r}} L_{y}\left(G_{y}\left(G_{f}\left(\mathbf{x}_{i}\right)\right), y_{i}\right) \\ &+\frac{\gamma}{n} \sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r} \cup \mathcal{D}_{t e}} \sum_{j=1}^{c}\left(1+H\left(\hat{d}_{i}\right)\right) \cdot \mathbf{p}_{i, j} \cdot \log \left(\mathbf{p}_{i, j}\right) \\ &-\frac{\lambda}{n}\left[\sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r} \cup \mathcal{D}_{t e}} \mathcal{L}_{d}\left(G_{d}\left(\mathbf{h}_{i}, d_{i}\right)\right)+\frac{1}{K} \sum_{k=1}^{K} \sum_{\mathbf{x}_{i} \in \mathcal{D}_{t r} \cup \mathcal{D}_{t e}} \mathcal{L}_{d}\left(G_{d}^{k}\left(\left(G_{f}\left(\mathbf{x}_{i}\right)\right)\right)\right)\right] \end{aligned}</script></blockquote>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft%5BKDD'%202019%5D(1)/" rel="prev" title="mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft">
+      <i class="fa fa-chevron-left"></i> mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/Improving%20EEG-Based%20Emotion%20Classification%20Using%20Conditional%20Transfer%20Learning/" rel="next" title="jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning">
+      jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E7%8C%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">文献信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">4.</span> <span class="nav-text">背景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BCI"><span class="nav-number">4.1.</span> <span class="nav-text">BCI</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BCI%E7%B3%BB%E7%BB%9F%E6%B5%81%E7%A8%8B"><span class="nav-number">4.2.</span> <span class="nav-text">BCI系统流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E7%A0%B4%E8%A7%A3%E6%96%B9%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">存在的问题和破解方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BCI%E7%BB%8F%E5%85%B8%E8%8C%83%E4%BE%8B"><span class="nav-number">4.4.</span> <span class="nav-text">BCI经典范例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E5%AE%9A%E4%B9%89"><span class="nav-number">4.5.</span> <span class="nav-text">迁移学习定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E5%88%86%E7%B1%BB"><span class="nav-number">4.5.1.</span> <span class="nav-text">迁移学习分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E5%88%86%E7%B1%BB-1"><span class="nav-number">4.5.2.</span> <span class="nav-text">迁移学习分类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BCI%E7%9A%84%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E5%9C%BA%E6%99%AF"><span class="nav-number">4.6.</span> <span class="nav-text">BCI的迁移学习场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E5%9C%A8BCI%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">迁移学习在BCI的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MI"><span class="nav-number">5.1.</span> <span class="nav-text">MI</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Cross-Subject-Session-TL"><span class="nav-number">5.1.1.</span> <span class="nav-text">Cross-Subject&#x2F;Session TL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cross-Device-TL"><span class="nav-number">5.1.2.</span> <span class="nav-text">Cross-Device TL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93"><span class="nav-number">5.1.3.</span> <span class="nav-text">方法总结</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Euclidean-Alignment-EA"><span class="nav-number">5.1.3.1.</span> <span class="nav-text">Euclidean Alignment (EA)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#CSP"><span class="nav-number">5.1.3.2.</span> <span class="nav-text">CSP</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ERP"><span class="nav-number">5.2.</span> <span class="nav-text">ERP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSVEP"><span class="nav-number">5.3.</span> <span class="nav-text">SSVEP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ABCI"><span class="nav-number">5.4.</span> <span class="nav-text">ABCI</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">5.4.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cross-Subject-Session-TL-1"><span class="nav-number">5.4.2.</span> <span class="nav-text">Cross-Subject&#x2F;Session TL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cross-Device-TL-1"><span class="nav-number">5.4.3.</span> <span class="nav-text">Cross-Device TL</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REGRESSION"><span class="nav-number">5.5.</span> <span class="nav-text">REGRESSION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ADVERSARIAL-ATTACKS"><span class="nav-number">5.6.</span> <span class="nav-text">ADVERSARIAL ATTACKS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sleep-Stage-Classification-And-Other"><span class="nav-number">5.7.</span> <span class="nav-text">Sleep Stage Classification And Other</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

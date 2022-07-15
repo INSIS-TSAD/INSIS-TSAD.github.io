@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="信息期刊:  IJCNN 作者:   摘要传统的机器学习方法使用手工提取特征和精心设计的分类器，然而提取特征局限于我们的专业领域知识。 我们提出了一种三维卷积神经网络模型来自动提取脑电信号的时空特征，通过预处理信号和对电极拓扑结构的重定位，在DEAP数据集二分类任务上实现了96.61%、96.43%的ACC，四分类上实现了93.53%的ACC，在AMIGOS实现了97.52%、96.96%和95.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals">
+<meta property="og:url" content="http://example.com/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="信息期刊:  IJCNN 作者:   摘要传统的机器学习方法使用手工提取特征和精心设计的分类器，然而提取特征局限于我们的专业领域知识。 我们提出了一种三维卷积神经网络模型来自动提取脑电信号的时空特征，通过预处理信号和对电极拓扑结构的重定位，在DEAP数据集二分类任务上实现了96.61%、96.43%的ACC，四分类上实现了93.53%的ACC，在AMIGOS实现了97.52%、96.96%和95.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006202616766.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006205022755.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006205211100.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211150102.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211158851.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211447565.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211447565.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211247669.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211310792.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211518043.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154305924.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:44:47.597Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006202616766.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:44:47" itemprop="dateModified" datetime="2021-01-16T11:44:47+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊: </strong> IJCNN</p>
+<p><strong>作者:</strong>  <img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006202616766.png" alt="image-20201006202616766"></p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>传统的机器学习方法使用手工提取特征和精心设计的分类器，然而提取特征局限于我们的专业领域知识。</p>
+<p>我们提出了一种三维卷积神经网络模型来自动提取脑电信号的时空特征，通过预处理信号和对电极拓扑结构的重定位，在DEAP数据集二分类任务上实现了96.61%、96.43%的ACC，四分类上实现了93.53%的ACC，在AMIGOS实现了97.52%、96.96%和95.86%ACC。</p>
+<a id="more"></a> 
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Emotion Recognition, Electroencephalography(EEG), 3D Convolutional Neural Network (3D CNN), Spatiotemporal Features, Deep Learning</strong></p>
+<h2 id="介绍及相关工作"><a href="#介绍及相关工作" class="headerlink" title="介绍及相关工作"></a>介绍及相关工作</h2><p>基于生理信号尤其是脑电图信号的识别方法已经成为研究热点，因为与面部表情或语音等其他信号相比，这些信号能够表征人的内在情绪状态，无法进行主观控制。</p>
+<p>传统的机器学习方法提取特征主要有</p>
+<ol>
+<li><strong>时域特征</strong>。事件相关电位ERP，信号统计(功率，均值，标准差，一阶差分，二阶差分)，高阶统计量(HOC)。</li>
+<li><strong>频域特征</strong>。功率谱密度(PSD)，高阶谱(HOS)。</li>
+<li><strong>时频特征</strong>。希尔伯特黄谱(HHS)，幅度平方相关估计(MSCE)。</li>
+</ol>
+<p>深度学习方法中，2D卷积常规方法忽略了脑电信号的空间特征，因此提出了时空特征提取方法。</p>
+<h2 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h2><h3 id="DEAP"><a href="#DEAP" class="headerlink" title="DEAP"></a>DEAP</h3><p>DEAP是一个开放的数据集，供研究人员验证他们的模型。该数据集包含<strong>32个通道的脑电信号和8个通道的其余生理信号</strong>，这些信号是在<strong>32名参与者观看40个视频</strong>(每个视频时长1分钟)时采集的。<strong>每次试验包含63s信号</strong>，<strong>前3s是baseline信号</strong>。当参与者没有受到刺激时，记录baseline信号。看完一分钟的视频后，参与者对<strong>valence、arousal、liking和dominance</strong>自我评估进行评分，评分范围从1到9。</p>
+<p>已经提供了预处理版本:数据从512赫兹下采样到128赫兹，并且应用了4.0-45.0赫兹的带通频率滤波器。DEAP的脑电数据大小为32(participants)x40(videos)x32(channels)x8064(signals)，8064信号包含384个baseline信号。</p>
+<h3 id="AMIGOS"><a href="#AMIGOS" class="headerlink" title="AMIGOS"></a>AMIGOS</h3><p>AMIGOS 是一个新开放的数据集。该数据集包含<strong>14导脑电信号和3导其余生理信号</strong>，采集于40名参与者观看20个视频(16个短视频 + 4个长视频)。每次试验首先包含5s的baseline信号，其他信号的长度取决于视频的持续时间。观看视频后，参与者还对<strong>valence、arousal、liking和dominance</strong>进行了1到9级的自我评估。</p>
+<p>已经提供了预处理版本:数据被下采样到128赫兹，并应用了4.0-45.0赫兹的带通频率滤波器。</p>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h3><p>Yang报告说，在情绪识别任务中，预处理方法可以将识别准确率提高大约32%。</p>
+<p>预处理方法包括:</p>
+<ol>
+<li>从所有<strong>通道C</strong>中提取<strong>baseline信号</strong>，并将其切割成固定长度L的N段，得到N段C×L矩阵</li>
+<li>用分段数据计算baseline信号的<strong>均值</strong>，得到baseline信号均值矩阵</li>
+<li>去除baseline信号，并且<strong>减去均值</strong>后进行切割，得到预处理后的信号。</li>
+<li><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006205022755.png" alt="image-20201006205022755">因为我们要利用空间位置，所以我们自己做了一个图。把32导转换到9*9的矩阵中去。我们转换的时候使用了标准化。</li>
+</ol>
+<h3 id="3D卷积结构"><a href="#3D卷积结构" class="headerlink" title="3D卷积结构"></a>3D卷积结构</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006205211100.png" alt="image-20201006205211100"></p>
+<p>卷积结构如上，只有两个卷积层，每次卷积层跟着池化。</p>
+<p>输入为（9，9，128）。前两维是空间位置图，最后一维是时间采样点的数量，也就是Hz。</p>
+<p>卷积核的数量为32和64，大小为（3，3，4），卷积使用零填充，激活函数是relu。</p>
+<p>池化层为（1，1，2）。</p>
+<p>全连接层后跟着dropout，为0.5。</p>
+<p>学习率为0.001。</p>
+<p>batchsize为240。</p>
+<p>验证方法是十倍交叉验证。</p>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h3 id="DEAP数据集结果"><a href="#DEAP数据集结果" class="headerlink" title="DEAP数据集结果"></a>DEAP数据集结果</h3><p>一次实验数据是(32×8064)，把baseline信号(32×384)切割成3段(3×32×128)，因为长3s，得到均值(1×32×128)。</p>
+<p>将没有baseline信号的脑电信号分割成60段(60×32×128)，然后减去baseline信号的均值，得到预处理后的信号(60×32×128)。</p>
+<p>对于每个时间采样点，将32路脑电信号映射成一个9x9矩阵。最终数据集是(76800×9×9×128)。76800是32个人看40个视频，每个视频1分钟。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211150102.png" alt="image-20201006211150102" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211158851.png" alt="image-20201006211158851" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211447565.png" alt="image-20201006211447565" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211447565.png" style="zoom:50%;" /></p>
+<h3 id="AMIGOS数据集结果"><a href="#AMIGOS数据集结果" class="headerlink" title="AMIGOS数据集结果"></a>AMIGOS数据集结果</h3><p>同上，最终有45474个样本。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211247669.png" alt="image-20201006211247669" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211310792.png" alt="image-20201006211310792" style="zoom:50%;" /></p>
+<h4 id=""><a href="#" class="headerlink" title=""></a><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006211518043.png" alt="image-20201006211518043"></h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154305924.png" alt="image-20201006154305924"></p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文提出了一种简单有效的基于脑电信号的三维卷积神经网络模型，该模型可用于不同的任务和数据集。</p>
+<p>缺点是，相比之下，深度学习方法往往被视为一个黑箱系统，我们将努力改进模型的可解释性，找出情感识别中的重要因素。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/" rel="prev" title="jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification">
+      <i class="fa fa-chevron-left"></i> jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/" rel="next" title="syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning">
+      syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">介绍及相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">5.</span> <span class="nav-text">数据集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DEAP"><span class="nav-number">5.1.</span> <span class="nav-text">DEAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AMIGOS"><span class="nav-number">5.2.</span> <span class="nav-text">AMIGOS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">6.1.</span> <span class="nav-text">预处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3D%E5%8D%B7%E7%A7%AF%E7%BB%93%E6%9E%84"><span class="nav-number">6.2.</span> <span class="nav-text">3D卷积结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">7.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DEAP%E6%95%B0%E6%8D%AE%E9%9B%86%E7%BB%93%E6%9E%9C"><span class="nav-number">7.1.</span> <span class="nav-text">DEAP数据集结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AMIGOS%E6%95%B0%E6%8D%AE%E9%9B%86%E7%BB%93%E6%9E%9C"><span class="nav-number">7.2.</span> <span class="nav-text">AMIGOS数据集结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link"><span class="nav-number">7.2.1.</span> <span class="nav-text"></span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

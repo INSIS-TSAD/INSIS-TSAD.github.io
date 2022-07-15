@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：大规模，异常检测  摘要:数据挖掘和时间序列计算在关键应用中仍值得研究。目前，在水文时间序列领域，大部分异常值的检测都集中在提高特异性上。为了有效检测海量水文传感器数据中的异常值，提出了一种基于Flink的水文时间序列异常检测方法。首先，利用滑动窗口和ARIMA模型对数据流进行预测。然后对预测结果计算置信区间，区间范围外的结果判断为备选异常数据。最后，基于历史批次数据，使用KMeans++">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink">
+<meta property="og:url" content="http://example.com/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：大规模，异常检测  摘要:数据挖掘和时间序列计算在关键应用中仍值得研究。目前，在水文时间序列领域，大部分异常值的检测都集中在提高特异性上。为了有效检测海量水文传感器数据中的异常值，提出了一种基于Flink的水文时间序列异常检测方法。首先，利用滑动窗口和ARIMA模型对数据流进行预测。然后对预测结果计算置信区间，区间范围外的结果判断为备选异常数据。最后，基于历史批次数据，使用KMeans++">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/S43oUgMiD9875qk.png">
+<meta property="og:image" content="https://img2018.cnblogs.com/common/1754004/202002/1754004-20200204092132360-1462288846.png">
+<meta property="og:image" content="https://images2015.cnblogs.com/blog/1024143/201701/1024143-20170111025932213-93380420.png">
+<meta property="og:image" content="https://images2015.cnblogs.com/blog/1024143/201701/1024143-20170111025934541-260409014.png">
+<meta property="og:image" content="https://static-01.hindawi.com/articles/mpe/volume-2020/3187697/figures/3187697.fig.004.svgz">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/PAcYV4UfxJ5wb92.png">
+<meta property="og:image" content="https://static-01.hindawi.com/articles/mpe/volume-2020/3187697/figures/3187697.fig.005.svgz">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/7tDiagf8RQshzJ9.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/3bdkNThVflgX6pJ.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/KpLridb8OHf2AZX.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/AINWv1la6UB3wjH.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/05/q8WfhXbIAr5BHmo.png">
+<meta property="article:published_time" content="2021-03-03T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-08T05:26:52.971Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="大规模">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/03/05/S43oUgMiD9875qk.png">
+
+<link rel="canonical" href="http://example.com/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-03 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-03T20:24:24+08:00">2021-03-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:26:52" itemprop="dateModified" datetime="2021-03-08T13:26:52+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mpt/" itemprop="url" rel="index"><span itemprop="name">mpt</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：大规模，异常检测</p>
+<p><img src="https://i.loli.net/2021/03/05/S43oUgMiD9875qk.png" alt="image-20210305112946386.png"></p>
+<p><strong>摘要</strong>:数据挖掘和时间序列计算在关键应用中仍值得研究。目前，在水文时间序列领域，大部分异常值的检测都集中在提高特异性上。为了有效检测海量水文传感器数据中的异常值，提出了一种基于<strong>Flink</strong>的水文时间序列异常检测方法。首先，利用<strong>滑动窗口</strong>和<strong>ARIMA模型</strong>对数据流进行预测。然后对预测结果计算<strong>置信区间</strong>，区间范围外的结果判断为备选异常数据。最后，基于历史批次数据，使用<strong>KMeans++算法</strong>对批次数据进行<strong>聚类</strong>。计算<strong>状态转移概率</strong>，对异常数据进行质量评估。以从楚江获取的水文传感器数据为实验数据，分别进行了检测时间和异常检测性能的实验。结果表明，在计算数千万个数据时，两个从机花费的时间比一个从机少，最大减少量为17.43%。评价的灵敏度从72.91%提高到92.98%。延迟方面，不同从机的平均延迟大致相同，维持在20ms以内。结果表明，在大数据平台下，该算法能有效提高数千万数据的水文时间序列检测的计算效率，并给出可靠的置信度，以提高整体灵敏度（不漏报）。在大量的水文时间序列中可以快速，准确地检测到异常值。</p>
+<a id="more"></a>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>水文数据根据其物理量分为各种类型的水文时间序列。目前，水文时间序列通常由确定的和随机的成分组成。确定成分具有一定的物理概念，而随机成分是由不规则振荡和随机影响产生的。水文时间序列主要表现出随机性，模糊性，非线性，非平稳性和多时间尺度变化的复杂特征。</p>
+<p>随着世界变得更加硬件化和互联，我们看到了各种硬件（例如传感器）或软件生成的大量数字数据。随着信息化的发展，水文站积累了大量重要数据，其中包含许多异常值。异常值通常包含重要信息，通过准确地找到数据背后的隐含价值，这对于后续的分析决策非常重要。目前，对于水文时间序列，传统方法仅适用于小型数据集，不适用于当前的大数据环境。而且，准确度虽达到99％的特异性（Specificity，不误报，TPR = TP / (TP + FN) ），灵敏度（Sensitivity，不漏报，召回率、查全率，TNR = TN / (TN + FP) ）仍然有提高的空间。随着数据量的增加，如何有效地进行计算已成为不可忽视的问题。在关键应用中时间序列的异常检测和计算仍然值得研究。</p>
+<h2 id="Apache-Flink"><a href="#Apache-Flink" class="headerlink" title="Apache Flink"></a>Apache Flink</h2><p>Flink 是一套集<strong>高吞吐、低延迟、有状态</strong>三者于一身的<strong>分布式</strong>流式数据处理框架。</p>
+<p>具体来说，Flink 是一个解决<strong>实时数据处理</strong>的计算框架，其可对有限数据流和无限数据流进行有状态计算，并能部署在各种集群环境，对各种大小的数据规模进行快速计算。</p>
+<p>Flink 支持消息队列的 Events（支持实时的事件）的输入(如Kafka)，上游源源不断产生数据放入消息队列，Flink 不断消费、处理消息队列中的数据，处理完成之后数据写入下游系统，这个过程是不断持续的进行。</p>
+<p>层次化的API在表达能力和易用性方面各有权衡。表达能力由强到弱（易用性由弱到强）依次是：ProcessFunction、DataStream API、SQL/Table API。</p>
+<p><img src="https://img2018.cnblogs.com/common/1754004/202002/1754004-20200204092132360-1462288846.png" alt="img"></p>
+<p>时间序列异常检测中，Flink具备<strong>批流一体</strong>(离线训练和在线训练同一套框架)、性能优异、并行计算等优势。针对不同的使用场景，分为基于时序预测和时序分解两种类型：</p>
+<ul>
+<li><p>时序预测算法适合流式数据，即时响应</p>
+</li>
+<li><p>时序分解算法适合全量数据，能够从全量数据中挖掘有效信息。</p>
+</li>
+</ul>
+<h2 id="滑动窗口"><a href="#滑动窗口" class="headerlink" title="滑动窗口"></a>滑动窗口</h2><p><strong>滑动窗口</strong>就是能够根据指定的单位长度来框住时间序列，从而计算框内的统计指标（均值、方差、标准差中位数、和等）。相当于一个长度指定的滑块正在刻度尺上面滑动，每滑动一个单位即可计算滑块内的数据。</p>
+<p>Flink为我们提供了方便易用的窗口算子API，我们可以将数据流切分成一个个窗口，对窗口内的数据进行实时处理。窗口的大小设置导致延迟的大小变化。（窗口越大延迟越高）</p>
+<h2 id="ARIMA模型"><a href="#ARIMA模型" class="headerlink" title="ARIMA模型"></a>ARIMA模型</h2><p><strong>时间序列的平稳性</strong>：由时间序列所得到的拟合曲线在未来一段时间内仍能顺着现有的形态惯性地延续下去。平稳性要求序列的均值和方差不发生明显变化。</p>
+<p><strong>AR:自回归模型</strong>，描述当前值与历史值之间的关系，用变量自身的历史时间数据对自身进行预测。</p>
+<p>自回归模型的限制：<br> 1、自回归模型只能用自身的数据进行预测<br> 2、时间序列数据必须具有平稳性<br> 3、自回归只适用于预测与自身前期相关的现象（泛化不足）</p>
+<p><strong>I:差分法</strong>，可以使得数据更平稳，常用的方法就是一阶差分法和二阶差分法。</p>
+<p><strong>MA:移动平均模型</strong>，移动平均模型关注的是自回归模型中的误差项的累加，能有效地消除预测中的随机波动。</p>
+<p><strong>ARIMA(p,d,q):差分自回归移动平均模型</strong>，将自回归模型、差分法和移动平均模型结合以来</p>
+<p><strong>p</strong>是自回归(AR)的项数，用来获取自变量</p>
+<p><strong>d</strong>是差分(I)的系数，为了使时间序列平稳，做d次差分</p>
+<p><strong>q</strong>是移动平均(MA)的项数，为了使其光滑</p>
+<p><strong>ARIMA原理</strong>：将非平稳时间序列转化为平稳时间序列，然后将因变量仅对它的滞后值以及随机误差项的当前值和滞后值进行回归所建立的模型</p>
+<p>建立ARIMA模型的流程：</p>
+<p>1.确定参数p,q 的值 </p>
+<p>2.确定d阶</p>
+<p>3.计算AIC或BIC,原则是使AIC和BIC越小越好</p>
+<h2 id="置信区间"><a href="#置信区间" class="headerlink" title="置信区间"></a>置信区间</h2><p>置信区间是总体变量估计的界限，它是一个区间统计量，用于量化估计的不确定性。在应用机器学习中，我们想在展示一个预测模型的能力时使用置信区间。选择95%的置信度在展现置信区间时很常见。实践中，你可以使用任何喜欢的值。置信区间的价值在于它能够量化估计的不确定性。它提供了一个下限和上限以及一个可能性。</p>
+<h2 id="KMeans-算法"><a href="#KMeans-算法" class="headerlink" title="KMeans++算法"></a>KMeans++算法</h2><p><strong>K-means与K-means++</strong>：原始K-means算法最开始随机选取数据集中K个点作为聚类中心，而K-means++按照如下的思想选取K个聚类中心：假设已经选取了n个初始聚类中心(0&lt;n&lt;K)，则在选取第n+1个聚类中心时：距离当前n个聚类中心越远的点会有更高的概率被选为第n+1个聚类中心。在选取第一个聚类中心(n=1)时同样通过随机的方法。可以说这也符合我们的直觉：聚类中心当然是互相离得越远越好。</p>
+<p><img src="https://images2015.cnblogs.com/blog/1024143/201701/1024143-20170111025932213-93380420.png" alt="图1"></p>
+<p><img src="https://images2015.cnblogs.com/blog/1024143/201701/1024143-20170111025934541-260409014.png" alt="https://images2015.cnblogs.com/blog/1024143/201701/1024143-20170111025934541-260409014.png"></p>
+<h2 id="转移概率矩阵"><a href="#转移概率矩阵" class="headerlink" title="转移概率矩阵"></a>转移概率矩阵</h2><p>转移概率矩阵：矩阵各元素都是非负的，并且各行元素之和等于1，各元素用概率表示，在一定条件下是互相转移的，故称为转移概率矩阵。</p>
+<h2 id="马尔可夫链"><a href="#马尔可夫链" class="headerlink" title="马尔可夫链"></a>马尔可夫链</h2><p><strong>马尔可夫性</strong>：过程或（系统）在时刻<em>t</em>0所处的状态为已知的条件下，过程在时刻<em>t</em> &gt; <em>t</em>0所处状态的条件分布，与过程在时刻<em>t</em>0之前所处的状态无关的特性称为马尔可夫性</p>
+<p><strong>马尔可夫过程</strong>：具有马尔可夫性的随机过程称为马尔可夫过程。</p>
+<p><strong>马尔可夫链</strong>：时间和状态都是离散的马尔可夫过程称为马尔可夫链，主要用于分析随机事件未来发展变化的趋势。</p>
+<h2 id="基于Flink的水文时间序列异常检测算法"><a href="#基于Flink的水文时间序列异常检测算法" class="headerlink" title="基于Flink的水文时间序列异常检测算法"></a>基于Flink的水文时间序列异常检测算法</h2><p>由于该实验的时间格式，水平标记重叠并且观察效果差。因此，将<strong>天数</strong>用作水平轴。然后，我们引入时间连续的数据流以进行异常检测。</p>
+<p>以下是<strong>原始水文时间序列</strong>的一部分。</p>
+<p><img src="https://static-01.hindawi.com/articles/mpe/volume-2020/3187697/figures/3187697.fig.004.svgz" alt="img"></p>
+<p><strong>一、数据预处理</strong></p>
+<p>在进行异常检测之前，应先清理获取的数据，清理前的数据如下。</p>
+<p>原始数据集中存在很多问题，例如重复，排序混乱，日期格式不符合数据挖掘要求以及不相关序列的存在。为解决上述问题，我们<strong>基于Flink</strong>处理了18910864行水文数据，消除其中的无效数据和重复数据，并统一了数据格式。</p>
+<p><strong>二、异常检测</strong></p>
+<p><strong>（1）本篇论文的ARIMA模型参数如何确定的？</strong></p>
+<p><strong>答</strong>:我们通过对时间序列进行<strong>单位根检验</strong>，判断出是非平稳序列，再通过差分将其转换为平稳序列。最后根据<strong>AIC准则</strong>，我们确定了自回归阶数<em>p</em>和移动平均阶数<em>q，</em>并找到具有最小AIC值的<em>p</em>和<em>q</em>组合</p>
+<p><strong>（2）ARIMA模型预测的是单点预测还是多点预测？</strong></p>
+<p><strong>答</strong>:是<strong>多点预测</strong>，通过将初始时间序列由滑动窗口划分为一段段的序列，再由窗口滑动时，将窗口内的原始数据值输入到ARIMA模型形成一个新的时间序列</p>
+<p><img src="https://i.loli.net/2021/03/05/PAcYV4UfxJ5wb92.png" alt="image-20210305115957543.png"></p>
+<p>首先，时间序列的ARIMA模型{x1,x2,…,xn}通过滑动窗口的预测检验（Forecast Testing）思想建立了“预测值”，并获得了预测检验的<strong>置信区间</strong>，并将其与<strong>原始数据</strong>进行比较得出候选异常值。该算法使用滑动窗口和ARIMA模型在Flink平台上进行预测。</p>
+<p>以下是设置了滑动窗口长度为6的数据集上使用ARIMA模型检测到异常的情况下，显示出置信度为95％的<strong>测量值</strong>和<strong>置信区间</strong>。由图可知，大多数点都非常接近正常值，但是在区间外还有一些点，因此它们被判断为可疑异常点。</p>
+<p><img src="https://static-01.hindawi.com/articles/mpe/volume-2020/3187697/figures/3187697.fig.005.svgz" alt="img"></p>
+<p><strong>三、结果验证</strong></p>
+<p><strong>为什么要通过聚类再使用马尔可夫链的状态转换矩阵来计算其真实异常值的概率？</strong></p>
+<p><strong>答:K-Means++算法</strong>模型训练完成后，可以得到离散的状态序列{T1,T2,…}，并且通过将矩阵转换为数据帧计算获得状态转移矩阵。再将ARIMA模型得到的可疑异常点集及其前一时刻的值输入到<strong>聚类</strong>训练好的模型中，以获取异常状态及其前一时刻状态，再通过状态转换数据帧估计异常的值及其前一时刻的值，输出真实异常值的概率。</p>
+<p><strong>马尔可夫过程中的状态转移矩阵有什么意义？</strong></p>
+<p><strong>答</strong>:马尔可夫每个时间点处在某一个状态，时间是离散的，每次到下一个时间点时按照图进行随机状态转移。假如某时的状态是个统计分布（看做向量），那么用状态转移矩阵（图里头边的权值）乘这个向量就得下一时刻的状态。不管初始状态是什么概率分布，状态转移矩阵不断乘它，这个状态向量最终会达到某个确定的平衡点。 </p>
+<p>解释链接：<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/41423304?sort=created">https://www.zhihu.com/question/41423304?sort=created</a></p>
+<p>在检测到异常值之后，通过<em>K</em>-Means++算法对<strong>原始数据</strong>进行聚类，并在聚类后使用状态转换矩阵来计算其真实异常值的概率。最后通过状态转移评估异常值并最终确定异常值。</p>
+<ol>
+<li><p>在表中，t0表示传输前的状态，t1表示传输后的状态。通过对初始水文时间序列进行聚类，选取异常值的状态和它们的前一阶矩，并在表3中查找得到真实异常值的概率，得到了以下结果。</p>
+<p><img src="https://i.loli.net/2021/03/05/7tDiagf8RQshzJ9.png" alt="image-20210303151016545.png"></p>
+<p>2.表中显示预测检验部分检测到的值确实是异常值的概率，可以看出某些检测值的真实异常值的概率为0，所以我们将这些真实异常值的概率小于50%的值从检测值中剔除。最终检测出水文时间序</p>
+</li>
+</ol>
+<p>列中的异常值。</p>
+<p><img src="https://i.loli.net/2021/03/05/3bdkNThVflgX6pJ.png" alt="image-20210303151153820.png"></p>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h5 id="实验环境和数据集"><a href="#实验环境和数据集" class="headerlink" title="实验环境和数据集"></a>实验环境和数据集</h5><p>运行时环境在使用四台PC的群集中部署，相关软件版本如下：Java 1.8和Flink 1.5.2，数据集为18910864行记录。</p>
+<p>如果基于滑动窗口来预测时间序列，则会出现高延迟和长时间运行的计算时间。采用Flink进行计算，比较了在不同计算资源下使用Flink执行算法的时间。结果如下。</p>
+<p><img src="https://i.loli.net/2021/03/05/KpLridb8OHf2AZX.png" alt="image-20210303154457730.png"></p>
+<p>从图中可以看出，在选择<strong>15个和35个</strong>水文站的数据的情况下，双节点的运行速度并不理想，但是当数据量增加到<strong>数千万级</strong>时，双节点的优势可以体现出计算时间的优势。可以看出，在较大的数据集下，计算速度更快。</p>
+<p><strong>有效性和准确性</strong></p>
+<p>检测到的异常值，并使用状态转换矩阵来计算其真实异常值的概率。为了验证该机制的有效性和准确性，将实验结果分为四类。第一类为TP（真阳性），判断为实际异常。第二类为FN（假阴性），实际异常被判断为正常；第三类为FP（假阳性），判断为实际正常。最后一个类别是TN（真负），并且实际法线被判断为法线。TP和TN是不需要FN和FP的理想情况。本文定义了灵敏度Sensitivity=TN / (TN + FP) 以及特异性，Specificity=TP / (TP + FN)。本文将基于滑动窗口，<strong>MARS的ARIMA模型</strong>和本文的算法在相同的水文时间序列数据集上进行了比较，结果如下</p>
+<p><img src="https://i.loli.net/2021/03/05/AINWv1la6UB3wjH.png" alt="image-20210303152656364.png"></p>
+<p>表中显示了三种模型的最佳结果进行比较。结果表明，传统的窗口方法在<strong>特异性方面</strong>（不误报）与本文提出的方法没有显着差异，保持了较高的准确性。在<strong>灵敏度</strong>（不漏报）方面，作为一种非线性预测模型，MARS在<strong>样本较小</strong>的情况下表现较好，最高达到83.12%。但是，随着<strong>窗口大小</strong>的增加，这种增加不如本文提出的算法好，因为本文的算法包含了历史校验机制，使用历史数据对实时数据进行校验。随着窗口大小的增加，本文提出的算法与传统算法相比有了明显的提高，灵敏度从72.91%提高到92.98%。与MARS模型相比，改进幅度高达2.75%。</p>
+<p><img src="https://i.loli.net/2021/03/05/q8WfhXbIAr5BHmo.png" alt="image-20210303153254069.png"></p>
+<p>从图中可以看出，随着<strong>窗口数量</strong>的增加，当窗口大小约为30时，特异性和灵敏度迅速提高。在窗口大小从10增大到30的过程中，特异性提高了29.47％，达到99.47％ ，灵敏度增加了42.08％，达到了92.44％，而延迟增加了93.32％，达到了19.92 ms。但是，当窗口大小大于30时，特异性和灵敏度变化不大，但<strong>延迟率</strong>增加到57.21 ms，增加了187.2％。因此，理想的选择是将窗口长度设置为大约30，这可以使平均延迟小于20 ms。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在大数据时代，传统的检测算法无法满足当前的需求。针对滑窗的特点以及传统滑窗检查的时间复杂度高，检错率高等缺点，提出了一种基于Flink的水文时间序列异常检测方法。通过使用<strong>Flink计算，此方法减少了计算时间</strong>，并将两个过程结合在一起。</p>
+<p>以楚河水文传感器的数据为实验数据，分别对离群值的检测时间和有效性进行了实验。结果表明，使用2个从站的百万个数据在<strong>计算时间</strong>上要比1个从站花费更多的时间，但是当计算十个数据时，2个从站比1个从站要好，最大值减少了17.43％。评估的<strong>灵敏性</strong>从72.91％增加到92.98％。在延迟方面，不同从站的平均延迟大致相同，保持在20 ms以内。结果表明，当该方法用于检测数以千万计的水文数据时，通过添加节点可以有效地提高Flink的计算效率。同时，与传统方法相比，该方法的灵敏度大大提高。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/%E5%A4%A7%E8%A7%84%E6%A8%A1/" rel="tag"># 大规模</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/" rel="prev" title="cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion">
+      <i class="fa fa-chevron-left"></i> cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/" rel="next" title="jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation">
+      jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Apache-Flink"><span class="nav-number">2.</span> <span class="nav-text">Apache Flink</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3"><span class="nav-number">3.</span> <span class="nav-text">滑动窗口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ARIMA%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">ARIMA模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%AE%E4%BF%A1%E5%8C%BA%E9%97%B4"><span class="nav-number">5.</span> <span class="nav-text">置信区间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KMeans-%E7%AE%97%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">KMeans++算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AC%E7%A7%BB%E6%A6%82%E7%8E%87%E7%9F%A9%E9%98%B5"><span class="nav-number">7.</span> <span class="nav-text">转移概率矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E9%93%BE"><span class="nav-number">8.</span> <span class="nav-text">马尔可夫链</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EFlink%E7%9A%84%E6%B0%B4%E6%96%87%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95"><span class="nav-number">9.</span> <span class="nav-text">基于Flink的水文时间序列异常检测算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">10.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83%E5%92%8C%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">10.0.0.1.</span> <span class="nav-text">实验环境和数据集</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

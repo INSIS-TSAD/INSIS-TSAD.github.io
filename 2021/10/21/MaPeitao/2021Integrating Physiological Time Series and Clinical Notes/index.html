@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="不规则采样时间序列的插值预测网络摘要本文提出了一种新的深度学习体系结构,来解决具有稀疏和不规则采样的多元时间序列的监督学习问题。该架构基于插值网络的使用，随后是预测网络的应用。  插值网络允许在插值阶段跨多元时间序列的多个维度共享信息，而任何标准深度学习模型都可以用于预测网络。这项工作的动机是分析电子健康记录中的生理时间序列数据，这些数据是稀疏的、不规则采样的和多变量的。我们研究了这个架构在分类和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction">
+<meta property="og:url" content="http://example.com/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="不规则采样时间序列的插值预测网络摘要本文提出了一种新的深度学习体系结构,来解决具有稀疏和不规则采样的多元时间序列的监督学习问题。该架构基于插值网络的使用，随后是预测网络的应用。  插值网络允许在插值阶段跨多元时间序列的多个维度共享信息，而任何标准深度学习模型都可以用于预测网络。这项工作的动机是分析电子健康记录中的生理时间序列数据，这些数据是稀疏的、不规则采样的和多变量的。我们研究了这个架构在分类和">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20211020174201936.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20211020174838027.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20211020174926865.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20211020163023828.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20210708215847574.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20210708221720832.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20210708222653718.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20210708223323853.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20210708223715564.png">
+<meta property="og:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20210708224705190.png">
+<meta property="article:published_time" content="2021-10-21T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-10-21T05:30:41.323Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="生理信号">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/Administrator/AppData/Roaming/Typora/typora-user-images/image-20211020174201936.png">
+
+<link rel="canonical" href="http://example.com/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-10-21 20:24:24 / Modified: 13:30:41" itemprop="dateCreated datePublished" datetime="2021-10-21T20:24:24+08:00">2021-10-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mpt/" itemprop="url" rel="index"><span itemprop="name">mpt</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="不规则采样时间序列的插值预测网络"><a href="#不规则采样时间序列的插值预测网络" class="headerlink" title="不规则采样时间序列的插值预测网络"></a>不规则采样时间序列的插值预测网络</h1><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a><strong>摘要</strong></h3><p>本文提出了一种新的<strong>深度学习体系结构</strong>,来解决具有<strong>稀疏和不规则采样</strong>的<strong>多元时间序列</strong>的<strong>监督学习</strong>问题。该架构基于<strong>插值网络</strong>的使用，随后是<strong>预测网络</strong>的应用。</p>
+<ul>
+<li><strong>插值网络</strong>允许在插值阶段<strong>跨多元时间序列的多个维度共享信息</strong>，而任何<strong>标准深度学习模型</strong>都可以用于<strong>预测网络</strong>。这项工作的动机是分析电子健康记录中的<strong>生理时间序列数据</strong>，这些数据是稀疏的、不规则采样的和多变量的。我们研究了这个架构在<strong>分类和回归任务上的性能</strong>，表明我们的方法优于一系列基线和最近提出的模型。</li>
+</ul>
+<a id="more"></a>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a><strong>介绍</strong></h3><p>在过去几年中，在开发专门的模型和架构方面取得了重大进展，这些模型和架构可以适应<strong>稀疏和不规则采样的时间序列</strong>作为输入。</p>
+<ul>
+<li><strong>不规则采样的时间序列</strong>是指在其<strong>观测时间之间</strong>具有<strong>不规则间隔</strong>的样本序列。当<strong>连续观测</strong>之间的<strong>间隔</strong>通常很<strong>大</strong>时，不规则采样的数据被认为是<strong>稀疏</strong>的。在<strong>监督学习设置中特别感兴趣</strong>的是直接使用多元稀疏和不规则采样时间序列作为输入来<strong>执行端到端学习的方法</strong>，而<strong>不需要</strong>单独的插值或插补步骤。</li>
+<li>在这项工作中，我们提出了一个新的模型架构，用于监督学习多元稀疏和不规则采样数据的插值预测网络。该架构基于使用<strong>组织成插值网络的几个半参数插值层</strong>，然后应用可以<strong>利用任何标准深度学习模型的预测网络</strong>。</li>
+<li>在这项工作中，我们使用<strong>GRU网络</strong>作为预测网络。<strong>插值网络允许包含</strong>在每个输入时间序列中的信息有助于模型中所有其他时间序列的<strong>插值。插值和预测网络的参数通过由</strong>监督和非监督成分组成的复合目标函数被<strong>端到端地学习。</strong></li>
+<li>医院系统捕捉<strong>密集</strong>的生理数据流仍然很少。相反，电子健康记录中的生理时间序列数据通常<strong>既稀疏又不规则采样</strong>。观察时间在<strong>生理变量之间缺乏一致性</strong>的额外问题也非常普遍。</li>
+</ul>
+<h3 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a><strong>相关工作</strong></h3><p>这项工作感兴趣的问题是从<strong>稀疏和不规则采样的多元时间序列中学习监督机器学习模型</strong>。如引言中所述，稀疏且不规则采样的时间序列是指在其<strong>观测时间之间具有大且不规则间隔的样本序列</strong>。这种数据通常出现在<strong>电子健康记录中</strong>，对于<strong>监督和非监督学习</strong>方法来说，这都是一个重大问题。稀疏和不规则采样的时间序列数据也出现在一系列具有类似复杂观测过程的其他领域，包括气候科学、生态学、生物学和天文学。</p>
+<p>一个密切相关(但不同)的问题是在<strong>存在缺失数据的情况下执行监督学习</strong>。主要区别在于缺失数据问题通常是相对于固定维特征空间定义的。<strong>在不规则采样的时间序列问题中，观测值通常出现在连续时间内</strong>，对于某些域可能没有“正常”或“预期”采样频率的概念。</p>
+<p>在监督学习中<strong>处理缺失数据的方法</strong>包括<strong>插补</strong>方法的预应用和<strong>特征和标签的联合学习</strong>模型。联合模型可以通过<strong>生成学习</strong>来优化特征和标签的联合似然性，也可以通过<strong>区分学习</strong>来优化标签的条件似然性。通过将<strong>时间轴离散成不重叠的区间，可以将不规则采样问题转化为缺失数据问题</strong>。然后，<strong>没有观测值的区间被称为包含缺失值</strong>。这种方法强制选择离散化间隔长度。</p>
+<ul>
+<li>当间隔很长时，丢失的数据会更少，但在同一间隔内也可以有多个观察值，这必须使用临时方法进行说明。</li>
+<li>当间隔较短时，大多数间隔最多包含一个值，但许多间隔可能为空。</li>
+</ul>
+<p>将<strong>不规则采样问题转化为丢失数据</strong>问题的另一种选择是构建能够<strong>直接使用不规则采样的时间序列作为输入的模型</strong>。机器学习和统计文献包括几个具有这种能力的模型。在<strong>概率环境</strong>下，<strong>高斯过程模型</strong>能够通过使用<strong>均值和协方差</strong>函数来表示<strong>连续</strong>时间数据(Rasmussen，2006)。这些模型具有类似于用<strong>核</strong>来定义的非概率类似物。例如，Lu等人。提出了一种基于核的方法，可用于产生<strong>两个不规则采样时间序列之间的相似性函数</strong>。Li&amp;Marlin随后将该方法推广到高斯过程模型之间的核的情况。Li&amp;Marlin展示了如何使用重新参数化技巧来扩展这些想法，以实现对堆叠在高斯过程层之上的深度神经网络模型(前馈、卷积或递归)的端到端训练。</p>
+<p>另一项单独的工作着眼于使用<strong>更多的局部插值方法</strong>，同时仍然直接在<strong>连续时间输入</strong>上操作。例如，Che等人提出了几种基于<strong>门控递归单元(GRU)网络</strong>的方法，并结合了简单的推算方法，包括<strong>平均推算和用过去值向前填充</strong>。Che等人还考虑了一种方法，该方法将由<strong>观测值</strong>和观测这些值的<strong>时间戳</strong>组成的序列作为输入。先前观察到的输入值随着时间向总体平均值<strong>衰减</strong>。</p>
+<p>这些<strong>现有方法</strong>在<strong>插值层内使用高斯过程</strong>表示。由此产生的计算可能是昂贵的，并且如上所述，在多变量情况下的协方差函数的设计可能是具有挑战性的。相比之下，我们提出的模型使用了<strong>半参数、确定性、前馈插值层</strong>，允许在层内和层间进行非常灵活的插值。我们的体系结构中的插值层产生<strong>规则采样的插值</strong>，可以作为任意的、未修改的、深度分类和回归网络的输入。这与切等人的做法形成了鲜明对比。其中直接修改了循环网络架构，降低了该方法的模块性。最后，与Lipton等人类似。我们的模型包括有关<strong>观测发生的时间的信息</strong>。然而，我们使用<strong>半参数强度函数</strong>将观测事件序列直接建模为<strong>连续时间点过程</strong>，而<strong>不是预先</strong>离散化输入并根据二进制观测掩模或一组缺失数据指标来查看这些信息。</p>
+<h3 id="符号"><a href="#符号" class="headerlink" title="符号"></a><strong>符号</strong></h3><ul>
+<li>设D={(Sn，yn)|n=1，…，N}表示包含<strong>N个数据案例</strong>的数据集。单个数据案例包括单个<strong>目标值yn</strong>(分类时为<strong>离散值</strong>，回归情况下为<strong>实值</strong>)，以及多维、稀疏和不规则采样的多变量时间序列<strong>sn</strong>。多变量时间序列的<strong>不同维度d</strong>可以在不同的时间具有观测值，以及不同的观测总数<strong>Ldn</strong>。因此，我们将n个数据案例的时间序列d表示为tuple，<strong>sdn=(tdn，xdn)</strong>，其中tdn=[t1dn，…，tLdndn]是定义<strong>观测的时间点列表</strong>，xdn=[x1dn，…，xLdndn]是相应的<strong>观测值</strong>列表。</li>
+</ul>
+<h3 id="模型体系结构"><a href="#模型体系结构" class="headerlink" title="模型体系结构"></a><strong>模型体系结构</strong></h3><ul>
+<li>结构由<strong>两个主要组件</strong>组成：<strong>插值网络和预测网络</strong>。插值网络相对于一组<strong>参考时间点r</strong>=[r1，…，rt]对多变量、稀疏和不规则采样的输入时间序列<strong>进行插值</strong>。我们假设所有的时间序列都定义在一个<strong>共同的时间间隔内</strong>(例如，对于MIMIC-III数据集，在入院后的<strong>第一个24或48小时内</strong>)。在这项工作中，两层内插网络，每一层执行<strong>不同类型的内插</strong>。</li>
+<li>第二个部件是预测网络，它将<strong>插值网络的输出作为其输入</strong>，并产生目标变量的预测<strong>yn</strong>。<strong>预测网络可以由任何标准的监督神经网络结构(全连接前馈、卷积、递归等)组成</strong>。因此，就<strong>不同</strong>预测网络的使用而言，该体系结构是完全模块化的。为了训练内插网络，除了来自预测网络的监督学习信号之外，该体系结构还包括自动编码组件以提供非监督学习信号。</li>
+</ul>
+<h3 id="插值网络"><a href="#插值网络" class="headerlink" title="插值网络"></a><strong>插值网络</strong></h3><p>插值网络的<strong>目标</strong>是<strong>提供</strong>在<strong>参考时间点r</strong>=[r1，…，rt]定义的<strong>每个D维多变量输入时间序列</strong>的<strong>插值的集合</strong>。在这项工作中，我们对每个<strong>D维输入时间序列</strong>使用总计C=3的<strong>输出</strong>。</p>
+<ul>
+<li>这<strong>三个输出</strong>捕获<strong>平滑趋势、瞬变和观测强度信息</strong>。我们定义fθ为插值网络输出S’n的函数，输出S’n是一个固定大小数组，对于所有输入Sn，其维数(DC)×T。</li>
+</ul>
+<p>插值网络中的<strong>第一层</strong>分别对<strong>每个时间序列</strong>执行<strong>三个半参数单变量变换</strong>。<strong>每个变换</strong>都基于一个<strong>径向基函数</strong>(RBF)网络，以适应<strong>连续时间观测</strong>。变换是<strong>低通(或平滑)</strong>插值<strong>σ</strong>d、<strong>高通(或非平滑)</strong>插值<strong>γd</strong>和<strong>强度函数λd</strong>。对于每个数据情况和每个输入时间序列d，这些变换在参考时间点计算。平滑插值<strong>σ</strong>d使用具有参数αd的<strong>RBF核</strong>，而非平滑插值γd使用具有参数κ*αd的RBF核，κ&gt;1。</p>
+<ul>
+<li>径向基函数核（RBF kernel），也被称为高斯核或平方指数核是常见的核函数。RBF核被应用各类核学习算法中，包括支持向量机、高斯过程回归等。</li>
+<li>径向基函数 (RBF), 通常定义为空间中任一点x到某一中心xc之间欧氏距离的单调函数。<strong>径向基函数插值法</strong></li>
+</ul>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20211020174201936.png" alt="image-20211020174201936"></p>
+<p><strong>第二内插层</strong>通过考虑所有时间序列上的<strong>可学习相关性</strong>ρdd‘，在<strong>每个参考时间点</strong>合并所有时间序列上的<strong>所有D维时间序列上的信息</strong>。这导致针对每个输入维度的<strong>交叉维插值</strong>χd。我们还将每个输入维度的<strong>瞬态分量Td</strong>定义为<strong>来自第一层的高通(或非平滑)插值γd和平滑交叉维度插值χd之间的差</strong>。</p>
+<p>在下一节介绍的实验中，我们使用每个维度d，总共<strong>三个插值网络输出</strong>作为预测网络的<strong>输入</strong>。我们使用<strong>平滑的跨通道内插值χd来捕获平滑趋势</strong>，使用<strong>瞬变分量Td来捕获瞬变</strong>，使用<strong>强度函数λd</strong>来及时捕捉有关<strong>观测点的信息</strong>。</p>
+<h3 id="预测网络"><a href="#预测网络" class="headerlink" title="预测网络"></a><strong>预测网络</strong></h3><p><strong>所有D维输入多变量时间序列</strong>都被<strong>重新表示</strong>为在<strong>规则间隔的参考时间点集合</strong>T=r1，…，rt上定义C输出(在我们的实验中，如上所述，我们使用C=3。同样，我们将<strong>插补网络输出的完整集合称为S’n</strong>=fθ(r，sn)，其可以表示为大小为(DC)×T的矩阵。</p>
+<p><strong>预测网络</strong>必须<strong>获取S’A输入</strong>并<strong>输出目标值yn的预测值</strong>y’n用于数据情况。该模型的这个组件有许多可能的选择。例如，<strong>矩阵可以转换成单个长向量</strong>，并作为输入提供给<strong>标准多层前馈网络</strong>。<strong>时间卷积模型</strong>或像GRU或LSTM这样的递归模型可以应用于<strong>矩阵S’n的时间片</strong>。在这项工作中，我们利用<strong>GRU网络</strong>作为预测网络进行实验。</p>
+<h3 id="参数学习"><a href="#参数学习" class="headerlink" title="参数学习"></a>参数学习</h3><p>为了学习模型参数，我们使用了一个由<strong>监督组件</strong>和<strong>非监督组件组成的</strong>复合目标函数。这是由于在给定可用训练数据量的情况下，仅受<strong>监督组件不足以学习插值网络参数的合理参数</strong>。所使用的<strong>非监督分量对应于类似自动编码器的损失函数</strong>。但是，通过将<strong>RBF核参数设置为非常大的值</strong>，半参数RBF插值层能够<strong>精确拟合输入点</strong>。</p>
+<p>为了避免这种解决方案，并迫使内插层学会正确地内插输入数据，有必要在学习期间<strong>保持一些观测数据点</strong>dn，然后只计算这些数据点的<strong>重构损失</strong>。这是大容量自动编码器的一个众所周知的问题，过去的工作已经使用了类似的策略来避免在<strong>没有学习有用结构的情况下简单地记忆输入数据</strong>的问题。</p>
+<p>我们假设预测网络的损失(分类使用<strong>交叉熵损失</strong>，回归使用<strong>误差平方</strong>)。我们采用插值网络自动编码器<strong>损失</strong>(我们使用<strong>标准平方误差</strong>)。</p>
+<h3 id="实验和结果"><a href="#实验和结果" class="headerlink" title="实验和结果"></a>实验和结果</h3><p>在本节中，我们提供了<strong>基于稀疏和不规则样本多变量时间序列的分类和回归任务</strong>的实验。在这两种情况下，<strong>预测网络的输入是稀疏且不规则采样的时间序列</strong>，而<strong>输出是代表预测类别或回归目标变量的单个标量</strong>。我们在<strong>两个公开可用的真实世界数据集</strong>上测试了模型框架：Mimic-III以及UWave手势是由分为八类的简单手势模式组成的单变量时间序列数据集。我们以MIMIC-III死亡率和住院时间预测任务为例，对<strong>多变量时间序列进行分类和回归</strong>。我们使用uWave手势分类任务来评估相对于<strong>单变量基线模型</strong>的训练时间和性能。</p>
+<h4 id="基准模型"><a href="#基准模型" class="headerlink" title="基准模型"></a>基准模型</h4><p>我们将我们提出的模型与<strong>一些基线方法进行了比较</strong>，包括使用基本特征学习的现成分类和回归模型，以及基于定制神经网络模型的较新方法。</p>
+<h5 id="非神经网络基线模型"><a href="#非神经网络基线模型" class="headerlink" title="非神经网络基线模型"></a>非神经网络基线模型</h5><p>对于非神经网络基线，我们评估Logistic回归、支持向量机(SVM)、随机森林(RF)和AdaBoost用于<strong>分类任务</strong>。对于住院时间预测任务，我们使用了线性回归、支持向量回归、AdaBoost回归和随机森林回归。所有这些模型的标准实例都需要<strong>固定大小的特征表示</strong>。在丢失数据的情况下，我们使用<strong>时间离散化和前向填充来创建固定大小的表示</strong>，并将该表示用作非神经网络基线的特征集。</p>
+<h5 id="神经网络基线模型"><a href="#神经网络基线模型" class="headerlink" title="神经网络基线模型"></a>神经网络基线模型</h5><p>我们使用简单的内插或推算方法，与几个建立在<strong>GRU上的现有深度学习基线进行比较</strong>。此外，我们还与目前最先进的死亡率预测模型进行了比较。他们的工作建议使用递归神经网络(RNNs)通过在输入层或隐藏层引入时间衰减来处理不规则采样和丢失的数据。我们还评估了可伸缩的端到端高斯过程适配器以及多任务高斯过程RNN分类器，分别用于不规则样本的单变量和多变量时间序列分类。</p>
+<ul>
+<li>GP-GRU：以GRU为分类器的端到端高斯过程（高斯过程中任意随机变量的线性组合都服从<strong>正态分布</strong>,高斯过程的性质与其协方差函数有密切联系，在构造高斯过程时，一些特定形式的协方差函数被称为<strong>核函数</strong>）。</li>
+<li>GRU-M：用<strong>训练示例中变量的全局平均值</strong>替换缺失的观测值。</li>
+<li>GRU-F：设置为该时间序列内<strong>最后观察到的测量值的缺失值</strong>(称为正向填充)。</li>
+<li>GRU-S：用<strong>全局平均值替换缺失的值</strong>。输入与掩蔽变量和指示特定变量缺失多长时间的时间间隔连接在一起</li>
+<li>GRU-D：为了捕捉更丰富的信息，在<strong>GRU的输入层和隐藏层都引入了衰减</strong>。不是用最后一次测量来替换遗漏的值，而是随着时间的推移，遗漏的值向经验平均值衰减。</li>
+<li>GRU-HD：GRU-D的变体，只在隐藏层引入衰减。</li>
+</ul>
+<h3 id="评估指标"><a href="#评估指标" class="headerlink" title="评估指标"></a><strong>评估指标</strong></h3><p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20211020174838027.png" style="height:200px"></img></p>
+<p>图2:UWAVEGENTURE数据集上的分类性能。具有几乎相同性能的模型用相同的点显示，例如（GRU-M，GRU-F）和（GRU-D，GRU-HD）。</p>
+<p>表1：<strong>MIMIC-III上死亡率(分类)</strong>和<strong>住院时间预测(回归)任务</strong>的性能。损失：交叉熵损失，MedAE：绝对误差中位数(天)，EV：解释方差</p>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20211020174926865.png" style="height:200px"></img></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在本文中，我们提出了一种<strong>新的框架来处理稀疏和不规则样本时间序列中的监督学习问题</strong>。建议的框架是完全模块化的。它使用<strong>内插网络来适应使用稀疏和不规则采样数据作为监督学习输入所产生的复杂性</strong>，然后应用<strong>预测网络</strong>，该预测网络在由内插网络提供的规则间隔且完全观察到的<strong>多通道输出</strong>上运行。所提出的方法还解决了现有方法的一些困难，包括中使用的高斯过程插值层的复杂性，以及Che等人的方法缺乏模块性。我们的框架还引入了新的元素，包括使用<strong>半参数前馈插值层</strong>，以及将<strong>不规则采样的输入时间序列分解为多个采样时间序列</strong>。有很多不同的信息渠道。我们的结果显示，与一系列基线和最先进的方法相比，分类和回归任务在统计上都有<strong>显著的改善</strong>。</p>
+<h1 id="将生理时间序列和临床笔记与深度学习相结合，提高ICU死亡率预测"><a href="#将生理时间序列和临床笔记与深度学习相结合，提高ICU死亡率预测" class="headerlink" title="将生理时间序列和临床笔记与深度学习相结合，提高ICU死亡率预测"></a>将生理时间序列和临床笔记与深度学习相结合，提高ICU死亡率预测</h1><p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20211020163023828.png" style="height:160px"></img></p>
+<p><strong>期刊：arXiv 2021</strong></p>
+<h3 id="摘要-1"><a href="#摘要-1" class="headerlink" title="摘要"></a><strong>摘要</strong></h3><p>重症监护室电子健康记录<strong>存储患者的多模式数据</strong>，包括<strong>临床记录</strong>、稀疏和不规则采样的<strong>生理时间序列</strong>、实验室测量值等。迄今为止，大多数从重症监护室EHR数据中学习预测模型的方法都集中在<strong>单一模式上</strong>。</p>
+<p>在本文中，我们利用最近提出的<strong>插值-预测深度学习架构</strong>(Shukla和Marlin  2019)作为<strong>基础</strong>，探索如何将生理时间序列数据和临床笔记<strong>集成</strong>到统一的死亡率预测模型中。我们研究<strong>早期和晚期融合</strong>方法，并演示临床文本和生理数据的<strong>相对预测值如何随时间变化</strong>。我们的结果表明，与单独使用单一模式相比，<strong>后期融合方法</strong>可以在死亡率预测性能方面提供<strong>统计学上的显著改善</strong>。</p>
+<h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a><strong>介绍</strong></h3><p>电子健康记录(EHRs)存储与个人病史相关的<strong>多模式</strong>数据，包括临床记录、生理测量、实验室结果、放射学图像等。重症监护室电子健康记录特别有趣，因为它们包含<strong>多个生理变量（心率，血压，血氧饱和度等）随时间的测量值</strong>。通过创建基于机器学习和数据挖掘技术的改进决策支持工具，对这些数据的分析有可能<strong>改善护理</strong>。然而，数据的<strong>复杂性</strong>导致了对孤立分析单一数据模式的关注。</p>
+<p>在本文中，我们探讨了将生理时间序列数据和临床文本整合到统一的死亡率预测模型中的<strong>预测价值</strong>。具体来说，我们通过时间<strong>利用临床笔记的内容</strong>，并将它们包含的信息与生理时间序列数据融合。我们基于最近提出的插值-预测深度学习架构作为稀疏建模框架和不规则采样的生理时间序列。我们研究了几种表达临床文本的方法，以及<strong>整合两种数据模式的早期和晚期融合方法</strong>。我们从介绍生理时间序列<strong>建模</strong>、临床文本和融合方法的<strong>相关工作</strong>开始。接下来，我们将介绍所提出的方法，包括对<strong>插值预测网络</strong>的简要回顾。最后，我们在MIMIC-III数据集上展示了死亡率预测实验，证明了临床文本和生理数据的<strong>相对预测值在入院后的前48小时内是如何变化的</strong>。我们表明，较之单独使用单个模态，<strong>后期融合</strong>方法可以提供显著的改进。</p>
+<h3 id="相关工作-1"><a href="#相关工作-1" class="headerlink" title="相关工作"></a><strong>相关工作</strong></h3><p>这项工作感兴趣的问题是通过将<strong>临床时间序列与非结构化临床文本数据相融合</strong>来学习<strong>有监督</strong>的机器学习模型。在本节中，我们回顾了临床文本和不规则采样的生理时间序列的<strong>稀疏建模和分析</strong>的相关工作，以及<strong>融合方法</strong>的相关工作。</p>
+<ul>
+<li><p><strong>临床文本</strong>:过去几年，随着临床笔记的访问越来越多，在<strong>理解临床文本数据和使用</strong>这些数据来改善临床结果预测方面取得了重大进展。<strong>自然语言处理</strong>和信息提取技术已成功应用于包括临床概念提取、关系提取、问题回答、预测建模等任务。使用叙事笔记预测临床结果的方法包括使用<strong>基于规则的医学概念提取</strong>或机器学习技术。然而，这种方法在规则构建、关键词选择、文本注释或<strong>有监督机器学习</strong>的特征工程方面需要<strong>大量</strong>的工作。</p>
+</li>
+<li><p><strong>主题建模</strong>等<strong>无监督方法</strong>可以用来解决这个问题。主题建模(Ghassemi等人，2012)方法依赖于从临床文本数据中提取<strong>主题特征</strong>。Lehman等人结合了<strong>主题建模和医学概念提取方法</strong>来预测住院死亡率。最近，包括word2vec和GloV  e (2014)在内的<strong>单词嵌入方法</strong>在众多自然语言处理任务中取得了成功，受此启发，Minarro  Gimenez、Marin Alonso和Samwald (2014)学习了一种用于<strong>医学文本数据的嵌入</strong>模型。De  Vine等人(2014)使用期刊摘要来训练嵌入。Choi，Yi-I Chiu和Sontag  (2016)评估了<strong>单词嵌入在捕捉医学概念</strong>之间关系的效率。Boag等人(2018)比较了由单词包(BOW)、word2vec和所学LSTM的最终隐藏层生成的临床笔记表示，用于下游临床预测任务。他们的结果表明，没有简单的获胜代表。<strong>BoW和word2vec</strong>在预测住院死亡率方面取得了相似的表现。在最近的其他工作中，Ghassemi等人(2015)使用<strong>高斯过程</strong>将临床笔记序列建模为主题的时间序列。在这项工作中，我们将临床笔记视为单词或句子的序列，并使用<strong>递归网络</strong>来预测住院死亡率。我们使用简单平均值(Pennington，Socher和Manning  2014)以及单词嵌入的加权平均值生成句子嵌入。与Boag等人(2018年)相似，我们比较了单词包和手套模型。最后，与Kalchbrenner、Grefenstette和Blunsom  (2014)相似，我们也使用<strong>卷积模型</strong>进行预测，其中<strong>临床笔记</strong>以<strong>单词嵌入</strong>的方式表示。</p>
+</li>
+<li><p><strong>不规则采样的生理时间序列：</strong>稀疏和不规则采样的<strong>时间序列</strong>是在它们的观测<strong>时间之间</strong>具有<strong>大的和不规则的</strong>间隔的样本序列。这种数据通常出现在电子健康记录中，对于监督学习方法和非监督学习方法来说都是一个<strong>重大问题</strong>(Marlin等人，2012年)。一个密切相关的问题是在<strong>存在缺失数据</strong>的情况下执行监督学习(Little和Rubin  2014)。事实上，通过离散化时间轴并指示没有观察到样本的间隔丢失，<strong>分析稀疏和不规则采样数据的问题可以转化为丢失数据的问题</strong>(通常伴随着信息或推理效率的损失)。马林等人(2012年)以及利普顿、卡勒和韦特泽尔(2016年)采用了这种方法来处理不规则采样。</p>
+<p>随着<strong>缺失数据量的增加</strong>，学习通常会变得更加困难，因此<strong>选择离散化间隔长度</strong>必须作为这种方法的<strong>超参数</strong>来处理。预离散化的替代方法是构建能够直接使用不规则采样时间序列作为输入的模型。</p>
+<ul>
+<li>例如，Lu等人(2008)提出了一种基于<strong>核</strong>的方法，该方法可用于产生两个不规则采样时间序列之间的相似性函数。李和马林(2015)随后对此进行了概括<strong>高斯过程模型之间核</strong>情况的探讨。Li和Marlin  (2016)展示了<strong>深度神经网络</strong>模型(前馈、卷积或递归)如何通过<strong>端到端训练</strong>叠加在<strong>高斯过程层</strong>之上，而Futoma等人(2017)展示了如何将这种方法从单变量推广到多变量。上述模型的一个<strong>重要特性</strong>是，它们允许将来自<strong>所有可用时间点</strong>的所有信息<strong>合并到全局插值模型</strong>中。</li>
+<li>另一个独立的研究方向是使用更多的<strong>局部插值</strong>方法，同时仍然<strong>直接对连续时间输入</strong>进行操作。例如，Che等人(2018年)提出了几种基于<strong>门控递归单位</strong>(GRU)网络(Chung等人，2014年)的方法，结合了<strong>简单的插补方法</strong>，包括均值插补和用过去的值进行正向填充。Che等人(2018年)还考虑了一种方法，该方法将由观察到的值和观察到这些值的时间戳组成的序列作为输入。先前观察到的<strong>输入值</strong>随着时间朝着总平均值<strong>衰减</strong>。在另一个变体中，<strong>隐藏状态类似地衰减到零</strong>。Yoon，Zame和van  der Schaar  (2017)提出了另一种基于<strong>多方向RNN</strong>的类似方法，该方法除了在<strong>流内</strong>运行之外，还在<strong>流间</strong>运行。</li>
+</ul>
+<p>在这项工作中，我们使用最近提出的<strong>插值预测网络</strong>来建模稀疏和不规则采样的生理时间序列(Shukla和Marlin  2019)。该框架<strong>解决了一些困难</strong>，包括Li和Marlin  (2016)和Futoma等人(2017)中使用的<strong>高斯过程插值层</strong>的复杂性，以及Che等人(2018)的方法缺乏模块化。</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>融合模型：</strong>学习<strong>多模态表示</strong>是一个基本的研究问题。Ngiam等人(2011)引入了一个多模态深度学习框架，将<strong>视频和音频结合起来用于语音识别</strong>。具有语言和视觉子空间的多模态学习已经被用于<strong>提高图像字幕任务</strong>的性能。Srivastava使用多模态(<strong>文本和图像</strong>)的融合表示作为区分任务的输入。Silberer使用<strong>堆叠自动编码来融合多模态</strong>数据，而Kiela和Bottou  (2014)采用简单的串联策略，并使用<strong>卷积模型提取视觉特征和文本的跳格模型</strong>来实现经验改进。</p>
+<p>另一项工作是将<strong>时间序列数据和文本信息</strong>结合起来。唐、杨和周(2009)分析了<strong>新闻报道以提高对股价的预测</strong>，而罗德里格斯、马高和佩雷拉(2018)使用简单的串联方法来<strong>组合时间序列和文本数据</strong>，用于通过学习它们的潜在表示来预测出租车需求。在临床数据空间中，Fiterau等人(2017年)展示了<strong>如何结合年龄、性别、身高等结构化信息</strong>。用时间序列数据可以提高性能。徐等(2018)通过<strong>整合连续</strong>监测数据和<strong>离散</strong>临床事件序列，开发了临床预测模型。Rajkomar等人(2018年)结合了多种模式，如<strong>人口统计、供应商订单、诊断、程序、药物、实验室值、临床文本数据和生命体征</strong>，并在多项任务中表现出改进的表现。</p>
+<p>金等(2018)将<strong>非结构化临床文本数据与生理时间序列数据相结合</strong>，用于<strong>院内死亡率预测</strong>，类似于目前的工作。相对于这项工作，我们考虑了多种临床文本表示，将我们的时间序列模型基于<strong>插值预测网络</strong>(Shukla和Marlin  2019)，并关注<strong>临床文本和生理数据</strong>的<strong>相对值如何随时间变化</strong>。此外，我们考虑了<strong>早期和晚期融合</strong>方法，扩展了Kiela和Bottou  (2014)和Fiterau等人(2017)的前期工作。</p>
+</li>
+</ul>
+<h3 id="模型"><a href="#模型" class="headerlink" title="模型"></a><strong>模型</strong></h3><ul>
+<li><strong>插值预测网络框架</strong>。该架构基于使用组织成插值网络的几个半参数插值层，然后应用可以利用任何标准深度学习模型的预测网络。</li>
+</ul>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708215847574.png" alt="image-20210708215847574"></p>
+<p>​    <strong>插值网络</strong>和<strong>预测网络</strong>，在融合的情况下，我们使用这个目标来<strong>单独预训练插值预测网络参数</strong>。</p>
+<ul>
+<li><p><strong>文本模型（预训练纯文本模型，用于提供纯文本基线）：</strong>我们考虑了几种不同的<strong>非结构化文本建模</strong>方法，包括基于<strong>单词包和单词嵌入表示</strong>的方法。</p>
+<p><strong>TF-IDF:</strong>首先使用从单词包（词袋）计算出的<strong>TFIDF特征</strong>表示每个文本文档。我们在TF-IDF输入上应用一个大小为128的单隐层(1NN)全连接网络，然后是预测网络的其余部分。</p>
+<p><strong>单词嵌入(WE):</strong>首先将每个文档表示为矩阵，其中行是文档中的单词，列是单词嵌入维度。</p>
+<p><strong>未加权句子嵌入(USE):</strong>首先将每个文档表示为矩阵，其中行是文档中的句子，列是句子嵌入维度。</p>
+<p><strong>加权句子嵌入(WSE):</strong>每个文档表示为一个矩阵，其中行是文档中的句子，列是句子嵌入维度。</p>
+</li>
+<li><p><strong>混合模型：插值预测网络</strong>与用于表示非结构化文本的<strong>基于嵌入的模型</strong>相结合</p>
+</li>
+</ul>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708221720832.png" alt="image-20210708221720832"></p>
+<p><strong>后期融合:</strong>该架构如图2(<strong>左</strong>)所示。在这种方法中，<strong>预测网络</strong>使用与Shukla和Marlin  (2019)使用的相同的<strong>GRU架构</strong>来提取<strong>生理时间序列数据</strong>的固定维潜在表示。该表示与文本嵌入层连接，并且使用线性层将<strong>组合的潜在表示</strong>连接到预测目标。</p>
+<p><strong>早期融合:</strong>如图2(<strong>右</strong>)所示，我们考虑对<strong>生理时间序列和临床笔记中包含的信息进行更深入的整合</strong>。在这种方法中，我们的预测网络可以在通过GRU层合并生理时间序列数据<strong>之前访问临床文本数据</strong>。</p>
+<h3 id="实验和结果-1"><a href="#实验和结果-1" class="headerlink" title="实验和结果"></a>实验和结果</h3><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p>在<strong>MIMIC-III数据集</strong>中，为患者的每一个独特的入院到出院事件分配一个独特的<strong>ID</strong>。每集的数据都被视为独立的。在训练-测试分割中，我们根据医院入院ID分割数据(即80%  (27510)的ID用于训练，20% (8597)用于测试)。训练集中另外留出20% (6877个数据案例)用作验证集。</p>
+<p>我们只使用单个入院到出院事件的数据，所以我们构建的数据案例在时间上是不重叠的。</p>
+<p>我们的实验基于公开可用的MIMIC-III数据集。该数据集包含<strong>稀疏和不规则采样的生理信号</strong>、出院总结、进展记录、药物治疗、诊断代码、住院死亡率、住院时间、人口统计信息等。它包括大约58，000份住院记录。我们专注于使用临床文本和时间序列数据预测住院死亡率。我们从Shukla和Marlin  (2019)中使用的<strong>数据集1</strong>开始，该数据集由<strong>住院到出院住院时间超过48小时</strong>的住院记录组成。从这个数据集中，我们获得了42，984条实验记录，这些记录是在<strong>移除了</strong>新生儿和不包含临床记录的入院记录后获得的。入院可能相当于零次或多次重症监护室发作。在本文中，我们只考虑住院期间<strong>至少一次</strong>入住重症监护室的数据病例。类似于Shukla和Marlin  (2019)，我们从每个记录中提取了<strong>12个标准生理变量</strong>。<strong>表1显示了变量和采样率</strong>(每小时)。</p>
+<ul>
+<li><p>我们使用<strong>入院时已知的文本数据</strong>，如主诉、既往病史和当前病史。为了避免任何信息泄露，我们小心地从<strong>出院总结</strong>中提取这些信息。</p>
+</li>
+<li><p>我们还从<strong>非出院报告</strong>中提取<strong>进展记录</strong>，如呼吸、心电图、回声、放射学和护理报告。我们使用这些报告上的日期和时间戳来创建一组在<strong>入院后6到48小时内</strong>可用的笔记。请注意，生理数据和临床笔记以保守的方式对齐。如果一个临床记录有相关的日期和时间，我们假设信息在指定的时间是可用的。对于有日期但没有时间可用的笔记，我们假设信息在指定日期结束时可用。数据集中的一些心电图和回声报告会出现这种情况。</p>
+</li>
+<li>SpO2:血氧饱和度，HR:心率，RR:呼吸频率，SBP: 收缩压，DBP:舒张压，Temp：体温，TGCS:CRR:UO:，FIO2:吸入氧浓度百分比，Glucose:葡萄糖，pH:酸碱度（12个<strong>非规则采样</strong>的生理时间序列）</li>
+</ul>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708222653718.png" alt="image-20210708222653718"></p>
+<h4 id="具体预处理细节"><a href="#具体预处理细节" class="headerlink" title="具体预处理细节"></a><strong>具体预处理细节</strong></h4><p>所有模型都经过训练，以最小化交叉熵损失。对于所有的模型，我们独立地调整超参数——隐藏层的数量、隐藏单元、卷积滤波器、滤波器大小、学习率、辍学率和验证集上的正则化参数。</p>
+<h4 id="评估指标-1"><a href="#评估指标-1" class="headerlink" title="评估指标"></a><strong>评估指标</strong></h4><p>我们的实验集中在<strong>纯文本模型</strong>、<strong>纯时间序列模型</strong>和<strong>融合模型</strong>对住院死亡率预测问题的相对预测性能上。</p>
+<p>我们将融合模型与许多分别对生理时间序列或临床文本数据建模的基线方法进行比较。Shukla和Marlin  (2019)表明，对于稀疏和不规则采样的时间序列，插值预测网络在<strong>分类和回归</strong>任务上<strong>优于</strong>一系列基线和最近提出的模型。因此，我们使用<strong>插值预测网络作为我们的纯时间序列基线模型</strong>。</p>
+<p>我们使用在测试集上计算的泛化性能的估计来评估所有模型。我们根据<strong>ROC曲线下的面积(AUC分数)</strong>报告测试集的性能。</p>
+<p>我们介绍死亡率预测实验的结果。我们从纯文本和时序基线结果开始，然后是融合模型结果。</p>
+<p>1.<strong>纯文本基线</strong>:表2显示了描述的<strong>纯文本模型</strong>的分类性能。我们在入院时可用文本数据的情况下评估所有模型。这些结果表明，基于<strong>TFIDF</strong>的模型明显<strong>优于嵌入</strong>方法。这可能是因为健康特定的概念在所使用的标准手套嵌入中没有得到很好的体现。另一个可能的原因可能是<strong>使用缩写术语</strong>，这在临床笔记中非常常见。因此，我们在根据入院后所有可用的进展记录进行预测时，仅考虑TF-IDF模型。我们可以看到，随着时间的推移，随着<strong>更多的文本数据</strong>变得可用，使用TF-IDF模型的预测性能显著提高。</p>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708223323853.png" style="height:220px"></img></p>
+<p>2.<strong>仅时间序列基线</strong>:表3评估了描述的仅时间序列<strong>插值预测网络</strong>的预测性能。正如预期的那样，预测性能随着观察到的生理<strong>数据量的增加</strong>而增加。我们注意到，这里报告的结果与Shukla和Marlin  (2019)的结果不同，因为<strong>移除</strong>不包含临床数据的医院入院记录需要额外的数据过滤笔记和新生儿<strong>数据</strong>。与表2中的结果相比，我们可以看到入院时可用的临床文本的预测值超过了入院后42小时内可用的生理数据的预测值。下一组实验旨在评估这两种模式融合后是否能提高性能。</p>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708223715564.png" style="height:220px"></img></p>
+<p>3.<strong>融合方法:</strong>基于在纯文本基线实验中观察到的基于TF-IDF的模型的成功，我们检查了使用基于TF-IDF的模型嵌入临床文本数据的融合方法的性能。我们首先评估一种融合方法的性能，这种方法只能访问入院时可用的临床文本数据，但会增加入院后48小时内的生理时间序列数据。表3显示了在该实验场景下早期和晚期融合模型的分类性能。图3<strong>显示了早期和晚期融合相对于纯时间序列和纯文本基线的性能</strong>。我们可以看到，在入院后的前30小时内，晚期融合方法比早期融合方法获得了更好的性能，而<strong>晚期融合方法则显著提高了纯时间序列基线</strong>。然而，我们看到，随着生理数据量的增加，包含生理数据的所有三个模型的预测性能都在提高。此外，我们看到融合模型和仅时间序列模型之间的性能差距随着时间的推移而减小，这表明<strong>初始融合与入院时可用的文本数据</strong>所提供的优势随着时间的推移而减小，因为该信息变得不太相关。最后，我们注意到，<strong>后期融合模型始终优于纯文本基线</strong>，而早期融合模型最初表现出比纯文本TF-IDF基线更低的性能，但继续匹配，然后优于纯文本基线。</p>
+<p>对于这个实验，我们只考虑基于TF-IDF的文本嵌入模型，并将讨论限制在后期融合方法，因为这些模型在我们迄今为止的实验中取得了最好的性能。我们考虑<strong>文本只在入院时可用，但生理时间序列的数量不断增加</strong>。以及<strong>不断增加生理时间序列和文本记录的情况</strong>。</p>
+<ul>
+<li>纳入<strong>入院时0时</strong>已知的文本数据，然后是<strong>入院后6至48小时</strong>内已知的所有笔记的文本。</li>
+</ul>
+<p><img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708224705190.png" style="height:260px"></img></p>
+<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h3><p>在本文中，我们开发了用于调查重症监护室电子病历中临床笔记内容和生理时间序列数据的相对预测值的方法。我们已经<strong>考虑了仅基于临床文本的模型，仅基于生理时间序列的模型，以及结合两种模态的新融合方法</strong>。我们的实验侧重于使用这种方法来评估临床文本和生理数据的相对预测值，作为入院后时间的函数。我们的重点是预测入院后超过48小时的住院死亡率事件。我们的结果表明，随着观察到更多的生理数据，入院时已知的文本记录中信息的相对<strong>价值会随着时间的推移而降低</strong>。然而，合并新可用的文本数据可以显著提高预测性能。最后，我们的结果有力地支持了融合两种数据模式导致最佳整体预测性能的结论。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%94%9F%E7%90%86%E4%BF%A1%E5%8F%B7/" rel="tag"># 生理信号</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/21/ZhangHongjun/%E3%80%902021CVPR%E3%80%91Understanding%20the%20Behaviour%20of%20Contrastive%20Loss/" rel="prev" title="zhj 【CVPR2021】Understanding the Behaviour of Contrastive Loss">
+      <i class="fa fa-chevron-left"></i> zhj 【CVPR2021】Understanding the Behaviour of Contrastive Loss
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/" rel="next" title="lyx GAN ensemble for anomaly detection">
+      lyx GAN ensemble for anomaly detection <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%8D%E8%A7%84%E5%88%99%E9%87%87%E6%A0%B7%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E6%8F%92%E5%80%BC%E9%A2%84%E6%B5%8B%E7%BD%91%E7%BB%9C"><span class="nav-number">1.</span> <span class="nav-text">不规则采样时间序列的插值预测网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.0.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.0.2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.0.3.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7"><span class="nav-number">1.0.4.</span> <span class="nav-text">符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="nav-number">1.0.5.</span> <span class="nav-text">模型体系结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%80%BC%E7%BD%91%E7%BB%9C"><span class="nav-number">1.0.6.</span> <span class="nav-text">插值网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E7%BD%91%E7%BB%9C"><span class="nav-number">1.0.7.</span> <span class="nav-text">预测网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.0.8.</span> <span class="nav-text">参数学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%92%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">1.0.9.</span> <span class="nav-text">实验和结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E5%87%86%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.0.9.1.</span> <span class="nav-text">基准模型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%9D%9E%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%BA%BF%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.0.9.1.1.</span> <span class="nav-text">非神经网络基线模型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%BA%BF%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.0.9.1.2.</span> <span class="nav-text">神经网络基线模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87"><span class="nav-number">1.0.10.</span> <span class="nav-text">评估指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.0.11.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%86%E7%94%9F%E7%90%86%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%92%8C%E4%B8%B4%E5%BA%8A%E7%AC%94%E8%AE%B0%E4%B8%8E%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%9B%B8%E7%BB%93%E5%90%88%EF%BC%8C%E6%8F%90%E9%AB%98ICU%E6%AD%BB%E4%BA%A1%E7%8E%87%E9%A2%84%E6%B5%8B"><span class="nav-number">2.</span> <span class="nav-text">将生理时间序列和临床笔记与深度学习相结合，提高ICU死亡率预测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81-1"><span class="nav-number">2.0.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D-1"><span class="nav-number">2.0.2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C-1"><span class="nav-number">2.0.3.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.0.4.</span> <span class="nav-text">模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E5%92%8C%E7%BB%93%E6%9E%9C-1"><span class="nav-number">2.0.5.</span> <span class="nav-text">实验和结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">2.0.5.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E9%A2%84%E5%A4%84%E7%90%86%E7%BB%86%E8%8A%82"><span class="nav-number">2.0.5.2.</span> <span class="nav-text">具体预处理细节</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%8C%87%E6%A0%87-1"><span class="nav-number">2.0.5.3.</span> <span class="nav-text">评估指标</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93-1"><span class="nav-number">2.0.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

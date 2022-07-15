@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="作者 Ki Hyun Kim, Sangwoo Shim, Yongsub Lim, Jongseob Jeon, Jeongwoo Choi, Byungchan Kim, Andre S. Yoon  会议 2020 ICLR  贡献 1、提出一种新的利用输入的隐藏层激活值和自编码器重构之后的隐藏层激活值异常检测方法RAPP，并且给出了识别输入异常的聚合函数 2、给出了RAPP的动机，将重构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssk NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY">
+<meta property="og:url" content="http://example.com/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="作者 Ki Hyun Kim, Sangwoo Shim, Yongsub Lim, Jongseob Jeon, Jeongwoo Choi, Byungchan Kim, Andre S. Yoon  会议 2020 ICLR  贡献 1、提出一种新的利用输入的隐藏层激活值和自编码器重构之后的隐藏层激活值异常检测方法RAPP，并且给出了识别输入异常的聚合函数 2、给出了RAPP的动机，将重构">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201003151333.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201003201056.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201003230421.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201003231256.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201003231303.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:49:42.940Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201003151333.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ssk NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ssk NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:49:42" itemprop="dateModified" datetime="2021-01-16T11:49:42+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li><p><strong>作者</strong></p>
+<p>Ki Hyun Kim, Sangwoo Shim, Yongsub Lim, Jongseob Jeon, Jeongwoo Choi, Byungchan Kim, Andre S. Yoon</p>
+</li>
+<li><p><strong>会议</strong></p>
+<p>2020 ICLR</p>
+</li>
+<li><p><strong>贡献</strong></p>
+<p>1、提出一种新的利用输入的隐藏层激活值和自编码器重构之后的隐藏层激活值异常检测方法RAPP，并且给出了识别输入异常的聚合函数</p>
+<p>2、给出了RAPP的动机，将重构的观点从输入空间扩展到隐空间。展示了重构输入之后再输入到网络的隐藏激活值与对应的原始输入的隐藏重构值是等价的。</p>
+<p>3、说明了RAPP在多个数据集上改进了基于自编码器的异常检测方法。此外，验证了RAPP的效果超过了最近的异常检测方法。</p>
+<a id="more"></a>
+</li>
+<li><p><strong>介绍</strong></p>
+<p>​    当只有正常值信息时应该如何来识别异常？异常检测是一种来识别数据样本相对于训练数据是否为离群点额方法，常见的例子有交易欺诈检测，视频监控，医学诊断和设备异常检测。最近深度自编码器和他们的变体在发现复杂数据的简洁表示方面展示出了杰出的表现，并且重构误差被用来作为一种检测异常值的受欢迎度量。但是这种方法有一种限制，只测量了输入空间的重构误差而没有充分利用隐空间中的层次表示。</p>
+<p>​    普通的基于重构的方法是通过比较输入层的输入数据和在输出层的重构数据之间的差别，RAPP把这种比较拓展到了隐空间。首先收集一些隐藏激活值通过将原始输入喂到自编码器中，然后将自编码器的重构值输入到自编码器中计算另一份隐藏层的激活值，这个过程不需要自编码器的额外训练。接下来通过聚合这两份隐藏激活值来量化输入的异常特性。最后，开发了两种度量标准，第一种测量了输入空间和隐空间的整个重构误差数量，第二种度量标准首先标准化了重构误差，然后再求和。</p>
+<p>​    介绍了开发RAPP的动机，展示了重构输入之后再输入到网络的隐藏激活值与对应的原始输入的隐藏重构值是等价的</p>
+</li>
+<li><p><strong>RAPP</strong></p>
+<p>​    下面来介绍提出的基于自编码器的异常检测方法：RAPP，主要的思想就是比较原始输入的隐藏激活值和沿着自编码器投影路径的隐藏重构。也就是说将输入和自编码器的重构映射到隐空间来得到成对的激活值。</p>
+<ul>
+<li><p><strong>基于重构的异常检测</strong></p>
+<p>​    一个自编码器 $A$ 是一个包含编码器 $g$ 和解码器 $f$ 的神经网络 $A=f \cdot g$ 编码器 $g$ 构造的空间叫做隐空间，提供了输入数据的更简洁的表示。</p>
+<p>​    出于这种无监督表示学习的属性，自编码器广泛用于异常检测。在正常的数据样本上训练自编码器，测试样本 $x$ 是否异常通过下式的重构误差 $\varepsilon $ 来度量：</p>
+<script type="math/tex; mode=display">
+\varepsilon =||x-A(x)||_2</script><p>​    随着$\varepsilon (x)$的增大，测试样本 $x$ 更可能是一个异常，因为那意味着 $x$ 更加远离了自编码器所描述的流形。</p>
+<p>​    即使这种方法展示了在异常检测方面有前景的结果，但重构误差没有充分利用训练好的自编码器提供的信息，特别是当自编码器很深的时候。换句话说被自编码器所识别的层次信息被忽略掉了，层次表示学习是深度神经网络被证明最成功的能力之一。</p>
+</li>
+<li><p><strong>隐空间中的重构误差</strong></p>
+<p>​    令 $A=f \cdot g$表示一个已经训练好的自编码器，$l$ 是编码器 $g$ 的隐藏层数量，$g=g_l\cdot …\cdot g_1$ ，定义$g$的部分计算为：</p>
+<script type="math/tex; mode=display">
+g_{:i} = g_i...g_1</script><p>其中$1\leq i\leq l$</p>
+<p>​    令$x$是输入向量，$\widehat{x}$是通过$A$的重构：$\widehat{x}=A(x)$。除了像普通自编码器那样在输入空间中比较$x$和$\widehat{x}$，还沿着$A$的投影路径来在隐空间中比较他们，也就是将$x$和$\widehat{x}$输入到$A$，得到成对的隐空间表示$(h_i,\widehat{h}_i)$，其中</p>
+<script type="math/tex; mode=display">
+h_i(x)=g_{:i}(x) ,</script><script type="math/tex; mode=display">
+\widehat{h}_i(x)=g_{:i}(\widehat{x})=g_{:i}(A(x))</script><p>​    如下图所示，表示了计算$h_i$和$\widehat{h}_i$的过程，因此，样本$x$的异常性由公式$H(x) = { (h_i(x), \widehat{h}_i(x)) : 1 ≤ i ≤ l }$来度量。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003151333.png" alt="微信截图_20201003151333" style="zoom:70%;" /></p>
+<p>​    注意RAPP确实是普通重构方法的一般化，通过定义$g<em>0$和$s</em>{ord}$如下</p>
+<script type="math/tex; mode=display">
+s_{ord}(H(x)) = ||h_0(x) − \widehat{h}_0(x)||_2</script><p>其中$h_0(x) = g_0(x) = x$，$\widehat{h}_0(x) = g_0(\widehat{x}) = \widehat{x}$</p>
+<p>​    在本文中定义了两个度量尺度$s<em>{SAP}$和$s</em>{NAP}$。当没有先验知识存在时，这两种度量尤其适用于选择层次以获得异常度量，注意，如果我们有关于空间的知识或者能够描述空间特征，可以设计出更精细的度量方法。</p>
+<ul>
+<li><p><strong>沿着路径的简单聚合(SAP)</strong></p>
+<p>​    这是一种最直接的定义在$H$上的度量方法，对于一个样本$x$，SAP可以定义为H中的所有pair之间的欧氏距离的平方和：</p>
+</li>
+</ul>
+<script type="math/tex; mode=display">
+s_{SAP}=\sum_{i=0}^{l}||h_i(x)-\widehat{h}_i(x)||^2_2=||\textbf{h}(x)-\widehat{\textbf{h}}(x)||^2_2</script><ul>
+<li><p><strong>沿着路径的标准化聚合(NAP)</strong></p>
+<p>​    虽然SAP很直观，但是隐空间的属性，$H$中pairs的距离分布可能由于不同隐空间而有不同，例如，</p>
+<p>距离的大小会依赖于不同的层，或者可能存在跨层的相关神经元，这些神经元无意之中在SAP中被强调。所以为了捕获更清楚的模式，通过两个步骤来标准化这些距离：正交化和缩放。</p>
+<p>​    令 $\textbf{d}(x) = \textbf{h}(x) − \widehat{\textbf{h}}(x)$ ；给定一个训练集$X$，令$\textbf{D}$表示一个矩阵，它的第$i$行对应$\textbf{d}(x<em>i)$，其中$x_i \in X$，令$\overline{\textbf{D}}$表示$\textbf{D}$的列优先中心(column-wise centered)矩阵，为了标准化，计算$\overline{\textbf{D}}$的SVD分解-$U\sum V^T$，得到奇异值$\sum $和右奇异向量$V$，对于一个给定的样本$x$，定义$s</em>{NAP}$如下</p>
+<script type="math/tex; mode=display">
+s_{NAP}(x)=||(\textbf{d}(x)-\mu_X)^TV\sum{^{-1}}||_2^2</script><p>​    其中$\mu_X$表示D的列优先的平均值，$\textbf{d}(x)$表示为一个列向量。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>RAPP的动机</strong></p>
+<p>​    使用普通的重构方法会有一个很自然的问题：为什么只使用输入空间？或者说为什么不使用隐空间的信息？当重构误差在输入空间中广泛使用，任何类似的观点在隐空间中就都不存在。一个原因是对应的编码器层和解码器层无法保证表示出相同的空间，这是因为自编码器的目标函数没有任何涉及到中间隐藏层的激活值。因此，$f<em>{l:i+1}(g(x))$不能被认为是$g</em>{:i}(x)$的重构。</p>
+<p>​    下面会介绍一种非直接的方法来计算隐空间重构，准确的说会介绍$\widehat{h}<em>i(x)=g</em>{:i}(A(x))$确实等同于$g_{:i}(x)$的重构，整体机制如下所示</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003201056.png" alt="微信截图_20201003201056" style="zoom:60%;" /></p>
+<ul>
+<li><p>隐空间重构的计算</p>
+<p>​    令$A=f\cdot g$为一个已经训练好的自编码器，令$M<em>0={A(x):x \in \mathbb{R}^n}$表示为$A$所描述的低维表示，定义$M_i={g</em>{:i}(x):x \in M<em>0}$为由$g</em>{:i}$定义的$M_0$的低维映像，$g$和$f$受限于$M_0$和$M_l$，是彼此之间的逆函数。</p>
+<p>​    <strong>量化隐空间的重构</strong>，我们首先假设存在一个解码器$\widetilde{f}=\widetilde{f}_1 \cdot… \cdot \widetilde{f}_l$，例如：</p>
+<script type="math/tex; mode=display">
+\forall x\in M_l,\widetilde{f}(x)=f(x),</script><script type="math/tex; mode=display">
+\forall a \in M_i,a=(g_i \cdot \widetilde{f}_i)(a)</script><p>​    其中第二个条件使$\widetilde{f}<em>{l:i+1}$成为一个对应于$g</em>{i+1:}$的合适的解码器，因此$\widetilde{f}$能够定义第$i$层的隐重构$\widehat{h}^{‘}_i(x)$，如下式所示：</p>
+<script type="math/tex; mode=display">
+\widehat{h}^{'}_i(x)=(\widetilde{f}_{l:i+1}\cdot g_{i+1:})(h_i(x))</script><p>最终能够得到结论$\widetilde{h}^{‘}_i(x)$等同于$\widetilde{h}_i(x)$，对于任一$x \in M_0$，如下所示：</p>
+<script type="math/tex; mode=display">
+\widehat{h}^{'}_i(x)=(\widetilde{f}_{l:i+1}\cdot g_{i+1:})(h_i(x))=(\widetilde{f}_{l:i+1}\cdot g)(x)</script><script type="math/tex; mode=display">
+\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space =(g_{:i}\cdot\widetilde{f}\cdot g)(x)</script><script type="math/tex; mode=display">
+\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space =(g_{:i} \cdot A)(x)=h_i(\widehat{x})=\widehat{h}_i(x)</script></li>
+</ul>
+</li>
+<li><p><strong>评价</strong></p>
+<p>使用了Kaggle和UCI中用来进行异常检测和多分类的数据集，如下表所示</p>
+</li>
+</ul>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003230421.png" alt="微信截图_20201003230421" style="zoom:60%;" /></p>
+<p>​        为了比较RAPP和最近文章中的异常检测方法，也选取了一些基数据集来评估深度学习技术：MNIST和F-MNIST。</p>
+<p>​        使用AUROC将RAPP和其他的一些方法进行了比较，没有使用基于阈值的度量，例如F1-score，因为只允许在测试期间访问异常样本。</p>
+<p>和基线的比较：</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003231256.png" alt="微信截图_20201003231256" style="zoom:60%;" /></p>
+<p>和最近的方法的比较：</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201003231303.png" alt="微信截图_20201003231303" style="zoom:60%;" /></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/" rel="prev" title="ssk Transfer Anomaly Detection by Inferring Latent Domain Representations">
+      <i class="fa fa-chevron-left"></i> ssk Transfer Anomaly Detection by Inferring Latent Domain Representations
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/MaPeitao/Time-Series%20Anomaly%20Detection%20Service%20at%20Microsoft%5BKDD'%202019%5D(1)/" rel="next" title="mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft">
+      mpt 【KKD-2019】Time-Series Anomaly Detection Service at Microsoft <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

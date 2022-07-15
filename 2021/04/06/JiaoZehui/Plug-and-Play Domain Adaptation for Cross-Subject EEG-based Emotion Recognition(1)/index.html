@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：迁移学习；EEG 摘要由于脑电信号的跨受试者的变异性，情感脑机接口面对人类情感解码时受到了很大的阻碍。现有的方法通常需要收集每一个新对象的大量脑电数据，耗时很大而且用户体验糟糕。为了解决这个问题，我们将脑电表示分为特定于每个受试者的私人成分和对所有受试者都通用的共同情感成分。根据这一表示部分，我们提出了一种即插即用域自适应方法来处理受试者的可变性。 在训练阶段，由一个共享编码器和一个私有编">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition">
+<meta property="og:url" content="http://example.com/2021/04/06/JiaoZehui/Plug-and-Play%20Domain%20Adaptation%20for%20Cross-Subject%20EEG-based%20Emotion%20Recognition(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：迁移学习；EEG 摘要由于脑电信号的跨受试者的变异性，情感脑机接口面对人类情感解码时受到了很大的阻碍。现有的方法通常需要收集每一个新对象的大量脑电数据，耗时很大而且用户体验糟糕。为了解决这个问题，我们将脑电表示分为特定于每个受试者的私人成分和对所有受试者都通用的共同情感成分。根据这一表示部分，我们提出了一种即插即用域自适应方法来处理受试者的可变性。 在训练阶段，由一个共享编码器和一个私有编">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311101228568.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311103426076.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311111320712.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311113915167.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311113957392.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311114308563.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311114541755.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311114525114.png">
+<meta property="article:published_time" content="2021-04-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-04-07T03:26:37.945Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311101228568.png">
+
+<link rel="canonical" href="http://example.com/2021/04/06/JiaoZehui/Plug-and-Play%20Domain%20Adaptation%20for%20Cross-Subject%20EEG-based%20Emotion%20Recognition(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/06/JiaoZehui/Plug-and-Play%20Domain%20Adaptation%20for%20Cross-Subject%20EEG-based%20Emotion%20Recognition(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-04-06T20:24:24+08:00">2021-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-04-07 11:26:37" itemprop="dateModified" datetime="2021-04-07T11:26:37+08:00">2021-04-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：迁移学习；EEG</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>由于脑电信号的跨受试者的变异性，情感脑机接口面对人类情感解码时受到了很大的阻碍。现有的方法通常需要收集每一个新对象的大量脑电数据，耗时很大而且用户体验糟糕。为了解决这个问题，我们将脑电表示分为特定于<strong>每个受试者的私人成分和对所有受试者都通用的共同情感成分</strong>。根据这一表示部分，我们提出了一种即插即用域自适应方法来处理受试者的可变性。</p>
+<p>在训练阶段，由一个<strong>共享编码器</strong>和一个<strong>私有编码器</strong>分别捕获对象不变的情感表征和源对象的私有成分。在此基础上，我们构建了一个基于<strong>共享部分的情感分类器</strong>，并结合这两个部分构建了<strong>受试者分类器</strong>。在校准阶段，该模型只需要少量来自目标受试者的未标记脑电数据来对其私有成分进行建模。因此，除了共享情感分类器外，我们还有另一条管道通过私有成分的相似性来使用源域的知识。在测试阶段，我们将共享情感分类器的预测结果与通过相似性权重调制后的个体分类器的预测结果相结合。在SEED数据集上的实验结果表明，该模型在保持识别准确率的同时，大大缩短了校准时间，使情感解码更具普遍性和实用性。</p>
+<a id="more"></a>
+<p><strong>作者：</strong> <strong>Li-Ming Zhao,</strong> <strong>Xu Yan,</strong>  <strong>Bao-Liang Lu</strong></p>
+<p>Department of Computer Science and Engineering, Shanghai Jiao Tong University, Shanghai, China, 200240</p>
+<p>Department of Linguistics, University of Washington, Seattle, WA, USA, 98195</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>新兴的情感计算旨在检测、记录、处理和回应人们的情感状态。它在日常生活中的许多应用领域都有着广阔的前景，从医疗、智能教育和娱乐等特定场景到脑-机接口（BCIs）等一般情感敏感系统，其中情感识别是首要步骤和里程碑。近年来，基于脑电信号的情感识别以其信息的充分性引起了研究者的极大兴趣。然而，由于受试者之间的<strong>结构和功能变异性</strong>，如精神状态、电极阻抗、头部形状等，EEG数据高度依赖于受试者。图1说明了情绪EEG数据的受试者间变异性，这给构建实用的基于脑电信号的情感模型带来了很大的挑战。这阻碍了情感计算的大规模发展和应用。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311101228568.png" alt="image-20210311101228568"></p>
+<p>上述阻碍促使许多研究者开发了实用的情感识别算法。<strong>传统的方法</strong>是从新受试者中采集大量数据，对其进行标记，并在测试阶段前使用它们定制分类器参数。不幸的是，这种需求耗时，导致用户体验差，这使得模型的实用性降低。另一种方法是使用<strong>迁移学习方法</strong>来处理个体差异。根据目标域的数据是否用于模型训练阶段，将迁移学习大致分为域适应（DA）和域通用化（DG）。在情感识别的实际应用中，由于使用了所有目标数据，DA效率低下，DG不依赖目标对象的任何信息，因此可能会受到其泛化能力的影响。</p>
+<p>与DA和DG的极端相反，在实时识别开始之前引入短期校准阶段是可以接受的，也是必要的。图1主观地展示了算法性能和用户体验之间的权衡困境。然而，现有的研究表明，如果训练数据的数量比特征向量的维数小，模型很可能会崩溃。因此，用有限的目标训练数据来获得良好的DA结果是一个挑战。</p>
+<p>针对上述问题，我们提出了一种<strong>即插即用的域自适应方法</strong>，该方法可以在不牺牲识别准确率的前提下，利用少量未标记的目标数据进行校正。我们假设将脑电表示分为对所有子对象具有<strong>普遍性的共享情感成分</strong>和对每个受试者具有<strong>特定性的私有成分</strong>。我们使用LSTM和损失函数来分离私有成分，并在此过程中产生对情感识别更有意义的表征。然而，我们相信，只用共享情感空间中的单一分类器对于从未见过的新受试者仍然具有有限的能力。因此，我们还为现有的源域建立了一系列独立的分类标准，目的是为新的受试者提供参考。通过重构少量的校准数据，我们可以快速构建新的被试的私有编码器，同时训练出共享的编码器和解码器。因此，目标主体可以通过私有成分的相似性从源个体分类器中借用知识，并与共享分类器一起加强情感预测。脑电传感器建立后，私有成分是引起个体间变异的主要原因，在一个集合内保持不变，这是缩短校准时间的关键。此外，我们希望利用注意机制自动学习与情绪识别最相关的关键脑电通道和频带。</p>
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><p>迁移学习的出现引起了广泛的关注，并迅速成为解决脑机接口受试者间差异的重要方法。</p>
+<p>迁移学习有两个主要的分支可以帮助减少主题不变性。一种是领域适应（DA）。DA方法通过最小化源域和目标域之间的域偏移来提高目标数据的准确性，这表明在训练阶段，我们必须从目标域获取数据。</p>
+<ul>
+<li>TPT</li>
+<li>DANNs</li>
+<li>DSN</li>
+</ul>
+<p>无论数据如何实现知识迁移，所有的方法都需要所有的目标信息，这适用于离线数据集的转移，但在实时BCI应用中是无法达到的。</p>
+<p>这种隐含的不足促使研究者转向域泛化（DG）寻求帮助。DG方法可以通过利用多个源对象的域差异来提取域不变特征，而无需从目标对象获取任何数据。</p>
+<ul>
+<li>DICA</li>
+<li>SCA</li>
+<li>DResNet</li>
+</ul>
+<p>虽然DG方法似乎更可能贴合实际，但仍有一些问题值得思考。DG方法对目标数据无需求的限制是否最适合实时应用方案？虽然长期校准会导致用户体验差，但通过短期校准仍然可以收集很少的目标数据，以快速适应目标主体。</p>
+<ul>
+<li>STM</li>
+</ul>
+<p>Li et al.（2019）利用样式转换映射（STM）方法，在支持少量标记目标数据的情况下减少域差异。他们在三种情绪识别任务的校准阶段使用了三组总共10分钟左右的标记脑电数据。Li等人已经取得了很好的效果，但是10分钟的校准时间在实际应用中仍然很长。此外，STM要求标记数据覆盖所有类别，这意味着随着情感类别的扩展，校准时间将进一步增加。</p>
+<p>影响脑电域适应时间的一个关键点是脑电信号含有过多的信息。我们的大脑在情绪方面表现出偏侧化，一些区域和频带比其他具有不同情绪的区域和频带更能提供信息。也已经证实了神经信号与不同情绪之间存在相关性。此外，在情绪识别任务中，有人还根据训练好的深层信念网络所赋予的权重来分配关键通道和频带。相比之下attention机制为解决这一问题提供了新的可能性。</p>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h3><p>我们提出了一种新的即插即用域适配（PPDA）方法。PPDA的框架如图2所示。整个结构可分为<strong>训练阶段、校准阶段和测试阶段</strong>。</p>
+<ul>
+<li>训练阶段，首先采用基于注意池的方法来利用脑电信号关键通道和频带的空间信息。然后，采用基于长-短记忆的编解码方案来提取特征。我们提出了一个<strong>共享编码器</strong>Es和<strong>n个私有编码器</strong>Ep，分别捕获受试者不变的情感表征和私有成分。通过使用编码器的输出，我们进一步构建了一个<strong>共享分类器</strong>Cs和<strong>n个分类器</strong>Cp来同时识别情感。在这个阶段，只采用<strong>有标签源数据</strong>来训练模型。</li>
+<li>在校准阶段，我们使用新受试者的起始数据，借助经过训练的Es和解码器Ds对新对象的<strong>私有部分编码器</strong>进行建模，我们称之为校准阶段。</li>
+<li>在测试阶段，我们不仅可以像领域泛化方法那样使用共享分类器的流水线，还可以通过与私有源组件的相似度从私有分类器中获取知识。最后采用分类器融合策略对两种识别结果进行融合。</li>
+</ul>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311103426076.png" alt="image-20210311103426076" style="zoom:200%;" /></p>
+<h3 id="自注意力"><a href="#自注意力" class="headerlink" title="自注意力"></a>自注意力</h3><script type="math/tex; mode=display">
+\alpha_{t}=\operatorname{softmax}\left(W_{a} x_{t}+b_{a}\right)\\\widetilde{x}_{t}=\alpha_{t} \cdot x_{t}</script><p>我们尝试引入注意机制，让模型自动探索情绪识别的关键通道和波段。</p>
+<h3 id="LSTM编码"><a href="#LSTM编码" class="headerlink" title="LSTM编码"></a>LSTM编码</h3><p>我们设计了两种编码器分别提取脑电信号的共享情感成分和私有成分。这两个组件串联之后，一个共享解码器被应用于重构输入特征。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311111320712.png" alt="image-20210311111320712" style="zoom:50%;" /></p>
+<h3 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h3><script type="math/tex; mode=display">
+\mathcal{L}=\mathcal{L}_{\mathrm{c}_{-} \mathrm{s}}+\alpha \mathcal{L}_{\mathrm{c}_{-} \mathrm{p}}+\beta \mathcal{L}_{\mathrm{recon}}+\gamma \mathcal{L}_{\mathrm{difference}}+\delta \mathcal{L}_{\mathrm{similarity}}</script><script type="math/tex; mode=display">
+\mathcal{L}_{\mathrm{recon}}=\frac{1}{k}\left\|\tilde{X}-\widetilde{X}^{\prime}\right\|_{2}^{2}</script><script type="math/tex; mode=display">
+\mathcal{L}_{\text {difference }}=\frac{1}{n} \sum_{j=1}^{n}\left\|\mathbf{H}_{s}^{j}{ }^{\top} \mathbf{H}_{p}^{j}\right\|_{F}^{2}</script><script type="math/tex; mode=display">
+\mathcal{L}_{\text {similarity }}=\sum_{i} d_{i} \log \left(\hat{d}_{i}\right)</script><h3 id="校准和测试"><a href="#校准和测试" class="headerlink" title="校准和测试"></a>校准和测试</h3><p>由于脑电图数据是按时间顺序记录的，所以我们只能从一开始就把数据作为校准数据。<br>首先对专用target编码器Etp的参数进行随机初始化，并利用校准数据，利用损失函数对其进行<strong>重构</strong>损失和<strong>difference</strong>的优化。我们认为，一旦任务完成，共享编码器Es就足够广义，并能够提取出主题不变的情感成分，Ds将很好地用于数据重建。</p>
+<p>在测试阶段，一旦收集到一个目标序列xt，我们就同时从每个源域中随机选择长度相同的数据，我们的模型的性能由两条管道保证。像大多数领域泛化方法一样，使用经过训练的共享分类器来保证泛化能力为。对于另一个管道，我们计算源域和测试数据之间的余弦相似度ws以利用私有信息。权重越高，表示分布与目标数据越相似，因此对相应分类器的信任度越高。然后，我们通过权重向量和Cp1∼n的结果向量的点积得到预测y。最终结果是在这两个标签通过分类器融合策略整合后确定的。</p>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><h3 id="数据集和实验设置"><a href="#数据集和实验设置" class="headerlink" title="数据集和实验设置"></a>数据集和实验设置</h3><p>我们在SEED上验证了我们的PPDA模型的性能，SEED是一个用于情感识别的公共情感EEG数据集。本研究选取了15个经过严格筛选的中国电影片段，在快乐、悲伤和中性三种情绪中提取出期望的目标情绪。15名受试者（8名女性，平均23.27，标准差2.37）在不同的时间参加了三次实验。在实验过程中，受试者被鼓励沉浸在视频中以激发相应的情绪。利用ESI神经扫描系统，利用国际10-20系统，在电影观看过程中记录了62个通道的脑电信号。预处理的数据被下采样到200 Hz，并用0-75 Hz的带通进行滤波。在不重叠的1秒时间窗口内，从5个频带（即δ：1-3Hz，θ：4-7Hz，α：8-13 Hz，β：14-30 Hz，γ：31-50 Hz）的频率。因此，在一个实验中，总共有3394个样本，每个受试者有310个特征，用62个通道乘以5个波段计算。</p>
+<p>为了与最新的结果进行比较，我们的评估细节保持一致。具体来说，每个受试者只进行一次实验，就可以用LOSO来研究跨受试者效果。在每次迭代中，我们选择一个主题作为目标域，另外14个主题作为现有的源域。<br>需要注意的是，尽管我们在校准阶段没有使用标记的emotion数据，但SEED中的所有3394个样本点都被标记。因此，在校准阶段，将第一个T秒数据作为校准数据。</p>
+<p>LSTM的层数、隐藏大小和时间步长分别固定为2、64和15。情感分类器和领域分类器都是单元为64的单层全连通网络。校准时间T设置为45s。</p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311113915167.png" alt="image-20210311113915167" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311113957392.png" alt="image-20210311113957392"></p>
+<p>一旦添加了校准过程，模型的性能将如预期的那样显著提高，这强调了校准的重要性。一般来说，模型的性能会随着校准时间的延长而提高。然而，随着校准时间的延长，我们并没有看到显著的增长。这种差异主要是由于脑电信号的独特性质，正如我们在一开始所讨论的。实际上，脑电图数据对外部因素（如电极阻抗和头部形状）以及内部变量（如精神状态）非常敏感。尽管很容易受到影响，但在一次实验中，由于这些因素在一定时期内是相对稳定的，因此其构成基本保持不变。换言之，我们可以在几乎没有校准数据的情况下很好地对目标主体的私有组件进行建模，并使用它来提高整体性能。由于只有很少的数据提供了我们所需要的足够的信息，模型的性能不会随着校准数据的增加而提高。</p>
+<h3 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311114308563.png" alt="image-20210311114308563" style="zoom:50%;" /></p>
+<p>为了证明该结构正常工作，我们从每个受试者中随机抽取50个脑电图样本，通过散点图（如图5（a）所示）用t-SNE对其进行可视化。图5（b）展示了共享编码器和私有编码器的输出。</p>
+<h3 id="注意力"><a href="#注意力" class="headerlink" title="注意力"></a>注意力</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311114541755.png" alt="image-20210311114541755" style="zoom:50%;" /></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210311114525114.png" alt="image-20210311114525114" style="zoom:50%;" /></p>
+<p>如图所示。在图中，很明显，β和γ波段比其他三个波段活跃得多。此外，颜色深度的分布甚至揭示了用它来识别情感的可行性。例如，在β波段，当快乐情绪被激发时，蓝色会更深。在中性和悲伤的感觉中，伽玛带也是如此。在图6（b）中，我们绘制了反映关键通道分布的地形脑电图图。大脑区域越暗，这个区域的通道就越重要。外侧颞叶FT7、FT8、T7和T8通道密集触发。我们的发现与现有的基于EEG的情绪识别关键波段和通道的观察结果一致。</p>
+<h2 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h2><p>本文设计了一种基于脑电的跨受试者情绪识别即插即用域自适应方法自动识别，旨在让每个人都能在保持识别准确性的同时，无需等待即可立即使用。它在一分钟内成功地缩短了校准时间，准确率超过86.7%，与最先进的域自适应性能相当。这种技术可以用来增强用户体验，使基于EEG的情感计算应用更加实用。此外，注意机制所覆盖的通道和频带为可穿戴式脑电设备和实时情绪识别的发展提供了线索。我们未来的工作将集中在各种实际环境下的实时测试，以观察其实用性。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/" rel="prev" title="jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals">
+      <i class="fa fa-chevron-left"></i> jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="next" title="lwh 时序数据库">
+      lwh 时序数据库 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%BC%E8%BF%B0"><span class="nav-number">4.1.</span> <span class="nav-text">综述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="nav-number">4.2.</span> <span class="nav-text">自注意力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LSTM%E7%BC%96%E7%A0%81"><span class="nav-number">4.3.</span> <span class="nav-text">LSTM编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">4.4.</span> <span class="nav-text">损失函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%A1%E5%87%86%E5%92%8C%E6%B5%8B%E8%AF%95"><span class="nav-number">4.5.</span> <span class="nav-text">校准和测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">数据集和实验设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">5.2.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LSTM"><span class="nav-number">5.3.</span> <span class="nav-text">LSTM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="nav-number">5.4.</span> <span class="nav-text">注意力</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">6.</span> <span class="nav-text">讨论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

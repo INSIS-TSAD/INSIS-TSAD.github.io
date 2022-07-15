@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="时序论文分享">
+<meta property="og:url" content="http://example.com/page/4/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="INSIS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/page/4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title>时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/" class="post-title-link" itemprop="url">hgh A时间序列异常检测论文阅读汇总</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-04 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-04T20:24:24+08:00">2021-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:32:05" itemprop="dateModified" datetime="2021-03-08T13:32:05+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="时间序列异常检测论文阅读汇总"><a href="#时间序列异常检测论文阅读汇总" class="headerlink" title="时间序列异常检测论文阅读汇总"></a>时间序列异常检测论文阅读汇总</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/" class="post-title-link" itemprop="url">hgh 关于时序异常检测-动态基线原型系统的提升点的思考</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-04 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-04T20:24:24+08:00">2021-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:32:18" itemprop="dateModified" datetime="2021-03-08T13:32:18+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="关于时序异常检测-动态基线原型系统的提升点的思考"><a href="#关于时序异常检测-动态基线原型系统的提升点的思考" class="headerlink" title="关于时序异常检测-动态基线原型系统的提升点的思考"></a>关于时序异常检测-动态基线原型系统的提升点的思考</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/" class="post-title-link" itemprop="url">jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-03 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-03T20:24:24+08:00">2021-03-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:22:08" itemprop="dateModified" datetime="2021-03-08T13:22:08+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><strong>作者：</strong> Changchun Zhang , Qingjie Zhao </p>
+<p>a Beijing Laboratory of Intelligent Information Technology, School of Computer Science, Beijing Institute of Technology, Beijing 100081, China</p>
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Partial Domain Adaptation</strong> <strong>Attention Mechanism</strong> <strong>Adversarial Networks</strong></p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>如何有效地从目标域的未标记样本中提取特征表示对于无监督的域自适应是至关重要的，特别是对于部分域自适应，其中源标签空间是目标标签空间的一个超空间，因为它有助于减少由于域偏移或域偏差而导致的较大性能差距。</p>
+<p>我们提出了一种基于对抗学习的局部域自适应方法和多自注意网络（MSAN）。与现有的大部分局部域自适应方法只关注高层次特征不同，MSAN主要是利用<strong>标记源数据从未标记目标数据中提取有效的高层次上下文特征和低层次结构特征</strong>。具体地说，我们提出了多重自注意网络，这是一种通过逐步增强特征来学习更细粒度和可转移特征的一般方法，这样可以相对减少域转移，从而提高模型的泛化能力。在Office-31和Office-Home数据集上的综合实验表明，该方法显著改进了表示部分域自适应方法，为各种部分转移任务提供了最新的结果。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/" class="post-title-link" itemprop="url">mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-03 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-03T20:24:24+08:00">2021-03-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:26:52" itemprop="dateModified" datetime="2021-03-08T13:26:52+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mpt/" itemprop="url" rel="index"><span itemprop="name">mpt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词：大规模，异常检测</p>
+<p><img src="https://i.loli.net/2021/03/05/S43oUgMiD9875qk.png" alt="image-20210305112946386.png"></p>
+<p><strong>摘要</strong>:数据挖掘和时间序列计算在关键应用中仍值得研究。目前，在水文时间序列领域，大部分异常值的检测都集中在提高特异性上。为了有效检测海量水文传感器数据中的异常值，提出了一种基于<strong>Flink</strong>的水文时间序列异常检测方法。首先，利用<strong>滑动窗口</strong>和<strong>ARIMA模型</strong>对数据流进行预测。然后对预测结果计算<strong>置信区间</strong>，区间范围外的结果判断为备选异常数据。最后，基于历史批次数据，使用<strong>KMeans++算法</strong>对批次数据进行<strong>聚类</strong>。计算<strong>状态转移概率</strong>，对异常数据进行质量评估。以从楚江获取的水文传感器数据为实验数据，分别进行了检测时间和异常检测性能的实验。结果表明，在计算数千万个数据时，两个从机花费的时间比一个从机少，最大减少量为17.43%。评价的灵敏度从72.91%提高到92.98%。延迟方面，不同从机的平均延迟大致相同，维持在20ms以内。结果表明，在大数据平台下，该算法能有效提高数千万数据的水文时间序列检测的计算效率，并给出可靠的置信度，以提高整体灵敏度（不漏报）。在大量的水文时间序列中可以快速，准确地检测到异常值。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/" class="post-title-link" itemprop="url">cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-02-24 20:24:24 / Modified: 15:54:42" itemprop="dateCreated datePublished" datetime="2021-02-24T20:24:24+08:00">2021-02-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cyf/" itemprop="url" rel="index"><span itemprop="name">cyf</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="基于量化的最小误差熵准则的格兰杰因果分析"><a href="#基于量化的最小误差熵准则的格兰杰因果分析" class="headerlink" title="基于量化的最小误差熵准则的格兰杰因果分析"></a>基于量化的最小误差熵准则的格兰杰因果分析</h1><p><a target="_blank" rel="noopener" href="https://academic.microsoft.com/journal/120629676">2019 IEEE Signal Processing Letters </a>Volume: 26, Issue: 2, pp 347-351 <a target="_blank" rel="noopener" href="https://doi.org/10.1109/LSP.2019.2890973"> DOI: 10.1109/LSP.2019.2890973</a></p>
+<p> <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2473510192/publication?paperId=3105268574">Badong Chen</a>1,       <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2899149957/publication?paperId=3105268574">Rongjin Ma</a> 1,       <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2886285899/publication?paperId=3105268574">Siyu Yu</a> 1,          <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2109410961/publication?paperId=3105268574">Shaoyi Du</a> 1,        <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2679377637/publication?paperId=3105268574">Jing Qin</a> 2</p>
+<p>1 <a target="_blank" rel="noopener" href="https://academic.microsoft.com/institution/87445476">Xi’an Jiaotong University</a> ,             2 <a target="_blank" rel="noopener" href="https://academic.microsoft.com/institution/14243506">Hong Kong Polytechnic University</a></p>
+<p>摘要：</p>
+<p>基于均方误差标准（MSE) 的线性回归模型（LRM) 被广泛应用于Granger因果分析中。然而，当信号被非高斯噪声污染的情况下，基于MSE的线性回归模型（LRM) 的系数就难以精确的估计，也就从而影响Granger因果分析的准确性。最小误差熵(MEE)标准可以取代MSE标准来解决非高斯噪声环境下的问题，但是它也因为信号过多产生了计算效率上的瓶颈。为了解决前面的这些问题，本文提出了量化的最小误差熵准则（QMEE) ，分别比较了传统的GC和GC—MEE以及GC—QMEE，通过模拟数据集，还有EEG数据集上的实验，表明GC—QMEE在非高斯噪声领域的优势以及QMEE相比MEE大大减少了计算复杂度。</p>
+<p>作者对于非高斯噪声的举例：多模的，重尾的，离散的，等等。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/24/GongSa/aa/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/24/GongSa/aa/" class="post-title-link" itemprop="url">gs CTF:Anomaly Detection in High Dimensional Time Series with Coarse to Fine Model Transfer</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-24 20:24:24" itemprop="dateCreated datePublished" datetime="2021-02-24T20:24:24+08:00">2021-02-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-18 09:55:54" itemprop="dateModified" datetime="2021-03-18T09:55:54+08:00">2021-03-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gs/" itemprop="url" rel="index"><span itemprop="name">gs</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://imgtu.com/i/yObyUH"><img src="https://s3.ax1x.com/2021/02/24/yObyUH.png" alt="yObyUH.png"></a></p>
+<p>[INFOCOM2021]</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文提出了一个基于粗到细模型迁移的<code>CTF</code>框架，以实现可扩展和准确的数据中心规模的异常检测。CTF预先训练一个粗粒度模型，使用该模型提取每台机器的特征并计算其分布，根据分布对机器进行聚类，并进行模型迁移以对每个类簇模型进行微调以获得较高的精度。文中还对聚类算法、距离度量等设计进行了证明，以达到最佳的精度，并在生产数据上进行实验，验证了其可扩展性和准确性。</p>
+<p>关键字：异常检测，高维，时间序列，大规模</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/02/24/GongSa/aa/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/" class="post-title-link" itemprop="url">syd 【ICML2018】GradNorm:Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-01 10:20:10" itemprop="dateCreated datePublished" datetime="2021-02-01T10:20:10+08:00">2021-02-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-14 17:23:47" itemprop="dateModified" datetime="2021-07-14T17:23:47+08:00">2021-07-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>深度多任务网络可以用一个网络产生多个输出，与单任务网络相比，又快又好，但是不好训练。提出了<strong>梯度归一</strong>方法，通过动态调整梯度大小，自动<strong>平衡多任务中的训练</strong>。与单任务、其他loss权衡机制相比，GradNorm可以提高准确率，缓解过拟合。GradNorm只用<strong>一个不对称超参数</strong>$\alpha$，能达到或超过<strong>穷举网格搜索</strong>的效果。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/26/DengJiaoxue/ecg_ssl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/26/DengJiaoxue/ecg_ssl/" class="post-title-link" itemprop="url">djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-26 15:00:24 / Modified: 19:47:03" itemprop="dateCreated datePublished" datetime="2021-01-26T15:00:24+08:00">2021-01-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h5 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h5><p>我们提出了一种使用自我监督学习的基于心电图（ECG）的情绪识别系统。我们提出的体系结构由两个主要网络组成，一个信号转换识别网络和一个情感识别网络。首先，未标记的数据用于成功训练前一个网络，以在自我监督的学习步骤中检测特定的预定信号转换。接下来，将该网络的卷积层的权重转移到情感识别网络，并训练两个密集层以对唤醒和化合价进行分类。我们表明，我们的自我监督方法可帮助模型学习情感识别所需的ECG特征集，其性能与模型的完全监督版本相同或更好。我们提出的方法性能优于使用两个公开可用的数据集SWELL和AMIGOS的基于ECG的最先进的情感识别技术。进一步的分析凸显了我们的自我监督方法的优势，即需要更少的数据来获得可接受的结果。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/26/DengJiaoxue/ecg_ssl/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/" class="post-title-link" itemprop="url">ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-20 14:24:24 / Modified: 15:10:19" itemprop="dateCreated datePublished" datetime="2021-01-20T14:24:24+08:00">2021-01-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[IEEE Transactions on Cybernetics 2019]</p>
+<p>Jinpeng Li, Shuang Qiu, Yuan-Yuan Shen, Cheng-Lin Liu, Fellow, IEEE, and Huiguang He, Senior Member, IEEE</p>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>​    脑电(EEG)信号，在情绪识别中得到广泛应用。由于脑电的个体差异较大，情感识别模型无法在个体间共享，需要收集新的标记数据来为新用户训练个人模型。在一些应用中，希望尽可能快地获得新的用户的模型，并减少对标记数据的需求，所以提出了一种以现有个体为源域，以新人为目标域的多源迁移(<strong>Multisource Transfer</strong>)的学习方法。</p>
+<p>​    目标数据被分开用于训练的校准过程和随后的测试过程。该方法的第一阶段是源选择，目的是选择合适的源域。第二阶段是样式转换映射(style transfer mapping)，为了减少目标与各源之间的脑电信号差异。    最后在后续过程中整合<strong>源模型</strong>来识别情绪。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/" class="post-title-link" itemprop="url">xw caNet:Frequency Channel Attention Networks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-20 14:00:40 / Modified: 15:13:01" itemprop="dateCreated datePublished" datetime="2021-01-20T14:00:40+08:00">2021-01-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote>
+<p>注意机制，特别是通道注意，在计算机视觉领域取得了巨大的成功。许多研究集中在如何设计有效的通道注意机制，而忽略了一个基本问题，即使用全局平均池化(GAP)是否存在问题。在这项工作中，本文从一个不同的视角出发，用频率分析重新思考通道注意。<strong>在频域分析的基础上，用数学方法证明了全局平均池化(GAP)是频域特征分解的一种特例。通过证明，自然地将通道注意机制的预处理推广到了频域，并提出了一种新的多谱通道注意网络。</strong>该方法简单有效。只修改计算中的一行代码，以在现有的通道注意方法中实现本文的方法。在图像分类、目标检测和实例分割等任务上，与其他通道注意方法相比，该方法取得了最先进的效果。与基线SENet50相比，在相同的参数数量和计算成本下，本文的方法在ImageNet上的Top-1精度提高了1.8%。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

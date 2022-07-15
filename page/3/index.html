@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="时序论文分享">
+<meta property="og:url" content="http://example.com/page/3/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="INSIS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/page/3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title>时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/" class="post-title-link" itemprop="url">zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-31 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-31T20:24:24+08:00">2021-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-03-02 17:25:59" itemprop="dateModified" datetime="2022-03-02T17:25:59+08:00">2022-03-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="任务场景"><a href="#任务场景" class="headerlink" title="任务场景"></a>任务场景</h3><p>在社交媒体中，有非常多的二部图。比如推特中，有关注者和被关注者两种节点，关注关系形成一个二部图；在大众点评中，有用户和商家两种节点，用户对商家的点评关系形成一个二部图；在淘宝里，用户购买商品，也形成一个二部图。</p>
+<p><center class="half"><br>    <img img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226160804505.png" alt="image-20220226160804505" width="150"/><br>    <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165517763.png" width="500" /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Fraudar可以解决哪些问题呢？（二部图的问题）</span><br><span class="line">\1. 用户在电商平台，购买商品（刷单）</span><br><span class="line">\2. 用户评论电影，美食，游戏评分（刷评分）</span><br><span class="line">\3. 推特，博客关注信息（购买粉丝）</span><br></pre></td></tr></table></figure>
+<p>为了在二部图中检测出上述的欺诈行为，以往的方法（在此篇论文发表的2016年以前）是检测二部图中的稠密子图。以购买粉丝为例，购买者会突然增加许多粉丝，在二部图中，购买者这个节点的边突然增多（稠密子图）。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/" class="post-title-link" itemprop="url">zhj 【NIPS2020】Supervised Contrastive Learning</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-31 20:24:24 / Modified: 17:33:47" itemprop="dateCreated datePublished" datetime="2021-03-31T20:24:24+08:00">2021-03-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Supervised-Contrastive-Learning"><a href="#Supervised-Contrastive-Learning" class="headerlink" title="Supervised Contrastive Learning"></a><strong>Supervised Contrastive Learning</strong></h2><p>关键词：对比学习；自监督；</p>
+<p><strong>Abstract</strong></p>
+<p>对比学习在自我监督表征学习中的应用近年来得到了迅速的发展，在深度图像模型的无监督训练中取得了很好的效果。现代批量对比方法包含或显著优于传统的对比损失，如三元组、最大边际和N对损失。在这项工作中，我们将自我监督的批对比方法扩展到完全监督的设置，使我们能够有效地利用标签信息。属于同一类的点簇在嵌入空间中被拉到一起，同时将来自不同类的样本簇分开。我们分析了监督对比（SupCon）损失的两种可能形式，确定了损失的最佳表现公式。在ResNet-200上，我们在ImageNet数据集上实现了81.4%的top-1准确率，比该体系结构报告的最佳数字高出0.8%。<br>我们在其他数据集和两个ResNet变量上显示了一致的优于交叉熵的性能。这种损失显示了对自然损坏的健壮性的好处，并且对于超参数设置（如优化器和数据处理）更为稳定。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/XuWei/Learnable%20Dynamic%20Temporal%20Pooling%20for%20Time%20Series%20Classification/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/31/XuWei/Learnable%20Dynamic%20Temporal%20Pooling%20for%20Time%20Series%20Classification/" class="post-title-link" itemprop="url">xw 【AAAI2021】Learnable Dynamic Temporal pooling for Time Series Classification</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-31 14:00:40 / Modified: 17:36:09" itemprop="dateCreated datePublished" datetime="2021-03-31T14:00:40+08:00">2021-03-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>关键词：时间序列；时序分类</p>
+<p><strong>Abstract</strong></p>
+<blockquote>
+<p>随着可用时间序列数据的增加，预测它们的类别标签已成为广泛学科中最重要的挑战之一。最近关于时间序列分类的研究表明，卷积神经网络(CNN)作为单一分类器实现了最先进的性能。本文指出现有CNN分类器通常采用的全局池化层<strong>丢弃了高层特征的时间信息</strong>，因此提出了一种动态时间池(DTP)技术，通过分段聚合特征，减少了隐层表示的时间长度。为了将整个序列划分为多个片段，本文使用动态时间规整(DTW)将每个时间点按照时间顺序与片段的原型特征对齐，这可以同时与CNN分类器的网络参数进行优化。结合DTP层和全连接层，有助于进一步提取区分性特征。在单变量和多变量时间序列数据集上的大量实验表明，本文提出的池化方法显著提高了分类性能。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/31/XuWei/Learnable%20Dynamic%20Temporal%20Pooling%20for%20Time%20Series%20Classification/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/" class="post-title-link" itemprop="url">yjn 【ICLR 2021】Unsupervised Representation Learning for Time Series with Temporal Neighborhood Coding</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-24 20:24:24 / Modified: 22:44:29" itemprop="dateCreated datePublished" datetime="2021-03-24T20:24:24+08:00">2021-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/yjn/" itemprop="url" rel="index"><span itemprop="name">yjn</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词：自监督学习，EEG，时间序列</p>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>时间序列通常很复杂且信息丰富，但标记稀疏，因此很难建模。 在本文中，我们提出了一种自监督框架，用于学习非平稳时间序列的通用表示。 我们的方法称为时间邻域编码（TNC），它利用信号生成过程的局部平滑度来及时定义具有相似属性的邻域。 通过使用无偏差的对比目标（debiased contrastive objective），我们的框架通过确保在编码空间中来自邻域内的信号的编码特征与非邻域信号的编码特征是可区分的，来学习时间序列表示。 我们的动机来自医学领域，在该领域中，对时间序列数据的动态性质进行建模的能力对于在几乎不可能标记数据的环境中识别，跟踪和预测潜在患者的潜在状态尤其有价值。 我们将我们的方法与最近开发的无监督表示学习方法进行了比较，并证明了在针对多个数据集进行聚类和分类任务方面的卓越性能。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/24/WuTao/informer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/24/WuTao/informer/" class="post-title-link" itemprop="url">wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-24 16:20:10 / Modified: 22:42:43" itemprop="dateCreated datePublished" datetime="2021-03-24T16:20:10+08:00">2021-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wt/" itemprop="url" rel="index"><span itemprop="name">wt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词：时间序列预测；</p>
+<h3 id="1摘要"><a href="#1摘要" class="headerlink" title="1摘要"></a>1摘要</h3><p>Informer的主要工作是使用Transfomer实现长序列预测（Long Sequence Time-Series Forecasting）,以下称为LSTF。针对Transfomer在长序列预测中的不足（平方时间复杂度、高内存占用和现有编解码结构的局限性），提出ProbSparse注意力机制、自注意力蒸馏技术和生成式解码器等模块解决或缓解上述问题。</p>
+<ol>
+<li>首先，LSTF任务具有重要研究意义，对政策计划和投资避险等多种需要长时预测的任务至关重要；</li>
+<li>目前现有方法多专注于短期预测，模型缺乏长期预测能力；</li>
+<li>Transformer具有较强捕获长距离依赖的能力，但是，在计算时间复杂度和空间复杂度以及如何加强长序列输入和输出关联上都需要优化；</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/24/WuTao/informer/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/" class="post-title-link" itemprop="url">syd 【AAAI 2021】Maximum Roaming Multi-Task Learning</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-17 16:20:10 / Modified: 21:21:29" itemprop="dateCreated datePublished" datetime="2021-03-17T16:20:10+08:00">2021-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词：多任务学习</p>
+<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>多任务参数<strong>联合优化</strong>是MTL中一个活跃的研究问题，对不同任务的参数进行<strong>划分</strong>（不相交或有重叠），可以放宽共享权值的优化约束，但是这种方法会<strong>削弱</strong>多任务产生的inductive bias（MTL的思想）。本文提出了新的划分参数空间的方法（Maximum Roaming），且不会削弱inductive bias。该方法受dropout启发，<strong>随机</strong>改变参数分区，迫使参数在规定的频率下尽可能<strong>多</strong>地查看任务，使网络全面适应每次更新。实验表明，与普通的分区优化策略相比，roaming带来的正则化对性能的影响更大，且整体方法灵活、易于应用。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/BaiYunfei/ShapeNet(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/17/BaiYunfei/ShapeNet(1)/" class="post-title-link" itemprop="url">byf 【AAAI-2021】ShapNet</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-17 14:20:10" itemprop="dateCreated datePublished" datetime="2021-03-17T14:20:10+08:00">2021-03-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-18 09:50:37" itemprop="dateModified" datetime="2021-03-18T09:50:37+08:00">2021-03-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/byf/" itemprop="url" rel="index"><span itemprop="name">byf</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词：多变量时间序列，时间序列分类</p>
+<p>在本文中，我们提出了一个名为ShapeNet的新型模型，该模型将不同长度的小波候选者嵌入到统一的空间中，以进行小波选择。该网络使用聚类三元组损失进行训练，该损失考虑了锚点与多个正（负）样本之间的距离以及正（负）样本之间的距离，这对于收敛非常重要。我们计算有代表性的和多样化的最终小波，而不是直接使用所有小波嵌入进行模型构建，以避免很大一部分非歧视性小波候选。我们已经使用UEA多元时间序列数据集在ShapeNet上进行了具有竞争性的最新技术和基准测试方法的实验。结果表明，ShapeNet的准确性是所有比较方法中最好的。此外，我们通过两个案例研究说明了小波的可解释性。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/17/BaiYunfei/ShapeNet(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/" class="post-title-link" itemprop="url">hgh 【ISSRE-2019】Unsupervised Detection of Microservice Trace Anomalies through Service-Level Deep Bayesian Networks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-11 09:19:56" itemprop="dateModified" datetime="2021-03-11T09:19:56+08:00">2021-03-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词：微服务； 异常检测； 根因分析</p>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><h3 id="本文旨在解决微服务调用跟踪异常"><a href="#本文旨在解决微服务调用跟踪异常" class="headerlink" title="本文旨在解决微服务调用跟踪异常"></a>本文旨在解决微服务调用跟踪异常</h3><ul>
+<li><p>挑战</p>
+<ul>
+<li>底层微服务数量众多</li>
+<li>它们之间的调用关系复杂</li>
+<li>响应时间和调用路径之间的相互依赖性</li>
+</ul>
+</li>
+<li><p>TraceAnomaly 核心理念</p>
+<ul>
+<li><p>在定期的离线训练中，使用机器学习来自动学习轨迹的整体正常模式</p>
+<ul>
+<li>新颖的痕迹表示和设计的深度贝叶斯网络后验流</li>
+</ul>
+</li>
+<li><p>在线异常检测中，一个带有小异常分数(根据学习到的正态模式计算)的新轨迹被认为是异常</p>
+</li>
+</ul>
+</li>
+<li><p>效果</p>
+<ul>
+<li>某公司已在18个在线服务上部署了TraceAnomaly</li>
+<li><p>详细评估四大在线服务包含数百个microservices和实验包含41 microservices</p>
+<ul>
+<li>表明TraceAnomaly的查全率和查准率都高于0.97,优于现有的方法(硬编码规则)19.6%和7.1%</li>
+<li>和其他七个基线平均57.0%和41.6%。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" class="post-title-link" itemprop="url">nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-11 09:16:38" itemprop="dateModified" datetime="2021-03-11T09:16:38+08:00">2021-03-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词： 元学习；迁移学习</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
+<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
+<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
+<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
+<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" class="post-title-link" itemprop="url">nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-11 09:16:38" itemprop="dateModified" datetime="2021-03-11T09:16:38+08:00">2021-03-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词： 元学习；迁移学习</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
+<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
+<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
+<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
+<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

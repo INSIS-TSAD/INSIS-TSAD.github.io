@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：时间序列预测，进化状态图，图网络 摘要为了对时序数据中未来事件做到精确且可解释的预测，需要捕获具有代表性的模式(state)。以前的研究都主要关注对模式的表示和识别，忽视了变化中的过渡关系。 本文使用一种演化状态图，节点表示模式，边表示演化关系。 提出了Evolutionary State Graph Network(EvoNet)，对进化状态图进行编码，以便准确和可解释的时间序列事件预测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph">
+<meta property="og:url" content="http://example.com/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：时间序列预测，进化状态图，图网络 摘要为了对时序数据中未来事件做到精确且可解释的预测，需要捕获具有代表性的模式(state)。以前的研究都主要关注对模式的表示和识别，忽视了变化中的过渡关系。 本文使用一种演化状态图，节点表示模式，边表示演化关系。 提出了Evolutionary State Graph Network(EvoNet)，对进化状态图进行编码，以便准确和可解释的时间序列事件预测">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccItf0.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccId6U.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIalT.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIUpV.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIBm4.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIr79.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccID0J.png">
+<meta property="og:image" content="https://imgtu.com/i/ccIcfx">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIykR.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccI2p6.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIq9P.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIR1K.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIW6O.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIfXD.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccI4ne.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccI50H.png">
+<meta property="og:image" content="https://imgtu.com/i/ccITAA">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIOc8.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccIHht.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/14/ccI7tI.png">
+<meta property="article:published_time" content="2021-04-14T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-04-14T14:29:12.636Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="自监督学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/04/14/ccItf0.png">
+
+<link rel="canonical" href="http://example.com/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-14 20:24:24 / Modified: 22:29:12" itemprop="dateCreated datePublished" datetime="2021-04-14T20:24:24+08:00">2021-04-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>关键词</strong>：时间序列预测，进化状态图，图网络</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>为了对时序数据中未来事件做到精确且可解释的预测，需要捕获具有代表性的模式(state)。以前的研究都主要关注对模式的表示和识别，忽视了变化中的过渡关系。</p>
+<p>本文使用一种演化状态图，节点表示模式，边表示演化关系。</p>
+<p>提出了<code>Evolutionary State Graph Network(EvoNet)</code>，对进化状态图进行编码，以便准确和可解释的时间序列事件预测，<code>EvoNet</code>对节点与节点和图级别传播（segment 2 segment）进行建模，同时捕获节点与图随时间交互的信息。</p>
+<p>基于5个真实世界数据集的实验结果表明，与11个基线相比，我们的方法不仅取得了明显的改进，而且为解释事件预测的结果提供了更多的见解。</p>
+<a id="more"></a>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>时间序列数据中未来事件(如异常)的预测一直是时间数据挖掘的重要任务。</p>
+<h4 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h4><ol>
+<li>一个常见的方法是<strong>使用隐空间状态的模型</strong>，像HMM、RNN和RNN的变体等，使用一系列潜在表示对时序数据进行编码，但这个编码是个黑盒操作，并不能直接捕获一些具有实际物理意义的典型模式，比如通过健身追踪设备观察对的步行或跑步。</li>
+</ol>
+<ul>
+<li>对噪声敏感</li>
+<li>可解释性差</li>
+<li>出现问题时很难调试</li>
+</ul>
+<ol>
+<li>另外的工作：对时间序列进行离散化并寻找其底层状态，采用序列<strong>聚类</strong>、<strong>字典</strong>(例如SAX)等方法和<strong>shapelets</strong>。</li>
+</ol>
+<ul>
+<li>有效处理噪声和提供更好的可解释性</li>
+<li>只找到这些状态，并没有关注状态之间的关系的潜在影响</li>
+</ul>
+<ol>
+<li><p><strong>图结构(graph structures)</strong>模型，<code>GCN-LSTM</code> 、 <code>Time2Graph</code> 。</p>
+<p><code>GCN-LSTM</code> 需要一个显示的图作为输入，这个一般很难从时间序列数据直接得到</p>
+<p><code>Time2Graph</code> 使用shapelets发现states和relations，但是图在全局是一个静态的，在实际中，这个图是随时间变化的。</p>
+</li>
+</ol>
+<p>时序往往受到不同的状态的共同影响，特别是状态关系的变化的影响。</p>
+<blockquote>
+<p>:one: 在健康追踪设备的连续观察中，在高强度跑步后停止运动可能会导致昏厥事件，而如果一个人在慢跑后停止运动，监测数据看起来是正常的</p>
+<p>:two:从网上购物记录来看，从电子产品到化妆品的突然兴趣转变可能比从化妆品到时尚的平稳转变更令人怀疑</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccItf0"><img src="https://z3.ax1x.com/2021/04/14/ccItf0.png" alt="ccItf0.png"></a></p>
+<p>方法：基于潜在的状态对时间序列进行建模，为了从原始时间序列数据中保留更多的信息，我们将每个时间序列段建模为属于多个具有不同权值的状态，并利用有向图来建模相邻段之间的状态之间的过渡关系。</p>
+<blockquote>
+<p>1)时间序列演化可以转化为不同层次的图动态</p>
+<p>2)当事件发生时，时间序列波动可以表示为图结构的迁移，特别是连接某些状态的一些边的动态</p>
+</blockquote>
+<h4 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h4><ul>
+<li>通过对实际数据的分析，我们发现状态间的时变关系对于时间序列事件的预测很重要</li>
+<li>我们提出了演化状态图来捕捉状态之间的动态关系，并基于进演化状态图开发<code>EvoNet</code>来提高事件预测的性能</li>
+<li>我们在5个数据集上进行了大量的实验，以证明我们的方法可以做出更准确的预测，并为解释它们提供更多的见解</li>
+</ul>
+<h3 id="背景及问题定义"><a href="#背景及问题定义" class="headerlink" title="背景及问题定义"></a>背景及问题定义</h3><h4 id="时间序列事件预测"><a href="#时间序列事件预测" class="headerlink" title="时间序列事件预测"></a>时间序列事件预测</h4><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccId6U"><img src="https://z3.ax1x.com/2021/04/14/ccId6U.png" alt="ccId6U.png"></a></p>
+<p>$\tau$：滑窗大小（表示某种物理意义，比如24h）</p>
+<p>$d$：dimension</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIalT"><img src="https://z3.ax1x.com/2021/04/14/ccIalT.png" alt="ccIalT.png"></a></p>
+<h4 id="状态-State"><a href="#状态-State" class="headerlink" title="状态 State"></a>状态 State</h4><p>状态集合（典型模式片段集合）：$\Theta _v\in R^{\tau \times d}$</p>
+<p>提取方式：Symbolic Aggregate Approximation, Bag of Patterns, Shapelets, sequence clustering</p>
+<h4 id="Segment-to-state-representation"><a href="#Segment-to-state-representation" class="headerlink" title="Segment-to-state representation"></a>Segment-to-state representation</h4><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIUpV"><img src="https://z3.ax1x.com/2021/04/14/ccIUpV.png" alt="ccIUpV.png"></a></p>
+<h3 id="EvoNet框架"><a href="#EvoNet框架" class="headerlink" title="EvoNet框架"></a><code>EvoNet</code>框架</h3><h4 id="Evolutionary-State-Graph-演化状态图"><a href="#Evolutionary-State-Graph-演化状态图" class="headerlink" title="Evolutionary State Graph  演化状态图"></a>Evolutionary State Graph  演化状态图</h4><p>图结构：$G<em>{(t)} = {V, E^{(t)}, M^{(t)}}$表示从$X</em>{t-1}$到$X_{t }$的状态</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIBm4"><img src="https://z3.ax1x.com/2021/04/14/ccIBm4.png" alt="ccIBm4.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIr79"><img src="https://z3.ax1x.com/2021/04/14/ccIr79.png" alt="ccIr79.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccID0J"><img src="https://z3.ax1x.com/2021/04/14/ccID0J.png" alt="ccID0J.png"></a></p>
+<ul>
+<li>异常时刻时图会更加稠密</li>
+<li>异常时节点对应的的in-degree会增加</li>
+</ul>
+<h4 id="Evolutionary-State-Graph-Network-演化状态图网络"><a href="#Evolutionary-State-Graph-Network-演化状态图网络" class="headerlink" title="Evolutionary State Graph Network  演化状态图网络"></a>Evolutionary State Graph Network  演化状态图网络</h4><p>网络利用状态演化图来捕获一下两种信息：</p>
+<p><strong>局部结构影响</strong>：状态与状态之间局部变化的影响（例子：跑步）</p>
+<p><strong>时间影响</strong>：先前状态的转换将影响当前观测数据</p>
+<blockquote>
+<p>例如，(高强度跑步→慢跑)→···→停止运动)和(慢跑→慢跑→···→停止运动)会产生不同的健身效果。</p>
+</blockquote>
+<p>在演化状态中的表现：</p>
+<ul>
+<li>局部结构影响-&gt;图中的每个节点之间的局部成对关系 ——&gt;local information aggregation</li>
+<li>时间影响-&gt;不同图上的演化 ——&gt;temporal graph propagation</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccI6t1"><img src="https://imgtu.com/i/ccIcfx" alt="ccIcfx.png](https://z3.ax1x.com/2021/04/14/ccIcfx.png)"></a></p>
+<h5 id="Local-information-aggregation"><a href="#Local-information-aggregation" class="headerlink" title="Local information aggregation"></a><strong>Local information aggregation</strong></h5><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIykR"><img src="https://z3.ax1x.com/2021/04/14/ccIykR.png" alt="ccIykR.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccI2p6"><img src="https://z3.ax1x.com/2021/04/14/ccI2p6.png" alt="ccI2p6.png"></a></p>
+<h5 id="Temporal-graph-propagation"><a href="#Temporal-graph-propagation" class="headerlink" title="Temporal graph propagation"></a>Temporal graph propagation</h5><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIq9P"><img src="https://z3.ax1x.com/2021/04/14/ccIq9P.png" alt="ccIq9P.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIR1K"><img src="https://z3.ax1x.com/2021/04/14/ccIR1K.png" alt="ccIR1K.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIW6O"><img src="https://z3.ax1x.com/2021/04/14/ccIW6O.png" alt="ccIW6O.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIfXD"><img src="https://z3.ax1x.com/2021/04/14/ccIfXD.png" alt="ccIfXD.png"></a></p>
+<h5 id="End-to-End-Model-Learning-端到端的模型学习"><a href="#End-to-End-Model-Learning-端到端的模型学习" class="headerlink" title="End-to-End Model Learning  端到端的模型学习"></a>End-to-End Model Learning  端到端的模型学习</h5><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccI4ne"><img src="https://z3.ax1x.com/2021/04/14/ccI4ne.png" alt="ccI4ne.png"></a></p>
+<p><strong>训练一个分类器</strong>（<code>NN</code> or <code>XGBoost</code>）</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccI50H"><img src="https://z3.ax1x.com/2021/04/14/ccI50H.png" alt="ccI50H.png"></a></p>
+<blockquote>
+<p>where Yˆ𝑡+1 ∈ {0, 1} is the ground truth that indicating whether a future event will occur.   </p>
+</blockquote>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccII7d"><img src="https://imgtu.com/i/ccITAA" alt="ccITAA.png](https://z3.ax1x.com/2021/04/14/ccITAA.png)"></a></p>
+<ul>
+<li><strong>DJIA 30 Stock Time Series (DJIA30)</strong>  ：三种交易价格和一个交易数字；目标是基于最近50周的数据预测下一周是否有异常的价格波动</li>
+<li><strong>Web Traffic Time Series Forecasting (WebTraffic)  </strong>：目标是根据12月的数据预测未来一个月是否出现快速增长</li>
+<li><strong>Information Networks Supervision (NetFlow)  </strong>：由中国电信提供。小时粒度；流入与流出（两维）；15天预测两天；</li>
+<li><strong>Watt-hour Meter Clock Error (ClockErr)  </strong>：由中国国家电网提供。每个读数记录电能表的偏差时间和延迟时间；当偏差时间超过120时，表示仪表异常；我们的目标是根据过去12个月的记录预测下个月的异常情况；</li>
+<li><strong>Abnormal Server Response (AbServe)  </strong>:本数据集由阿里巴巴云提供。每个系列记录不同指标的详细读数(例如:CPU、磁盘、内存等)。当服务器无法响应时，日志将记录异常。我们的目标是根据前一小时的记录预测未来五分钟内的异常情况。</li>
+</ul>
+<h4 id="BaseLine"><a href="#BaseLine" class="headerlink" title="BaseLine"></a>BaseLine</h4><ul>
+<li><p><strong>基于特征的模型</strong></p>
+<p>Bag of Patterns (BoP), Vector Space Model using SAX (SAX-VSM) and Fast Shapelet (FS)  </p>
+<blockquote>
+<p>这些方法捕获不同的状态表示，这些状态表示作为事件预测的特征</p>
+</blockquote>
+</li>
+<li><p><strong>序列模型</strong></p>
+<ul>
+<li><p>switching-time-series model (S-HMM)   ：建模状态序列的马尔可夫依赖</p>
+</li>
+<li><p>multiscale recurrent neural network (MRNN)   ：以$X_t \oplus Y_t$作为输入，学习隐空间表示来做预测</p>
+</li>
+<li><p>hierarchical recurrent neural network (HRNN)   ：学习更多$X_t $和$ Y_t$的相关性</p>
+</li>
+</ul>
+</li>
+<li><p><strong>基于图的模型</strong></p>
+<ul>
+<li><p>gated graph neural network (GGNN)  ：使用one-hot对$h_0$进行初始化，局部信息传递使用GGNN，节点级传播是用GRU</p>
+</li>
+<li><p>GCN-LSTM ：使用$\Theta$对$h_0$进行初始化，局部信息传递使用GCN，节点级传播是用LSTM</p>
+</li>
+<li><p>EvolveGCN ：将RNN和GCN结合起来的多层动态图神经网络，关注的节点级的传播</p>
+</li>
+<li><p>ST-MGCN  ：时空多图卷积网络，使用$ Y_t$作为传播的上下文信息，它直接将上下文信息融合到节点级表示中，而不是学习图级表示并对节点-图交互进行建模</p>
+</li>
+<li><p>Time2Graph  ：将不同时间的图形聚合成静态图，并进行DeepWalk来学习图形的表示，然后作为事件预测的特征</p>
+</li>
+</ul>
+</li>
+<li><p><strong><code>EvoNet</code>变体</strong></p>
+<p><code>EvoNet w/o G</code>：不使用演化状态图，使用状态序列直接建模（LSTM）</p>
+<p><code>EvoNet w/o A</code>：不使用时间注意力机制</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIOc8"><img src="https://z3.ax1x.com/2021/04/14/ccIOc8.png" alt="ccIOc8.png"></a></p>
+<p><code>Q1</code>: How does <code>EvoNet</code> perform on the time-series prediction task, compared with other baselines from the state-of-the-art?  </p>
+<p><code>Q2</code>: How does the proposed <code>EvoBlock</code> effectively bridge the graph-level and node-level information over time?</p>
+<p><code>Q3</code>: How do different configurations, e.g., state number, segmentation length, implementation of state recognition and message passing, influence the performance?  </p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccIHht"><img src="https://z3.ax1x.com/2021/04/14/ccIHht.png" alt="ccIHht.png"></a></p>
+<h4 id="Case-Study"><a href="#Case-Study" class="headerlink" title="Case Study"></a>Case Study</h4><p><a target="_blank" rel="noopener" href="https://imgtu.com/i/ccI7tI"><img src="https://z3.ax1x.com/2021/04/14/ccI7tI.png" alt="ccI7tI.png"></a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文研究状态之间的关系如何反映时间数据的演化问题。我们提出了一种新的表示方法——演化状态图，来表示时间序列状态之间的时变关系。为了捕获这些有效的模式用于下游任务，我们进一步提出了基于<code>GNN</code>的<code>EvoNet</code>模型来进行动态图建模。为了验证<code>EvoNet</code>的有效性，我们在五个真实世界的数据集上进行了大量的实验。实验结果表明，我们的模型明显优于11种最先进的基准测试方法。在此基础上，我们可以发现状态之间的一些有意义的关系，使我们能够理解时间数据。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0/" rel="tag"># 自监督学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/09/DengJiaoxue/%E3%80%90IEEE2019%E3%80%91ssl-eeg/" rel="prev" title="djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS">
+      <i class="fa fa-chevron-left"></i> djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/18/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/" rel="next" title="cyf 【ICLR2021】潜在的收敛交叉映射">
+      cyf 【ICLR2021】潜在的收敛交叉映射 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.1.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE"><span class="nav-number">2.2.</span> <span class="nav-text">贡献</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E5%8F%8A%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">3.</span> <span class="nav-text">背景及问题定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E4%BA%8B%E4%BB%B6%E9%A2%84%E6%B5%8B"><span class="nav-number">3.1.</span> <span class="nav-text">时间序列事件预测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%8A%B6%E6%80%81-State"><span class="nav-number">3.2.</span> <span class="nav-text">状态 State</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Segment-to-state-representation"><span class="nav-number">3.3.</span> <span class="nav-text">Segment-to-state representation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EvoNet%E6%A1%86%E6%9E%B6"><span class="nav-number">4.</span> <span class="nav-text">EvoNet框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Evolutionary-State-Graph-%E6%BC%94%E5%8C%96%E7%8A%B6%E6%80%81%E5%9B%BE"><span class="nav-number">4.1.</span> <span class="nav-text">Evolutionary State Graph  演化状态图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Evolutionary-State-Graph-Network-%E6%BC%94%E5%8C%96%E7%8A%B6%E6%80%81%E5%9B%BE%E7%BD%91%E7%BB%9C"><span class="nav-number">4.2.</span> <span class="nav-text">Evolutionary State Graph Network  演化状态图网络</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Local-information-aggregation"><span class="nav-number">4.2.1.</span> <span class="nav-text">Local information aggregation</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Temporal-graph-propagation"><span class="nav-number">4.2.2.</span> <span class="nav-text">Temporal graph propagation</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#End-to-End-Model-Learning-%E7%AB%AF%E5%88%B0%E7%AB%AF%E7%9A%84%E6%A8%A1%E5%9E%8B%E5%AD%A6%E4%B9%A0"><span class="nav-number">4.2.3.</span> <span class="nav-text">End-to-End Model Learning  端到端的模型学习</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">5.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">5.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BaseLine"><span class="nav-number">5.2.</span> <span class="nav-text">BaseLine</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Case-Study"><span class="nav-number">5.3.</span> <span class="nav-text">Case Study</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

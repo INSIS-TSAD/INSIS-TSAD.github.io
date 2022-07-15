@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="基于量化的最小误差熵准则的格兰杰因果分析2019 IEEE Signal Processing Letters Volume: 26, Issue: 2, pp 347-351  DOI: 10.1109&#x2F;LSP.2019.2890973  Badong Chen1,       Rongjin Ma 1,       Siyu Yu 1,          Shaoyi Du 1,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion">
+<meta property="og:url" content="http://example.com/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="基于量化的最小误差熵准则的格兰杰因果分析2019 IEEE Signal Processing Letters Volume: 26, Issue: 2, pp 347-351  DOI: 10.1109&#x2F;LSP.2019.2890973  Badong Chen1,       Rongjin Ma 1,       Siyu Yu 1,          Shaoyi Du 1,">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220160836459.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220161635411.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220162820224.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220181846008.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220183303520.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220183332611.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220183816295.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220184734621.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220185220761.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220185542260.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220185711137.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220191919234.png">
+<meta property="article:published_time" content="2021-02-24T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-02-24T07:54:42.160Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="可解释">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210220160836459.png">
+
+<link rel="canonical" href="http://example.com/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/24/ChenYifei/Granger%20Causality%20Analysis%20Based%20on%20Quantized%20Minimum%20Error%20Entropy%20Criterion/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          cyf Granger Causality Analysis Based on Quantized Minimum Error Entropy Criterion
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-02-24 20:24:24 / Modified: 15:54:42" itemprop="dateCreated datePublished" datetime="2021-02-24T20:24:24+08:00">2021-02-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cyf/" itemprop="url" rel="index"><span itemprop="name">cyf</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="基于量化的最小误差熵准则的格兰杰因果分析"><a href="#基于量化的最小误差熵准则的格兰杰因果分析" class="headerlink" title="基于量化的最小误差熵准则的格兰杰因果分析"></a>基于量化的最小误差熵准则的格兰杰因果分析</h1><p><a target="_blank" rel="noopener" href="https://academic.microsoft.com/journal/120629676">2019 IEEE Signal Processing Letters </a>Volume: 26, Issue: 2, pp 347-351 <a target="_blank" rel="noopener" href="https://doi.org/10.1109/LSP.2019.2890973"> DOI: 10.1109/LSP.2019.2890973</a></p>
+<p> <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2473510192/publication?paperId=3105268574">Badong Chen</a>1,       <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2899149957/publication?paperId=3105268574">Rongjin Ma</a> 1,       <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2886285899/publication?paperId=3105268574">Siyu Yu</a> 1,          <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2109410961/publication?paperId=3105268574">Shaoyi Du</a> 1,        <a target="_blank" rel="noopener" href="https://academic.microsoft.com/author/2679377637/publication?paperId=3105268574">Jing Qin</a> 2</p>
+<p>1 <a target="_blank" rel="noopener" href="https://academic.microsoft.com/institution/87445476">Xi’an Jiaotong University</a> ,             2 <a target="_blank" rel="noopener" href="https://academic.microsoft.com/institution/14243506">Hong Kong Polytechnic University</a></p>
+<p>摘要：</p>
+<p>基于均方误差标准（MSE) 的线性回归模型（LRM) 被广泛应用于Granger因果分析中。然而，当信号被非高斯噪声污染的情况下，基于MSE的线性回归模型（LRM) 的系数就难以精确的估计，也就从而影响Granger因果分析的准确性。最小误差熵(MEE)标准可以取代MSE标准来解决非高斯噪声环境下的问题，但是它也因为信号过多产生了计算效率上的瓶颈。为了解决前面的这些问题，本文提出了量化的最小误差熵准则（QMEE) ，分别比较了传统的GC和GC—MEE以及GC—QMEE，通过模拟数据集，还有EEG数据集上的实验，表明GC—QMEE在非高斯噪声领域的优势以及QMEE相比MEE大大减少了计算复杂度。</p>
+<p>作者对于非高斯噪声的举例：多模的，重尾的，离散的，等等。</p>
+<a id="more"></a>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>在信息理论学习（ITL) 中，大量的有监督或无监督的学习算法都与信息论的测量的优化相关，例如熵，互信息以及信息散度等。其中的最小误差熵（MEE) 已经被成功地用在回归，分类，自适应系统训练等领域上。</p>
+<p>MEE的基础思想就是利用熵（不确定度）代表假定模型和实验数据对应真实模型的差异。一般常用的均方误差（MSE）只依赖于预测误差的二阶矩，而误差熵则能考虑到更高阶的矩，因此在非高斯分布以及极大的异常点的问题上有更佳的表现。以及已经有一些数值实验证明了MEE的更强的鲁棒性。</p>
+<p>本文作者的另一篇文章也就MEE在最简单的情形下优于MSE的结果给出了理论上的数学证明。</p>
+<h6 id="具体介绍——"><a href="#具体介绍——" class="headerlink" title="具体介绍——"></a>具体介绍——</h6><p>A.最小误差熵</p>
+<p>在ITL（ J. C. Principe, Information theoretic learning: Renyi’s entropy and kernel perspectives. Springer Science and Business Media, 2010.）中，瑞丽（Renyi）熵被用作损失函数，其定义为</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220160836459.png" alt="image-20210220160836459"></p>
+<p>Renyi熵在$\alpha\rightarrow1$的时候就变成熟知的香农熵。这里$p(e)$表示误差变量$e$的概率密度函数（PDF）。</p>
+<p>为了估计$p(e)$，这里使用了Parzen窗方法：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220161635411.png" alt="image-20210220161635411"></p>
+<script type="math/tex; mode=display">
+这里G_{\sigma}(e,e_i)表示高斯核函数：G_{\sigma}(e,e_i)=\frac{1}{\sqrt{2\pi}\sigma}exp[-\frac{(e-e_i)^2}{2{\sigma}^2}]\</script><p>因为$\alpha$是可变的，在本文中设置$\alpha=2$，就能推导出具体表达式</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220162820224.png" alt="image-20210220162820224"></p>
+<p>最终上式就是理论上的用于计算的损失函数，这里$N$表示样本点个数，通过两个求和符号可以估计它的计算复杂度是O($N^2$)，这对于庞大的数据集来说不适用。</p>
+<p>B.量化方法</p>
+<p>提出一种MEE的量化算法，保留它的优点同时减少它的计算复杂度。</p>
+<p>量化算法：</p>
+<p>输入——误差样本：${e<em>i}</em>{i=1}^N$</p>
+<p>输出——量化误差：${Q(e<em>i)}</em>{i=1}^N$以及codebook：${c<em>i}</em>{i=1}^M$</p>
+<ol>
+<li><p>参数设置：阈值$\epsilon$</p>
+</li>
+<li><p>初始条件：设置$c_1={e_1}$，这里$c_i$表示第i次迭代时的codebook</p>
+</li>
+<li><p>for $i=2,3,…,N$  do</p>
+<p>​       计算$e<em>i$和$c</em>{i-1}$之间的距离：$dis(e<em>i,c</em>{i-1})=|e<em>i-c</em>{i-1}(j^*)|$</p>
+<p>​       这里$j^*=\operatorname{argmin}<em>{}|e_i-c</em>{i-1}(j)|$表示$c_{i-1}$中的第$j$个元素。即距离定义为最小距离</p>
+<p>​       if    $dis(e<em>i,c</em>{i-1})\le \epsilon$    then</p>
+<p>​              codebook保持不变：$c<em>i=c</em>{i-1}$  并且$Q(e<em>i)=c</em>{i-1}(j^*)$；</p>
+<p>​       else    </p>
+<p>​              更新codebook：$c<em>i={c</em>{i-1},e_i}$  并且$Q(e_i)=e_i$；</p>
+</li>
+</ol>
+<p>​              end  if</p>
+<p>​        end  for</p>
+<p>$Q(·)$表示量化算子，最终得到N个误差样本${e<em>i}</em>{i=1}^N$对应的${Q(e<em>i)}</em>{i=1}^N$，和codebook：${c<em>i}</em>{i=1}^M$</p>
+<p>量化的误差熵：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220181846008.png" alt="image-20210220181846008"></p>
+<p>里面的$M$远小于$N$时，可以看出计算复杂度降低很多。$A_m$表示$c_m$中元素的个数。</p>
+<p>这就是最后用于计算的函数。</p>
+<p>C.传统granger因果</p>
+<p>一种基于线性回归模型的方法，通过比较两个模型的预测能力判断一对时间序列间的关系。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220183303520.png" alt="image-20210220183303520"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220183332611.png" alt="image-20210220183332611"></p>
+<p>如果时间序列x的过去值对y的预测有帮助，则认为x对y有Granger因果影响。</p>
+<p>直观上即比较$Var(e<em>{21})$和$Var(e</em>{22})$的大小</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220183816295.png" alt="image-20210220183816295"></p>
+<h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><strong>模拟实验</strong></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220184734621.png" alt="image-20210220184734621"></p>
+<p>$\varphi_t$服从$[-2,2]$均匀分布，$\psi_t$是噪声分别服从以下四个情况里的分布：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220185220761.png" alt="image-20210220185220761"></p>
+<p>结果如下表：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220185542260.png" alt="image-20210220185542260"></p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220185711137.png" alt="image-20210220185711137"></p>
+<p>文章没有深入讨论在高斯噪声下QMEE比MSE优越多少，但是在混合高斯噪声和$\alpha$稳态噪声下QMEE和MEE有更强的鲁棒性。</p>
+<p><strong>EEG数据集实验</strong></p>
+<p>该数据集由9名受试者使用3个电极（C3，Cz，C4）进行记录</p>
+<p>受试者为右撇子，视力正常或矫正视力正常。运动想象任务分为左脑运动想象任务和右脑运动想象任务。</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210220191919234.png" alt="image-20210220191919234"></p>
+<p>t是100次替代数据实验中满足Granger因果指数大于原序列实验的Granger因果指数这一条件的实验的相对频率</p>
+<p>t越小说明Granger因果越显著</p>
+<p>实验结果展示了右撇子的大脑不对称性对有效连接网络的影响，与之前的研究结果相符。</p>
+<h4 id="感想："><a href="#感想：" class="headerlink" title="感想："></a>感想：</h4><p>本文展示了QMEE和MEE准则在非高斯噪声环境下比一般的MSE准则得到的结果更加精确的优势。文章只是提出了线性回归模型上的方案，对于非线性的情况可以使用神经网络进行预测，而且损失函数可以换成QMEE标准下的函数。对于在真实数据集上的神经网络的应用在MSE标准下效果不佳的时候也可以考虑使用QMEE/MEE准则。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8F%AF%E8%A7%A3%E9%87%8A/" rel="tag"># 可解释</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/24/GongSa/aa/" rel="prev" title="gs CTF:Anomaly Detection in High Dimensional Time Series with Coarse to Fine Model Transfer">
+      <i class="fa fa-chevron-left"></i> gs CTF:Anomaly Detection in High Dimensional Time Series with Coarse to Fine Model Transfer
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/" rel="next" title="mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink">
+      mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E9%87%8F%E5%8C%96%E7%9A%84%E6%9C%80%E5%B0%8F%E8%AF%AF%E5%B7%AE%E7%86%B5%E5%87%86%E5%88%99%E7%9A%84%E6%A0%BC%E5%85%B0%E6%9D%B0%E5%9B%A0%E6%9E%9C%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">基于量化的最小误差熵准则的格兰杰因果分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E4%BB%8B%E7%BB%8D%E2%80%94%E2%80%94"><span class="nav-number">1.0.0.1.0.1.</span> <span class="nav-text">具体介绍——</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%84%9F%E6%83%B3%EF%BC%9A"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">感想：</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

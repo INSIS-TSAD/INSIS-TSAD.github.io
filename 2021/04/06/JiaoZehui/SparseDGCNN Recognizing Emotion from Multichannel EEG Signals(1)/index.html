@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：图神经网络；EEG 摘要基于脑电信号的情感识别在情感计算中受到了广泛的关注。近年来，提出了一种新的动态图卷积神经网络（DGCNN）模型，该模型同时优化了网络参数和表征脑电记录设备中每对电极之间函数关系强度的加权图G。本文提出了一种稀疏的DGCNN模型，该模型通过对G进行稀疏约束来修正DGCNN，提高了情感识别的性能。我们的工作基于一个重要的观察：断层扫描研究表明，脑电图电极采集的不同脑区可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals">
+<meta property="og:url" content="http://example.com/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：图神经网络；EEG 摘要基于脑电信号的情感识别在情感计算中受到了广泛的关注。近年来，提出了一种新的动态图卷积神经网络（DGCNN）模型，该模型同时优化了网络参数和表征脑电记录设备中每对电极之间函数关系强度的加权图G。本文提出了一种稀疏的DGCNN模型，该模型通过对G进行稀疏约束来修正DGCNN，提高了情感识别的性能。我们的工作基于一个重要的观察：断层扫描研究表明，脑电图电极采集的不同脑区可">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318125158268.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318130022988.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318132754001.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318133018359.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318133819566.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318133829741.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318134942423.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318135035457.png">
+<meta property="article:published_time" content="2021-04-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-04-07T03:36:15.809Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="图神经网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318125158268.png">
+
+<link rel="canonical" href="http://example.com/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-04-06T20:24:24+08:00">2021-04-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-04-07 11:36:15" itemprop="dateModified" datetime="2021-04-07T11:36:15+08:00">2021-04-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：图神经网络；EEG</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>基于脑电信号的情感识别在情感计算中受到了广泛的关注。近年来，提出了一种新的动态图卷积神经网络（DGCNN）模型，该模型同时优化了网络参数和表征脑电记录设备中每对电极之间函数关系强度的加权图G。本文提出了一种<strong>稀疏的DGCNN模型</strong>，该模型通过对G进行稀疏约束来修正DGCNN，提高了情感识别的性能。我们的工作基于一个<strong>重要的观察</strong>：断层扫描研究表明，脑电图电极采集的不同脑区可能与大脑的不同功能有关，电极之间的功能关系可能是<strong>高度局部化和稀疏的</strong>。然而，在图G中引入稀疏性约束，使得稀疏DGCNN的损失函数在某些奇点处不可微。为了保证稀疏DGCNN的训练过程收敛，我们采用了前向后向切分的方法。为了评价稀疏DGCNN的性能，我们将其与四种有代表性的识别方法（SVM、DBN、GELM和DGCNN）进行了比较。除了比较不同的识别方法外，我们的实验还比较了不同的特征和谱带，包括从四个有代表性的脑电数据集（SEED、DEAP、DREAMER和CMEED）中提取的时频域脑电特征（DE、PSD、DASM、RASM、ASM和DCAU）。<br>结果表明：</p>
+<ul>
+<li>稀疏DGCNN的识别准确率始终优于典型方法，且具有良好的可扩展性；</li>
+<li>γ波段的DE、PSD和ASM特征表达了最具区分性的情感信息，分离特征和频带的融合可以提高识别性能。</li>
+</ul>
+<a id="more"></a>
+<h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊：</strong> IEEE TRANSACTIONS ON AFFECTIVE COMPUTING 2021</p>
+<p><strong>作者：</strong>Guanhua Zhang, Minjing Yu, Yong-Jin Liu<em>,</em> Guozhen Zhao, Dan Zhang, Wenming Zheng</p>
+<p>清华大学、天津大学、东南大学、中科院心理所</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>运动是一种与特定生理活动模式相关的人类体验，它可以通过一种灵活的适应机制来表征。从行为或生理信号中识别人类的情感状态在情感计算和人机交互中起着重要的作用。与行为信号（如面部表情、声调、手势和身体姿势）相比，生理信号是自发的，很难隐藏，因此为情感识别提供了一种直接而全面的手段。</p>
+<p>人体产生各种生理信号，包括<strong>脑电活动（脑电图或EEG）、心率变化（心电图或ECG）、肌电流（肌电图或EMG）、呼吸频率（capno gram）、皮肤电导和皮肤电反应等</strong>。近年来，随着新型无线耳机（如Emotiv）的普及，以及便携、经济、易用、实用性强、物理限制小等特点，脑电信号在各种生理信号中备受关注</p>
+<p>为了训练和评估一个基于脑电信号的情感识别系统，需要具有真值标签的数据集。在这些数据集中，为了正确标记脑电图信号，标准化的情绪刺激（例如视觉或听觉刺激）被用来激发目标情绪。一些早期的数据集包括英语单词和文本的情感规范[8]、国际情感数字化语音系统[9]、国际情感图片系统[10]和日内瓦情感图片数据库[11]。最近提出的数据集扩展了传统的材料（如文字、文本、图片和声音），将视觉和听觉刺激结合起来，通常采用电影剪辑或音乐视频的形式[3]、[12]、[13]。与静态照片和幻灯片相比，这些组合刺激的存在可以更好地捕捉现实生活中的情感体验[14]。在本文中，我们选取了四个有代表性的公开数据集，即<strong>DEAP[4]、SEED[15]、DREAMER[16]和CMEED</strong>[3]、[17]、[18]，来评估我们提出的情绪识别方法：在所有这些数据集中，通过从观看标准化的音乐视频或电影片段中激发目标情绪来收集和标记脑电信号。</p>
+<p>两种不同的模型可以用来描述脑电数据中的情绪：<strong>离散模型和多维模型</strong>。</p>
+<ul>
+<li>离散模型将情感空间表示为有限数量的基本情感。例如，Ekman[19]提出了六种普遍的情绪（喜悦、悲伤、惊讶、恐惧、愤怒和厌恶），Plutchik[20]提出了八种离散的情绪，增加了两种（好奇和接受）。</li>
+<li>作为一个二维或三维空间，例如，三个维度valence, arousal and dominance被广泛使用。valence是指内在的吸引力/优点（正valence）或厌恶/缺点（负valence）。arousal 反映了一个人情绪的心理警觉水平和生理活动的强度。dominance地位是指一个人的状态，即控制或被控制。现在，最常用的模型是Circumplex Model of Affect，它只使用了valence, arousal[6]，[21]</li>
+</ul>
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><p>脑电信号的情感识别依赖于鉴别脑电特征。脑电信号是离散时间序列，存在与认知过程密切相关的<strong>空间、频谱和时间脑电特征</strong>[22]。在时间域，一些广泛应用的<strong>统计信息</strong>，如倾向性、分形维数和高阶交叉等，可以作为脑电特征[23]、[24]。在频域中，EEG信号被分解成<strong>几个频率范围</strong>，每个频率范围在某些脑活动中都是突出的，例如δ带（1-3Hz）、θ带（4-7Hz）、α带（8-13Hz）、β带（14-30Hz）和γ带（&gt;30Hz）[25]。从每个频带中，可以提取一些广泛应用的特征，包括功率谱密度（PSD）特征、差分熵（DE）特征、差分因果性（DCAU）、不对称性（ASM）、差分不对称性（DASM）和有理不对称性（RASM）等特征[2]、[4]、[15]、[26]。<strong>与时域特征相比，基于频率的特征更适合于情感识别。</strong>一些神经科学研究表明，情绪相关的神经信息主要存在于较高的频带[27]、[28]、[29]，但时域特征使用所有频带的信息。</p>
+<p>脑电图是通过头皮上的电极测量大脑电场，它通常有足够的密度（&gt;30个电极）来绘制地形图。<br>到目前为止，研究不同脑电通道/电极之间关系的功能特征在文献中很少被考虑。最近，Li等人[30]提出了一个通用的神经网络模型来学习左右半球的区别性情感特征。但他们的工作并没有调查渠道之间的关系。Song等人[31]建立了一个表示多个脑电通道之间连接的加权图G，并提出了一个动态图卷积神经网络（DGCNN）模型来自动学习G中的一组最优权值。图G中的每个节点对应于一个脑电通道，并由标量（针对单个特征）或一个向量表示向量（用于融合特征），然后将脑电数据视为图信号，即定义在不规则图G上的信号。通过学习G中每一条边上定义的一组最优权值，节点间的连接强度可以作为一个函数特征来确定。为了分析图形信号，需要对图形进行信号处理的技术（特别是谱图滤波或图形卷积技术）[32]，我们在第2.1节中简要总结了这些技术。</p>
+<p>为了处理不规则图结构上的信号，如社交网络和大脑连接体中的信号，图CNN（GCNN）首先在[33]中提出，它基于域的层次聚类或图的拉普拉斯谱。通过引入用于图卷积的快速局部化谱滤波器[35]，进一步改进了GCNN[34]。GCNN的一些其他变体包括[36]，[37]。Song等人[31]将GCNN引入到使用多通道EEG的情绪识别中，并提出了一个DGCNN模型。DGCNN考虑不规则图上的边权值，并自动学习一组最优权值。这些权值为揭示脑电通道间的内在联系提供了一种有效的方法：在脑电图形信号中，第i个和第j个电极之间的权值越大，这两个节点的相关性就越强。我们在第2.2节中简要总结了DGCNN。</p>
+<p>本文的工作是基于一个重要的观察：DGCNN以无约束的方式优化图G的权值，而断层扫描显示，脑电电极所采集的不同脑区可能与不同的脑功能有关，因此权值（代表电极间的功能关系）可能是高度局部化和稀疏的。本文通过在图表示G中引入一个新的稀疏约束来改进DGCNN，提出了一个稀疏约束极小化问题的解决方案，以保证网络模型的收敛性。</p>
+<p>我们称我们的方法为稀疏DGCNN。实验结果表明，与现有的情绪识别方法相比，稀疏DGCNN基于DEAP[4]、SEED[15]、DREAMER[16]和CMEED[3]四个数据集提取的不同时频域脑电特征，均取得了较好的性能，平均提高了8.88%的准确率。我们的研究结果还表明，γ波段的DE、PSD和ASM特征传达了最重要的辨别性情感信息，这与以往的研究结果一致。</p>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="Spectral-graph-theory"><a href="#Spectral-graph-theory" class="headerlink" title="Spectral graph theory"></a>Spectral graph theory</h3><p>我们感兴趣的是分析定义在无向加权图G={V，W}上的多通道脑电信号。V={v1，v2，···，vn}是顶点集，其中每个顶点vi对应一个电极，n是脑电图记录设备中的电极数。n×n矩阵W是G的邻接矩阵，其条目wij≥0度量vi和vj之间函数关系的强度。DGCNN[31]从训练集中自动学习最优邻接矩阵W。</p>
+<p>谱图论将经典的信号处理技术推广到图谱域，在处理图上的信号时引入了不规则的图结构。在特殊图论中起中心作用的图G的拉普拉斯矩阵L被定义为L=D-W，其中D是一个n×n对角矩阵，$D<em>{i i}=\sum</em>{j=1}^{n} w_{i j}$。图G的傅里叶基U可以表示为正交矩阵，由拉普拉斯矩阵$L=U \Lambda U^{T}$的奇异值分解得到，其中∧=diag（[λ1，λ2，···，λn]）是对角矩阵。当图的傅里叶变换及其逆可以表示为ˆx=UT x和x=Uˆx时，图卷积算子在图的谱域中定义为</p>
+<script type="math/tex; mode=display">
+x * y=U\left[\left(U^{T} x\right) \odot\left(U^{T} y\right)\right]</script><p>滤波函数g可以设计成对角矩阵。</p>
+<script type="math/tex; mode=display">
+y=g(L) x=g\left(U \Lambda U^{T}\right) x=U g(\Lambda) U^{T} x</script><p>上述滤波器设计可以解释为滤波信号y等于信号x和Ug（λ）的图形卷积：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} y &=g(L) x=U g(\Lambda) U^{T} x=[U g(\Lambda)] \odot\left(U^{T} x\right) \\ &=U\left\{U^{T}[U g(\Lambda)]\right\} \odot\left(U^{T} x\right)=x *[U g(\Lambda)] \end{aligned}</script><h3 id="DGCNN"><a href="#DGCNN" class="headerlink" title="DGCNN"></a>DGCNN</h3><p>DGCNN的输入是一个图信号G={V，W}，其中W是相邻矩阵，其条目wij≥0度量每对（vi，vj），i，j∈{1，2，·····，n}之间函数关系的强度，每个顶点处的信号vi∈V是从相应电极提取的脑电特征f。在[31]中，测试了五个频段（δ、θ、α、β和γ波段）的PSD、DE、DASM、RASM和DCAU特征。</p>
+<p>DGCNN模型由图滤波层、卷积层、ReLu激活层和全连接层组成。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318125158268.png" alt="image-20210318125158268"></p>
+<p>图形滤波层将不规则图形信号传输到频域。然而，式（2）中滤波函数g的对角线形式没有局部化，因此其计算非常耗时。DGCNN使用Defferrard等人[34]提出的多项式滤波器，其近似于切比雪夫展开式。</p>
+<script type="math/tex; mode=display">
+g(\Lambda)=\sum_{k=0}^{K-1} \theta_{k}^{\prime} \Lambda^{k} \simeq \sum_{k=0}^{K-1} \theta_{k} T_{k}(\widetilde{\Lambda})</script><p>与传统的CNN类似，卷积层可能检测到频域中的特定模式。然后应用ReLu激活函数[41]来实现非线性映射能力。ReLu激活层的输出是非负的。最后一个完全连接的层使用softmax函数来预测所需的类标签信息。</p>
+<p>除了像GCNN一样优化网络参数[34]，DGCNN在训练过程中同时学习一个最优的邻接矩阵W。为了实现这一目标，DGCNN使用以下损失函数并计算其对网络参数和矩阵W的偏导数：</p>
+<script type="math/tex; mode=display">
+\operatorname{Loss}=\psi\left(l, l^{p}\right)+\alpha\|\Theta\|_{2}</script><h3 id="THE-SPARSE-DGCNN-MODEL"><a href="#THE-SPARSE-DGCNN-MODEL" class="headerlink" title="THE SPARSE DGCNN MODEL"></a>THE SPARSE DGCNN MODEL</h3><p>迄今为止，大多数基于EEG的情绪识别研究都利用了个别电极的EEG特征（如[3]、[6]）。在这些方法中，基本假设是每个个体的情绪体验都与一组限定的皮层和皮层下的大脑区域相关，不同的大脑区域参与不同的情绪，构成了认知的基础。</p>
+<p>网络神经科学的最新进展正在改变我们对人类情感的理解。简单地说，网络神经科学家强调神经连接的重要性，而不是神经反应，因为它能更好地描述影响人类认知功能的神经机制[42]。由于情感与感知、认知、动机和行动紧密相连，从神经生理角度来看，基于网络的观点是合理的，最近受到越来越多的关注[43]。</p>
+<p>随着神经科学的发展，情感计算领域的研究人员开始探索基于网络的情感识别特征。然而，DGCNN模型以无约束的方式优化相邻矩阵W，没有充分利用人类神经网络的神经生理特性。我们的关键观察是W具有很高的包含n×n个变量的能力，我们可以通过加入一些特定的先验知识来减少方差。本文所考虑的先验知识是矩阵W的稀疏性：由于W表示每对（vi，vj），vi，vj∈V之间函数关系的强度，因此W中的非零项wij应尽可能稀疏。</p>
+<p>上述W的稀疏假设得到了一些神经科学研究的支持。从层析成像可知，不同的脑区可能与不同的脑功能有关。如图2所示，头皮电极位置根据不同的大脑区域进行标记：额叶（F）、中央叶（C）、颞叶（T）、后叶（P）和枕叶（O）。一些大脑功能可能只激活受限的大脑区域；例如，情绪处理器可能位于T3和T4[44]。因此，条目wij之间的函数关系可能是高度局部化的，因此矩阵W应该是非常稀疏的。此外，大脑网络通常表现出一系列用于有效信息处理的复杂特性，包括集线器（高度互联的节点）、小世界拓扑（具有稀疏远程连接的密集局部聚类）等[45]。因此，这些神经科学发现要求在基于图的机器学习算法中实现稀疏性。事实上，稀疏性已经被认为是实现可靠和高性能脑电处理算法的一个重要因素（例如，[46]）。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318130022988.png" alt="image-20210318130022988"></p>
+<p>为了对矩阵W施加稀疏性，我们期望W中的非零项应该尽可能少。为了实现这一目标，在稀疏编码研究中，我们可以使用L1或L0矩阵范数。在我们的研究中，我们选择L1矩阵范数由于其凸性，并制定以下正则化项。</p>
+<script type="math/tex; mode=display">
+\mathcal{L}(\Theta, W)=\psi\left(l, l^{p}\right)+\alpha\|\Theta\|_{2}+\lambda\|W\|_{1}</script><p>其中λ是稀疏约束的权重。预测标签lp取决于输入图形信号、动态调整矩阵W和网络参数；因此，它是一个函数lp（Θ，W）。</p>
+<script type="math/tex; mode=display">
+\frac{\partial \mathcal{L}}{\partial W}=\frac{\partial \psi\left(l, l^{p}\right)}{\partial W}+\lambda \frac{\partial\|W\|_{1}}{\partial W}</script><p>这一项有可能不可微。我们可以应用<strong>次梯度法</strong>[47]。然而，次梯度法的迭代在不可微的点上变得很少，在不可微点上通常可能是真最小值。此外，次梯度法有时不能保证精确的稀疏解[48]。在稀疏DGCNN中，我们使用了前向后分裂方法[49]，它可以有效地解决不可微和有约束的优化问题，如最小化等式（8）中的目标函数。具体步骤如下。稀疏DGCNN在每个迭代中有两个步骤。</p>
+<ul>
+<li>第一步与DGCNN相同，使用式（6）中的损失函数进行反向传播：$W^{i+\frac{1}{2}}=W^{i}-\tau_{i} \frac{\partial L o s s}{\partial W^{i}}$</li>
+<li>在第二步中，我们计算了一个新的矩阵Wi+1，它在两个目标之间找到了一个很好的折衷：（1）紧靠$W^{i+\frac{1}{2}}$；（2）用||W||1实现稀疏表示：<script type="math/tex">W^{i+1}=\arg \min _{W}\left\{\left\|W-W^{i+\frac{1}{2}}\right\|_{F}^{2}+\tau_{i+\frac{1}{2}} \lambda\|W\|_{1}\right\}</script></li>
+</ul>
+<p>在上述目标函数中，稀疏编码被描述为由矩阵数据邻近项组成的最小化问题，由Frobenius范数表示</p>
+<script type="math/tex; mode=display">
+\left\|W^{\prime}\right\|_{F}=\sqrt{\sum_{i=1}^{n} \sum_{j=1}^{n} w_{i j}^{\prime 2}}=\sqrt{\operatorname{trace}\left(W^{\prime T} W^{\prime}\right)}</script><h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>为了评价稀疏DGCNN的性能，我们将其与四种具有代表性的算法进行了比较，包括两种经典的机器学习方法，即支持向量机（SVM）和图正则化极值学习方法（GELM），以及两种深层神经网络模型，即深层信念网络（DBN）和原始DGCNN。</p>
+<p>支持向量机利用核函数将输入数据转化为一个特征空间，在该特征空间中找到一个超平面，将数据最好地分割成两个距离最大的类。</p>
+<p>支持向量机是最流行的传统机器学习方法之一，在[51]中被用来研究脑电信号的频带。</p>
+<p>Peng等人[52]提出了GELM，它构建了一个节点为样本的图。GELM对基本ELM进行了图正则化，使得同一类样本的输出是相似的。</p>
+<p>请注意，GELM中的图形没有描述多通道连接。GELM被用于情感识别，与SVM分类器相比取得了更好的性能[51]。</p>
+<p>DBN使用一堆受限的Boltzmann机器，其最后一层是分类器。</p>
+<p>综上所述，对于SVM、DBN和GELM，将数据嵌入到序列和矩阵中，即将一个时间单元中所有通道的脑电特征串联成一个序列，然后将所有时间单元组成一个矩阵。对于DGCNN和稀疏DGCNN，脑电数据被嵌入到一个不规则的图结构中，即图的每个节点都是来自一个通道的脑电数据，而节点之间的连接则代表通道之间的连接。</p>
+<h3 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h3><p>两个策略：</p>
+<ul>
+<li><p>一种是不使用一个片段的交叉验证，用于受试者依赖性评价。也就是说，对于观看m个视频片段的每个受试者，我们使用m-1片段为他/她训练一个模型，并在1个片段上进行测试。最后的结果是所有测试的平均值，每个片段用于一个测试。</p>
+</li>
+<li><p>另一种方案是将一名受试者排除在交叉验证之外，进行独立于受试者的评估。也就是说，一个受试者的数据被用作测试集，而其他受试者的数据被用作训练集。同样，最终结果是所有测试的平均值，每个受试者的数据用于一次测试。</p>
+</li>
+</ul>
+<p>两个情绪识别任务:</p>
+<ul>
+<li>SEED具有正、负、中性价情绪，而DEAP、DREAMER和CMEED具有正、负性价情绪和高、低唤醒情绪。因此，我们在本文中确定了正性与负性valence以及高与低arousal情绪。</li>
+</ul>
+<p>六个基本特征和融合：</p>
+<ul>
+<li>从θ、α、β和γ波段提取DE、PSD、DASM、RASM、ASM和DCAU作为数据源。进一步研究了提高分类精度的特征融合方法。我们首先融合一个特征的不同波段，并将所有波段的特征作为输入数据，例如所有波段的DE。</li>
+</ul>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318132754001.png" alt="image-20210318132754001"></p>
+<h3 id="SEED"><a href="#SEED" class="headerlink" title="SEED"></a>SEED</h3><p>种子数据集[15]收集了15名受试者（7名男性和8名女性，平均年龄=23.27，SD=2.37）的脑电图数据。这些脑电图数据是由中国情感电影剪辑形式的视听刺激所激发的。在参与者观看15个4分钟的电影片段时，他们的脑电图数据由62个通道的ESI神经系统记录，采样率为1000Hz。随后，将脑电图数据采样至200 Hz，并手动检查以消除EOG和EMG ARI事实。对于每个受试者，在三个时间顺序不连贯的会话中捕获脑电图记录，每个会话重复相同的实验。因为SEED是四个数据集中唯一包含三个重复会话的会话，以确保评估的一致性，因此在我们的实验中，<strong>我们只对每个受试者使用第一个session</strong>，因为第一个会话反映的情感比后面两个会话更可靠。</p>
+<p>另外，SEED不包含唤醒信息，因此我们只认识到SEED上的积极和消极情绪。在0.3～50Hz之间的带通滤波器预处理后，提取了5个特征（DE、PSD、DASM、RASM和DCAU），在四个波段上提取1s窗口θ带（4-7Hz）、α波段（8-13Hz）、β带（14-30Hz）和γ带（&gt;30Hz）。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318133018359.png" alt="image-20210318133018359"></p>
+<h3 id="DEAP"><a href="#DEAP" class="headerlink" title="DEAP"></a>DEAP</h3><p>DEAP数据集[4]收集了32名受试者（16名女性和16名男性，平均年龄为26.9岁，年龄范围为19-37岁）的脑电图和外周信号。在Biosemi-ActiveTwo系统中，采用32个电极，以512hz的采样率采集了40个1min长的音乐视频，记录了脑电数据。脑电图数据随后被下采样到128Hz，并去除了EOG伪影。数据以普通参考为基础，分割成1分钟长的片段。删除了3秒长的试验前基准。</p>
+<p>根据自我评估人体模型（SAM），对每一部电影和相关的EEG信号进行高/低唤醒、价维度的标记。如前所述，我们对正/负价和高/低唤醒维度进行了二元分类。由于DEAP提供的预处理数据在4.0-45.0Hz波段进行滤波（即去除δ波段），我们在其他4个波段提取了6个窗口为2s的特征，即θ（4-8hz）、α（8-12hz）、β（12-30Hz）和γ（&gt;30Hz）。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318133819566.png" alt="image-20210318133819566"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318133829741.png" alt="image-20210318133829741"></p>
+<h3 id="DREAMER"><a href="#DREAMER" class="headerlink" title="DREAMER"></a>DREAMER</h3><p>DREAMER数据集[16]收集了23名受试者（14名男性和9名女性，平均年龄=26.6，标准差=2.7）的脑电图和心电图数据。脑电图数据是在观看18段英语情感电影片段（长度在65到393秒之间，平均199秒）的过程中获得的，并由Emotiv-EPOC系统使用16个通道中的14个（左2个为参考）以128hz的采样率记录。我们遵循[16]中的预处理方法去除脑电数据中的伪影，只保留每个片段的最后60秒，并在四个波段使用重叠1s的2s窗口进一步处理脑电数据，与其他三个波段一致：θ波段（4-8Hz）、α波段（8-13Hz）、β波段（13-30Hz）和γ波段（&gt;30Hz）。对每个频带，计算PSD特征。</p>
+<p>脑电数据显示了9种情绪类型（娱乐、兴奋、快乐、平静、愤怒、厌恶、恐惧、悲伤和惊讶）。这些情绪类型进一步被分为价/唤醒等级量表，并按照[16]中相同的阈值策略，将问题转化为二值分类问题。</p>
+<h3 id="CMEED"><a href="#CMEED" class="headerlink" title="CMEED"></a>CMEED</h3><p>CMEED数据集[3]收集了37名受试者（17名男性和20名女性，平均年龄=23.95，SD=1.56）的脑电图数据。在观看16个胶片剪辑（长度在61至134秒）期间，脑电图数据被神经症患者quik-cap2记录，使用32个电极中的30个（左2个为参考），采样率为1024Hz。利用MATLAB中的EEGLAB工具箱，对1-45hz滤波器进行滤波预处理，并进行独立分量分析。利用1s重叠的2s窗口，从θ波段（4-7Hz）、α波段（8-13Hz）、β波段（14-30Hz）、γ波段（&gt;30Hz）四个波段提取PSD特征，与做梦者和DEAP相似，我们还根据评分将情绪分为正/负价和高/低唤醒。</p>
+<h3 id="Cross-corpus-Evaluation"><a href="#Cross-corpus-Evaluation" class="headerlink" title="Cross-corpus Evaluation"></a>Cross-corpus Evaluation</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318134942423.png" alt="image-20210318134942423"></p>
+<h2 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h2><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210318135035457.png" alt="image-20210318135035457"></p>
+<p>在未来的工作中，我们计划研究注意机制的作用，并在适当的水平上进一步引导我们的稀疏约束。第二，稀疏DGCNN遵循原始DGCNN[31]使用非负条目来建模邻接矩阵W，因为ReLu激活层的输出是非负的。在未来的研究中，考虑负相关值是一个有趣的问题，因为在情绪面孔处理中可能发现负相关。第三，DEAP、DREAMER和CMEED的数据集使用自我报告标签，SEED使用电影剪辑类别作为标签。这两种类型的标签分别对应于感觉到的和感知到的情绪（例如，[72]）。我们的CNN可以处理这两种类型的标签。在今后的工作中，通过研究这两种标签类型的差异，有可能提高识别精度。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" rel="tag"># 图神经网络</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/" rel="prev" title="zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage">
+      <i class="fa fa-chevron-left"></i> zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/06/JiaoZehui/Plug-and-Play%20Domain%20Adaptation%20for%20Cross-Subject%20EEG-based%20Emotion%20Recognition(1)/" rel="next" title="jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition">
+      jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spectral-graph-theory"><span class="nav-number">5.1.</span> <span class="nav-text">Spectral graph theory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DGCNN"><span class="nav-number">5.2.</span> <span class="nav-text">DGCNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#THE-SPARSE-DGCNN-MODEL"><span class="nav-number">5.3.</span> <span class="nav-text">THE SPARSE DGCNN MODEL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">6.1.</span> <span class="nav-text">实验设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SEED"><span class="nav-number">6.2.</span> <span class="nav-text">SEED</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DEAP"><span class="nav-number">6.3.</span> <span class="nav-text">DEAP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DREAMER"><span class="nav-number">6.4.</span> <span class="nav-text">DREAMER</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CMEED"><span class="nav-number">6.5.</span> <span class="nav-text">CMEED</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cross-corpus-Evaluation"><span class="nav-number">6.6.</span> <span class="nav-text">Cross-corpus Evaluation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">讨论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

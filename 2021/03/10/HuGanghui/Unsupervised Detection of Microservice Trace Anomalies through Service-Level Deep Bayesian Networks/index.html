@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：微服务； 异常检测； 根因分析 Abstract本文旨在解决微服务调用跟踪异常 挑战  底层微服务数量众多 它们之间的调用关系复杂 响应时间和调用路径之间的相互依赖性   TraceAnomaly 核心理念  在定期的离线训练中，使用机器学习来自动学习轨迹的整体正常模式  新颖的痕迹表示和设计的深度贝叶斯网络后验流   在线异常检测中，一个带有小异常分数(根据学习到的正态模式计算)的新轨迹">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hgh 【ISSRE-2019】Unsupervised Detection of Microservice Trace Anomalies through Service-Level Deep Bayesian Networks">
+<meta property="og:url" content="http://example.com/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：微服务； 异常检测； 根因分析 Abstract本文旨在解决微服务调用跟踪异常 挑战  底层微服务数量众多 它们之间的调用关系复杂 响应时间和调用路径之间的相互依赖性   TraceAnomaly 核心理念  在定期的离线训练中，使用机器学习来自动学习轨迹的整体正常模式  新颖的痕迹表示和设计的深度贝叶斯网络后验流   在线异常检测中，一个带有小异常分数(根据学习到的正态模式计算)的新轨迹">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig8.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+<meta property="article:published_time" content="2021-03-10T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-11T01:19:56.944Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="微服务">
+<meta property="article:tag" content="根因分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png">
+
+<link rel="canonical" href="http://example.com/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>hgh 【ISSRE-2019】Unsupervised Detection of Microservice Trace Anomalies through Service-Level Deep Bayesian Networks | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hgh 【ISSRE-2019】Unsupervised Detection of Microservice Trace Anomalies through Service-Level Deep Bayesian Networks
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-11 09:19:56" itemprop="dateModified" datetime="2021-03-11T09:19:56+08:00">2021-03-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：微服务； 异常检测； 根因分析</p>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><h3 id="本文旨在解决微服务调用跟踪异常"><a href="#本文旨在解决微服务调用跟踪异常" class="headerlink" title="本文旨在解决微服务调用跟踪异常"></a>本文旨在解决微服务调用跟踪异常</h3><ul>
+<li><p>挑战</p>
+<ul>
+<li>底层微服务数量众多</li>
+<li>它们之间的调用关系复杂</li>
+<li>响应时间和调用路径之间的相互依赖性</li>
+</ul>
+</li>
+<li><p>TraceAnomaly 核心理念</p>
+<ul>
+<li><p>在定期的离线训练中，使用机器学习来自动学习轨迹的整体正常模式</p>
+<ul>
+<li>新颖的痕迹表示和设计的深度贝叶斯网络后验流</li>
+</ul>
+</li>
+<li><p>在线异常检测中，一个带有小异常分数(根据学习到的正态模式计算)的新轨迹被认为是异常</p>
+</li>
+</ul>
+</li>
+<li><p>效果</p>
+<ul>
+<li>某公司已在18个在线服务上部署了TraceAnomaly</li>
+<li><p>详细评估四大在线服务包含数百个microservices和实验包含41 microservices</p>
+<ul>
+<li>表明TraceAnomaly的查全率和查准率都高于0.97,优于现有的方法(硬编码规则)19.6%和7.1%</li>
+<li>和其他七个基线平均57.0%和41.6%。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="具有相同uuid的所有消息构成一个微服务调用跟踪"><a href="#具有相同uuid的所有消息构成一个微服务调用跟踪" class="headerlink" title="具有相同uuid的所有消息构成一个微服务调用跟踪"></a>具有相同uuid的所有消息构成一个微服务调用跟踪</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Figure1"></p>
+<h3 id="解决挑战"><a href="#解决挑战" class="headerlink" title="解决挑战"></a>解决挑战</h3><ul>
+<li><p>以一种可解释的方式统一跟踪的响应时间和调用路径，用于异常检测</p>
+<ul>
+<li>由于不同的调用路径会导致不同的响应时间，因此对响应时间的建模需要一定需要考虑调用路径</li>
+<li>由于调用的频繁程度，对于每个单个的path的响应时间进行单独的时序异常检测也是不现实的</li>
+<li>并且当异常路径被检测到，需要快速的定位到根因，因此需要这种统一表示的方式有一定的可解释性</li>
+<li><p>核心思想</p>
+<ul>
+<li>将每个服务的trace作为一个训练样本，并使用机器学习来捕捉服务跟踪的整体模式。因此，每个服务都有一个模型</li>
+<li>将调用路径和响应时间构建成一个向量 STV（service trace verctor），然后交给深度学习算法</li>
+<li>通过STV，也可以很轻松的帮助后续的根因的确定</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>设计一个精确的、健壮的、无监督的学习体系结构，以捕获复杂的痕迹模式的特征，并有合理的训练开销</p>
+<ul>
+<li>正如挑战1中所描述的，微服务的响应时间与它本身和它的调用路径有关。因此需要在它们的调用路径上有条件地学习数百个响应时间分布。</li>
+<li>有了这样的复杂性，就需要一个大容量的模型，并且标签难以获得，就必须使用无监督算法</li>
+<li><p>符合上述条件的就是深度贝叶斯网络</p>
+<ul>
+<li>同时希望模型对超参数不敏感。应对这一挑战的核心思想是应用后验流（posterior flow），它可以使用非线性映射来增加贝叶斯网络中潜在变量的复杂性，允许模型以稳健、准确和无监督的方式捕捉复杂模式。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="贡献点"><a href="#贡献点" class="headerlink" title="贡献点"></a>贡献点</h3><ul>
+<li><p>提出STV</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig4"></p>
+<ul>
+<li>相信除了本文提出的算法外，STV还可以作为其他基于ml的跟踪异常检测和定位算法的跟踪表示。</li>
+<li>第一种被实际部署应用的基于机器学习的trace异常检测方法</li>
+<li>提出一种基于STV根源定位算法，该算法成功地对来自4个大型服务的所有73个异常跟踪进行了正确的根源定位，其定位精度比3个基线的测试结果高出55%。</li>
+</ul>
+</li>
+</ul>
+<h2 id="TRACEANOMALY-OVERVIEW-SERVICE-TRACE-VECTOR-CONSTRUCTION-AND-LOCALIZATION-ALGORITHM"><a href="#TRACEANOMALY-OVERVIEW-SERVICE-TRACE-VECTOR-CONSTRUCTION-AND-LOCALIZATION-ALGORITHM" class="headerlink" title="TRACEANOMALY OVERVIEW, SERVICE TRACE VECTOR CONSTRUCTION AND LOCALIZATION ALGORITHM"></a>TRACEANOMALY OVERVIEW, SERVICE TRACE VECTOR CONSTRUCTION AND LOCALIZATION ALGORITHM</h2><h3 id="异常检测"><a href="#异常检测" class="headerlink" title="异常检测"></a>异常检测</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig3"></p>
+<ul>
+<li><p>VAE + Posterior Flow</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig8"></p>
+<ul>
+<li><p>一个标准化流作用在一个简单分布上，经过 k个可逆的函数变换后得到一个复杂的分布，基于流的生成模型即用 pk(zk)来模拟训练数据的分布</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Flow"></p>
+</li>
+<li><p>进而得到训练数据在这个分布下的似然，然后按着最大似然准则对标准流进行优化</p>
+</li>
+</ul>
+</li>
+<li><p>使用KDE而不是简单阈值来判断某个样本是否是异常</p>
+<ul>
+<li>设定p-value的显著性水平为0.001，一个常用的值</li>
+</ul>
+</li>
+</ul>
+<h3 id="根因定位"><a href="#根因定位" class="headerlink" title="根因定位"></a>根因定位</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig7"></p>
+<ul>
+<li>3-sigma原则</li>
+</ul>
+<h2 id="IMPLEMENTATION-AND-DEPLOYMENT"><a href="#IMPLEMENTATION-AND-DEPLOYMENT" class="headerlink" title="IMPLEMENTATION AND DEPLOYMENT"></a>IMPLEMENTATION AND DEPLOYMENT</h2><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig8.png" alt="Fig9"></p>
+<h2 id="Evaluation"><a href="#Evaluation" class="headerlink" title="Evaluation"></a>Evaluation</h2><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/Fig7.png" alt="Fig8"></p>
+<p>TraceAnomaly和Multimodal LSTM无法区分异常类型(响应时间异常或调用路径异常)，因此无法计算响应时间异常和调用路径异常的精度。实际上，异常跟踪通常包含响应时间异常和调用路径异常。它在试验台的区别只是为了评价的目的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="tag"># 微服务</a>
+              <a href="/tags/%E6%A0%B9%E5%9B%A0%E5%88%86%E6%9E%90/" rel="tag"># 根因分析</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" rel="prev" title="nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks">
+      <i class="fa fa-chevron-left"></i> nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/17/BaiYunfei/ShapeNet(1)/" rel="next" title="byf 【AAAI-2021】ShapNet">
+      byf 【AAAI-2021】ShapNet <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E6%96%87%E6%97%A8%E5%9C%A8%E8%A7%A3%E5%86%B3%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E8%B7%9F%E8%B8%AA%E5%BC%82%E5%B8%B8"><span class="nav-number">1.1.</span> <span class="nav-text">本文旨在解决微服务调用跟踪异常</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E6%9C%89%E7%9B%B8%E5%90%8Cuuid%E7%9A%84%E6%89%80%E6%9C%89%E6%B6%88%E6%81%AF%E6%9E%84%E6%88%90%E4%B8%80%E4%B8%AA%E5%BE%AE%E6%9C%8D%E5%8A%A1%E8%B0%83%E7%94%A8%E8%B7%9F%E8%B8%AA"><span class="nav-number">2.1.</span> <span class="nav-text">具有相同uuid的所有消息构成一个微服务调用跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%8C%91%E6%88%98"><span class="nav-number">2.2.</span> <span class="nav-text">解决挑战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE%E7%82%B9"><span class="nav-number">2.3.</span> <span class="nav-text">贡献点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TRACEANOMALY-OVERVIEW-SERVICE-TRACE-VECTOR-CONSTRUCTION-AND-LOCALIZATION-ALGORITHM"><span class="nav-number">3.</span> <span class="nav-text">TRACEANOMALY OVERVIEW, SERVICE TRACE VECTOR CONSTRUCTION AND LOCALIZATION ALGORITHM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B"><span class="nav-number">3.1.</span> <span class="nav-text">异常检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B9%E5%9B%A0%E5%AE%9A%E4%BD%8D"><span class="nav-number">3.2.</span> <span class="nav-text">根因定位</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IMPLEMENTATION-AND-DEPLOYMENT"><span class="nav-number">4.</span> <span class="nav-text">IMPLEMENTATION AND DEPLOYMENT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Evaluation"><span class="nav-number">5.</span> <span class="nav-text">Evaluation</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

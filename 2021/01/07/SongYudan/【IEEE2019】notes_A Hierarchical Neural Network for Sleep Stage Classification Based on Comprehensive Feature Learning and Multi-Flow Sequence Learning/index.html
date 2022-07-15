@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络  【2019,IEEE Journal of Biomedical and Health Informatics】 【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】 Abstract自动睡眠分期通常提取PSG信号中的人工特征或">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning">
+<meta property="og:url" content="http://example.com/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络  【2019,IEEE Journal of Biomedical and Health Informatics】 【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】 Abstract自动睡眠分期通常提取PSG信号中的人工特征或">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132222.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132328.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132413.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132455.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133736.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132717.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132742.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132831.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132858.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133841.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132951.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133025.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133051.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133913.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133940.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133201.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133226.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133248.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133319.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133338.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133359.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133422.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133443.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133603.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133627.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134033.png">
+<meta property="article:published_time" content="2021-01-07T06:20:10.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:24:06.647Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="睡眠分期">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132222.png">
+
+<link rel="canonical" href="http://example.com/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-14 17:24:06" itemprop="dateModified" datetime="2021-07-14T17:24:06+08:00">2021-07-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>基于综合特征学习和多流序列学习的用于睡眠分期的分层神经网络</p>
+<hr>
+<p>【2019,IEEE Journal of Biomedical and Health Informatics】</p>
+<p>【Chenglu Sun，Chen Chen， Wei Li， Jiahao Fan，Wei Chen：复旦大学，信息科学与技术学院电子工程系，智能医疗电子中心】</p>
+<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><strong>自动睡眠分期</strong>通常提取PSG信号中的人工特征或网络训练的特征，用多种分类器估计它属于哪个阶段。</p>
+<p>本文提出了基于分层神经网络的方法处理多通道PSG信号。包含<strong>两个阶段</strong>：综合特征学习阶段和序列学习阶段。第一阶段，将人工特征和网络训得的特征融合；第二阶段用多流的循环神经网络学习睡眠周期之间的时间信息，并微调第一阶段的参数。</p>
+<p>用公开数据集MASS中147份记录来评估模型，总体能达到0.878的准确率，F1-score为0.818。与目前的先进方法相比，这种方法性能<strong>更优</strong>。消融实验和模型分析证明了模型<strong>不同组成部分的有效性</strong>。该方法可以根据不同的标准、信号特征和阶段划分的多通道PSG信号对睡眠阶段进行自动分类，具有<strong>全面</strong>开发睡眠信息的潜力。</p>
+<a id="more"></a>
+<p>关键词：睡眠阶段分期；卷积神经网络；循环神经网络；EEG信号</p>
+<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p><strong>背景：</strong>AASM标准将睡眠阶段分为五类：WAKE，REM，NREM1，NREM2，NREM3；把睡眠记录分为连续的阶段，专家根据一定标准将每个阶段划分为一个特定的睡眠阶段。为了减轻专家负担并提供辅助诊断，基于传统机器学习的方法应用了PSG信号中的典型特征（具有明显的物理意义），然后用不同的分类器进行睡眠分期。</p>
+<p><strong>存在问题：</strong></p>
+<ol>
+<li><p>如何从EEG、EOG和EMG信号中提取超越现有经典特征的<strong>新的、有效的特征</strong>是一个挑战；</p>
+</li>
+<li><p>如果根据以已提供的特征，某个阶段的特征仍然难以<strong>全面描述</strong>，这个阶段就会比较难识别；</p>
+</li>
+<li>传统机器学习方法的分类器<strong>不擅长处理时间序列信号</strong>。</li>
+</ol>
+<p><strong>A. 睡眠阶段分期的深度学习方法：文献综述</strong></p>
+<p>深度学习方法在很多领域都取得巨大成功。CNN和DBN在特征提取上性能比较好，RNN适于处理时序信号。<strong>深度网络</strong>在生理信号和医学图像处理方面都表现出<strong>良好性能</strong>。</p>
+<p>睡眠分期分为两步：特征提取和序列信号分类。可以用深度网络来处理睡眠数据：CNN单通道、CNN多通道。信号越多，分类效果越好；序列分类：DBN+HMM，ReNN+LSTM，CNN+BLSTM，只用深度网络，会<strong>过度依赖于网络</strong>。</p>
+<p>PSG信号可提取出三类特征：手动设计特征（可以提取到网络提取不到的特征，但是进步缓慢），网络训得的特征（难以描述和理解，有效性有待研究），从手动设计特征得到的分层特征（忽略了直接从网络提取的特征）。这些网络架构还有很大的<strong>提升空间</strong>。</p>
+<p><strong>B. 本文目标</strong></p>
+<p>旨在提出一个更好的方法，能<strong>综合</strong>的利用睡眠阶段知识，利用深度网络的特点（把手动设计特征和网络科学地结合起来）。还要考虑所训练特征的<strong>序列相关性</strong>；可以用于多种PSG信号，<strong>泛化性</strong>强。</p>
+<p>本文中提出了基于分层网络的新的分类方法，包括两步：综合特征学习阶段（自动提取特征矩阵）&amp;序列学习阶段（BLSTM和注意力层结合的多流网络进行序列学习）</p>
+<p><strong>贡献：</strong></p>
+<ol>
+<li>提出了一种<strong>两阶段</strong>的网络结构，提高分类效果。一阶段用三级CNN学习网络特征，将其与手工特征融合；二阶段用多流RNN&amp;注意力机制发掘序列信息，建立“序列-序列”的映射，而不是睡眠阶段之间的一对一映射。</li>
+<li>为了避免样本不均衡、过拟合问题，提高泛化能力，采用了一些<strong>学习策略</strong>：focal loss function，去除无用训练轮，选择性的模型储存策略。</li>
+<li>提出的模型可以完成不同数据集、不同标准、信号特征和阶段划分的睡眠分期。在4个数据集上做了实验，证明了模型的前景和<strong>鲁棒性</strong>。</li>
+</ol>
+<h3 id="2-Methodology"><a href="#2-Methodology" class="headerlink" title="2. Methodology"></a>2. Methodology</h3><p>介绍了模型架构，手动设计特征和分层网络。</p>
+<p><strong>A. 模型架构</strong></p>
+<p>模型结构如图1，初始信号自动预处理生成网络输入，然后通过网络习得特征。特征训练过程中，从网络输入中提取手动设计特征，然后将二者融合得到综合特征。然后训练模型根据综合特征学习时间信息，将网络输入喂给模型，验证模型的可行性。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132222.png" style="zoom:67%;" /></p>
+<p><strong>B. 手动设计特征</strong></p>
+<p>根据AASM标准，连续30s长的睡眠阶段被分为WAKE，REM，NREM1，NREM2，NREM3五类。根据R&amp;K标准，连续20s或30s的睡眠阶段被分为Wake, S1, S2, S3, S4, REM六类。每个阶段有自己的特点，即<strong>物理特征（如频率范围、振幅、某些特定波的持续时间</strong>），物理特征可通过手工设计提取出来，因此，<strong>基于睡眠医学先验知识提取手工特征</strong>是区分睡眠阶段的一种快速而简单的方法。</p>
+<p>EEG EOG EMG信号去噪后进行手工特征提取，提取了122个特征（时域、频域、形态特征），如表1所示。滑窗自动提取，进行z-score归一化，以减少受试者之间生理差异和设备相关差异的影响。特征向量拼接起来，<strong>虽然网络习得的特征也很好，但是不能完全抛弃手工设计特征，因为这些特性与睡眠知识是一致的</strong>。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132328.png" alt=""></p>
+<p><strong>C. 网络结构</strong></p>
+<p>特征学习阶段（阶段1）：三个filter分别学习细节特征、结构特征、形状特征，同时提取手工特征，然后进行融合；</p>
+<p>多流序列学习阶段（阶段2）：获得混合特征矩阵，习得时序信息，如阶段转换规则；微调stage1模型，得到最终模型。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132413.png" style="zoom:67%;" /></p>
+<p><strong>1）Stage1</strong></p>
+<p>CNN可以捕捉局部相关性和空间不变性，参数共享，可用于特征提取。设计了三级CNN结构（图3），有三个分支，分别<strong>捕捉细节特征、结构特征、形状特征（对应的filter size和步长不同）</strong>。每一个分支有4个卷积层，2个最大池化层，一个dropout层。然后拼接，全连接，输出。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132455.png" alt=""></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133736.png" style="zoom:67%;" /></p>
+<p>标准化的<strong>手工特征</strong>也被加入网络中（图4，公式6-8）</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132717.png" alt=""></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132742.png" style="zoom:67%;" /></p>
+<p><strong>2）Stage2</strong></p>
+<p>睡眠阶段有内部阶段相关性。阶段2主要捕捉时序信息，调整阶段1模型。LSTM能捕获序列之间依赖，选择性传递信息，<strong>BLSTM，输出同时受前后信息的影响</strong>。</p>
+<p>样本不平衡可能导致有些阶段被<strong>忽略/错分</strong>。<strong>为了保留被忽视的阶段，采用注意力机制</strong>。注意力层可以<strong>辅助</strong>BLSTM捕捉阶段信息（如图5所示），可以加强阶段之间的联系，通过引入新训练变量来突出一些阶段。根据前面和后面的阶段来判断本阶段属于哪个类。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132831.png" style="zoom:67%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132858.png" style="zoom: 67%;" /></p>
+<p>$h_t$是序列h中第t个阶段BLSTM的输出，W和b是序列h的权值和偏置，$I_t$是$\mu_t$的权值矩阵，$\alpha_t$是第t个阶段占的比例，$v_t$是注意力层的输出。</p>
+<p>完整的阶段2如图6所示，数据分批输入。阶段2是多流结构，有3个数据通路。三个tensor（三个阶段1的输出）拼接，全连接层，BLSTM，注意力层。三个输出的维度相同，即特征提取、BLSTM、注意力层的提供相同数量的信息（在最后加权之前）。然后经过全连接、softmax提取信息，给出类别概率。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133841.png" alt=""></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107132951.png" style="zoom: 67%;" /></p>
+<h3 id="3-Experiment"><a href="#3-Experiment" class="headerlink" title="3. Experiment"></a>3. Experiment</h3><p>介绍数据和训练过程。</p>
+<p><strong>A. 数据</strong></p>
+<p>用147条整晚记录来评估模型。<strong>MASS有五个子集，子集内部同质，子集之间差距较大</strong>。SS2-SS5都是健康样本，用SS2-SS5进行训练。</p>
+<p>SS2-SS5的属性如表2，选共同部分用于训练：<strong>C3 EEG，EOG，chin1 EMG</strong>（以256Hz频率采样），通过60hz陷波滤波器和带通滤波器进行去噪。所有信号被降采样到128hz，便于后续处理减少、计算复杂度。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133025.png" alt=""></p>
+<p>四个数据集的人口统计资料、五类睡眠阶段比例和总的test epoch数由表3给出。用LOSO（Leave One Subject Out ）来评估模型在四个子集上的性能。训练：验证：测试=k-2:1:1,本课题独立验证更适合实际应用场景。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133051.png" alt=""></p>
+<p><strong>B. 训练过程</strong></p>
+<p><strong>1）训练参数</strong></p>
+<p>阶段1：Adam，batchsize，lr，epochs，cross-entropy。</p>
+<p>阶段2：两层BLSTM，Adam，batchsize，epochs，SL。同时考虑阶段的时序信息，微调阶段1参数。为了避免<strong>梯度爆炸</strong>，采用启发式梯度裁剪技术；用<strong>focal loss fuction</strong>量化真实标签和预测标签之间的一致性。FL如下：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133913.png" style="zoom:70%;" /></p>
+<p>其中$p_t$是每一类的概率，权重因子$\alpha$和集中参数$\gamma$解决<strong>样本不均衡</strong>问题、区分简单/困难例子，分别设置为0.25和2。dropout，L2正则化，这些超参数的值如表4。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133940.png" style="zoom:67%;" /></p>
+<p>用全局acc、F1-score、kappa系数，精度，recall，每一类的F1-score来<strong>评估</strong>。</p>
+<p><strong>2）学习策略</strong></p>
+<p><strong>epoch removal：</strong>从训练集中剔除了代表睡眠阶段转换的两个变化期，使模型充分研究<strong>纯特征</strong>。</p>
+<p><strong>oversampling：</strong>根据最多epoch数来确定睡眠阶段，然后在训练集中重复地从小睡眠阶段中选取相同的epoch数，使得所有睡眠阶段都有<strong>相同数目的样本</strong>。所有阶段中的信息能被充分学习。</p>
+<p><strong>model storage scheme：</strong>每训练一轮，如果满足要求，储存当前模型。该方法可以在不存在过拟合现象的前提下，<strong>尽量少存储模型</strong>，减少训练时间和存储空间。</p>
+<h3 id="5-结果"><a href="#5-结果" class="headerlink" title="5. 结果"></a>5. 结果</h3><p>本文模型与目前的先进模型对比，探究模型各模块的效果。</p>
+<p><strong>A. 睡眠阶段分期表现</strong></p>
+<p>图7给出混淆矩阵，N1分类效果相对较差，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133201.png" alt=""></p>
+<p>评估指标如表5，<strong>N1分类效果差</strong>，N1在睡眠阶段中比例相对较低，比较难分类。在SS2-SS5上总体的acc、F1-scores和kappa系数分别在0.867~0.897、0.797~0.839、0.806~0.847。kappa系数说明：分类结果和专家意见一致；acc：对于具有不同特征的四个子集，acc高且稳定；F1-score：同时兼顾精度和召回率。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133226.png" alt=""></p>
+<p>图8给出了一个样本的睡眠图，分类结果和之前提到的阶段匹配规则基本一致，错分的基本上是把N1错分为其他类（与图7显示的结果一致）。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133248.png" alt=""></p>
+<p><strong>B. 与目前先进模型对比</strong></p>
+<p>a). 三层CNN+SGD+Adam+cross entropy</p>
+<p>b). ReNN(探测特征)+LSTM（序列数据学习）+SGD+cross entropy</p>
+<p>c). CNN（表示学习模块，提取时间不变特征）+BLSTM（序列残差学习模块）+oversampling+Adam++cross entropy</p>
+<p>d). EEG features+ stacked sparse autoencoders +L-BFGS+正则化</p>
+<p>图9给出四种方法和我们的模型混淆矩阵：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133319.png" alt=""></p>
+<p>表5给出评估指标的表格：除了N1类的F1-score，其余指标都高于现有模型。结果说明：RNN适于发掘时序信息，<strong>特征提取对不同的类别贡献不同</strong>。用 Wilcoxon秩和检验探究我们的方法在acc上是否和另外四种有显著差异，表格说明我们的方法有<strong>显著提高</strong>。表6列出了反映了分类结果、时间复杂度、训练时间、测试时间的指标对比。模型越复杂，训练时间越长。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133338.png" alt=""></p>
+<p><strong>C. 模型各元素（模块）的表现</strong></p>
+<p>提出的结构有4个关键点：三级CNN，手工设计特征，BLSTM，注意力层；以及学习策略。从完整模型中提取5个模型：</p>
+<p>1). 三级CNN（没有手工设计特征）</p>
+<p>2).先提取手工设计特征，再训练网络特征，并融合</p>
+<p>3).stage1+BLSTM，无注意力层</p>
+<p>4).stage1+stage2，无学习策略</p>
+<p>5). stage1+stage2（含学习策略），即完整模型</p>
+<p>图10给出混淆矩阵结果，三级CNN是模型的<strong>基础</strong>，对分类效果有比较大的影响；模型中每个元素都能提高分类效果。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133359.png" alt=""></p>
+<p>表7是各指标结果，显示完整的模型效果最好。2、3对比：学习策略的提升效果；12对比，手工设计特征的提升效果；注意力机制有效果；学习策略有用</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133422.png" alt=""></p>
+<p><strong>D. 模型分析</strong></p>
+<p>记录融合层中的权值分布。权值为正，正面影响；权值为负，负面影响。权值绝对值越大，影响越大，全连接层中的<strong>权值绝对值可以反应传递过来的信息流</strong>。提取出特征拼接之后的<strong>全连接层的权值，初步总结两类特征的贡献</strong>。网络训得的特征信息量如下：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133443.png" style="zoom: 80%;" /></p>
+<p>每个特征平均信息量T/1000.</p>
+<p>提取了阶段2拼接之后的第一个全连接层的权值，信息总量和平均信息量如表8：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133603.png" style="zoom:67%;" /></p>
+<p><strong>网络训得的特征</strong>总量比手工设计特征，<strong>提供更多有效信息</strong>，网络训得的特征能保存形状信息（卷积核是定长一维张量），手工特征可能会忽略形状特点（压缩了信号信息）。但是<strong>平均手工特征</strong>更大，说明它<strong>也很重要</strong>。</p>
+<p>注意力机制的信息总量大于BLSTM的，说明<strong>注意力机制提供了额外的信息</strong>。网络习得的特征和手工设计特征是平行输入的，stage1、BLSTM、注意力机制是级联的。后面模块包含了前面模块的信息。</p>
+<p>加入手工设计特征后，后面的全连接层的权值被提取出来。图11给出了SS4中每个手工设计特征的相对信息量，<strong>不同滑窗大小、不同时刻下特征的贡献是相似的</strong>，MSE特征不能提供足够的信息，被过滤掉了。其中，前7个能区分五个睡眠阶段的特征是：EMG信号PSD平均功率、EMG信号峰值、肌电信号中PSD的平均功率、DFA在3个阶段上的标度指数、脑电图信号中PSD的峰值功率、脑电信号的频域差值分析、EOG信号的谱熵。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107133627.png" alt=""></p>
+<p>网络习得的特征是随机抽取的，下标不固定，不能定量描述形态，很难总结每个特征的贡献。</p>
+<h3 id="5-discussion-amp-future-work"><a href="#5-discussion-amp-future-work" class="headerlink" title="5. discussion&amp;future work"></a>5. discussion&amp;future work</h3><p><strong>手工设计特征</strong>不能被完全丢弃，不同特征可以通过合适的网络有效结合。实际上手工设计特征也经过一系列线性/非线性操作，<strong>其实也是在加深网络</strong>，因为网络可以同时进行不同深度的训练。</p>
+<p>N1和N2<strong>错分</strong>，它们比较类似，专家通过前后信息来判断，所以引入<strong>序列学习</strong>可以提高分类效果。可以试图发现新的验证特征、探究N1的时间信息，或者寻找N1阶段的<strong>数据扩增</strong>方法，来提高效果。</p>
+<p>网络习得的特征比手工设计特征表现力更强。我们推测是专家主要看波形，不能发现隐藏信息。手工设计特征间接形容形态，CNN<strong>直接提取形态信息</strong>（与专家方法一致）。</p>
+<p><strong>深度学习在睡眠分期上有优势</strong>。从特征提取角度，CNN能提取不同的形态信息（与专家一致）；BLSTM更擅长发掘睡眠阶段之间的联系；结合手工设计特征，得到更全面的特征；注意力机制加强睡眠阶段之间的联系 ；各种学习策略提高模型的泛化性。</p>
+<p>表9给出了传统睡眠分期方法和本方法的全面比较结果，说明<strong>手工设计特征有待提高</strong>。传统方法分类效果也不错，但是样本数量都比较小。手工设计特征需要特征选择过程（避免过拟合）。深度学习方法需要大量数据，<strong>若数据量小，也可以考虑传统方法</strong>。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134033.png" alt=""></p>
+<p>局限性和未来方向：深度学习框架可解释性相对较差；手工设计特征需要一些<strong>睡眠医学的知识</strong>；本文选用的是正常人数据，有睡眠疾病的人睡眠结构会更复杂、分类更难，更多关注<strong>有睡眠疾病的人患者</strong>的睡眠分期方法，检测相关睡眠疾病；<strong>数据扩增</strong>（如GAN，可以人工生成睡眠阶段使得阶段样本平衡）；解码网络映射关系，探究不同的阶段哪个特征最相关（比较困难），考虑通过模型可解释性/信息追踪来解决这个问题。</p>
+<h3 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h3><p>本文利用EEG、EOG、EMG信号，基于综合特征学习和多流序列学习构造了层次神经网络来解决睡眠分期问题。第一阶段，用三级CNN提取特征，将其与手工设计特征融合；第二阶段用BLSTM和注意力机制进行分类。在四个数据集上进行实验，评估模型，acc达到0.878，F1-score达到0.818，优于目前的先进模型。分析了五个不同模块组合的模型，验证各部分的效果，说明所提出的模型是有效的，有全面地发掘睡眠信息的潜力。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F/" rel="tag"># 睡眠分期</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/" rel="prev" title="jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals">
+      <i class="fa fa-chevron-left"></i> jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/" rel="next" title="syd 【NIPS2019】TWNet:a Dynamic Time Warping Network">
+      syd 【NIPS2019】TWNet:a Dynamic Time Warping Network <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Methodology"><span class="nav-number">3.</span> <span class="nav-text">2. Methodology</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Experiment"><span class="nav-number">4.</span> <span class="nav-text">3. Experiment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">5. 结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-discussion-amp-future-work"><span class="nav-number">6.</span> <span class="nav-text">5. discussion&amp;future work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">7.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

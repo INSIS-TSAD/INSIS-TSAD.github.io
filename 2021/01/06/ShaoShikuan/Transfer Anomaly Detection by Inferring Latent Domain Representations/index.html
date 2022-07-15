@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Transfer Anomaly Detection by Inferring Latent Domain Representations作者：Atsutoshi Kumagai，Tomoharu Iwata会议：NeurIPS 2019贡献：​        使用源域的正常和异常实例或者仅使用正常实例训练自编码器，通过引入隐域向量(latent domain vector)(域的隐表示，由每一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssk Transfer Anomaly Detection by Inferring Latent Domain Representations">
+<meta property="og:url" content="http://example.com/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Transfer Anomaly Detection by Inferring Latent Domain Representations作者：Atsutoshi Kumagai，Tomoharu Iwata会议：NeurIPS 2019贡献：​        使用源域的正常和异常实例或者仅使用正常实例训练自编码器，通过引入隐域向量(latent domain vector)(域的隐表示，由每一个">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201123164447.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122163254167.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122173008338.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122173025976.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122173041877.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/image-20201122173053750.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:49:49.757Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201123164447.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ssk Transfer Anomaly Detection by Inferring Latent Domain Representations | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/ShaoShikuan/Transfer%20Anomaly%20Detection%20by%20Inferring%20Latent%20Domain%20Representations/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ssk Transfer Anomaly Detection by Inferring Latent Domain Representations
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:49:49" itemprop="dateModified" datetime="2021-01-16T11:49:49+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations"><a href="#Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations" class="headerlink" title="Transfer Anomaly Detection by Inferring Latent Domain Representations"></a>Transfer Anomaly Detection by Inferring Latent Domain Representations</h3><h5 id="作者：Atsutoshi-Kumagai，Tomoharu-Iwata"><a href="#作者：Atsutoshi-Kumagai，Tomoharu-Iwata" class="headerlink" title="作者：Atsutoshi Kumagai，Tomoharu Iwata"></a>作者：Atsutoshi Kumagai，Tomoharu Iwata</h5><h5 id="会议：NeurIPS-2019"><a href="#会议：NeurIPS-2019" class="headerlink" title="会议：NeurIPS 2019"></a>会议：NeurIPS 2019</h5><h5 id="贡献："><a href="#贡献：" class="headerlink" title="贡献："></a>贡献：</h5><p>​        使用源域的正常和异常实例或者仅使用正常实例训练自编码器，通过引入隐域向量(<em>latent domain vector</em>)(<em>域的隐表示，由每一个域的正常实例通过神经网络得到</em>)的概念，所提出的方法可以为目标域推断出异常检测器，而不需要在目标域中重新训练。</p>
+<p>​        每一个域的隐域向量都是由每个域的正常实例来得到的，每个域的异常分数函数由自编码器的偏差来建模，并且自编码器具体的域属性由隐域向量来控制。</p>
+<a id="more"></a>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201123164447.png" alt="微信截图_20201123164447" style="zoom:67%;" /></p>
+<h5 id="准备知识："><a href="#准备知识：" class="headerlink" title="准备知识："></a>准备知识：</h5><p>​        由于AE的简洁有效性，AE在最近的半监督异常检测中广泛使用，所以本文也使用AE作为所提出方法的基础。AE的用来训练的损失函数表示如下：</p>
+<script type="math/tex; mode=display">
+L(\theta_F,\theta_G):=\frac{1}{N}\sum_{n = 1}^{N}||x_n-G_{\theta_G}(F_{\theta_F}(x_n))||^2</script><h5 id="方法："><a href="#方法：" class="headerlink" title="方法："></a>方法：</h5><h6 id="Task"><a href="#Task" class="headerlink" title="Task"></a>Task</h6><p>​        令$X<em>d^+:={x</em>{dn}^+}<em>{n=1}^{N_d^+}$表示第d个域中的异常实例，其中$x</em>{dn}^+ \in R^M$，第d个域中第n个实例的M维特征向量，$N<em>d^+$是异常实例的数量，同样定义$X_d^-:={x</em>{dn}^-}_{n=1}^{N_d^-}$。我们假设$N_d^+&lt;&lt;N_d^-$，M在所有域中都是相同的，在$D_S$个源域中有异常和正常实例，在$D_T$个目标域中有正常实例，注意本文所提出的方法也可以处理源域只有正常实例的情况。</p>
+<p>​        本文的目标是对于所有目标域获得一个领域具体的异常分数函数，用来输出实例的异常分数。</p>
+<h6 id="Domain-specific-Anomaly-Score-Function"><a href="#Domain-specific-Anomaly-Score-Function" class="headerlink" title="Domain-specific Anomaly Score Function"></a>Domain-specific Anomaly Score Function</h6><p>​        基于AE的重构误差来定义本文的领域具体的异常分数函数。假设每一个领域都有一个<strong>K</strong>维的隐藏连续变量$\bold z_d \in R^K$，在本文中称为隐域向量，对于第d个域，定义如下的异常分数函数：</p>
+<script type="math/tex; mode=display">
+s_\theta(x_{dn}|z_d):=||x_{dn}-G_{\theta_G}(F_{\theta_F}(x_{dn},z_d))||^2 \qquad(1)</script><p>​        其中的参数$\theta:=(\theta_F,\theta_G)$在所有域中共享。通过改变$z_d$的值，本文的方法可以灵活的改变异常分数函数的属性。</p>
+<h6 id="Models-for-Latent-Domain-Vectors"><a href="#Models-for-Latent-Domain-Vectors" class="headerlink" title="Models for Latent Domain Vectors"></a>Models for Latent Domain Vectors</h6><p>​        由于隐域向量无法被观测到，所以我们从数据中对其进行估计。通过给定的正常实例，建模隐域向量的条件概率为多元高斯分布：</p>
+<script type="math/tex; mode=display">
+q_\phi(z_d|X_d^-):= {\cal N}(z_d|\mu_\phi(X_d^-),diag(\sigma^2_\phi(X_d^-))) \qquad(2)</script><p>​        其中diag是对角协方差矩阵。均值$\mu<em>\phi(X_d^-)\in R^K$，方差$\sigma</em>\phi^2(X<em>d^-)\in R^K</em>+$是通过神经网络来进行建模，神经网络的参数$\phi$在所有域中共享。在这个模型中隐域向量$z_d$依赖于正常实例$X_d^-$。通过建模，当一个域的正常实例给定时，我们可以推断任何域的隐域向量。相应的就可以得到领域具体的异常分数函数，而不需要重新训练。</p>
+<h6 id="Objective-Function"><a href="#Objective-Function" class="headerlink" title="Objective Function"></a>Objective Function</h6><p>​        定义本文的目标函数，使用领域具体的异常分数函数和隐域向量。首先，对于第d个<strong>源域</strong>在隐域向量$z_d$约束下的最小化目标函数定义如下：</p>
+<script type="math/tex; mode=display">
+L_d(\theta|z_d):=\frac{1}{N_d^-}\sum_{n = 1}^{N_d^-}s_\theta(x_{dn}^-|z_d)-\frac{\lambda}{N_d^-N_d^+}\sum_{n,m = 1}^{N_d^-,N_d^+}f(s_\theta(x_{dm}^+|z_d)-s_\theta(x_{dn}^-|z_d)) \qquad (3)</script><p>​        这种形式的目标函数由二作提出(Supervised anomaly detection based on deep autoregressive density estimators.)，但是没有考虑领域差异。    </p>
+<p>​        其中超参数$\lambda\geq 0$，$f$是sigmoid函数，上式的第一项表示的是第d个域内正常实例的异常分数，因为正常实例的异常分数应该很小，所以我们最小化这一部分。上面公式的第二项是AUC的可微近似，对于类别不平衡的数据很有效，异常实例的异常分数应该比正常实例的高，$s<em>\theta(x</em>{dm}^+|z<em>d)&gt;s</em>\theta(x<em>{dn}^-|z_d)$对于任意的$x</em>{dm}^+\in X^+<em>d,x</em>{dn}^-\in X^-_d$。</p>
+<p>​        当域中没有异常，或者$\lambda=0$，上式第二项等于0，第一项保留。所以这一目标函数是AE的有监督扩展。</p>
+<p>​        由于隐域向量$z<em>d$具有方差$\sigma^2</em>\phi$的不确定性，也就是隐域向量是由数据估计的，因此估计往往具有不确定性。我们想要针对目标函数适当地考虑这一点，所以定义了如下的第d个<strong>源域</strong>的目标函数来最小化：</p>
+<script type="math/tex; mode=display">
+{\cal L}_d(\theta,\phi):=\mathbb{E}_{q_\phi(z_d|X_d^-)}[L_d(\theta|z_d)]+\beta D_{KL}(q_\phi(z_d|X_d^-)||p(z_d)) \qquad(4)</script><p>​        其中$D<em>{KL}(q</em>\phi(z<em>d|X_d^-)||p(z_d))$是$q</em>\phi(z_d|X_d^-)$和一个标准正态分布$p(z_d):= {\cal N}(0,I)$之间的KL散度，$\beta&gt;0$是一个超参。</p>
+<p>​        上式第一项是公式(3)关于$q<em>\phi(z_d|X_d^-)$的期望。这一期望项可以通过重新参数化(reparametrization)技巧(trick)有效地近似，即$\mathbb{E}</em>{q<em>\phi(z_d|X_d^-)}[L_d(\theta|z_d)] \approx \frac{1}{L} \sum</em>{l=1}^LL<em>d(\theta|z_d^{(l)})$，其中，$z_d^{(l)}=\mu</em>{\phi}(X<em>d^-)+\epsilon_d^{(l)} \odot \sigma</em>{\phi}(X_d^-),\epsilon_d^{(l)} \sim {\cal N}(0,I)$，其中$\odot$表示每个元素分别相乘，$L$为随机采样$L$次</p>
+<p>​        上式第二项是正则化项，防止隐域向量的过拟合，这种形式的正则化项在VAE中比较常见。</p>
+<p>​        对于第d个<strong>目标域</strong>的目标函数通过忽略掉公式(4)中的异常项，因为目标域中没有异常实例，也就是：</p>
+<script type="math/tex; mode=display">
+{\cal L}_d(\theta,\phi):=\mathbb{E}_{q_\phi(z_d|X_d^-)}[\frac{1}{N_d^-}\sum_{n = 1}^{N_d^-}s_\theta(x_{dn}^-|z_d)]+\beta D_{KL}(q_\phi(z_d|X_d^-)||p(z_d)) \qquad(5)</script><p>​        其中的第一项也可以按上面的方法近似。所以本文所提出的方法的目标函数也就是以下各领域目标函数的加权和，${\cal L}<em>d(\theta,\phi):=\sum</em>{d = 1}^{D_S+D_T} \alpha_d {\cal L}_d(\theta,\phi)$，其中$\alpha_d\geq 0$是超参数，通过梯度下降，目标函数可以关于$\theta,\phi$最小化</p>
+<h6 id="Inference"><a href="#Inference" class="headerlink" title="Inference"></a>Inference</h6><p>​        通过学习到的参数$(\theta<em>*,\phi</em>*)$和正常实例$X_{d’}^-$，为第$d’$个域推断特定域的异常分数函数，如下所示：</p>
+<script type="math/tex; mode=display">
+s(x_{d'}):=\int s_{\theta_*}(x_{d'}|z_{d'})q_{\phi_*}(z_{d'}|X_{d'}^-)d_{z_{d'}}\approx \frac{1}{L} \sum_{l=1}^Ls_{\theta_*}(x_{d'}|z_{d'}^{(l)})\qquad(6)</script><p>​        其中$z<em>{d’}^{(l)}=\mu</em>{\phi<em>*}(X</em>{d’}^-)+\epsilon<em>d^{(l)} \odot \sigma</em>{\phi<em>*}(X</em>{d’}^-),\epsilon<em>d^{(l)} \sim {\cal N}(0,I)$，$x</em>{d’}$是第$d’$个域的任意实例，可以得到异常分数函数，在$X_{d’}^-$没有参与到训练的情况下。</p>
+<h5 id="实验："><a href="#实验：" class="headerlink" title="实验："></a>实验：</h5><p>​        本文用到了一个合成数据集和四个类别不平衡的真实数据集。</p>
+<h6 id="Data"><a href="#Data" class="headerlink" title="Data"></a>Data</h6><p>​        我们创建了简单的二维数据集如下所示，此数据集由围绕(0,0)的8个双层圆(域)组成。每个双层圆有外圆和内圆，分别由正常实例和异常实例组成。使用第7个域作为目标域，其余的作为源域。使用四个真实数据集：MNIST-r, Anuran Calls, Landmine, 和 IoT。</p>
+<p>​        Synthetic, MNIST-r, Anuran Calls, Landmine, 和 IoT的平均异常比例为0.048, 0.1, 0.024, 0.062, 和 0.05</p>
+<h6 id="Comparison-Methods"><a href="#Comparison-Methods" class="headerlink" title="Comparison Methods"></a>Comparison Methods</h6><p>​        比较了本文的两个变体：ProT 和 ProS。ProT使用目标域中的正常实例以及异常和正常源实例进行训练。ProS不使用目标域正常实例进行训练，在使用源域训练完成后，ProS使用目标域的正常实例来推断目标域的异常分数函数而无需再训练。</p>
+<p>​        比较了本文的方法和其他八个方法：NN，NNAUC，AEAUC，AE，OSVM，CCSA，TOSVM，OTL，其中AE，OSVM是半监督异常检测方法，NN，NNAUC，AEAUC是监督学习方法，AEAUC和本文的方法类似，不过没有考虑隐域向量。CCSA, TOSVM, 和 OTL是迁移学习方法或者是迁移异常检测方法。</p>
+<h6 id="Results"><a href="#Results" class="headerlink" title="Results"></a>Results</h6><p><img src="http://echo23334.gitee.io/pic_repo/image-20201122163254167.png" alt="image-20201122163254167" style="zoom:67%;" /></p>
+<p>​        首先是合成数据集上的结果，如上Figure 2所示。2b是通过ProS估计的隐域向量(K=2)，特别的，目标域的隐域向量通过源域的隐域向量预测出来了，尽管目标域没有参与到训练。2c表示的是通过ProS得到的目标域异常分数的热力图。2d表示的是在目标域上不同$\lambda$所得到的AUC折线，使用AEAUC作为基线，因为它是由ProS忽略隐域向量得到的。</p>
+<p>​        接下来是在真实数据集上的结果。表1-4展示的是不同数据集，不同目标域上AUC的均值和标准差。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173008338.png" alt="image-20201122173008338" style="zoom:67%;" /></p>
+<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173025976.png" alt="image-20201122173025976" style="zoom:67%;" /></p>
+<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173041877.png" alt="image-20201122173041877" style="zoom:67%;" /></p>
+<p><img src="http://echo23334.gitee.io/pic_repo/image-20201122173053750.png" alt="image-20201122173053750" style="zoom:67%;" /></p>
+<p>​        第三，研究了该方法中考虑潜在域向量不确定性的影响，为此考虑了ProT和ProS的确定性变量，称作D-ProT和D-ProS，表5展示了结果。</p>
+<p>​        第四，研究了异常训练实例数量的影响，表-6展示了结果。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/" rel="prev" title="yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)">
+      <i class="fa fa-chevron-left"></i> yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/ShaoShikuan/RAPP%20NOVELTY%20DETECTION%20WITH%20RECONSTRUCTION%20ALONG%20PROJECTION%20PATHWAY/" rel="next" title="ssk NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY">
+      ssk NOVELTY DETECTION WITH RECONSTRUCTION ALONG PROJECTION PATHWAY <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Transfer-Anomaly-Detection-by-Inferring-Latent-Domain-Representations"><span class="nav-number">1.</span> <span class="nav-text">Transfer Anomaly Detection by Inferring Latent Domain Representations</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%9C%E8%80%85%EF%BC%9AAtsutoshi-Kumagai%EF%BC%8CTomoharu-Iwata"><span class="nav-number">1.0.1.</span> <span class="nav-text">作者：Atsutoshi Kumagai，Tomoharu Iwata</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BC%9A%E8%AE%AE%EF%BC%9ANeurIPS-2019"><span class="nav-number">1.0.2.</span> <span class="nav-text">会议：NeurIPS 2019</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE%EF%BC%9A"><span class="nav-number">1.0.3.</span> <span class="nav-text">贡献：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E7%9F%A5%E8%AF%86%EF%BC%9A"><span class="nav-number">1.0.4.</span> <span class="nav-text">准备知识：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">1.0.5.</span> <span class="nav-text">方法：</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Task"><span class="nav-number">1.0.5.1.</span> <span class="nav-text">Task</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Domain-specific-Anomaly-Score-Function"><span class="nav-number">1.0.5.2.</span> <span class="nav-text">Domain-specific Anomaly Score Function</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Models-for-Latent-Domain-Vectors"><span class="nav-number">1.0.5.3.</span> <span class="nav-text">Models for Latent Domain Vectors</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Objective-Function"><span class="nav-number">1.0.5.4.</span> <span class="nav-text">Objective Function</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Inference"><span class="nav-number">1.0.5.5.</span> <span class="nav-text">Inference</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%EF%BC%9A"><span class="nav-number">1.0.6.</span> <span class="nav-text">实验：</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Data"><span class="nav-number">1.0.6.1.</span> <span class="nav-text">Data</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Comparison-Methods"><span class="nav-number">1.0.6.2.</span> <span class="nav-text">Comparison Methods</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Results"><span class="nav-number">1.0.6.3.</span> <span class="nav-text">Results</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="时间序列异常检测论文阅读汇总">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hgh A时间序列异常检测论文阅读汇总">
+<meta property="og:url" content="http://example.com/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="时间序列异常检测论文阅读汇总">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-04T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-08T05:32:05.925Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>hgh A时间序列异常检测论文阅读汇总 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hgh A时间序列异常检测论文阅读汇总
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-04 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-04T20:24:24+08:00">2021-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:32:05" itemprop="dateModified" datetime="2021-03-08T13:32:05+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="时间序列异常检测论文阅读汇总"><a href="#时间序列异常检测论文阅读汇总" class="headerlink" title="时间序列异常检测论文阅读汇总"></a>时间序列异常检测论文阅读汇总</h2><a id="more"></a>
+<h3 id="《Time-Series-Anomaly-Detection-Service-at-Microsoft》SR方法-KDD-2019-微软"><a href="#《Time-Series-Anomaly-Detection-Service-at-Microsoft》SR方法-KDD-2019-微软" class="headerlink" title="《Time-Series Anomaly Detection Service at Microsoft》SR方法 KDD 2019 微软"></a>《Time-Series Anomaly Detection Service at Microsoft》SR方法 KDD 2019 微软</h3><p><a href="/Users/hgh/Downloads/my_file/insis实验室/航信项目/时间序列异常检测项目/异常检测——论文/2019最新的论文/Time-Series Anomaly Detection Service at Microsof.pdf">论文地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/microsoft/anomalydetector">开源代码</a></p>
+<p>文章中有提到Holt winters以及Spot算法（极值理论）的利弊，称<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/Holt-Winters%20方法/24137738?fr=aladdin">Holt winters</a>对非季节性/周期性的时序的效果不好，</p>
+<p>Spot则相反，对于季节性/周期性的时序效果不行。言下之意就是SR在三者上的效果都是非常好的，更加通用。</p>
+<p>其中设计时序分类，关于<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/非平稳序列/10449553">非平稳序列的定义</a></p>
+<p>同时文章提到工业界需要的异常检测算法需要满足：无监督、准确、高效、通用。（不过，可能有些企业可以也愿意打标签使用有监督的算法😂，比如美团？）</p>
+<p>提到两个无监督算法Luminol [1] and DONUT [23]说问题在于要么需要大量时间要么对参数敏感（不过这个应该指训练吧，如果是训练的话，时间倒还好，但是这里很可能是因为需要部署到海量的时序上，因此训练时间过长也是不可接受的，那这样其实可以看看最新的裴丹团队的异常检测模型迁移的文章-<a target="_blank" rel="noopener" href="https://netman.aiops.org/wp-content/uploads/2021/02/paper-INFOCOM21-cfp.pdf"><strong>CTF: Anomaly Detection in High-Dimensional Time Series with Coarse-to-Fine Model Transfer</strong></a>）</p>
+<p>这篇文章提到SR+CNN，因为SR处理后的时序的异常就非常明显了，因此相当于给CNN提供了一个伪标签，没有使用任何真实标签，保持了算法的无监督的特点。</p>
+<p>在具体实现细节方面，SR提供了比较详细的说明，以及如何应对实时化的改进，应该相当于需要实时的进行FFT（<a target="_blank" rel="noopener" href="https://www.zhihu.com/search?type=content&amp;q=快速傅立叶变换">关于FFT相关介绍博客</a>），提到了填充点的操作，可能有参考价值。</p>
+<p>对于开源代码方面，在之前论文的基础上，后续又有了一项<a target="_blank" rel="noopener" href="https://github.com/microsoft/anomalydetector/tree/master/aml_component">更新</a>，主要是添加了一个有上下界限的模式，然后这个东西好像是为了给Azure Machine Learning designer使用的。<strong>不过之前我们也思考过一个问题就是如何给SR添加上下界限，这个确实值得看看源码的实现。</strong></p>
+<h3 id="《RobustSTL-A-Robust-Seasonal-Trend-Decomposition-Algorithm-for-Long-Time-Series》AAAI-2019-阿里达摩院"><a href="#《RobustSTL-A-Robust-Seasonal-Trend-Decomposition-Algorithm-for-Long-Time-Series》AAAI-2019-阿里达摩院" class="headerlink" title="《RobustSTL: A Robust Seasonal-Trend Decomposition Algorithm for Long Time Series》AAAI 2019 阿里达摩院"></a>《RobustSTL: A Robust Seasonal-Trend Decomposition Algorithm for Long Time Series》AAAI 2019 阿里达摩院</h3><p><a href="/Users/hgh/Downloads/my_file/insis实验室/航信项目/时间序列异常检测项目/异常检测——论文/动态基线-阿里达摩院跟进/RobustSTL- A Robust Seasonal-Trend Decomposition Algorithm for Long Time Series.pdf">论文地址</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/LeeDoYup/RobustSTL">非官方复现代码</a></p>
+<p>这片文章介绍了一个改进版本的STL算法，不过我发现突然发现，作为异常检测，我只需要将残差项剥离出来即可，不需要周期项和趋势项的分离，因此这个想通了的话，我一直思考的如何进行STL的Online版本也就相对好实现了。不过好像也没有我想的那么简单啦，再看RobustSTL如果后续操作真的都对残差项没影响了，也不太可能。</p>
+<p>参考IBM的实时分解算法：<a target="_blank" rel="noopener" href="https://community.ibm.com/community/user/cloudpakfordata/viewdocument/real-time-decomposition-of-time-ser?CommunityKey=c0c16ff2-10ef-4b50-ae4c-57d769937235&amp;tab=librarydocuments">Real-Time Decomposition of Time Series</a> </p>
+<p><a target="_blank" rel="noopener" href="https://community.ibm.com/community/user/cloudpakfordata/viewdocument/detecting-anomalies-in-seasonal-dat?CommunityKey=c0c16ff2-10ef-4b50-ae4c-57d769937235&amp;tab=librarydocuments">Detecting Anomalies in Seasonal Data</a></p>
+<p>其实都谈不上实时，真的分解的时候的延时还是很大的</p>
+<p>搜索过程中遇到几篇Stream Time Series的论文</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1911.05376.pdf">Real-Time Anomaly Detection for Advanced Manufacturing:<br>Improving on Twitter’s State of the Art</a> 20年6月的，还比较新</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://milets19.github.io/papers/milets19_paper_6.pdf">Online FDR Controlled Anomaly Detection for Streaming Time<br>Series</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.mdpi.com/1424-8220/20/8/2344/htm">Automatic Anomaly Detection on In-Production Manufacturing Machines Using Statistical Learning Methods</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="http://cs230.stanford.edu/projects_spring_2020/reports/38856976.pdf">CS230 Project Report Cloud Anomaly Detection</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.sciencedirect.com/science/article/pii/S0925231217309864">Unsupervised real-time anomaly detection for streaming data</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/" rel="prev" title="hgh 关于时序异常检测-动态基线原型系统的提升点的思考">
+      <i class="fa fa-chevron-left"></i> hgh 关于时序异常检测-动态基线原型系统的提升点的思考
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" rel="next" title="nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks">
+      nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB"><span class="nav-number">1.</span> <span class="nav-text">时间序列异常检测论文阅读汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E3%80%8ATime-Series-Anomaly-Detection-Service-at-Microsoft%E3%80%8BSR%E6%96%B9%E6%B3%95-KDD-2019-%E5%BE%AE%E8%BD%AF"><span class="nav-number">1.1.</span> <span class="nav-text">《Time-Series Anomaly Detection Service at Microsoft》SR方法 KDD 2019 微软</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E3%80%8ARobustSTL-A-Robust-Seasonal-Trend-Decomposition-Algorithm-for-Long-Time-Series%E3%80%8BAAAI-2019-%E9%98%BF%E9%87%8C%E8%BE%BE%E6%91%A9%E9%99%A2"><span class="nav-number">1.2.</span> <span class="nav-text">《RobustSTL: A Robust Seasonal-Trend Decomposition Algorithm for Long Time Series》AAAI 2019 阿里达摩院</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

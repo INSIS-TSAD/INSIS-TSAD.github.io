@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="MTL可以训练一个神经网络同时解决多个任务，减少时间成本，但是性能一般，因为任务间可能有竞争关系。MTL中，哪些任务应该、不应该在一个网络中一起学习？ 本文提出了一个框架，将若干个任务分配给几个网络，将协作的任务分配到同一个网络，将竞争的任务分配到不同的网络。与单个大型网络、多个单任务网络相比，该框架能提供时间-精度的折中，在有限的时间内达到尽量高的精度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning?">
+<meta property="og:url" content="http://example.com/2021/07/14/SongYudan/%E3%80%90ICML2020%E3%80%91Which%20Tasks%20Should%20Be%20Learned%20Together%20in%20Multi-task%20Learning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="MTL可以训练一个神经网络同时解决多个任务，减少时间成本，但是性能一般，因为任务间可能有竞争关系。MTL中，哪些任务应该、不应该在一个网络中一起学习？ 本文提出了一个框架，将若干个任务分配给几个网络，将协作的任务分配到同一个网络，将竞争的任务分配到不同的网络。与单个大型网络、多个单任务网络相比，该框架能提供时间-精度的折中，在有限的时间内达到尽量高的精度。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711120452570.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711162322293.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711170240554.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711171906926.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711214134743.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711222212818.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711225103364.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712161449845.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712164300650.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712171037595.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712211942415.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712212429067.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712212805811.png">
+<meta property="article:published_time" content="2021-07-14T02:20:10.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:23:58.834Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="多任务学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711120452570.png">
+
+<link rel="canonical" href="http://example.com/2021/07/14/SongYudan/%E3%80%90ICML2020%E3%80%91Which%20Tasks%20Should%20Be%20Learned%20Together%20in%20Multi-task%20Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning? | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/14/SongYudan/%E3%80%90ICML2020%E3%80%91Which%20Tasks%20Should%20Be%20Learned%20Together%20in%20Multi-task%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning?
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-14 10:20:10 / Modified: 17:23:58" itemprop="dateCreated datePublished" datetime="2021-07-14T10:20:10+08:00">2021-07-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>MTL可以训练一个神经网络同时解决多个任务，减少时间成本，但是性能一般，因为任务间可能有<strong>竞争</strong>关系。MTL中，哪些任务应该、不应该在一个网络中一起学习？</p>
+<p>本文提出了一个框架，将若干个任务分配给几个网络，将<strong>协作</strong>的任务分配到同一个网络，将<strong>竞争</strong>的任务分配到不同的网络。与单个大型网络、多个单任务网络相比，该框架能提供时间-精度的折中，<strong>在有限的时间内达到尽量高的精度</strong>。</p>
+<a id="more"></a>
+<p>斯坦福；瑞士联邦理工学院；谷歌；加州大学伯克利分校；</p>
+<h3 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h3><p>MTL用一个网络同时解决多个任务，可以提高预测精度，提高数据效率，减少训练时间。但是由于<strong>负迁移、任务干扰</strong>，预测效果不佳，不如小型的独立网络；不同任务的学习率不同，可能被某一任务主导，导致其它任务性能下降；乘加loss比较难优化。MTL是否有增益取决于任务间的<strong>关系</strong>。</p>
+<p>目标：给定一系列任务，在计算成本&lt;预算b的情况下，尽可能最大化任务性能。所以我们提出了一个计算框架，<strong>把相关的任务组成一组，在给定成本b的限制下，用几个网络覆盖所有的任务，最大化任务性能</strong>。在一个网络中额外加入一个任务，可以提高其它任务的性能，（虽然该任务的性能可能只有一点点提升）。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711120452570.png" alt="image-20210711120452570" style="zoom:80%;" /></p>
+<p>如图一所示，训练网络A完成语义分割、深度估计和表面法线预测，训练网络B完成关键点检测、边检测、表面法线预测，训练网络C单独完成表面法线预测（计算代价小）。<strong>将表面法线预测也作为网络A、B的输出</strong>，可以<strong>提升</strong>其它任务的效果，将网络C的输出作为该任务的预测结果。这种任务分组方法优于一个大网络完成五个任务、优于五个小网络完成单个任务。</p>
+<p><strong>主要贡献：</strong></p>
+<ol>
+<li>研究了多任务学习中，网络大小、数据大小对性能的影响，以及任务如何互相影响；</li>
+<li>提出了一个框架，如何将任务分配给网络，  在有限的时间内，尽可能达到好的预测效果，如何<strong>分组</strong>对最终的性能是至关重要的。                                                                                                                                                                                        </li>
+</ol>
+<h3 id="2-之前的工作"><a href="#2-之前的工作" class="headerlink" title="2. 之前的工作"></a>2. 之前的工作</h3><p>MTL：hard参数共享，soft参数共享。很多情况下，MTL效果不如单任务多个网络；而且这些已有的方法，没有将任务<strong>分组</strong>，soft参数共享也没有<strong>减少推理时间</strong>。</p>
+<h3 id="3-实验设置"><a href="#3-实验设置" class="headerlink" title="3. 实验设置"></a>3. 实验设置</h3><p><strong>Dataset：</strong>Taskonomy，CV领域中的多任务数据集，400万样例，390万训练，5万验证，5万测试，训练集和测试集中的建筑无重叠。</p>
+<p><strong>任务集：</strong>任务集1包括语义分割，深度估计，表面法线预测，SURF关键点检测，canny边检测；这些任务代表了CV中的主要任务类别，任务间也有一些重叠，用于探究相似的任务一起训练是否能提高性能。任务集2包括自编码器，表面法线预测，遮挡边缘，重塑和主曲率。语义分割任务是交叉熵损失，其余都是L1损失。</p>
+<p><strong>结构：</strong>所有实验都采用标准的encoder-decoder结构。用改进的Xception encoder；所有的最大池化都用步长为2、卷积核为2<em>2的卷积层代替，16.5百万参数，输入大小为256，256。为了探究<em>*网络大小</em></em>对任务关系的影响，更小的网络（Xception17，4百万参数，乘加操作次数也更少）。轻量级decoder，4个转置卷积层和4个卷积层。</p>
+<p><strong>设置：</strong></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711162322293.png" alt="image-20210711162322293"></p>
+<p>setting2是对照组，setting1探究网络大小的影响，setting3探究数据集大小的影响，setting4探究其它任务关系。</p>
+<p><strong>训练细节：</strong>loss未加权，初始lr=0.1，每次trainingloss不下降lr就减半，validloss没有改善就停止训练，</p>
+<p><strong>比较：</strong>定义了计算网络代价单元，标准网络时间SNT；<strong>SNT是Xception17网络中一次乘加的时间</strong></p>
+<p><strong>训练好的网络：</strong>训练了5个单任务（1-SNT），10个双任务，10个三任务，5个四任务，1个五任务网络；另外还训练了5个单任务网络（1/2-SNT）</p>
+<h3 id="4-任务关系的研究"><a href="#4-任务关系的研究" class="headerlink" title="4. 任务关系的研究"></a>4. 任务关系的研究</h3><p>探究任务关系对多任务网络性能的影响</p>
+<h4 id="4-1-Setting1：小网络（Xception17）"><a href="#4-1-Setting1：小网络（Xception17）" class="headerlink" title="4.1 Setting1：小网络（Xception17）"></a>4.1 Setting1：小网络（Xception17）</h4><p>探究<strong>任务数量</strong>对多任务网络性能的影响，表1是与<strong>独立训练</strong>的结果相比，第一行是与每个任务1-SNT的单任务网络相比，第二行是与几个任务一共1-SNT的单任务网络相比。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711170240554.png" alt="image-20210711170240554" style="zoom:80%;" /></p>
+<p>单任务网络缩小到总的计算限制和多任务网络的<strong>总预算相同</strong>时，3、4、5个任务一起训练优于单任务，但是2个任务一起训练情况不同，表2显示了<strong>两个任务一起训练</strong>与1/2-SNT的网络单独训练时的对比，法线任务对每个任务都有提升。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711171906926.png" alt="image-20210711171906926" style="zoom:80%;" /></p>
+<h4 id="4-2-Setting2：对照组"><a href="#4-2-Setting2：对照组" class="headerlink" title="4.2 Setting2：对照组"></a>4.2 Setting2：对照组</h4><p>为了探究<strong>网络容量</strong>对多任务中任务关系的影响，用更高容量的encoder对所有的网络重新训练，结果如表5（对应前面的表2）</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711214134743.png" alt="image-20210711214134743"></p>
+<p>通过表5和表2的对比可以看出，<strong>网络越大，共同训练的任务性能增益越大</strong>，也有些任务共同训练时性能下降，且表5和表2不具有相关性，任务关系复杂，<strong>说明需要一个自动框架，来确定哪些任务应该被一起训练</strong>。</p>
+<h4 id="4-3-Setting3：只用5-的训练数据"><a href="#4-3-Setting3：只用5-的训练数据" class="headerlink" title="4.3 Setting3：只用5%的训练数据"></a>4.3 Setting3：只用5%的训练数据</h4><p>探究训练集大小对结果的影响，只用了199498训练数据，接近于其它多任务数据集的大小。假设是，MTL可能在low-data（低数据）场景下表现更好，可以集中监督。但是表6的结果与假设相悖，<strong>与表2相比，表6大部分任务性能都下降了</strong>，最后的average是提升也是因为edge这个任务的大幅提升。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711222212818.png" alt="image-20210711222212818"></p>
+<h4 id="4-4-Setting4：使用任务集2"><a href="#4-4-Setting4：使用任务集2" class="headerlink" title="4.4 Setting4：使用任务集2"></a>4.4 Setting4：使用任务集2</h4><p>除了auto encoder任务，其余的四个任务基本上都对其它任务有提升作用，这四个任务是比较相似的3D任务，似乎<strong>相似</strong>的任务可以互相提升，法线任务似乎可以提高和它一起训练的所有任务，这可能是因为法线在表面上有统一的值，并且保留了3D边缘。</p>
+<p>所以，选择哪些任务进行一起训练是非常关键的，那么<strong>如何对任务进行分组，达到最好的性能</strong>？</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210711225103364.png" alt="image-20210711225103364"></p>
+<h3 id="5-任务分组框架"><a href="#5-任务分组框架" class="headerlink" title="5. 任务分组框架"></a>5. 任务分组框架</h3><p>对所有的任务子集都训练网络，选择最合适的分组，但是这样计算代价很高，所以提出了两种策略，来预测训练结果。</p>
+<p><strong>定义：</strong>想要在给定预算b内最小化一系列任务上的loss，每个网络$n$解决任务集中的子集，其代价为$c_n$，该网络在每个任务上的loss为$L(n,t_i)$，$S$是解决所有任务的网络集合，代价是所有网络的$c_n$之和，某个任务上的loss$L(S,t_i)$为S中所有网络在该任务上loss的最小值，总体性能就是每个任务上的loss求和。<strong>我们的目标就是在给定预算的条件下，寻找任务分组和对应的网络，使得总体loss最小。</strong></p>
+<h4 id="5-1-考虑哪些网络？"><a href="#5-1-考虑哪些网络？" class="headerlink" title="5.1 考虑哪些网络？"></a>5.1 考虑哪些网络？</h4><p>不仅考虑“每对”任务一起训练时是否有提升，还要考虑哪些“组合”一起训练可以提升性能，所以候选网络一共有$（2^{|T|}-1）$个。本实验有5个任务，有31个网络，其中5个是单任务网络。</p>
+<p>考虑网络大小的影响，另外有5个单任务网络，网络大小是标准网络的一半（1/2-SNT），所以一共<strong>36个网络</strong>。</p>
+<h4 id="5-2-网络选择"><a href="#5-2-网络选择" class="headerlink" title="5.2 网络选择"></a>5.2 网络选择</h4><p>假设已经有训练好的一系列网络$C_0={n_1,n_2,…n_m}$，每个网络解决某个任务子集，目标是选择$C_0$的一个子集，能在成本限制下解决所有任务，达到最小loss，NP-hard问题，可以选择<strong>分支定界法，二进制整数规划</strong>解决，得到<strong>最优解</strong>。</p>
+<h4 id="5-3-为减少训练时间作的近似"><a href="#5-3-为减少训练时间作的近似" class="headerlink" title="5.3 为减少训练时间作的近似"></a>5.3 为减少训练时间作的近似</h4><p>减少训练时间的两个技术：1）每个网络只训练一小段时间；2）基于两个任务一起训练的基础上，引入更多的任务，看表现如何。不过这些近似都会<strong>影响最后的精度</strong>。</p>
+<h5 id="5-3-1-早停近似（ESA）"><a href="#5-3-1-早停近似（ESA）" class="headerlink" title="5.3.1 早停近似（ESA）"></a>5.3.1 早停近似（ESA）</h5><p>无需训练充分，在收敛之前<strong>早停</strong>，先进行网络选择，训练时间大幅提升，但是这样选择的网络并不一定是最优的。</p>
+<h5 id="5-3-2-高阶近似（HOA）"><a href="#5-3-2-高阶近似（HOA）" class="headerlink" title="5.3.2 高阶近似（HOA）"></a>5.3.2 高阶近似（HOA）</h5><p>已经有同时训练AB的网络，同时训练AC的网络，同时训练BC的网络，以及各任务在各网络中的loss，可以由此推断同时训练ABC三个网络，各任务的loss，<strong>从低阶预测高阶</strong>：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712161449845.png" alt="image-20210712161449845" style="zoom:67%;" /></p>
+<p>用该方法预测三个或更多的任务一起训练时，可以<strong>基于充分训练的双任务网络</strong>预测网络的性能，然后进行网络选择，从头开始训练高阶网络。</p>
+<h3 id="6-任务分组评估"><a href="#6-任务分组评估" class="headerlink" title="6. 任务分组评估"></a>6. 任务分组评估</h3><p><strong>baselines：</strong>五个单任务网络，一个网络训练所有任务，将任务随机分组，全局性能最差的分组（pessimal）</p>
+<h4 id="6-1-Setting1"><a href="#6-1-Setting1" class="headerlink" title="6.1 Setting1"></a>6.1 Setting1</h4><p>图3是<strong>不同计算成本</strong>限制下的<strong>不同任务分组</strong>策略，以及最终的总体<strong>loss</strong>：</p>
+<p>最优分组性能最佳，两种近似方法中，虽然效果都不及最优分组，但是HOA近似与最优分组的结果差距不大。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712164300650.png" alt="image-20210712164300650"></p>
+<p>图2是baseline以及本文三种方法的loss比较，当计算限制为1SNT时，都是用一个网络训练所有任务；当计算限制&gt;1.5SNT时，<strong>将任务分组表现更好</strong>，当计算限制为5SNT时，五个网络，其中s d e的网络需要其余两个任务的辅助，而n k这两个网络单独训练效果比较好。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712171037595.png" alt="image-20210712171037595" style="zoom:80%;" /></p>
+<h4 id="6-2-Setting2"><a href="#6-2-Setting2" class="headerlink" title="6.2 Setting2"></a>6.2 Setting2</h4><p>在该设置下（网络容量大），我们的方法超过了别的方法，而且拉开了很大差距。ESA和HOA两种近似方法，ESA与最优方法差距较大，<strong>HOA</strong>比较接近。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712211942415.png" alt="image-20210712211942415"></p>
+<h4 id="6-3-Setting3"><a href="#6-3-Setting3" class="headerlink" title="6.3 Setting3"></a>6.3 Setting3</h4><p>即使在小数据集情况下，我们的方法也优于其它方法：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712212429067.png" alt="image-20210712212429067"></p>
+<h4 id="6-4-Setting4"><a href="#6-4-Setting4" class="headerlink" title="6.4 Setting4"></a>6.4 Setting4</h4><p>该设置下的任务协作的很好，所以单独训练、分组训练没有很突出的优势：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210712212805811.png" alt="image-20210712212805811"></p>
+<h4 id="6-5-讨论"><a href="#6-5-讨论" class="headerlink" title="6.5 讨论"></a>6.5 讨论</h4><p>在四种设置下，<strong>最优分组</strong>的表现都是最好的，<strong>HOA近似</strong>能和最优分组达到类似的水平，ESA近似不如最优分组的表现</p>
+<h3 id="7-结论"><a href="#7-结论" class="headerlink" title="7. 结论"></a>7. 结论</h3><p>我们描述了任务的兼容性，分析任务关系，多任务中的任务关系<strong>受很多因素的影</strong>响，所以需要一个计算框架，确定哪些任务<strong>应该一起训练</strong>，哪些任务应该单独训练；探索所有的可能性训练时间过长，所以我们提出了两种<strong>近似策略</strong>，大大减少训练时间。</p>
+<p>我们将最优分组、两种近似策略与单任务、一个网络训练所有任务以及其它基线方法进行对比，我们的<strong>方法优于基线方法</strong>，且<strong>HOA</strong>近似方法性能接近于最优分组。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%AD%A6%E4%B9%A0/" rel="tag"># 多任务学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/18/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/" rel="prev" title="cyf 【ICLR2021】潜在的收敛交叉映射">
+      <i class="fa fa-chevron-left"></i> cyf 【ICLR2021】潜在的收敛交叉映射
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/14/BaiYunfei/MSCRED/" rel="next" title="byf 【AAAI-2019】A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
+      byf 【AAAI-2019】A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B9%8B%E5%89%8D%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">2. 之前的工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">3. 实验设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E4%BB%BB%E5%8A%A1%E5%85%B3%E7%B3%BB%E7%9A%84%E7%A0%94%E7%A9%B6"><span class="nav-number">4.</span> <span class="nav-text">4. 任务关系的研究</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-Setting1%EF%BC%9A%E5%B0%8F%E7%BD%91%E7%BB%9C%EF%BC%88Xception17%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 Setting1：小网络（Xception17）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-Setting2%EF%BC%9A%E5%AF%B9%E7%85%A7%E7%BB%84"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 Setting2：对照组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-Setting3%EF%BC%9A%E5%8F%AA%E7%94%A85-%E7%9A%84%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 Setting3：只用5%的训练数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-4-Setting4%EF%BC%9A%E4%BD%BF%E7%94%A8%E4%BB%BB%E5%8A%A1%E9%9B%862"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 Setting4：使用任务集2</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%BB%BB%E5%8A%A1%E5%88%86%E7%BB%84%E6%A1%86%E6%9E%B6"><span class="nav-number">5.</span> <span class="nav-text">5. 任务分组框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-%E8%80%83%E8%99%91%E5%93%AA%E4%BA%9B%E7%BD%91%E7%BB%9C%EF%BC%9F"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 考虑哪些网络？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-%E7%BD%91%E7%BB%9C%E9%80%89%E6%8B%A9"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 网络选择</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-%E4%B8%BA%E5%87%8F%E5%B0%91%E8%AE%AD%E7%BB%83%E6%97%B6%E9%97%B4%E4%BD%9C%E7%9A%84%E8%BF%91%E4%BC%BC"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 为减少训练时间作的近似</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#5-3-1-%E6%97%A9%E5%81%9C%E8%BF%91%E4%BC%BC%EF%BC%88ESA%EF%BC%89"><span class="nav-number">5.3.1.</span> <span class="nav-text">5.3.1 早停近似（ESA）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-3-2-%E9%AB%98%E9%98%B6%E8%BF%91%E4%BC%BC%EF%BC%88HOA%EF%BC%89"><span class="nav-number">5.3.2.</span> <span class="nav-text">5.3.2 高阶近似（HOA）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E4%BB%BB%E5%8A%A1%E5%88%86%E7%BB%84%E8%AF%84%E4%BC%B0"><span class="nav-number">6.</span> <span class="nav-text">6. 任务分组评估</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-Setting1"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 Setting1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-Setting2"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 Setting2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-3-Setting3"><span class="nav-number">6.3.</span> <span class="nav-text">6.3 Setting3</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-4-Setting4"><span class="nav-number">6.4.</span> <span class="nav-text">6.4 Setting4</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-5-%E8%AE%A8%E8%AE%BA"><span class="nav-number">6.5.</span> <span class="nav-text">6.5 讨论</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-%E7%BB%93%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">7. 结论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

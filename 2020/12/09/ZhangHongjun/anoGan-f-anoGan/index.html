@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="anoGanPaper：Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery 2017, IPMI ( Information Processing in Medical Imaging )  生物医学影像与影像引导治疗系, 奥地利维也纳医科大学 数据类型为医学影像">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj anoGan">
+<meta property="og:url" content="http://example.com/2020/12/09/ZhangHongjun/anoGan-f-anoGan/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="anoGanPaper：Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery 2017, IPMI ( Information Processing in Medical Imaging )  生物医学影像与影像引导治疗系, 奥地利维也纳医科大学 数据类型为医学影像">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027112727.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027153314.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027202802.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027204822.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211838.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211946.png">
+<meta property="article:published_time" content="2020-12-09T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:41:11.403Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027112727.png">
+
+<link rel="canonical" href="http://example.com/2020/12/09/ZhangHongjun/anoGan-f-anoGan/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj anoGan | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/anoGan-f-anoGan/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj anoGan
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:41:11" itemprop="dateModified" datetime="2021-01-16T11:41:11+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="anoGan"><a href="#anoGan" class="headerlink" title="anoGan"></a>anoGan</h2><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection with Generative Adversarial Networks to Guide Marker Discovery</em></p>
+<p>2017, IPMI ( Information Processing in Medical Imaging ) </p>
+<p>生物医学影像与影像引导治疗系, 奥地利维也纳医科大学</p>
+<p>数据类型为医学影像, 光学相干层析成像(Optical Coherence tomography, OCT)技术</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027112727.png" alt="image-20201027112720144"></p>
+<a id="more"></a> 
+<h4 id="异常检测前提"><a href="#异常检测前提" class="headerlink" title="异常检测前提"></a>异常检测前提</h4><p>使用正常样本来训练生成器和判别器, 正常样本能够很好地被重构出来， 而异常样本不能被很好地重构出来。</p>
+<h4 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027153314.png" alt="image-20201027153314856"></p>
+<h4 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h4><p>生成器G, 将隐变量z经过一系列的反卷积操作, 生成样本.</p>
+<p>判别器D, 最后一层的激活函数是sigmoid, 输出一个概率, $\in[0,1 ]$, 越大代表判别器D认为输入的样本为真实的样本.</p>
+<p>使用健康人的样本来训练模型.  隐变量Z,服从标准正态分布.  采样z, 经过生成器G(z), 得到生成的图片G(z). 将生成的图片样本G(z) 和 健康人图片样本x, 一起输入到判别器D. </p>
+<p>训练步骤:</p>
+<ol>
+<li>将G(z), x 输入到判别器D,  根据以下目标函数更新判别器D的参数:</li>
+</ol>
+<script type="math/tex; mode=display">
+\max _{D} V(D, G)=\mathbb{E}_{\mathbf{x} \sim p_{\text {data}}(\mathbf{x})}[\log D(\mathbf{x})]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log (1-D(G(\mathbf{z})))]</script><p>​    意义是,  对于输入样本为真实样本x, 希望判别器的输出值趋近1; 对于输入样本为生成样本G(z), 希望判别器的输出值趋近于0.</p>
+<ol>
+<li>固定判别器D的参数, 根据以下目标函数更新生成器G的参数:<script type="math/tex; mode=display">
+\min _{G} V(D, G)=\mathbb{E}_{\mathbf{x} \sim p_{\text {data}}(\mathbf{x})}[\log D(\mathbf{x})]+\mathbb{E}_{\mathbf{z} \sim p_{\mathbf{z}}(\mathbf{z})}[\log (1-D(G(\mathbf{z})))]</script>意义是, 通过调整生成器G的参数,让生成的样本G(z)更像真实样本x, 让判别器D无法判别真实样本和生成样本.</li>
+</ol>
+<p>经过这样的对抗训练之后, 生成样本G(z)越来越像真实样本.</p>
+<h4 id="找到输入样本x对应的隐变量z"><a href="#找到输入样本x对应的隐变量z" class="headerlink" title="找到输入样本x对应的隐变量z"></a>找到输入样本x对应的隐变量z</h4><p>生成器G可以将隐变量z映射到x, $G(\mathbf{z})=\mathbf{z} \mapsto \mathbf{x}$. 如果给定x, 很难直接找到这个x对应的z, 使得G(z)看起来跟x很像. 为了找到最好的z,  固定生成器G的参数. 先随机采样一个$z<em>1$, 生成一个图像$G(z_1)$,  利于一个损失函数来提供梯度, 去更新$z_1$的系数, 更新后的位置设为$z_2$.  为了找到与输入图片样本x最相似的生成图片样本$G\left(\mathbf{z}</em>{\Gamma}\right)$, 需要经过迭代过程$\gamma=1,2, \ldots, \Gamma$.</p>
+<p>以上使用的损失函数, 包括两个部分:</p>
+<ol>
+<li><p><strong>Residual Loss</strong></p>
+<p>利用生成器G:生成样本和真实样本之间像素级别的差距.</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">
+\mathcal{L}_{R}\left(\mathbf{z}_{\gamma}\right)=\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|</script><ol>
+<li><p><strong>Discrimination Loss</strong></p>
+<p>利用判别器D: </p>
+<p>原始的版本:交叉熵损失</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{\hat{D}}\left(\mathbf{z}_{\gamma}\right) = -ylog(D(G(z_\gamma))) - (1-y)log(1-D(G(z_\gamma)))</script><p>   其中目标为1, 即希望判别器D不能判别出$G(z_\gamma)$为生成样本, 以上公式化简为:</p>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{\hat{D}}\left(\mathbf{z}_{\gamma}\right) = -ylog(D(G(z_\gamma)))</script><p>   本文改进的版本: 利用判别器的中间结果:</p>
+<script type="math/tex; mode=display">
+   \mathcal{L}_{D}\left(\mathbf{z}_{\gamma}\right)=\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|</script><p>   其中$f(*)$为判别器的中间层的输出.</p>
+<p>综上,  寻找最优的$z$所用的损失函数为:</p>
+<script type="math/tex; mode=display">
+\mathcal{L}\left(\mathbf{z}_{\gamma}\right)=(1-\lambda) \cdot \mathcal{L}_{R}\left(\mathbf{z}_{\gamma}\right)+\lambda \cdot \mathcal{L}_{D}\left(\mathbf{z}_{\gamma}\right)</script><p>其中$\lambda$为权重, 本文设定为0.1 </p>
+<h4 id="异常检测"><a href="#异常检测" class="headerlink" title="异常检测"></a>异常检测</h4><p>定义异常分数, 利用以上的损失函数:</p>
+<script type="math/tex; mode=display">
+A(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot D(\mathbf{x})
+\\
+=(1-\lambda) \cdot \mathcal{L}_{R}\left(\mathbf{z}_{\Gamma}\right)+\lambda \cdot \mathcal{L}_{D}\left(\mathbf{z}_{\Gamma}\right)</script><h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027202802.png" alt="image-20201027112720144"></p>
+<p>第一,二列为训练样本, 第三列为测试样本.  第一行为输入样本, 第二行为对应的生成样本, 第三行中的红色部分为异常分数较高的区域, 最后一行中的绿色区域为异常区域.</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027204822.png" alt="image-20201027204822072"></p>
+<p><strong>图a</strong>: 不同的模型的检测结果</p>
+<p>AnoGAN:$A(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot D(\mathbf{x})$</p>
+<p>$GAN_R$:$\hat{A}(\mathbf{x})=(1-\lambda) \cdot R(\mathbf{x})+\lambda \cdot \hat{D}(\mathbf{x})$</p>
+<p>$P_D$:  直接的D(x), 不经过生成器. </p>
+<p><strong>图b</strong>: 不同的部分的异常检测结果.</p>
+<p><strong>图c</strong>:Residual loss A(x) =$\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|$ 的分布</p>
+<p><strong>图d</strong>:Discrimination loss A(x) =$\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|$ 的分布</p>
+<p>其中蓝色为训练集, 绿色为测试集, 红色为异常样本.</p>
+<p>综上,  能够检测出异常的部分主要是$R(X)=\sum\left|\mathbf{x}-G\left(\mathbf{z}_{\gamma}\right)\right|$,   </p>
+<p>$D(X)=\sum\left|\mathbf{f}(\mathbf{x})-\mathbf{f}\left(G\left(\mathbf{z}_{\gamma}\right)\right)\right|$能够稍微提升检测结果.</p>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>由于在训练的时候, 只使用了正常样本,</p>
+<p>对于生成器来说,  给定异常样本x, 重构出来的会很像是正常样本.</p>
+<p>对于判别器来说, 由于没有使用异常真实样本来训练,  不能将异常真实样本判定为真实样本. 只有正常真实样本, 才能判定为真实样本. </p>
+<h2 id="f-anoGan"><a href="#f-anoGan" class="headerlink" title="f-anoGan"></a>f-anoGan</h2><p><strong>Paper</strong>：<em>f-AnoGAN: Fast unsupervised anomaly detection with generative adversarial networks</em></p>
+<p>2019, Medical Image Analysis </p>
+<h4 id="anoGan的缺点"><a href="#anoGan的缺点" class="headerlink" title="anoGan的缺点"></a>anoGan的缺点</h4><p>在检测的时候, 为了找到输入样本x对应的隐变量$z_\Gamma$, 需要经过500次迭代. 为了加速检测, 提出了f-anoGan</p>
+<h4 id="新的网络结构"><a href="#新的网络结构" class="headerlink" title="新的网络结构"></a>新的网络结构</h4><p>原来的结构:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211838.png" alt="image-20201027211838605"></p>
+<p>为了在检测的时候, 快速找到输入样本x对应的隐变量$z_\Gamma$, 在训练好生成器G和判别器D之后, 固定G和D的参数, 加入编码器E:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201027211946.png" alt="image-20201027211946806"></p>
+<p>训练编码器E, 是的输入的样本x经过编码器E之后, 直接得到对应的隐变量z.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/" rel="prev" title="xw Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning">
+      <i class="fa fa-chevron-left"></i> xw Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/" rel="next" title="zhj Memorizing Normality to Detect  Anomaly">
+      zhj Memorizing Normality to Detect  Anomaly <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#anoGan"><span class="nav-number">1.</span> <span class="nav-text">anoGan</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E5%89%8D%E6%8F%90"><span class="nav-number">1.0.1.</span> <span class="nav-text">异常检测前提</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84"><span class="nav-number">1.0.2.</span> <span class="nav-text">模型结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">1.0.3.</span> <span class="nav-text">模型训练</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%BE%E5%88%B0%E8%BE%93%E5%85%A5%E6%A0%B7%E6%9C%ACx%E5%AF%B9%E5%BA%94%E7%9A%84%E9%9A%90%E5%8F%98%E9%87%8Fz"><span class="nav-number">1.0.4.</span> <span class="nav-text">找到输入样本x对应的隐变量z</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B"><span class="nav-number">1.0.5.</span> <span class="nav-text">异常检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">1.0.6.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.0.6.1.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#f-anoGan"><span class="nav-number">2.</span> <span class="nav-text">f-anoGan</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#anoGan%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">2.0.1.</span> <span class="nav-text">anoGan的缺点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E7%9A%84%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="nav-number">2.0.2.</span> <span class="nav-text">新的网络结构</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

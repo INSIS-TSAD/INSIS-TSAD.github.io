@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="1 Abstract 概要用数据的多个视图来做表示学习是当前自监督学习的热点。尽管这方面的应用很成功，但是很少有人研究怎么选择好的视图来做表示学习。本文运用理论和实证分析来更好地理解视图选择的重要性，得出的结论，在给定下游任务时，视图之间的互信息恰好都仅与下游任务有关，这时候下游任务能取得最好的结果。除此之外，本文还设计了一种半监督的方法，用来学习如何生成最好的视图。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj 【NIPS 2020】 What Makes Good Views for Contrastive Learning">
+<meta property="og:url" content="http://example.com/2020/12/16/ZhangHongjun/2012_NeuriPS-2020-What%20Makes%20for%20Good%20Views%20for%20ContrastiveLearning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="1 Abstract 概要用数据的多个视图来做表示学习是当前自监督学习的热点。尽管这方面的应用很成功，但是很少有人研究怎么选择好的视图来做表示学习。本文运用理论和实证分析来更好地理解视图选择的重要性，得出的结论，在给定下游任务时，视图之间的互信息恰好都仅与下游任务有关，这时候下游任务能取得最好的结果。除此之外，本文还设计了一种半监督的方法，用来学习如何生成最好的视图。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110206216.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110239948.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110331718.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110206216.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113111629299.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113115134473.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113120023277.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113115838448.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113115903284.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113122756215.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113131115473.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113125930802.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113131204656.png">
+<meta property="article:published_time" content="2020-12-16T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:41:01.586Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="自监督">
+<meta property="article:tag" content="表示学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110206216.png">
+
+<link rel="canonical" href="http://example.com/2020/12/16/ZhangHongjun/2012_NeuriPS-2020-What%20Makes%20for%20Good%20Views%20for%20ContrastiveLearning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj 【NIPS 2020】 What Makes Good Views for Contrastive Learning | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/16/ZhangHongjun/2012_NeuriPS-2020-What%20Makes%20for%20Good%20Views%20for%20ContrastiveLearning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj 【NIPS 2020】 What Makes Good Views for Contrastive Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-16 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-16T20:24:24+08:00">2020-12-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:41:01" itemprop="dateModified" datetime="2021-01-16T11:41:01+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="1-Abstract-概要"><a href="#1-Abstract-概要" class="headerlink" title="1 Abstract 概要"></a>1 Abstract 概要</h3><p>用数据的多个视图来做表示学习是当前自监督学习的热点。尽管这方面的应用很成功，但是很少有人研究怎么选择好的视图来做表示学习。本文运用理论和实证分析来更好地理解视图选择的重要性，得出的结论，在给定下游任务时，视图之间的互信息恰好都仅与下游任务有关，这时候下游任务能取得最好的结果。除此之外，本文还设计了一种半监督的方法，用来学习如何生成最好的视图。</p>
+<a id="more"></a> 
+<h3 id="2-什么是视图（view）？"><a href="#2-什么是视图（view）？" class="headerlink" title="2 什么是视图（view）？"></a>2 什么是视图（view）？</h3><h5 id="视图的例子"><a href="#视图的例子" class="headerlink" title="视图的例子"></a>视图的例子</h5><p>从不同的角度看同样的事物，会有不同的视图。在自监督学习里面，视图可以是同一个物体不同的角度的图片；视频中的图片、声音和字幕；图片的不同通道；不同的数据增强方式获得不同的视图；生理信号的时频图；</p>
+<h5 id="视图之间的共享信息（mutual-information，-MI）"><a href="#视图之间的共享信息（mutual-information，-MI）" class="headerlink" title="视图之间的共享信息（mutual information， MI）"></a>视图之间的共享信息（mutual information， MI）</h5><p>理解为视图之间共有的信息。</p>
+<p>举例：</p>
+<p>例1：下面三个视图中的数字3，是他们共享的信息。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110206216.png" alt="image-20210113110206216"><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110239948.png" alt="image-20210113110239948"><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110331718.png" alt="image-20210113110331718"></p>
+<p>例2：下面两个视图中的背景，是他们共享的信息。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113110206216.png" alt="image-20210113110206216"><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113111629299.png" alt="image-20210113111629299"></p>
+<p>在表示学习的应用中，一般有两个阶段：</p>
+<p>1.表示学习阶段：使用不同的视图，进行自监督的表示学习，训练一个编码器$f$</p>
+<p>2.下游任务：固定学习好的网络$f$参数，在$f$后面加一个线性层，参数为$w$，使用少量的有标签数据训练$w$。</p>
+<p>由于表示学习阶段学到了数据中的语义信息，下游任务只需要少量的标签就可以取得较好的效果。</p>
+<h3 id="3-怎么样的视图是最好的视图？"><a href="#3-怎么样的视图是最好的视图？" class="headerlink" title="3 怎么样的视图是最好的视图？"></a>3 怎么样的视图是最好的视图？</h3><p>用什么样的视图来做表示学习，才能使得下游任务取得最好的效果呢？</p>
+<p>在本文的定义中，最好的视图是与下游任务息息相关的。在给定下游任务之后，视图之间的互信息恰好都仅与下游任务有关，这时候下游任务能取得最好的结果。例如，在例1中，视图之间共享的信息是数字，如果下游任务是数字识别，它们就是好的视图；如果下游任务是背景识别，那就不是好的视图。例2则相反。</p>
+<p>用$I(a,b)$表示a和b的互信息，x表示输入，y表示标签，$v_1,v_2$是x的两个视图，则最好的视图应该是：</p>
+<script type="math/tex; mode=display">
+I\left(\mathbf{v}_{\mathbf{1}} ; \mathbf{y}\right)=I\left(\mathbf{v}_{\mathbf{2}} ; \mathbf{y}\right)=I\left(\mathbf{v}_{\mathbf{1}} ; \mathbf{v}_{\mathbf{2}}\right)=I(\mathbf{x} ; \mathbf{y})</script><p>也就是$v_1，v_2$这两个视图，都包含了对下游任务有帮助的所有信息。</p>
+<p>以下图有助于说明：</p>
+<p>横轴是视图之间的互信息，纵轴是下游任务的效果。绿色是与下游任务有关的信息，粉红色是与下游任务无关的信息，视图重叠的部分是视图的共享信息。当视图之间共享的信息仅包含与下游任务有关的信息，此时下游任务的效果是最好的。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113115134473.png" alt="image-20210113115134473"></p>
+<p>最好的视图，就是视图之间的互信息恰好处于一个最佳点（Sweet Spot），视图之间的共享信息及不漏掉对下游任务用贡献的信息，也不包含对下游任务没有的信息。</p>
+<p>下图b)分为3段：</p>
+<ul>
+<li>丢失信息：$I\left(\mathbf{v}<em>{\mathbf{1}} ; \mathbf{v}</em>{\mathbf{2}}\right)&lt;I(\mathbf{x} ; \mathbf{y})$，missing info是丢失的有用信息，视图之间的互信息没有包含太多对下游任务有用的信息，所以效果不好；</li>
+<li>最佳点（Sweet Spot）：$I\left(\mathbf{v}<em>{\mathbf{1}} ; \mathbf{y}\right)=I\left(\mathbf{v}</em>{\mathbf{2}} ; \mathbf{y}\right)=I\left(\mathbf{v}<em>{\mathbf{1}} ; \mathbf{v}</em>{\mathbf{2}}\right)=I(\mathbf{x} ; \mathbf{y})$，视图之间的共享信息就是全部对下游任务有用的信息。</li>
+<li>过多噪声：$I\left(\mathbf{v}<em>{\mathbf{1}} ; \mathbf{v}</em>{\mathbf{2}}\right)$，视图之间的互信息包含了太多对下游任务没用的信息，下游任务的泛化性能差。（可以参考）</li>
+</ul>
+<p>所以，&lt;下游任务性能-$I(v_1,v_2)$&gt; 的图像普遍是一个倒立的U形（如下图右）：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113120023277.png" alt="image-20210113120023277"></p>
+<p>本文的多个实验说明，图  &lt;下游任务性能-$I(v_1,v_2)$&gt;  普遍存在倒U型的图：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113115838448.png" alt="image-20210113115838448"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113115903284.png" alt="image-20210113115903284"></p>
+<h3 id="4-学习最好的视图"><a href="#4-学习最好的视图" class="headerlink" title="4 学习最好的视图"></a>4 学习最好的视图</h3><p>以往的视图都是人工设计的视图，这里提出了一个通用的生成最佳视图的半监督方法。</p>
+<p>生成最好的视图：在将视图应用到表示学习之前，先设计另外一个神经网络（生成器g），用g来生成最好的视图。</p>
+<p>流程是：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113122756215.png" alt="image-20210113122756215"></p>
+<h5 id="4-1-无监督的生成视图方式：最小化-I-left-mathbf-v-mathbf-1-mathbf-v-mathbf-2-right"><a href="#4-1-无监督的生成视图方式：最小化-I-left-mathbf-v-mathbf-1-mathbf-v-mathbf-2-right" class="headerlink" title="4.1 无监督的生成视图方式：最小化$I\left(\mathbf{v}{\mathbf{1}} ; \mathbf{v}{\mathbf{2}}\right)$"></a>4.1 无监督的生成视图方式：最小化$I\left(\mathbf{v}<em>{\mathbf{1}} ; \mathbf{v}</em>{\mathbf{2}}\right)$</h5><p>定义生成器g，g是一个卷积核为1*1的卷积层加ReLU激活，$\hat{X}=g(X)$, 对于数据$X$，可以将$X$按通道切分为$\left{X<em>{1}, X</em>{2: 3}\right}$。</p>
+<p>定义$\hat{X}<em>{1}$,$\hat{X}</em>{2: 3}$分别为两个视图；另外有$I<em>{\mathrm{NCE}}\left(\hat{X}</em>{1} ; \hat{X}<em>{2: 3}\right)$是$I\left(\hat{X}</em>{1} ; \hat{X}_{2: 3}\right)$的估计（文章中有定义）。</p>
+<p>为了训练g，使得$I<em>{\mathrm{NCE}}\left(\hat{X}</em>{1} ; \hat{X}_{2: 3}\right)$最小，使用对抗训练的思想。</p>
+<p>引如两个编码器$f<em>1,f_2$,训练$f_1,f_2$最大化$I</em>{\mathrm{NCE}}\left(\hat{X}<em>{1} ; \hat{X}</em>{2: 3}\right)$，与 GAN中的判别器相似。</p>
+<p>同时，训练g，最小化$I<em>{\mathrm{NCE}}\left(\hat{X}</em>{1} ; \hat{X}_{2: 3}\right)$，形式化的目标函数为：</p>
+<script type="math/tex; mode=display">
+\min _{g} \max _{f_{1}, f_{2}} I_{\mathrm{NCE}}^{f_{1}, f_{2}}\left(g(X)_{1} ; g(X)_{2: 3}\right)</script><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113131115473.png" alt="image-20210113131115473"></p>
+<p>结果如下图（a）所示：</p>
+<p>可以看到，这么训练没有给出一个最佳的视图。虽然g生成的两个视图的互信息在减少，但是也丢失了许多对下游任务有用的信息。<img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113125930802.png" alt="image-20210113125930802"></p>
+<h5 id="半监督的生成视图方式：找到对下游任务有用的信息"><a href="#半监督的生成视图方式：找到对下游任务有用的信息" class="headerlink" title="半监督的生成视图方式：找到对下游任务有用的信息"></a>半监督的生成视图方式：找到对下游任务有用的信息</h5><p>假设我们有少量的下游任务标签y，引入两个分类器C1和C2，g不仅要最小化$I<em>{\mathrm{NCE}}\left(\hat{X}</em>{1} ; \hat{X}_{2: 3}\right)$，也要保证C1和C2分类正确。这样，就可以保留对下游任务有用的信息。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210113131204656.png" alt="image-20210113131204656" style="zoom: 50%;" /></p>
+<p>形式化的损失函数：</p>
+<script type="math/tex; mode=display">
+\min _{g, c_{1}, c_{2}} \max _{f_{1}, f_{2}} \underbrace{I_{\mathrm{NCE}}^{f_{1}, f_{2}}\left(g(X)_{1} ; g(X)_{2: 3}\right)}_{\text {unsupervised: reduce } I\left(v_{1} ; v_{2}\right)}+\underbrace{\mathcal{L}_{c e}\left(c_{1}\left(g(X)_{1}\right), y\right)+\mathcal{L}_{c e}\left(c_{2}\left(g(X)_{2: 3}\right), y\right)}_{\text {supervised: keep } I\left(v_{1} ; y\right) \text { and } I\left(v_{2} ; y\right)}</script><h3 id="5-总结一些启发"><a href="#5-总结一些启发" class="headerlink" title="5 总结一些启发"></a>5 总结一些启发</h3><ol>
+<li>表示学习的视图之间的互信息仅包含对下游任务有用的信息，有助于提高下游任务的泛化性。[59,]</li>
+<li>在表示学习中，适当引入一下标签来提高模型的泛化性。[75, 29, 34, 69].</li>
+<li>使用标签生成最佳视图用于表示学习，提高模型的泛化性。（本文）</li>
+<li>本文的寻找最佳视图的方式，同样适用于时序数据。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3/" rel="tag"># 自监督</a>
+              <a href="/tags/%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/" rel="tag"># 表示学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/Buzz/" rel="prev" title="zhj 自编码器 异常检测">
+      <i class="fa fa-chevron-left"></i> zhj 自编码器 异常检测
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/04/HuGanghui/Adversarial%20Graph%20Representation%20Adaptation%20for%20Cross-Domain%20Facial%20Expression%20Recognition/" rel="next" title="hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition">
+      hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Abstract-%E6%A6%82%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">1 Abstract 概要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BB%80%E4%B9%88%E6%98%AF%E8%A7%86%E5%9B%BE%EF%BC%88view%EF%BC%89%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">2 什么是视图（view）？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">2.0.1.</span> <span class="nav-text">视图的例子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B1%E4%BA%AB%E4%BF%A1%E6%81%AF%EF%BC%88mutual-information%EF%BC%8C-MI%EF%BC%89"><span class="nav-number">2.0.2.</span> <span class="nav-text">视图之间的共享信息（mutual information， MI）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%E8%A7%86%E5%9B%BE%E6%98%AF%E6%9C%80%E5%A5%BD%E7%9A%84%E8%A7%86%E5%9B%BE%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">3 怎么样的视图是最好的视图？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AD%A6%E4%B9%A0%E6%9C%80%E5%A5%BD%E7%9A%84%E8%A7%86%E5%9B%BE"><span class="nav-number">4.</span> <span class="nav-text">4 学习最好的视图</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-%E6%97%A0%E7%9B%91%E7%9D%A3%E7%9A%84%E7%94%9F%E6%88%90%E8%A7%86%E5%9B%BE%E6%96%B9%E5%BC%8F%EF%BC%9A%E6%9C%80%E5%B0%8F%E5%8C%96-I-left-mathbf-v-mathbf-1-mathbf-v-mathbf-2-right"><span class="nav-number">4.0.1.</span> <span class="nav-text">4.1 无监督的生成视图方式：最小化$I\left(\mathbf{v}{\mathbf{1}} ; \mathbf{v}{\mathbf{2}}\right)$</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8D%8A%E7%9B%91%E7%9D%A3%E7%9A%84%E7%94%9F%E6%88%90%E8%A7%86%E5%9B%BE%E6%96%B9%E5%BC%8F%EF%BC%9A%E6%89%BE%E5%88%B0%E5%AF%B9%E4%B8%8B%E6%B8%B8%E4%BB%BB%E5%8A%A1%E6%9C%89%E7%94%A8%E7%9A%84%E4%BF%A1%E6%81%AF"><span class="nav-number">4.0.2.</span> <span class="nav-text">半监督的生成视图方式：找到对下游任务有用的信息</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93%E4%B8%80%E4%BA%9B%E5%90%AF%E5%8F%91"><span class="nav-number">5.</span> <span class="nav-text">5 总结一些启发</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

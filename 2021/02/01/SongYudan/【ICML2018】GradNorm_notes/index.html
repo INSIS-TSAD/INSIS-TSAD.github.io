@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Abstract深度多任务网络可以用一个网络产生多个输出，与单任务网络相比，又快又好，但是不好训练。提出了梯度归一方法，通过动态调整梯度大小，自动平衡多任务中的训练。与单任务、其他loss权衡机制相比，GradNorm可以提高准确率，缓解过拟合。GradNorm只用一个不对称超参数$\alpha$，能达到或超过穷举网格搜索的效果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd 【ICML2018】GradNorm:Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks">
+<meta property="og:url" content="http://example.com/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Abstract深度多任务网络可以用一个网络产生多个输出，与单任务网络相比，又快又好，但是不好训练。提出了梯度归一方法，通过动态调整梯度大小，自动平衡多任务中的训练。与单任务、其他loss权衡机制相比，GradNorm可以提高准确率，缓解过拟合。GradNorm只用一个不对称超参数$\alpha$，能达到或超过穷举网格搜索的效果。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129143007.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144254.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129145617.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144123.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144146.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144208.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210128155658.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129124840.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129143658.png">
+<meta property="article:published_time" content="2021-02-01T02:20:10.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:23:47.897Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="多任务学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129143007.png">
+
+<link rel="canonical" href="http://example.com/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd 【ICML2018】GradNorm:Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd 【ICML2018】GradNorm:Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-02-01 10:20:10" itemprop="dateCreated datePublished" datetime="2021-02-01T10:20:10+08:00">2021-02-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-14 17:23:47" itemprop="dateModified" datetime="2021-07-14T17:23:47+08:00">2021-07-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>深度多任务网络可以用一个网络产生多个输出，与单任务网络相比，又快又好，但是不好训练。提出了<strong>梯度归一</strong>方法，通过动态调整梯度大小，自动<strong>平衡多任务中的训练</strong>。与单任务、其他loss权衡机制相比，GradNorm可以提高准确率，缓解过拟合。GradNorm只用<strong>一个不对称超参数</strong>$\alpha$，能达到或超过<strong>穷举网格搜索</strong>的效果。</p>
+<a id="more"></a>
+<h3 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h3><p>CV中需要同时且高效的完成多个任务，可以通过MTL实现，不同的任务间共享网络权重，在一个这种网络可伸缩，且共享特征引入更鲁棒的正则化、性能。但是多任务网络难以训练，不同的任务需要有一个<strong>恰当的平衡</strong>，参数应该收敛到鲁棒的共享特征。通过操控网络的反向传播寻找任务间的平衡，现有的方法都忽略了这一点：任务不平衡会阻碍训练，表现为反向梯度的不平衡。所以本文考虑<strong>直接调整loss</strong>，改变梯度大小，缓解这个问题。</p>
+<p>多任务loss是单任务的线性组合，$L=\Sigma_iw_IL_i$，我们提出自适应方法，<strong>每一个训练步权值都变化</strong>，在训练过程中优化$w_i$，达到平衡的目的。当某个反向梯度过大或过小时，进行惩罚。所有的任务以相似的速率训练时，就达到平衡了。如果某个任务训练较快，对应的权值就要变小。</p>
+<p>贡献：</p>
+<ol>
+<li>直接调整梯度大小，实现多任务loss平衡</li>
+<li>只需调整一个参数，可以达到或超过穷举网格搜索</li>
+<li>直接梯度交互可以控制MTL</li>
+</ol>
+<h3 id="GradNorm"><a href="#GradNorm" class="headerlink" title="GradNorm"></a>GradNorm</h3><p><strong>3.1. Definitions and Preliminaries</strong></p>
+<p>期望学到的$w_i(t)$能实现以下目标：1）将不同任务的梯度规范置于同一尺度上，通过这个尺度可以推断出梯度的相对大小；2）动态调整梯度范数，使得不同的任务以相似的速率训练。</p>
+<p>$W$：网络权值的子集，真正应用GradNorm的参数，一般是最后一层权值共享层</p>
+<p>$G_W^{(i)}(t)$：单任务loss（$w_iL_i$）对$W$的梯度的l2范数</p>
+<p>$\overline{G}_W(t)$：所有任务$G_W^{(i)}(t)$的均值</p>
+<p>$\widetilde{L}_i(t)=L_i(t)/L_i(0)$：任务i在t时刻的loss比率，记为反向训练速率，这个值越小，loss降的越快，训练速度就越快</p>
+<p>$r<em>i(t)=\widetilde{L}_i(t)/E</em>{task}[\widetilde{L}_i(t)]$：相对逆训练速率，越小，训练速度越快</p>
+<p><strong>3.2. Balancing Gradients with GradNorm</strong></p>
+<p>GradNorm讲梯度大小规范到同一尺度（平均梯度$\overline{G}_W(t)$），平衡不同任务的训练速率。相对反向训练速率$r_i(t)$用于平衡梯度，$r_i(t)$越大（说明该任务训练比较慢），梯度值应越大，加速这个任务的训练，所以得到任务i的期望梯度：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129143007.png" style="zoom: 80%;" /></p>
+<p>$\alpha$是超参数，控制恢复力（将梯度拉回同一训练速率）的强度。如果任务之间非常不平衡，$\alpha$适当调大；如果任务只是轻微不平衡，$\alpha$适当调小。上式给出了任务i的目标梯度，更新loss权值$w<em>i$使得梯度朝着这个目标前进，目标梯度和当前梯度的l1范数求和，得到$L</em>{grad}$:</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144254.png" style="zoom:80%;" /></p>
+<p>将后半部分看作常数，那么$L_{grad}$只与$w_i$有关。对$w_i$进行求导，它直接控制每个任务的梯度大小，利用标准更新准则进行更新；每次更新后，需要规范化使得$\Sigma w_i$为T。</p>
+<p>算法：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129145617.png" style="zoom:80%;" /></p>
+<hr>
+<ul>
+<li>补充博客：<a target="_blank" rel="noopener" href="https://blog.csdn.net/leon_winter/article/details/105014677">https://blog.csdn.net/leon_winter/article/details/105014677</a></li>
+</ul>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144123.png" alt=""></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144146.png" alt=""></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129144208.png" alt=""></p>
+<hr>
+<h3 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h3><p>训练多个任务，具有相似的损失函数，但是尺度不同，起初$w_i$均为1，损失量级越大的、反向传播梯度越大的任务越占主导地位。应用GradNorm：</p>
+<p>T个回归任务，square loss，输入250维，输出100维，B和$\epsilon_i$是常矩阵，分别服从两个IID的正态分布。每个任务共享B中的信息，也包含任务特定信息$\epsilon_i$，$\sigma_i$控制着输出$f_i$的尺度，若$\sigma_i$较大的任务占主导，不是最优训练状态。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210128155658.png" style="zoom:67%;" /></p>
+<p>设计了4层全连接层，ReLU激活函数，每层100个神经元，最后的仿射层给出T个任务的T个预测，<strong>$\alpha$设为0.12</strong>。我们设计的多个任务，除了$\sigma_i$外都相同，所以用$\sigma_i^2$对每个任务进行标准化然后再求和，等同于对loss比率进行求和。</p>
+<p>设只有两个任务，且$(\sigma_0,\sigma_1)=(1,100)$，初始权重均为1，由于任务1的量级较大，它的学习会超过任务0，所以应该相应地增大$w_0(t)$，提高任务平衡性。下图给出了训练过程中$w_0$和$w_1$的变化。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129124840.png" alt=""></p>
+<p>用10个任务进行了实验，结果如下，可以看出当任务数量变多时，梯度归一化的效果会更明显。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210129143658.png" alt=""></p>
+<p>应用梯度归一化后，会得到各任务loss的权值$w_i$随着训练步变化的曲线，将<strong>权值按时间进行平均</strong>，取最终的一个<strong>静态值</strong>，这个静态权重可以<strong>近似达到网格搜索的效果</strong>。</p>
+<h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>提出了GradNorm-一种自适应的加权机制，基于不同任务的训练速率，调整各任务loss的权值。通过调整$\alpha$的大小实现不同层层次的平衡，可以达到或超过网格搜索的效果，且更高效。</p>
+<hr>
+<ul>
+<li>这项研究由 Magic Leap 完成。这篇论文解决了一个非常有意思并且非常实用的问题，即多任务学习中多个任务难易程度不同所导致的优化不同步问题。作者提出了一种梯度传播机制，其核心思想是动态调整多个任务的权重，这些权重通过各个任务的实时梯度再进行反向传播和更新。研究表明，GradNorm 算法对多种不同的网络架构都有效，而且无论是回归任务还是分类任务，无论是合成数据集还是真实数据集，GradNorm 在多个任务上都能实现优于单任务网络的准确度并降低过拟合。GradNorm 也能得到比肩或超过穷举网格搜索方法的表现，尽管其仅涉及到单个不对称超参数 α。因此，曾经每增加一个任务都会导致计算需求指数增长的繁琐的搜索过程现在只需几次训练就能完成了，而且无论任务有多少都一样。研究者还表明梯度操作能实现对多任务网络的训练动态的更好控制。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%AD%A6%E4%B9%A0/" rel="tag"># 多任务学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/26/DengJiaoxue/ecg_ssl/" rel="prev" title="djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型">
+      <i class="fa fa-chevron-left"></i> djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/24/GongSa/aa/" rel="next" title="gs CTF:Anomaly Detection in High Dimensional Time Series with Coarse to Fine Model Transfer">
+      gs CTF:Anomaly Detection in High Dimensional Time Series with Coarse to Fine Model Transfer <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GradNorm"><span class="nav-number">3.</span> <span class="nav-text">GradNorm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Example"><span class="nav-number">4.</span> <span class="nav-text">Example</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Conclusion"><span class="nav-number">5.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

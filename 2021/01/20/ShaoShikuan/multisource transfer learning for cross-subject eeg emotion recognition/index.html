@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="[IEEE Transactions on Cybernetics 2019] Jinpeng Li, Shuang Qiu, Yuan-Yuan Shen, Cheng-Lin Liu, Fellow, IEEE, and Huiguang He, Senior Member, IEEE 介绍​    脑电(EEG)信号，在情绪识别中得到广泛应用。由于脑电的个体差异较大，情感识别模型无法在个体间">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition">
+<meta property="og:url" content="http://example.com/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="[IEEE Transactions on Cybernetics 2019] Jinpeng Li, Shuang Qiu, Yuan-Yuan Shen, Cheng-Lin Liu, Fellow, IEEE, and Huiguang He, Senior Member, IEEE 介绍​    脑电(EEG)信号，在情绪识别中得到广泛应用。由于脑电的个体差异较大，情感识别模型无法在个体间">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210116094954.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210116100240.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210116211240.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210116211711.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210116211718.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210117111319.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210117111732.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210117113501.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20210117113702.png">
+<meta property="article:published_time" content="2021-01-20T06:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-20T07:10:19.453Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210116094954.png">
+
+<link rel="canonical" href="http://example.com/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-20 14:24:24 / Modified: 15:10:19" itemprop="dateCreated datePublished" datetime="2021-01-20T14:24:24+08:00">2021-01-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[IEEE Transactions on Cybernetics 2019]</p>
+<p>Jinpeng Li, Shuang Qiu, Yuan-Yuan Shen, Cheng-Lin Liu, Fellow, IEEE, and Huiguang He, Senior Member, IEEE</p>
+<h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>​    脑电(EEG)信号，在情绪识别中得到广泛应用。由于脑电的个体差异较大，情感识别模型无法在个体间共享，需要收集新的标记数据来为新用户训练个人模型。在一些应用中，希望尽可能快地获得新的用户的模型，并减少对标记数据的需求，所以提出了一种以现有个体为源域，以新人为目标域的多源迁移(<strong>Multisource Transfer</strong>)的学习方法。</p>
+<p>​    目标数据被分开用于训练的校准过程和随后的测试过程。该方法的第一阶段是源选择，目的是选择合适的源域。第二阶段是样式转换映射(style transfer mapping)，为了减少目标与各源之间的脑电信号差异。    最后在后续过程中整合<strong>源模型</strong>来识别情绪。</p>
+<a id="more"></a>
+<h4 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h4><p>​    提出了一种迁移学习(TL)方法来探索和利用现有个体的信息，以弥补目标训练数据的不足。该方法的目标是使目标域与源域在统计上相似，从而实现源模型的共享，和传统方法不同，这里有少量的标记数据可用。</p>
+<p>​    如下图，已有多个个体和它们各自的分类器，对于一个新个体，在校准阶段选择合适的源并学习样式转化映射(style transfer mapping)，以减少目标和所选的每个源之间的差异。在随后的测试阶段通过STM进行样本映射，接着集成源域分类器来得到最终的情感标签。</p>
+<p>​    在样式转换映射中探索了两种类型的映射终点(destination)设置。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20210116094954.png" alt="微信截图_20210116094954" style="zoom:75%;" /></p>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116100240.png" alt="微信截图_20210116100240" style="zoom:75%;" /></p>
+<h5 id="A-Source-Selection"><a href="#A-Source-Selection" class="headerlink" title="A. Source Selection"></a>A. Source Selection</h5><p>​        现有的研究表明，强行利用与目标域不相关的资源可能会降低迁移性能，被称为“负迁移”。为了避免负迁移，在迁移前选择合适的源。$\boldsymbol{A}<em>{L}^{T}$是一些来自校准阶段的标记数据，$\boldsymbol{A}</em>{U}^{T}$是后续阶段的无标签数据。</p>
+<p>​        由于$\boldsymbol{A}<em>{L}^{T}$有标签信息，所以源选择就变得很直观。枚举源域中的N个分类器来对$\boldsymbol{A}</em>{L}^{T}$进行分类，选取精度最高的$N_S$个分类器。将其对应的数据作为相应的数据源域。</p>
+<p>​        这背后的假设是$\boldsymbol{A}<em>{L}^{T}$和$\boldsymbol{A}</em>{U}^{T}$之间的差异不大，可以接受因为这两种数据属于同一实验的同一个体。</p>
+<h5 id="B-Style-Transfer-Mapping"><a href="#B-Style-Transfer-Mapping" class="headerlink" title="B. Style Transfer Mapping"></a>B. Style Transfer Mapping</h5><p>​        在STM中，我们将$\boldsymbol{A}^{T}$ 映射到$\boldsymbol{A}^{S p}$来联结这两个分布，不直接将$\boldsymbol{A}^{T}$ 映射到$\boldsymbol{A}^{S p}$，而是寻找一些在$\boldsymbol{A}^{S p}$的表示模式(典型的聚类中心，类均值)，在这里称$\boldsymbol{A}^{S p}$为映射“destination”终点，$\boldsymbol{A}^{T}$为“origin” 起点。</p>
+<p>​        终点的点集表示为</p>
+<p>​                                                                                    $D=\left{d_{i} \in R^{m} \mid i=1, \ldots, n\right}$</p>
+<p>​        STM起点的点集表示为</p>
+<p>​                                                                                    $O=\left{o_{i} \in R^{m} \mid i=1, \ldots, n\right}$</p>
+<p>​        从$d<em>{i}$ 到 $o</em>{i}$的改变称为概念漂移，假设$d<em>{i}$ 转换到 $o</em>{i}$有置信度$f<em>{i} \in[0,1]$，那么我们就可以学习一个反变换函数将$o</em>{i}$转换回$d<em>{i}$ ，$A o</em>{i}+b$。参数$A \in R^{m \times m}$和$b \in R^{m}$通过最小化带有正则化项的加权平方误差来避免过度迁移</p>
+<p>​                                                            $\min <em>{A \in R^{m \times m}, b \in R^{m}}         \sum</em>{i=1}^{n} f<em>{i}\left|A o</em>{i}+b-d<em>{i}\right|</em>{2}^{2}+\beta|A-I|<em>{F}^{2}+\gamma|b|</em>{2}^{2} \space\space\space(3)$</p>
+<p>​        上式是一个凸二次规划问题，它有一个封闭形式的解</p>
+<p>​                                                                                    $A=Q P^{-1}, b=\frac{1}{\hat{f}}(\hat{d}-A \hat{o})$</p>
+<p>其中</p>
+<p>​                                                                                    $Q=\sum<em>{i=1}^{n} f</em>{i} d<em>{i} o</em>{i}^{T}-\frac{1}{\hat{f}} \hat{d} \hat{o}^{T}+\beta I$<br>​                                                                                    $P=\sum<em>{i=1}^{n} f</em>{i} o<em>{i} o</em>{i}^{T}-\frac{1}{\hat{f}} \hat{o} \hat{o}^{T}+\beta I$<br>​                                                                                     $\hat{o}=\sum<em>{i=1}^{n} f</em>{i} o<em>{i}, \hat{d}=\sum</em>{i=1}^{n} f<em>{i} d</em>{i}$<br>​                                                                                    $\hat{f}=\sum<em>{i=1}^{n} f</em>{i}+\gamma$</p>
+<h5 id="C-Mapping-Origin-and-Destination"><a href="#C-Mapping-Origin-and-Destination" class="headerlink" title="C. Mapping Origin and Destination"></a>C. Mapping Origin and Destination</h5><p>​        映射的起点是$\boldsymbol{A}^{T}$，关键的任务是定义映射的终点$\boldsymbol{A}^{S p}$（也就是）。本文使用的分类器是SVM，在源域中训练好分类器之后，由于对于支持向量的分类难度很大，所以在训练好好之后将支持向量移除，即支持向量只参与推导决策边界，而不参与映射终点的推导。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116211240.png" alt="微信截图_20210116211240" style="zoom:67%;" /></p>
+<p>​        本文将探索在源域中派生映射终点的两种技术。</p>
+<h6 id="1）聚类Nearest-Prototype-原型"><a href="#1）聚类Nearest-Prototype-原型" class="headerlink" title="1）聚类Nearest Prototype(原型)"></a>1）聚类Nearest Prototype(原型)</h6><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116211711.png" alt="微信截图_20210116211711" style="zoom:67%;" /></p>
+<p>​        我们使用K-means聚类在每个类上来获取原型(代表性点)：</p>
+<p>​                                                                $p<em>{i j} \in R^{m}, j=i, \ldots, n</em>{i}, i=1, \ldots, M$</p>
+<p>​        其中$n_i$表示每个类别的原型数量，定义每个来自类别$i$的样本的最近原型如下所示：</p>
+<p>​                                                            $N(x, i)=p<em>{i j},$ where $j=\arg \min </em>{j^{\prime}=1}^{n<em>{i}}\left|x-p</em>{i j^{\prime}}\right|_{2}^{2}$</p>
+<p>​        目标域$\boldsymbol{A}^{T}$中的样本$x$的终点就定义为离其真实类(标记数据)或推导类(未标记数据)最近的原型</p>
+<p>​                                                                            $D_{\text {proto }}(x, y)=N(x, y)$ </p>
+<h6 id="2）Gaussian-Model"><a href="#2）Gaussian-Model" class="headerlink" title="2）Gaussian Model"></a>2）Gaussian Model</h6><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210116211718.png" alt="微信截图_20210116211718" style="zoom:67%;" /></p>
+<p>​        高斯模型假设条件密度是服从高斯分布的，上图展示了基于高斯模型的终点，其中均值是$\mu<em>i$，协方差矩阵是$\Sigma</em>{i}$，定义了$x$的映射模式在类别$i$上的马氏距离</p>
+<p>​                                                                $P(x, i)=\mu_{i}+\min \left{1, \frac{\rho}{d(x, i)}\right}$</p>
+<p>其中$d(x, i)=\sqrt{\left(x-\mu<em>{i}\right)^{T} \Sigma</em>{i}^{-1}\left(x-\mu<em>{i}\right)}$是类别$i$的马氏距离，在目标域$\boldsymbol{A}^{T}$样本的终点可以被定义为对真实类(标记数据)或推导类(未标记数据)的投影$D</em>{\text {gauss }}(x, y)=P(x, y)$。</p>
+<h5 id="D-Confidence-Setup"><a href="#D-Confidence-Setup" class="headerlink" title="D. Confidence Setup"></a>D. Confidence Setup</h5><p>​        这里有两种策略来计算STM，（1）有监督的方法，在校准阶段只使用有标签数据$\boldsymbol{A}^{T}_L$，这是一种inductive的迁移方法。（2）半监督的方法使用$\boldsymbol{A}^{T}_L$和测试数据$\boldsymbol{A}^{T}_U$来学习STM，这是一种transductive的方法。</p>
+<p>​        在有监督方法中就没有必要设置置信度了，或者说置信度设置为1，而在半监督方法中设置置信度就很重要了。对于$\boldsymbol{A}^{T}$中一个没有标签的数据，我们推导它的标签，并在相应的类中找到映射终点。标签推测不是绝对可靠的。如果推断的标签是错误的，STM将把数据映射到一个错误的类。因此，我们用一个置信度值标记每个转换，出现在公式(3)的第一项中。样本的置信度越高，对STM计算的影响越大，反之亦然。置信度的设置在这里就不再展开。</p>
+<h4 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h4><p>​        本文使用的数据集为<strong>SEED</strong>数据集，一个用于通过观看电影片段后的感情变化来进行情感分类数据集。</p>
+<h5 id="源域数量评估"><a href="#源域数量评估" class="headerlink" title="源域数量评估"></a>源域数量评估</h5><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117111319.png" alt="微信截图_20210117111319" style="zoom:67%;" /></p>
+<h5 id="使用一个统一的源来进行迁移"><a href="#使用一个统一的源来进行迁移" class="headerlink" title="使用一个统一的源来进行迁移"></a>使用一个统一的源来进行迁移</h5><p>​        STM与多源框架相关联，其中每个个体都被视为一个独立的源。我们可以将所有可用的受试者的数据合并为一个统一的源域。我们比较了多源方法和统一源方法的精度。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117111732.png" alt="微信截图_20210117111732" style="zoom:67%;" /></p>
+<h5 id="置信度评估"><a href="#置信度评估" class="headerlink" title="置信度评估"></a>置信度评估</h5><p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117113501.png" alt="微信截图_20210117113501" style="zoom:67%;" /></p>
+<p>​        评估了本文提出的置信度设置方法和之前的两种置信度设置方法之间的效果。</p>
+<h5 id="个体表现"><a href="#个体表现" class="headerlink" title="个体表现"></a>个体表现</h5><p>​                                    <img src="http://echo23334.gitee.io/pic_repo/微信截图_20210117113702.png" alt="微信截图_20210117113702" style="zoom:67%;" /></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/" rel="prev" title="xw caNet:Frequency Channel Attention Networks">
+      <i class="fa fa-chevron-left"></i> xw caNet:Frequency Channel Attention Networks
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/26/DengJiaoxue/ecg_ssl/" rel="next" title="djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型">
+      djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE"><span class="nav-number">2.</span> <span class="nav-text">贡献</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#A-Source-Selection"><span class="nav-number">3.1.</span> <span class="nav-text">A. Source Selection</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#B-Style-Transfer-Mapping"><span class="nav-number">3.2.</span> <span class="nav-text">B. Style Transfer Mapping</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#C-Mapping-Origin-and-Destination"><span class="nav-number">3.3.</span> <span class="nav-text">C. Mapping Origin and Destination</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#1%EF%BC%89%E8%81%9A%E7%B1%BBNearest-Prototype-%E5%8E%9F%E5%9E%8B"><span class="nav-number">3.3.1.</span> <span class="nav-text">1）聚类Nearest Prototype(原型)</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2%EF%BC%89Gaussian-Model"><span class="nav-number">3.3.2.</span> <span class="nav-text">2）Gaussian Model</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#D-Confidence-Setup"><span class="nav-number">3.4.</span> <span class="nav-text">D. Confidence Setup</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%BA%90%E5%9F%9F%E6%95%B0%E9%87%8F%E8%AF%84%E4%BC%B0"><span class="nav-number">4.1.</span> <span class="nav-text">源域数量评估</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E4%B8%80%E4%B8%AA%E7%BB%9F%E4%B8%80%E7%9A%84%E6%BA%90%E6%9D%A5%E8%BF%9B%E8%A1%8C%E8%BF%81%E7%A7%BB"><span class="nav-number">4.2.</span> <span class="nav-text">使用一个统一的源来进行迁移</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%BD%AE%E4%BF%A1%E5%BA%A6%E8%AF%84%E4%BC%B0"><span class="nav-number">4.3.</span> <span class="nav-text">置信度评估</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%AA%E4%BD%93%E8%A1%A8%E7%8E%B0"><span class="nav-number">4.4.</span> <span class="nav-text">个体表现</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

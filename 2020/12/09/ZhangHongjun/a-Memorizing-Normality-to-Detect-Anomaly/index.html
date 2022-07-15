@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="ICCV, 2020 概要autoencoder被广泛应用到异常检测. 前提假设:在正常的数据上训练, 在异常样本上会有较大的重构误差, 使用重构误差作为检测异常的标准.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj Memorizing Normality to Detect  Anomaly">
+<meta property="og:url" content="http://example.com/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="ICCV, 2020 概要autoencoder被广泛应用到异常检测. 前提假设:在正常的数据上训练, 在异常样本上会有较大的重构误差, 使用重构误差作为检测异常的标准.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201183707.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201220151.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201232017.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103206.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103625.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202112919.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114254.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114413.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png">
+<meta property="article:published_time" content="2020-12-09T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:52:25.836Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201183707.png">
+
+<link rel="canonical" href="http://example.com/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj Memorizing Normality to Detect  Anomaly | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj Memorizing Normality to Detect  Anomaly
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:52:25" itemprop="dateModified" datetime="2021-01-16T11:52:25+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201183707.png" alt="image-20201201183707250"></p>
+<p>ICCV, 2020</p>
+<h4 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h4><p>autoencoder被广泛应用到异常检测.</p>
+<p>前提假设:在正常的数据上训练, 在异常样本上会有较大的重构误差, 使用重构误差作为检测异常的标准. </p>
+<a id="more"></a>
+<p>然而, 这一假设在实际应用中不一定成立. 有时autoencoder的泛化性太好, 而导致在面对异常样本时也能很好地重构, 即重构误差小, 这会导致漏报异常.  为了缓解这个问题, 本文提出了memory-augmented autoencoder(MemAE). 给定一个输入样本, MemAE首先使用编码器获得隐变量z, 然后使用z作为一个查询, 在memory中检索出与z最相近的条目, 然后将这些条目组合输入到解码器用于重构. 在训练阶段, memory中的内容不断更新. 在测试的使用, memory被固定, 不再更新. 这样做会使用重构的样本非常像正常的样本(训练的时候只有正常样本, 所以memory是用正常样本编码获得的.)  这样做可以使得异常样本的重构误差更大.  此外, MemAE不限定数据类型, 所以它适用于各种数据类型的异常检测.</p>
+<p>下图为检索数量为1的情况下的示意图:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201220151.png" alt="image-20201201220151716"></p>
+<h3 id="Memory-augmented-Autoencoder"><a href="#Memory-augmented-Autoencoder" class="headerlink" title="Memory-augmented Autoencoder"></a>Memory-augmented Autoencoder</h3><h4 id="1-Overview"><a href="#1-Overview" class="headerlink" title="1. Overview"></a>1. Overview</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201201232017.png" alt="image-20201201232017450"></p>
+<p>模型有3个组成成分: encoder, decoder 和 memory.  给定一个输入, 首先编码获得隐变量z, 在训练的时候, 使用z去Memory中检索与z最像的一些记录, 然后将这些记录组合成新的隐变量$\hat{z}$, 然后传给解码器用于重构. </p>
+<p>在训练的时候, 编码器, 解码器优化的方向是最小化重构误差. Memory同时不断更新.</p>
+<p>在测试时, 输入一个测试样本, 只会使用Memory中的一些记录来重构. 这样的话, 重构样本会趋近与更像正常样本. 正常样本重构出来的重构误差更小, 异常样本的重构误差更大.</p>
+<h4 id="2-Enocder-and-Decoder"><a href="#2-Enocder-and-Decoder" class="headerlink" title="2.Enocder and Decoder"></a>2.Enocder and Decoder</h4><p>定义编码器为$f<em>{e}(\cdot): \mathbb{X} \rightarrow \mathbb{Z}$, 解码器为$f</em>{d}(\cdot): \mathbb{Z} \rightarrow \mathbb{X}$,  给定一个输入$x$, 首先通过编码器获得$z$, 然后从Memory中检索出$\hat{z}$, 然后经过解码器获得$\hat{x}$</p>
+<script type="math/tex; mode=display">
+\mathbf{z}=f_{e}\left(\mathbf{x} ; \theta_{e}\right)
+\\
+\widehat{\mathbf{x}}=f_{d}\left(\widehat{\mathbf{z}} ; \theta_{d}\right)</script><p>使用的损失函数为MSE: $e=|\mathbf{x}-\widehat{\mathbf{x}}|_{2}^{2}$</p>
+<h4 id="3-Memory-Module-with-Attention-based-Sparse-Addressing"><a href="#3-Memory-Module-with-Attention-based-Sparse-Addressing" class="headerlink" title="3.Memory Module with Attention-based Sparse Addressing"></a>3.Memory Module with Attention-based Sparse Addressing</h4><p>本文所提出的memory模块包括两个部分: 存储模块和检索模块.</p>
+<h5 id="3-1-Memory设计"><a href="#3-1-Memory设计" class="headerlink" title="3.1 Memory设计"></a>3.1 Memory设计</h5><p>memory是一个矩阵$\mathbf{M} \in \mathbb{R}^{N \times C}$, 包含$N$个向量, 每个向量的维度是$C$ , $z$的维度是$C$. 设$m_i$是M的第i行. 给定一个query(查询)$\mathbf{z} \in \mathbb{R}^{C}$,首先获得一个寻址向量$\mathbf{w} \in \mathbb{R}^{1 \times N}$,  获得$\hat{z}$的方式为:</p>
+<script type="math/tex; mode=display">
+\widehat{\mathbf{z}}=\mathbf{w} \mathbf{M}=\sum_{i=1}^{N} w_{i} \mathbf{m}_{i}</script><p>$w$是和为1的非负向量, 相当于$\hat{z}$是$m_i$的加权求和. 经过实验, 认为模型对$N$的取值不是很敏感, 一个足够大的$N$就能够在所有数据集上都取得较好的效果.</p>
+<h5 id="3-2-w的计算方式"><a href="#3-2-w的计算方式" class="headerlink" title="3.2 w的计算方式"></a>3.2 w的计算方式</h5><p>计算$w_i$:</p>
+<script type="math/tex; mode=display">
+w_{i}=\frac{\exp \left(d\left(\mathbf{z}, \mathbf{m}_{i}\right)\right)}{\sum_{j=1}^{N} \exp \left(d\left(\mathbf{z}, \mathbf{m}_{j}\right)\right)}</script><p>$d(\cdot, \cdot)$是距离度量, 本文使用的是余弦距离:</p>
+<script type="math/tex; mode=display">
+d\left(\mathbf{z}, \mathbf{m}_{i}\right)=\frac{\mathbf{z} \mathbf{m}_{i}^{\top}}{\|\mathbf{z}\|\left\|\mathbf{m}_{i}\right\|}</script><p>在训练的时候, 由于Memory的空间有限, MemAE通过使用有限的m组合来重构样本, 这样会迫使模型充分利用Memory, 使得Memory存储的是最具代表性的原型模式. 下图是使用9作为正常样本来训练MemAE, 并从Memory中随机选几个m, 经过解码之后重构出来的样本. 这张图是为了说明Memory中存储的是有代表性的原型模式. </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103206.png" alt="image-20201202103206688"></p>
+<p>在测试阶段, 给定训练好的Memory, 异常样本的重构也只能利用正常的m组合形成$\hat{z}$, 然后重构. 下图中, 左图是使用5来训练, 测试时输入9. 右图是使用2来训练, 测试时输入4. 重构出来的样本都很像是训练样本. </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202103625.png" alt="image-20201202103625165"></p>
+<h5 id="3-3-稀疏寻址-硬收缩"><a href="#3-3-稀疏寻址-硬收缩" class="headerlink" title="3.3 稀疏寻址(硬收缩)"></a>3.3 稀疏寻址(硬收缩)</h5><p>作者指出, 如果w很稠密, 即w的每个分量都很小, 会导致多个m组合之后, 使用模型仍然具有较好的泛化性, 也有可能重构出异常样本. 为了缓解这个问题, 迫使w变得稀疏:</p>
+<script type="math/tex; mode=display">
+\widehat{w}_{i}=h\left(w_{i} ; \lambda\right)=\left\{\begin{array}{ll}
+w_{i}, & \text { if } w_{i}>\lambda \\
+0, & \text { otherwise }
+\end{array}\right.</script><p>简单来说是设定一个阈值$\lambda$, 小于$\lambda$就设为0.</p>
+<p>上式不容易反向传播, 修改为(continuous ReLU activation function):</p>
+<script type="math/tex; mode=display">
+\widehat{w}_{i}=\frac{\max \left(w_{i}-\lambda, 0\right) \cdot w_{i}}{\left|w_{i}-\lambda\right|+\epsilon}</script><p>根据经验, $\lambda$在区间$[1 / N, 3 / N]$内取值会取得比较理想的效果.</p>
+<p>经过以上压缩之后,重新标准化:$\widehat{w}<em>{i}=\widehat{w}</em>{i} /|\widehat{\mathbf{w}}|_{1}$.  这样一来, $\widehat{\mathbf{z}}=\widehat{\mathbf{w}} \mathbf{M}$</p>
+<p>以上的稀疏寻址操作有两个好处: 一是迫使Memory中的m是更具有代表性的原型; 二是降低模型泛化性导致异常样本也能重构的可能性.</p>
+<h5 id="3-4-训练"><a href="#3-4-训练" class="headerlink" title="3.4 训练"></a>3.4 训练</h5><p>损失函数包括两部分:</p>
+<p>一. 样本重构误差</p>
+<script type="math/tex; mode=display">
+R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)=\left\|\mathbf{x}^{t}-\widehat{\mathbf{x}}^{t}\right\|_{2}^{2}</script><p>二. 除上述的硬收缩之外, 通过损失函数使得w更加稀疏.</p>
+<p>​    考虑到$\hat{\mathbf{w}}$中的元素非负且$|\widehat{\mathbf{w}}|_{1}=1$, 最小化它的交叉熵就可以达到稀疏化的效果.</p>
+<script type="math/tex; mode=display">
+E\left(\widehat{\mathbf{w}}^{t}\right)=\sum_{i=1}^{T}-\widehat{w}_{i} \cdot \log \left(\widehat{w}_{i}\right)</script><p>总体的损失函数如下:</p>
+<script type="math/tex; mode=display">
+L\left(\theta_{e}, \theta_{d}, \mathbf{M}\right)=\frac{1}{T} \sum_{t=1}^{T}\left(R\left(\mathbf{x}^{t}, \widehat{\mathbf{x}}^{t}\right)+\alpha E\left(\widehat{\mathbf{w}}^{t}\right)\right)</script><p>$\alpha$是调节权重的超参, 本文设定为0.0002</p>
+<h4 id="4-实验"><a href="#4-实验" class="headerlink" title="4 实验"></a>4 实验</h4><h5 id="4-1-图像数据"><a href="#4-1-图像数据" class="headerlink" title="4.1 图像数据"></a>4.1 图像数据</h5><p>平均AUC. </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202112919.png" alt="image-20201202112919657" style="zoom: 80%;" /></p>
+<h5 id="4-2-视频数据"><a href="#4-2-视频数据" class="headerlink" title="4.2 视频数据"></a>4.2 视频数据</h5><p>AUC:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114254.png" alt="image-20201202114254063" style="zoom: 50%;" /></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201202114413.png" alt="image-20201202114413583"></p>
+<h5 id="4-3-网络安全数据"><a href="#4-3-网络安全数据" class="headerlink" title="4.3 网络安全数据"></a>4.3 网络安全数据</h5><p> KDDCUP99 </p>
+<p>Each sample can be organized as a vector with 120 dimensions </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png" alt="image-20201202114638957"></p>
+<h5 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h5><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201210202446.png" alt="image-20201202114807190"></p>
+<p>AE-ℓ1:最小化z的ℓ1范数.</p>
+<p>MemAE-nonSpar: 不做稀疏化处理</p>
+<p>MemAE w/o Shrinkage:没有硬收缩</p>
+<p>MemAE w/o Entropy loss:损失函数中没有交叉熵</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/anoGan-f-anoGan/" rel="prev" title="zhj anoGan">
+      <i class="fa fa-chevron-left"></i> zhj anoGan
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/" rel="next" title="zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION">
+      zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A6%82%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">概要</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memory-augmented-Autoencoder"><span class="nav-number"></span> <span class="nav-text">Memory-augmented Autoencoder</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Overview"><span class="nav-number">1.</span> <span class="nav-text">1. Overview</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Enocder-and-Decoder"><span class="nav-number">2.</span> <span class="nav-text">2.Enocder and Decoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Memory-Module-with-Attention-based-Sparse-Addressing"><span class="nav-number">3.</span> <span class="nav-text">3.Memory Module with Attention-based Sparse Addressing</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-Memory%E8%AE%BE%E8%AE%A1"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Memory设计</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-w%E7%9A%84%E8%AE%A1%E7%AE%97%E6%96%B9%E5%BC%8F"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 w的计算方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-%E7%A8%80%E7%96%8F%E5%AF%BB%E5%9D%80-%E7%A1%AC%E6%94%B6%E7%BC%A9"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 稀疏寻址(硬收缩)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4-%E8%AE%AD%E7%BB%83"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 训练</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.</span> <span class="nav-text">4 实验</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#4-1-%E5%9B%BE%E5%83%8F%E6%95%B0%E6%8D%AE"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 图像数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-2-%E8%A7%86%E9%A2%91%E6%95%B0%E6%8D%AE"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 视频数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-3-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%95%B0%E6%8D%AE"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 网络安全数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.4.</span> <span class="nav-text">消融实验</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

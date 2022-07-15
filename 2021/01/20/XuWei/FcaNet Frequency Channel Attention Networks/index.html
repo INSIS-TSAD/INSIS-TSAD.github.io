@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Introduction 注意机制，特别是通道注意，在计算机视觉领域取得了巨大的成功。许多研究集中在如何设计有效的通道注意机制，而忽略了一个基本问题，即使用全局平均池化(GAP)是否存在问题。在这项工作中，本文从一个不同的视角出发，用频率分析重新思考通道注意。在频域分析的基础上，用数学方法证明了全局平均池化(GAP)是频域特征分解的一种特例。通过证明，自然地将通道注意机制的预处理推广到了频域，并提">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xw caNet:Frequency Channel Attention Networks">
+<meta property="og:url" content="http://example.com/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Introduction 注意机制，特别是通道注意，在计算机视觉领域取得了巨大的成功。许多研究集中在如何设计有效的通道注意机制，而忽略了一个基本问题，即使用全局平均池化(GAP)是否存在问题。在这项工作中，本文从一个不同的视角出发，用频率分析重新思考通道注意。在频域分析的基础上，用数学方法证明了全局平均池化(GAP)是频域特征分解的一种特例。通过证明，自然地将通道注意机制的预处理推广到了频域，并提">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210112162526585.png">
+<meta property="og:image" content="https://pic4.zhimg.com/v2-77affb3d6037ab0fa4f564f30c38031b_r.jpg">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120005612174.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120010126425.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120010237029.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120133711682.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120133733751.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120135835661.png">
+<meta property="article:published_time" content="2021-01-20T06:00:40.000Z">
+<meta property="article:modified_time" content="2021-01-20T07:13:01.071Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="Attention">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210112162526585.png">
+
+<link rel="canonical" href="http://example.com/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>xw caNet:Frequency Channel Attention Networks | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          xw caNet:Frequency Channel Attention Networks
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-20 14:00:40 / Modified: 15:13:01" itemprop="dateCreated datePublished" datetime="2021-01-20T14:00:40+08:00">2021-01-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote>
+<p>注意机制，特别是通道注意，在计算机视觉领域取得了巨大的成功。许多研究集中在如何设计有效的通道注意机制，而忽略了一个基本问题，即使用全局平均池化(GAP)是否存在问题。在这项工作中，本文从一个不同的视角出发，用频率分析重新思考通道注意。<strong>在频域分析的基础上，用数学方法证明了全局平均池化(GAP)是频域特征分解的一种特例。通过证明，自然地将通道注意机制的预处理推广到了频域，并提出了一种新的多谱通道注意网络。</strong>该方法简单有效。只修改计算中的一行代码，以在现有的通道注意方法中实现本文的方法。在图像分类、目标检测和实例分割等任务上，与其他通道注意方法相比，该方法取得了最先进的效果。与基线SENet50相比，在相同的参数数量和计算成本下，本文的方法在ImageNet上的Top-1精度提高了1.8%。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p><strong>作者信息</strong></p>
+<p>浙江大学（李玺团队）</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210112162526585.png" alt="image-20210112162526585"></p>
+<h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><ol>
+<li>通道注意力大都通过GAP实现，尽管GAP(global average pooling)算法简单有效，但它存在一个潜在的问题，即不能很好地捕捉到丰富的输入模式信息，从而在处理不同的输入时缺乏特征多样性。因此，出现了一个自然的问题，是否均值信息仅足以代表渠道注意中的各种渠道。</li>
+</ol>
+<h3 id="Contribution"><a href="#Contribution" class="headerlink" title="Contribution"></a>Contribution</h3><ol>
+<li>证明了GAP是离散余弦变换(DCT)的一个特例，等价于离散余弦变换(DCT)的最低频率，仅使用GAP等价于丢弃特征信道中包含大量有用信息的其他频率分量。在此基础上，本文将通道注意推广到频域，提出了具有多谱通道注意框架的FcaNet。</li>
+<li>提出了一种选择频率分量的两步准则，探讨了使用不同数量的频率分量及其不同组合的效果。</li>
+<li>方法简单，改进一行代码即可。</li>
+</ol>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><h3 id="Revisiting-Channel-Attention-and-DCT"><a href="#Revisiting-Channel-Attention-and-DCT" class="headerlink" title="Revisiting Channel Attention and DCT"></a>Revisiting Channel Attention and DCT</h3><h4 id="Channel-Attention"><a href="#Channel-Attention" class="headerlink" title="Channel Attention"></a>Channel Attention</h4><p><strong>输入</strong></p>
+<script type="math/tex; mode=display">
+X \in \mathbb{R}^{C \times H \times W}</script><p><em>C是通道数</em></p>
+<p><strong>注意力</strong></p>
+<script type="math/tex; mode=display">
+a t t=\operatorname{sigmoid}(f c(\operatorname{gap}(X)))</script><script type="math/tex; mode=display">
+att\in \mathbb{R}^{C}</script><p><strong>注意力机制输出</strong></p>
+<script type="math/tex; mode=display">
+\widetilde{X}_{:, i,:,:}=a t t_{i} X_{:, i,:,:}, \quad \text { s.t. } \quad i \in\{0,1, \cdots, C-1\}</script><p><img src="https://pic4.zhimg.com/v2-77affb3d6037ab0fa4f564f30c38031b_r.jpg" alt="img"></p>
+<h4 id="Discrete-Cosine-Transform-DCT"><a href="#Discrete-Cosine-Transform-DCT" class="headerlink" title="Discrete Cosine Transform (DCT)"></a>Discrete Cosine Transform (DCT)</h4><p><strong>一维DCT</strong></p>
+<script type="math/tex; mode=display">
+f_{k}=\sum_{i=0}^{L-1} x_{i} \cos \left(\frac{\pi k}{L}\left(i+\frac{1}{2}\right)\right), \text { s.t. } k \in\{0,1, \cdots, L-1\}</script><p>输入：$x \in \mathbb{R}^{L}$</p>
+<p>离散余弦转换频谱：$f \in \mathbb{R}^{L}$</p>
+<p><strong>二维DCT</strong></p>
+<script type="math/tex; mode=display">
+\begin{array}{l}f_{h, w}^{2 d}=\sum_{i=0}^{H-1} \sum_{j=0}^{W-1} x_{i, j}^{2 d} \underbrace{\cos \left(\frac{\pi h}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\pi w}{W}\left(j+\frac{1}{2}\right)\right)}_{\text {DCT weights }}, \\ \text { s.t. } h \in\{0,1, \cdots, H-1\}, w \in\{0,1, \cdots, W-1\}\end{array}</script><p>反变换</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}x_{i, j}^{2 d}=\sum_{h=0}^{H-1} \sum_{w=0}^{W-1} f_{h, w}^{2 d} \underbrace{\cos \left(\frac{\pi h}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\pi w}{W}\left(j+\frac{1}{2}\right)\right)}_{\text {DCT weights }} \\ \text { s.t. } i \in\{0,1, \cdots, H-1\}, j \in\{0,1, \cdots, W-1\}\end{array}</script><p><strong>GAP</strong></p>
+<script type="math/tex; mode=display">
+\begin{aligned} f_{0,0}^{2 d} &=\sum_{i=0}^{H-1} \sum_{j=0}^{W-1} x_{i, j}^{2 d} \cos \left(\frac{0}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\theta}{W}\left(j+\frac{1}{2}\right)\right) \\ &=\sum_{i=0}^{H-1} \sum_{j=0}^{W-1} x_{i, j}^{2 d} \\ &=g a p\left(x^{2 d}\right) H W \end{aligned}</script><p>由上可见全局平均池化(GAP)是频域特征分解的一种特例（只保留低频信息）</p>
+<script type="math/tex; mode=display">
+B_{h, w}^{i, j}=\cos \left(\frac{\pi h}{H}\left(i+\frac{1}{2}\right)\right) \cos \left(\frac{\pi w}{W}\left(j+\frac{1}{2}\right)\right)</script><script type="math/tex; mode=display">
+X=\underbrace{\operatorname{gap}(X) H W B_{0,0}^{i, j}}_{\text {utilized }}+\underbrace{f_{0,1}^{2 d} B_{0,1}^{i, j}+\cdots+f_{H-1, W-1}^{2 d} B_{H-1, W-1}^{i, j}}_{\text {discarded }}</script><h4 id="Multi-Spectral-Channel-Attention"><a href="#Multi-Spectral-Channel-Attention" class="headerlink" title="Multi-Spectral Channel Attention"></a>Multi-Spectral Channel Attention</h4><p>现有的通道注意所使用的信息不足，而通道注意间GAP预处理方法是二维DCT的特例。这样就可以很自然地将GAP推广到2D  DCT中更多的频率分量，引入更多的信息来解决信道注意信息不足的问题。</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120005612174.png" alt="image-20210120005612174"></p>
+<script type="math/tex; mode=display">
+\begin{aligned} F r e q^{i} &=2 \mathrm{DDCT}^{u, v}\left(X^{i}\right) \\ &=\sum_{h=0}^{H-1} \sum_{w=0}^{W-1} X_{:, h, w}^{i} B_{h, w}^{u, v} \\ & \text { s.t. } i \in\{0,1, \cdots, n-1\} \end{aligned}</script><p>将通道C划分成多个C’的通道，分别进行不同频率分量的DCT运算</p>
+<p>主要思想是首先确定每个频率分量的重要性，然后确定使用不同数量的频率分量一起使用的效果。</p>
+<h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p><strong>在ImageNet上使用不同频率分量的频道注意的最高精度</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120010126425.png" alt="image-20210120010126425" style="zoom:50%;" /></p>
+<p>确定每个频率分量的重要性（性能）</p>
+<p><strong>选择不同数目频率分量的准确性</strong></p>
+<p>选取性能最高的K个频率分量</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120010237029.png" alt="image-20210120010237029" style="zoom:50%;" /></p>
+<p><strong>ImageNet</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120133711682.png" alt="image-20210120133711682" style="zoom:50%;" /></p>
+<p><strong>COCO</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120133733751.png" alt="image-20210120133733751" style="zoom:50%;" /></p>
+<p><strong>研究更多的频率组合</strong></p>
+<p>选取Top-k频率分量的最优结果:78.52%</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20210120135835661.png" alt="image-20210120135835661"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Attention/" rel="tag"># Attention</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/" rel="prev" title="gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
+      <i class="fa fa-chevron-left"></i> gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/" rel="next" title="ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition">
+      ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">论文信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Motivation"><span class="nav-number">2.1.</span> <span class="nav-text">Motivation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Contribution"><span class="nav-number">2.2.</span> <span class="nav-text">Contribution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Method"><span class="nav-number">3.</span> <span class="nav-text">Method</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Revisiting-Channel-Attention-and-DCT"><span class="nav-number">3.1.</span> <span class="nav-text">Revisiting Channel Attention and DCT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Channel-Attention"><span class="nav-number">3.1.1.</span> <span class="nav-text">Channel Attention</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Discrete-Cosine-Transform-DCT"><span class="nav-number">3.1.2.</span> <span class="nav-text">Discrete Cosine Transform (DCT)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Multi-Spectral-Channel-Attention"><span class="nav-number">3.1.3.</span> <span class="nav-text">Multi-Spectral Channel Attention</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Experiments"><span class="nav-number">3.2.</span> <span class="nav-text">Experiments</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

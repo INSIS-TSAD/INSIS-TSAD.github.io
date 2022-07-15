@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）1.优点（解决的问题）。 在半监督异常检测方法中，除了利用无标签的样本，大多数监督方法只利用了标记出来的正常样本，本方法同时利用的标记的正常样本和异常样本。  在Mnist，fashion-mnist、cifar-10和其他异常检测基准数据集上，与浅层的方法、混合的方法以及深度的方法比较， 效果相当或">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION">
+<meta property="og:url" content="http://example.com/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）1.优点（解决的问题）。 在半监督异常检测方法中，除了利用无标签的样本，大多数监督方法只利用了标记出来的正常样本，本方法同时利用的标记的正常样本和异常样本。  在Mnist，fashion-mnist、cifar-10和其他异常检测基准数据集上，与浅层的方法、混合的方法以及深度的方法比较， 效果相当或">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221831.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830214926.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831120602.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830215431.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221730.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830222630.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831100546.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831101617.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831104502.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114314.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831115723.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114942.png">
+<meta property="article:published_time" content="2020-12-09T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:41:25.387Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221831.png">
+
+<link rel="canonical" href="http://example.com/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:41:25" itemprop="dateModified" datetime="2021-01-16T11:41:25+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION（2020-ICLR）"><a href="#DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION（2020-ICLR）" class="headerlink" title="DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）"></a>DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）</h3><h4 id="1-优点（解决的问题）。"><a href="#1-优点（解决的问题）。" class="headerlink" title="1.优点（解决的问题）。"></a>1.优点（解决的问题）。</h4><ul>
+<li><p>在半监督异常检测方法中，除了利用无标签的样本，大多数监督方法只利用了标记出来的正常样本，本方法同时利用的标记的正常样本和异常样本。</p>
+</li>
+<li><p>在Mnist，fashion-mnist、cifar-10和其他异常检测基准数据集上，与浅层的方法、混合的方法以及深度的方法比较， 效果相当或者比它们好。</p>
+</li>
+<li><p>使用很少的有标签样本能够明显提高效果。</p>
+</li>
+</ul>
+<a id="more"></a> 
+<h4 id="2-模型原理"><a href="#2-模型原理" class="headerlink" title="2. 模型原理"></a>2. 模型原理</h4><h5 id="2-1-SVDD（Support-Vector-Data-Description）支持向量数据描述"><a href="#2-1-SVDD（Support-Vector-Data-Description）支持向量数据描述" class="headerlink" title="2.1 SVDD（Support Vector Data Description）支持向量数据描述"></a>2.1 SVDD（Support Vector Data Description）支持向量数据描述</h5><p>一分类问题。训练出一个最小的超球面，将数据全部包起来。在识别新的数据时， 如果数据在球内，就属于这个类。</p>
+<p>实现思路：原始数据–高维表示–Min超球体积–求得c和R。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221831.png" alt="image-20200830221831085"></p>
+<h5 id="2-2-deep-SVDD"><a href="#2-2-deep-SVDD" class="headerlink" title="2.2 deep SVDD."></a>2.2 deep SVDD.</h5><p>同作者论文：Deep One-Class Classification, PMLR, 2018</p>
+<p>应用场景：Anomaly Detction</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830214926.png" alt="image-20200830214925996"></p>
+<p>使用神经网络来将数据映射到高维空间。</p>
+<p>超球体中心为C， 半径为R。</p>
+<p>目标：最小化超球面的体积， 正常的样本在球内，异常样本在球外。</p>
+<p>得到球体中心：利用autoencoder，使用所有样本训练autoencoder。 使用收敛之后的encoder部分作为初始化的网络， 同时将所有样本在encoder的输出的平均值作为超球体中心C。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831120602.png" alt="image-20200831120602081"></p>
+<p>目标函数：</p>
+<p>n个样本， $\Phi$是代表网络的函数， $x_i$是输入样本， $W$是网络权重。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830215431.png" alt="image-20200830215431541"></p>
+<p>预先定义球体中心C，迫使所有的样本向C靠拢，离球中心越远的样本越可能是异常样本。</p>
+<p>异常分数：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830221730.png" alt="image-20200830221730565"></p>
+<h5 id="2-3-（本文）DEEP-SAD（deep-semi-supervised-anomaly-detection）"><a href="#2-3-（本文）DEEP-SAD（deep-semi-supervised-anomaly-detection）" class="headerlink" title="2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）"></a>2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）</h5><p>目标函数：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200830222630.png" alt="image-20200830222630686"></p>
+<p>$\tilde{y}=-1$表示异常，$\tilde{y}=+1$表示正常。</p>
+<p>意义： 对于无标签的样本，尽量往球体中心靠拢； 对于便签为正常的样本， 尽量往球体中心靠拢； 对于便签为异常的样本， $\tilde{y}=-1$, 括号内的值越大越好， 也就是异常样本尽量远离球体中心。</p>
+<p>参数$\eta$与前一项分子上的1对应，控制有标签的样本和无标签的样本的影响， $\eta&gt;1$ 则侧重于有标签样本， $\eta &lt; 1$ 则侧重于无标签样本。</p>
+<h4 id="3-实验"><a href="#3-实验" class="headerlink" title="3.实验"></a>3.实验</h4><h5 id="3-1对比实验："><a href="#3-1对比实验：" class="headerlink" title="3.1对比实验："></a>3.1对比实验：</h5><p>shallow unsupervised baselines：</p>
+<ul>
+<li>OC-SVM</li>
+</ul>
+<p>deep unsupervised competitors：</p>
+<ul>
+<li>Deep SVDD</li>
+</ul>
+<p>浅层的半监督方法：</p>
+<ul>
+<li>shallow SSAD method</li>
+</ul>
+<p>深层的自监督方法： 缺乏深层的自监督方法（同时利用标记的正常样本和异常样本），这里自行构建</p>
+<ul>
+<li>hybrid SSAD：自编码器和SSAD</li>
+</ul>
+<p>深层的自监督方法：只利用标记的正常样本。</p>
+<ul>
+<li>Semi-Supervised Deep Generative Model (SS-DGM)</li>
+</ul>
+<p>有监督方法：</p>
+<ul>
+<li>supervised deep classifier</li>
+</ul>
+<h5 id="3-2-实验场景"><a href="#3-2-实验场景" class="headerlink" title="3.2 实验场景"></a>3.2 实验场景</h5><p>MNIST, Fashion-MNIST, 以及 CIFAR-10都是十分类问题。设置其中一类为正常样本（无标签），其余九类构成异常样本池， 从池中抽取一下异常样本作为有便签异常样本。这样就满足假设：大多数无标签样本为正常样本（这里设置为全部无标签样本为正常样本）。</p>
+<h5 id="场景一：加入有便签的异常样本（不同比例）"><a href="#场景一：加入有便签的异常样本（不同比例）" class="headerlink" title="场景一：加入有便签的异常样本（不同比例）"></a>场景一：加入有便签的异常样本（不同比例）</h5><p>比例$\gamma_l=m/(n+m)$， </p>
+<p>m：有标签样本数量，n: 无标签样本数</p>
+<p>在取异常样本时，只从其中9个异常类别中的一类中选取，测试时同时使用9个异常类别。这样在测试时， 会有模型从没见过的异常类别。</p>
+<p>实验数量：对于每个$\gamma_l$, 进行10 * 9 = 90 次实验。</p>
+<p>结果： 90次实验AUC的均值和标准差。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831100546.png" alt="image-20200831100546365"></p>
+<p>$\gamma_l=0$, 退化为无监督问题。</p>
+<p>在数据较为复杂的CIFAR10上， 本文的Deep SAD 表现最好。</p>
+<p>hybrid SSAD表现也较好。</p>
+<h5 id="场景二：污染训练数据"><a href="#场景二：污染训练数据" class="headerlink" title="场景二：污染训练数据"></a>场景二：污染训练数据</h5><p>在无标签的正常样本中混入无标签异常样本。</p>
+<p>固定$\gamma_l=0.05$, 取不同的污染比列$\gamma_p$, </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831101617.png" alt="image-20200831101617372"></p>
+<p>原文：最鲁棒的是本文的Deep SAD</p>
+<p>观察:</p>
+<p>在Mnist和Fashion Mnist上，最好的反而是OC-SVM Hybrid。</p>
+<p>在CIFAR-10上最好是本文的Deep SAD。(数据较复杂)</p>
+<h5 id="场景三：不同的已知异常类别数"><a href="#场景三：不同的已知异常类别数" class="headerlink" title="场景三：不同的已知异常类别数"></a>场景三：不同的已知异常类别数</h5><p>已知异常类别数：$k_l$,</p>
+<p>选取异常样本方法：随机抽取$k_l$个样本。对于每个$k_l$, 做10次随机抽取，10个类别，共10*10=100次实验。</p>
+<p>结果：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831104502.png" alt="image-20200831104502119"></p>
+<p>训练时使用的异常类别越多，效果越好。</p>
+<p>总体而言，我们看到Deep SAD在更复杂的数据上特别有用。</p>
+<p>同时暴露了有监督分类的一个问题：在测试时出现没有见过的异常类型， 表现较差。</p>
+<h5 id="超参的影响"><a href="#超参的影响" class="headerlink" title="超参的影响"></a>超参的影响</h5><ul>
+<li><p>设定   有便签异常样本比例：$\gamma_l=0.05$，无标签样本污染比例：$\eta_p=0.1$,  已知异常类别数$k_l=1$,</p>
+<p>$\eta$的影响如下图， 结论：对$\eta$的变化是鲁棒的。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114314.png" alt="image-20200831114314276"></p>
+<ul>
+<li>隐表示的维度d    </li>
+</ul>
+<p>  <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831115723.png" alt="image-20200831115723567"></p>
+<p>  <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20200831114942.png" alt="image-20200831114942261"></p>
+<p>  结论：d越大越好。</p>
+<h4 id="4-结论"><a href="#4-结论" class="headerlink" title="4.结论"></a>4.结论</h4><p>介绍了一个泛化的自监督方法（同时利用有标签的正常和异常样本）， 在同时获得有标签的正常和异常样本时， 本文方法是更好的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/a-Memorizing-Normality-to-Detect-Anomaly/" rel="prev" title="zhj Memorizing Normality to Detect  Anomaly">
+      <i class="fa fa-chevron-left"></i> zhj Memorizing Normality to Detect  Anomaly
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/Buzz/" rel="next" title="zhj 自编码器 异常检测">
+      zhj 自编码器 异常检测 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#DEEP-SEMI-SUPERVISED-ANOMALY-DETECTION%EF%BC%882020-ICLR%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">DEEP SEMI-SUPERVISED ANOMALY DETECTION（2020 ICLR）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E4%BC%98%E7%82%B9%EF%BC%88%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%89%E3%80%82"><span class="nav-number">1.1.</span> <span class="nav-text">1.优点（解决的问题）。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">2. 模型原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-SVDD%EF%BC%88Support-Vector-Data-Description%EF%BC%89%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%95%B0%E6%8D%AE%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 SVDD（Support Vector Data Description）支持向量数据描述</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-deep-SVDD"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 deep SVDD.</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-%EF%BC%88%E6%9C%AC%E6%96%87%EF%BC%89DEEP-SAD%EF%BC%88deep-semi-supervised-anomaly-detection%EF%BC%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 （本文）DEEP SAD（deep semi-supervised anomaly detection）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.3.</span> <span class="nav-text">3.实验</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1%E5%AF%B9%E6%AF%94%E5%AE%9E%E9%AA%8C%EF%BC%9A"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1对比实验：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-%E5%AE%9E%E9%AA%8C%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 实验场景</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%80%EF%BC%9A%E5%8A%A0%E5%85%A5%E6%9C%89%E4%BE%BF%E7%AD%BE%E7%9A%84%E5%BC%82%E5%B8%B8%E6%A0%B7%E6%9C%AC%EF%BC%88%E4%B8%8D%E5%90%8C%E6%AF%94%E4%BE%8B%EF%BC%89"><span class="nav-number">1.3.3.</span> <span class="nav-text">场景一：加入有便签的异常样本（不同比例）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%8C%EF%BC%9A%E6%B1%A1%E6%9F%93%E8%AE%AD%E7%BB%83%E6%95%B0%E6%8D%AE"><span class="nav-number">1.3.4.</span> <span class="nav-text">场景二：污染训练数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%89%EF%BC%9A%E4%B8%8D%E5%90%8C%E7%9A%84%E5%B7%B2%E7%9F%A5%E5%BC%82%E5%B8%B8%E7%B1%BB%E5%88%AB%E6%95%B0"><span class="nav-number">1.3.5.</span> <span class="nav-text">场景三：不同的已知异常类别数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B6%85%E5%8F%82%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">1.3.6.</span> <span class="nav-text">超参的影响</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E7%BB%93%E8%AE%BA"><span class="nav-number">1.4.</span> <span class="nav-text">4.结论</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

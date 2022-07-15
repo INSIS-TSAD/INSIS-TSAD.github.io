@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta property="og:type" content="website">
+<meta property="og:title" content="时序论文分享">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="INSIS">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : true,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title>时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content index posts-expand">
+            
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/" class="post-title-link" itemprop="url">ssk Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-07-15 10:46:24" itemprop="dateCreated datePublished" datetime="2022-07-15T10:46:24+08:00">2022-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:50:13" itemprop="dateModified" datetime="2021-01-16T11:50:13+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ul>
+<li>作者</li>
+</ul>
+<p>Vincent Vercruyssen, Wannes Meert, Jesse Davis</p>
+<p>DTAI group, KU Leuven, Belgium<br>firstname.lastname@kuleuven.be</p>
+<ul>
+<li>会议</li>
+</ul>
+<p>2020 AAAI</p>
+<ul>
+<li><p>介绍</p>
+<p>​    异常检测可以自然地作为一项无监督的学习任务，无监督的方法利用了异常不经常发生的假设，即异常会落在整个实例空间中的低密度区域。但是现实世界的数据经常违背这一假设，例如系统维护会不定期的发生，但不是异常。带标签的数据提供了修正这一差错的可能性，但是完全的监督方法却是不可行的，因为收集现实世界的异常标签是非常昂贵的。激发了对异常检测的半监督方法的研究兴趣，通常与主动学习结合来有效地收集标签。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">mzy 【ICCV-2019】一种严格的对于时间序列可解释性的评估方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 20:24:24 / Modified: 14:22:13" itemprop="dateCreated datePublished" datetime="2022-04-13T20:24:24+08:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mzy/" itemprop="url" rel="index"><span itemprop="name">mzy</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><strong>题    目：</strong>一种严格的对于时间序列可解释性的评估方法</p>
+<p><strong>出    处：</strong>ICCV2019</p>
+<p><strong>关键词：</strong>时间序列，可解释性</p>
+<p>​        可解释的人工智能(XAI)方法通常被用于解释和调试黑盒机器学习模型。然而，大多数提出的XAI方法都是黑盒本身的，并且是为图像设计的。因此，他们依靠视觉上的可解释性来评估和证明解释。在这项工作中，我们应用了以前用于时间序列上的图像和文本域的XAI方法。我们<strong>提出了一种方法来测试和评估时间序列上的各种XAI方法</strong>，通过引入新的验证方法来纳入时间维度。我们进一步进行了初步实验，以评估在一系列数据集上使用各种验证方法对所选择的XAI方法解释的质量，并对其进行质量指标的检查。我们证明，在我们最初的实验中，Shap对所有模型都很有效，但其他模型如DeepLIFT、LRP和显著性地图在特定架构中工作得更好。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/13/WangXuehui/AdaRNN%20Adaptive%20Learning%20and%20Forecasting%20of%20Time%20Series%E3%80%90CIKM%202021%E3%80%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/13/WangXuehui/AdaRNN%20Adaptive%20Learning%20and%20Forecasting%20of%20Time%20Series%E3%80%90CIKM%202021%E3%80%91/" class="post-title-link" itemprop="url">wxh【CIKM-2021】AdaRNN--Adaptive Learning and Forecasting of Time Series</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 20:24:24 / Modified: 14:11:20" itemprop="dateCreated datePublished" datetime="2022-04-13T20:24:24+08:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wxh/" itemprop="url" rel="index"><span itemprop="name">wxh</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>时间序列预测在日常生活中有着广泛的应用，并且是一个有挑战的任务，因为<strong>时间序列的性质会随时间变化</strong>，这被称为<strong>分布偏移（distribution shift）</strong>。</p>
+<p>本文提出了时间序列的<strong>时序协方差漂移问题(Temporal Covariate Shift, TCS)</strong>，进而提出了<strong>AdaRNN方法</strong>解决了此问题。AdaRNN主要由两个部件组成，第一个组件用于<strong>刻画时间序列中的分布信息</strong>，第二个组件用于<strong>减少分布的错误匹配</strong>并学习一种基于rnn的自适应时间序列预测模型。AdaRNN是一个集成了多种灵活分布距离的通用框架。</p>
+<p>在<strong>分类和回归问题</strong>上比对比方法提高2.6%和9.0%的精度(RMSE)。另外，AdaRNN可以被简单地扩展到<strong>Transformer</strong>框架下，同样能够提高其表现。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/13/WangXuehui/AdaRNN%20Adaptive%20Learning%20and%20Forecasting%20of%20Time%20Series%E3%80%90CIKM%202021%E3%80%91/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/02/WuTao/ANOMALY%20TRANSFORMER%20TIME%20SERIES%20ANOMALY%20DETECTION%20WITH%20ASSOCIATION%20DISCREPANCY/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/02/WuTao/ANOMALY%20TRANSFORMER%20TIME%20SERIES%20ANOMALY%20DETECTION%20WITH%20ASSOCIATION%20DISCREPANCY/" class="post-title-link" itemprop="url">wt【ICLR2022】Amomaly Transformer</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-03-02 16:20:10 / Modified: 17:17:42" itemprop="dateCreated datePublished" datetime="2022-03-02T16:20:10+08:00">2022-03-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wt/" itemprop="url" rel="index"><span itemprop="name">wt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>时间序列异常点的无监督检测是一个具有挑战性的问题，它需要模型推导出一个可识别的准则。以往的方法主要是通过学习点表示或成对关联来解决这一问题，但这两种方法都不足以对于复杂情况进行检测。近年来，Transformers在点态表示和成对关联的统一建模中表现出了巨大的威力，我们发现每个时间点的自我注意权重分布可以体现出与整个序列的丰富关联。我们的主要观察结果是，由于异常的罕见性，从异常点到整个序列建立非平凡的关联非常困难，因此，异常的关联应主要集中在其相邻的时间点上。这种相邻的关联性偏差意味着一种基于关联的标准，可以在正常点和异常点之间进行固有的区分，我们通过关联差异来强调这一点。在技术上，我们提出了一种新的异常注意机制来计算关联差异的  Anomaly Transformer。设计了一种极大极小策略来增强关联差异的正常-异常区分能力。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/02/WuTao/ANOMALY%20TRANSFORMER%20TIME%20SERIES%20ANOMALY%20DETECTION%20WITH%20ASSOCIATION%20DISCREPANCY/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/23/DengJiaoxue/SELF-SUPERVISED%20LEARNING%20FOR%20FEW-SHOT%20IMAGE%20CLASSIFICATION%E3%80%90ICASSP2021%E3%80%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/23/DengJiaoxue/SELF-SUPERVISED%20LEARNING%20FOR%20FEW-SHOT%20IMAGE%20CLASSIFICATION%E3%80%90ICASSP2021%E3%80%91/" class="post-title-link" itemprop="url">djx ELF-SUPERVISED LEARNING FOR FEW-SHOT IMAGE CLASSIFICATION【ICASSP2021】</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-02-23 15:00:24 / Modified: 11:12:36" itemprop="dateCreated datePublished" datetime="2022-02-23T15:00:24+08:00">2022-02-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://gitee.com/jiaoxuedeng/markdown/raw/master/img//202202221943711.png" alt="image-20220222194352641"></p>
+<h4 id="一、摘要"><a href="#一、摘要" class="headerlink" title="一、摘要"></a>一、<strong>摘要</strong></h4><p>​    小样本图像分类目的是以有限的标注样本进行分类。考虑到标注数据的限制，本文提出在元学习基础上引入自监督学习来训练一个更广义的嵌入网络，通过从数据本身学习到对下游任务更有效的特征，提高特征的鲁棒性及泛化能力。</p>
+<p><strong>关键词</strong>：小样本学习（元学习） 自监督学习</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/02/23/DengJiaoxue/SELF-SUPERVISED%20LEARNING%20FOR%20FEW-SHOT%20IMAGE%20CLASSIFICATION%E3%80%90ICASSP2021%E3%80%91/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/" class="post-title-link" itemprop="url">syd【TNSRE 2021】AttnSleep:基于注意力的单导EEG睡眠分期方法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-02-23 14:20:10 / Modified: 11:26:19" itemprop="dateCreated datePublished" datetime="2022-02-23T14:20:10+08:00">2022-02-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="0-Abstract"><a href="#0-Abstract" class="headerlink" title="0. Abstract"></a>0. Abstract</h3><p>睡眠阶段自动分类对睡眠质量的监测具有重要意义，本文提出了一种基于注意力的深度网络<strong>AttnSleep</strong>，利用<strong>单导EEG</strong>进行<strong>睡眠分期</strong>。用多分辨率卷积网络（<strong>MRCNN</strong>）提取特征，通过自适应特征重校准(<strong>AFR</strong>)对特征之间的依赖进行建模；第二模块是时间上下文编码器（<strong>TCE</strong>），用多头注意机制（MHA）来捕获所提取特征之间的时间关系，在三个公开数据集上评估了模型性能。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/" class="post-title-link" itemprop="url">lyx GAN ensemble for anomaly detection</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-10-21 20:24:24 / Modified: 11:49:03" itemprop="dateCreated datePublished" datetime="2021-10-21T20:24:24+08:00">2021-10-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/lyx/" itemprop="url" rel="index"><span itemprop="name">lyx</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="1-研究背景"><a href="#1-研究背景" class="headerlink" title="1.研究背景"></a>1.研究背景</h1><p>当异常检测形式化为一个无监督的学习问题时，通常需要模型学习正常数据的分布。基于GAN的方法以及改进版本已经被提出。很多工作主要是修改生成器的结构。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/" class="post-title-link" itemprop="url">【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-10-21 20:24:24 / Modified: 13:30:41" itemprop="dateCreated datePublished" datetime="2021-10-21T20:24:24+08:00">2021-10-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mpt/" itemprop="url" rel="index"><span itemprop="name">mpt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="不规则采样时间序列的插值预测网络"><a href="#不规则采样时间序列的插值预测网络" class="headerlink" title="不规则采样时间序列的插值预测网络"></a>不规则采样时间序列的插值预测网络</h1><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a><strong>摘要</strong></h3><p>本文提出了一种新的<strong>深度学习体系结构</strong>,来解决具有<strong>稀疏和不规则采样</strong>的<strong>多元时间序列</strong>的<strong>监督学习</strong>问题。该架构基于<strong>插值网络</strong>的使用，随后是<strong>预测网络</strong>的应用。</p>
+<ul>
+<li><strong>插值网络</strong>允许在插值阶段<strong>跨多元时间序列的多个维度共享信息</strong>，而任何<strong>标准深度学习模型</strong>都可以用于<strong>预测网络</strong>。这项工作的动机是分析电子健康记录中的<strong>生理时间序列数据</strong>，这些数据是稀疏的、不规则采样的和多变量的。我们研究了这个架构在<strong>分类和回归任务上的性能</strong>，表明我们的方法优于一系列基线和最近提出的模型。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/21/ZhangHongjun/%E3%80%902021CVPR%E3%80%91Understanding%20the%20Behaviour%20of%20Contrastive%20Loss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/07/21/ZhangHongjun/%E3%80%902021CVPR%E3%80%91Understanding%20the%20Behaviour%20of%20Contrastive%20Loss/" class="post-title-link" itemprop="url">zhj 【CVPR2021】Understanding the Behaviour of Contrastive Loss</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-21 20:24:24 / Modified: 19:10:19" itemprop="dateCreated datePublished" datetime="2021-07-21T20:24:24+08:00">2021-07-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><strong>Abstract</strong></p>
+<p>无监督的对比学习取得了成功，而对比损失的机制很少被研究。本文专注于探究无监督损失的行为。本文将证明对比损失是一个具有难样本感知能力的损失函数，温度τ控制难样本的惩罚强度。以往的研究表明，均匀性是对比学习的一个重要特征。我们建立了均匀性和温度τ之间的关系。本文将证明，均匀性有助于对比学习学习可分离的特征，但过分追求均匀性会使对比损失对语义相似的样本无法容忍，这可能会破坏潜在的语义结构，不利于形成对下游任务有用的特征。究其原因，是由于实例判别目标函数的内在缺陷。具体来说，实例判别目标函数试图将所有不同的实例分开，忽略样本之间的潜在关系。将语义一致的样本分开对于获取一般下游任务的先验信息没有积极的作用。一个设计良好的对比损失应该对语义相似性样本有一定程度的容忍度。因此，我们发现对比损失会遇到一个均匀性-容忍性的困境，而温度的良好选择可以协调这两个特性，既有利于学习可分离特征，又有利于对语义相似样本的容忍，从而提高特征质量和下游性能。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/07/21/ZhangHongjun/%E3%80%902021CVPR%E3%80%91Understanding%20the%20Behaviour%20of%20Contrastive%20Loss/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/21/WuTao/Understanding%20Electricity-Theft%20Behavior%20via%20Multi-Source%20Data/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/07/21/WuTao/Understanding%20Electricity-Theft%20Behavior%20via%20Multi-Source%20Data/" class="post-title-link" itemprop="url">wt【WWW2021】Understanding Electricity-Theft Behavior via Multi-Source Data</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-21 16:20:10 / Modified: 19:06:55" itemprop="dateCreated datePublished" datetime="2021-07-21T16:20:10+08:00">2021-07-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wt/" itemprop="url" rel="index"><span itemprop="name">wt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>本文提出了一种利用多源数据识别窃电行为的方法。除了用户用电记录外，我们还利用区域因素(非技术损失)和气候因素(温度)对用户行为进行了分析。通过进行分析实验，我们了解了几种有趣的现象：例如，电力可能会消耗更多的电力大致用户，特别是在极高或低温下。通过这些经验观察，我们进一步设计了识别电力盗贼的Anovel等级框架 。 基于现实世界数据集的实际结果表明，大家建议的模型可以在电力检测中实现最佳性能（例如，在F0.5方面至少+ 3.0％）相比。 最后，我们的工作已被中国国家电网应用，用来在杭州成功地捕捉电力盗窃行为，精度为15％</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/07/21/WuTao/Understanding%20Electricity-Theft%20Behavior%20via%20Multi-Source%20Data/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+
+  
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

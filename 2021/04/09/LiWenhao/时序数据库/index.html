@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="1.时序场景特点 写入平稳、高并发高吞吐：时序数据的产生通常是以一个固定的时间频率产生，不会受其他因素的制约，其数据生成的速度是相对比较平稳的。时序数据是由每个个体独立生成，所以当个体数量众多时，写入的并发和吞吐量都是很高的 数据量大：每天可能会有TB，PB级的数据需要存储 写多读少：监控的指标很多，但是通常只关心几个特定的指标、特定的场景。 实时写入：时序数据的写入是实时的，且每次写入都是最近生">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lwh 时序数据库">
+<meta property="og:url" content="http://example.com/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="1.时序场景特点 写入平稳、高并发高吞吐：时序数据的产生通常是以一个固定的时间频率产生，不会受其他因素的制约，其数据生成的速度是相对比较平稳的。时序数据是由每个个体独立生成，所以当个体数量众多时，写入的并发和吞吐量都是很高的 数据量大：每天可能会有TB，PB级的数据需要存储 写多读少：监控的指标很多，但是通常只关心几个特定的指标、特定的场景。 实时写入：时序数据的写入是实时的，且每次写入都是最近生">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210405164517997.png">
+<meta property="og:image" content="c:/Users/16281/AppData/Roaming/Typora/typora-user-images/image-20210407153555192.png">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407153555192.png">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/v2-a9b615e76149a9ef71b3ab67c3d0fb58_r.jpg">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407153430628.png">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/v2-4eabe030c388f195f9a04674da5a86c5_r.jpg">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/v2-467b2c27f41bad29b01be13e1e5cd1bb_b.gif">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/1329243358-5d94891acb4a2_fix732">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/td6.png">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210406103056005.png">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210406103123647.png">
+<meta property="og:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407155516363.png">
+<meta property="article:published_time" content="2021-04-09T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-04-09T07:03:54.838Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210405164517997.png">
+
+<link rel="canonical" href="http://example.com/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>lwh 时序数据库 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          lwh 时序数据库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-09 20:24:24 / Modified: 15:03:54" itemprop="dateCreated datePublished" datetime="2021-04-09T20:24:24+08:00">2021-04-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/lwh/" itemprop="url" rel="index"><span itemprop="name">lwh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-时序场景特点"><a href="#1-时序场景特点" class="headerlink" title="1.时序场景特点"></a>1.时序场景特点</h2><ul>
+<li>写入平稳、高并发高吞吐：时序数据的产生通常是以一个固定的时间频率产生，不会受其他因素的制约，其数据生成的速度是相对比较平稳的。时序数据是由每个个体独立生成，所以当个体数量众多时，写入的并发和吞吐量都是很高的</li>
+<li>数据量大：每天可能会有TB，PB级的数据需要存储</li>
+<li>写多读少：监控的指标很多，但是通常只关心几个特定的指标、特定的场景。</li>
+<li>实时写入：时序数据的写入是实时的，且每次写入都是最近生成的数据。因为其数据生成是随着时间推进的，很少有更新删除的操作。</li>
+<li>近期数据的关注度更高，时间久远的数据极少被访问，冷热分明</li>
+<li>多维查询、分析</li>
+</ul>
+<a id="more"></a>
+<h2 id="2-对时序数据库的要求"><a href="#2-对时序数据库的要求" class="headerlink" title="2.对时序数据库的要求"></a>2.对时序数据库的要求</h2><ul>
+<li>高吞吐、高并发的写入能力：时序数据具有典型的写多读少特征，在读和写上，首要权衡的是写的能力。对于数据库的高并发、高吞吐写入能力有很高的要求。</li>
+<li>高可用：分布式架构，系统要具有水平扩展的能力。</li>
+<li>数据分级存储 ：将最近小时级别的数据放到内存中，将最近天级别的数据放到SSD，更久远的数据放到更加廉价的HDD或者直接使用TTL过期淘汰掉。</li>
+<li>高压缩率：一方面是节省成本，另一个方面是压缩后的数据可以更容易保证存储到内存中</li>
+<li>多维度查询、聚合：交互级的查询延迟，并且是在数据基数（TB级）较大的情况下，也能够达到很低的查询延迟。在很大的数据量的基础上将满足条件的原始数据查询出来并聚合，原始值可能因为时间比较久远而不在内存。</li>
+</ul>
+<h2 id="3-时序建模"><a href="#3-时序建模" class="headerlink" title="3.时序建模"></a>3.时序建模</h2><h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><ul>
+<li>metric   采集的数据指标</li>
+<li>tag    标签</li>
+<li>field    域</li>
+<li>timestamp    时间戳</li>
+</ul>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210405164517997.png" alt=""></p>
+<h3 id="按数据源建模"><a href="#按数据源建模" class="headerlink" title="按数据源建模"></a>按数据源建模</h3><p><img src="C:\Users\16281\AppData\Roaming\Typora\typora-user-images\image-20210407153555192.png" alt="image-20210407153555192" style="zoom: 80%;" /><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407153555192.png" alt=""></p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/v2-a9b615e76149a9ef71b3ab67c3d0fb58_r.jpg" style="zoom: 50%;" /></p>
+<h3 id="按指标建模"><a href="#按指标建模" class="headerlink" title="按指标建模"></a>按指标建模</h3><p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407153430628.png" style="zoom:50%;" /></p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/v2-4eabe030c388f195f9a04674da5a86c5_r.jpg" style="zoom:50%;" /></p>
+<h2 id="4-时序数据库分类"><a href="#4-时序数据库分类" class="headerlink" title="4.时序数据库分类"></a>4.时序数据库分类</h2><p>第一种，在关系数据库基础上进行改进的时序数据库，比如基于PG开发的Timescale。</p>
+<p>第二种，在KV数据库的基础之上进行改进的时序数据库，比如，基于HBase开发的OpenTSDB、基于Cassandra的KairosDB</p>
+<p>第三种，为时序数据量身定制的时序数据库，InfluxDB、ApacheIoTDB等</p>
+<h2 id="5-时序数据为什么不适合存在关系型数据库"><a href="#5-时序数据为什么不适合存在关系型数据库" class="headerlink" title="5.时序数据为什么不适合存在关系型数据库"></a>5.时序数据为什么不适合存在关系型数据库</h2><ul>
+<li>存储成本大 对时序数据的压缩不佳</li>
+<li>维护成本高 单机系统</li>
+<li>写入吞吐差 单机写入吞吐低，无法满足千万级的写入压力</li>
+<li>查询性能差  适用于交易处理，海量数据的聚合能力差</li>
+</ul>
+<p><strong>基于B/B+树</strong>:造成很多随机IO 存储的地址不连续-&gt;关系型数据库写入速度慢</p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/v2-467b2c27f41bad29b01be13e1e5cd1bb_b.gif" alt=""></p>
+<p>如果一个节点已经写入磁盘了，后面树形发生变化之后，节点分裂，原先存储到一个磁盘块的数据，就会分开存储到2个新的磁盘块，那么原先的磁盘块就要删除。这样反复的操作，那就造成了Btree/B+tree很多的随机IO</p>
+<h2 id="6-LSM-tree"><a href="#6-LSM-tree" class="headerlink" title="6.LSM tree"></a>6.LSM tree</h2><p><strong>核心思路：</strong>假定内存足够大，因此不需要每次有数据更新就必须将数据写入到磁盘中，而可以先将最新的数据驻留在内存中，等到积累到足够多之后，再使用归并排序的方式将内存内的数据合并追加到磁盘队尾。放弃部分读能力，换取写能力。</p>
+<p><strong>WAL</strong> 预写log 。当插入一条数据时，数据先顺序写入 WAL 文件中，之后插入到内存中的 MemTable 中。这样就保证了数据的持久化，不会丢失数据，并且都是顺序写，速度很快。</p>
+<p><strong>MemTable: </strong>对应的就是 WAL 文件，是该文件内容在内存中的存储结构。写入操作会直接将数据写入到Memtable后返回。读取操作又会首先尝试从Memtable中进行查询，允许写入和读取。当Memtable写入的数据占用内存到达指定数量，则自动转换为Immutable Memtable，等待Dump到磁盘中，系统会自动生成新的Memtable供写操作写入新数据。</p>
+<p><strong>SSTable:</strong> 是 MemTable 中的数据在磁盘上的有序存储，其内部数据是根据 key 从小到大排列的。通常为了加快查找的速度，需要在 SSTable 中加入数据索引，可以快读定位到指定的 k-v 数据</p>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/1329243358-5d94891acb4a2_fix732" alt=""></p>
+<h2 id="7-基于kv"><a href="#7-基于kv" class="headerlink" title="7.基于kv"></a>7.基于kv</h2><p>​    基于LSM设计的面向分布式场景的HBase，再基于HBase设计了openTSDB。这类时序数据库都是采用了一个比较成熟的数据库来作为底层存储引擎。自己的主要逻辑仅仅是在存储引擎层之上很薄的一个逻辑层</p>
+<h4 id="基于HBase的数据库的问题？"><a href="#基于HBase的数据库的问题？" class="headerlink" title="基于HBase的数据库的问题？"></a><strong>基于HBase的数据库的问题？</strong></h4><ul>
+<li>为了套用HBase结构，存储中有很多无用的信息。Rowkey里面的metric是一个业务字符串，这些数据在实际存储过程中很多冗余，造成存储成本的浪费</li>
+<li>数据采集指标冗余</li>
+<li>HBase是弱类型问题，不能对Value部分根据业务的不同字段类型进行专门的压缩</li>
+<li>Rowkey部分包含很多tag信息，没有对Rowkey和tag进行倒排索引，不能完全保证多维度的查询能力</li>
+</ul>
+<h4 id="openTSDB的优化："><a href="#openTSDB的优化：" class="headerlink" title="openTSDB的优化："></a><strong>openTSDB的优化：</strong></h4><ul>
+<li>时间粒度为小时，每次读一个小时</li>
+<li>将业务字符串映射为uid，简化存储</li>
+</ul>
+<p><img src="https://gitee.com/lwh233/blogimage/raw/master/img/td6.png" alt=""></p>
+<h2 id="8-原生时序数据库"><a href="#8-原生时序数据库" class="headerlink" title="8.原生时序数据库"></a>8.原生时序数据库</h2><p>基于LSM设计面向时序数据的influxDb,ioTDB</p>
+<h4 id="influxdb-tsm"><a href="#influxdb-tsm" class="headerlink" title="influxdb(tsm)"></a>influxdb(tsm)</h4><ul>
+<li><p>tags不再冗余存储 metric+tag -&gt; series key</p>
+</li>
+<li><p>数据分区：按不同的时间范围划分为不同的分区（Shard），写入通常是在最新的分区，而不会散列到多个分区。分区的优点是数据回收的物理删除非常简单，直接把整个分区删除即可</p>
+</li>
+<li><p>针对时序和不同类型的压缩方案 delta-delta</p>
+<ul>
+<li><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210406103056005.png" alt=""></li>
+<li><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210406103123647.png" alt=""></li>
+<li>时间戳8byte-&gt; 64bit 最大间隔3600秒-&gt;13bit</li>
+<li>delta 64 + 13 *7 = 155bit</li>
+<li>delta of delta 64 + 9 <em> 4 + 1 </em> 3 = 103bit</li>
+</ul>
+</li>
+<li><p>倒排索引 高效查找 </p>
+</li>
+<li><p>对cache的设计：Cache内部提供了一个ring结构，取series key前8个bit进行hash,来对数据进行分桶/分区管理，降低读写时候锁的竞争。确保连续数据存储在一个磁盘块。</p>
+<ul>
+<li><img src="https://gitee.com/lwh233/blogimage/raw/master/img/image-20210407155516363.png" style="zoom:50%;" /></li>
+</ul>
+</li>
+<li><p>对于时序实用的功能:</p>
+<ul>
+<li>ContinuousQueries，每小时触发一次，每次待计算数据区间是90分钟，分组区间是30分钟</li>
+</ul>
+</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>时序数据库技术体系－时序数据存储模型设计:<a target="_blank" rel="noopener" href="http://hbasefly.com/2017/11/19/timeseries-database-2/">http://hbasefly.com/2017/11/19/timeseries-database-2/</a></p>
+<p>No.1-时序数据库随笔 - Time Series DBMS 综述:<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/782579?spm=a2c6h.13262185.0.0.60b372994locIc">https://developer.aliyun.com/article/782579?spm=a2c6h.13262185.0.0.60b372994locIc</a></p>
+<p>Writing a Time Series Database from Scratch:<a target="_blank" rel="noopener" href="https://fabxc.org/tsdb/">https://fabxc.org/tsdb/</a></p>
+<p>时间序列数据的存储和计算 - 概述:<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/32709932">https://zhuanlan.zhihu.com/p/32709932</a></p>
+<p>B+tree:<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/149287061">https://zhuanlan.zhihu.com/p/149287061</a></p>
+<p>delta-of-delta编码:<a target="_blank" rel="noopener" href="https://blog.csdn.net/yapuge/article/details/102765248">https://blog.csdn.net/yapuge/article/details/102765248</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/06/JiaoZehui/Plug-and-Play%20Domain%20Adaptation%20for%20Cross-Subject%20EEG-based%20Emotion%20Recognition(1)/" rel="prev" title="jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition">
+      <i class="fa fa-chevron-left"></i> jzh 【AAAI2021】Plug-and-Play Domain Adaptation for Cross-Subject EEG-based Emotion Recognition
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/09/DengJiaoxue/%E3%80%90IEEE2019%E3%80%91ssl-eeg/" rel="next" title="djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS">
+      djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%97%B6%E5%BA%8F%E5%9C%BA%E6%99%AF%E7%89%B9%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">1.时序场景特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AF%B9%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E8%A6%81%E6%B1%82"><span class="nav-number">2.</span> <span class="nav-text">2.对时序数据库的要求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%97%B6%E5%BA%8F%E5%BB%BA%E6%A8%A1"><span class="nav-number">3.</span> <span class="nav-text">3.时序建模</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">3.1.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E6%95%B0%E6%8D%AE%E6%BA%90%E5%BB%BA%E6%A8%A1"><span class="nav-number">3.2.</span> <span class="nav-text">按数据源建模</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%89%E6%8C%87%E6%A0%87%E5%BB%BA%E6%A8%A1"><span class="nav-number">3.3.</span> <span class="nav-text">按指标建模</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%86%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">4.时序数据库分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E9%80%82%E5%90%88%E5%AD%98%E5%9C%A8%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">5.</span> <span class="nav-text">5.时序数据为什么不适合存在关系型数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-LSM-tree"><span class="nav-number">6.</span> <span class="nav-text">6.LSM tree</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E5%9F%BA%E4%BA%8Ekv"><span class="nav-number">7.</span> <span class="nav-text">7.基于kv</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EHBase%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">7.0.1.</span> <span class="nav-text">基于HBase的数据库的问题？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#openTSDB%E7%9A%84%E4%BC%98%E5%8C%96%EF%BC%9A"><span class="nav-number">7.0.2.</span> <span class="nav-text">openTSDB的优化：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%8E%9F%E7%94%9F%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">8.</span> <span class="nav-text">8.原生时序数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#influxdb-tsm"><span class="nav-number">8.0.1.</span> <span class="nav-text">influxdb(tsm)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">9.</span> <span class="nav-text">参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="作者： Changchun Zhang , Qingjie Zhao  a Beijing Laboratory of Intelligent Information Technology, School of Computer Science, Beijing Institute of Technology, Beijing 100081, China 关键词Partial Domain Ada">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation">
+<meta property="og:url" content="http://example.com/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="作者： Changchun Zhang , Qingjie Zhao  a Beijing Laboratory of Intelligent Information Technology, School of Computer Science, Beijing Institute of Technology, Beijing 100081, China 关键词Partial Domain Ada">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210227202256124.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210227203703520.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303115414985.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/1665919-20190424155202293-128757257.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/20190416200902443.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/20201112115255.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125341967.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125427627.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125514872.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125709083.png">
+<meta property="article:published_time" content="2021-03-03T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-08T05:22:08.324Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210227202256124.png">
+
+<link rel="canonical" href="http://example.com/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-03 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-03T20:24:24+08:00">2021-03-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:22:08" itemprop="dateModified" datetime="2021-03-08T13:22:08+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>作者：</strong> Changchun Zhang , Qingjie Zhao </p>
+<p>a Beijing Laboratory of Intelligent Information Technology, School of Computer Science, Beijing Institute of Technology, Beijing 100081, China</p>
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Partial Domain Adaptation</strong> <strong>Attention Mechanism</strong> <strong>Adversarial Networks</strong></p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>如何有效地从目标域的未标记样本中提取特征表示对于无监督的域自适应是至关重要的，特别是对于部分域自适应，其中源标签空间是目标标签空间的一个超空间，因为它有助于减少由于域偏移或域偏差而导致的较大性能差距。</p>
+<p>我们提出了一种基于对抗学习的局部域自适应方法和多自注意网络（MSAN）。与现有的大部分局部域自适应方法只关注高层次特征不同，MSAN主要是利用<strong>标记源数据从未标记目标数据中提取有效的高层次上下文特征和低层次结构特征</strong>。具体地说，我们提出了多重自注意网络，这是一种通过逐步增强特征来学习更细粒度和可转移特征的一般方法，这样可以相对减少域转移，从而提高模型的泛化能力。在Office-31和Office-Home数据集上的综合实验表明，该方法显著改进了表示部分域自适应方法，为各种部分转移任务提供了最新的结果。</p>
+<a id="more"></a>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>虽然深度神经网络基于其丰富的特征表示能力，极大地提高了各种机器学习问题和应用的性能，但其训练过程在很大程度上依赖于大量的标记样本，为各种应用程序任务手动标注大量此类数据是非常必要，成本往往非常昂贵。</p>
+<p>因此，如何有效地降低机器学习中数据标注的巨大成本仍然是一个有待解决的问题。领域自适应方法[]是一种研究得很好的策略，通过传递知识来解决这个问题，它使用一个有标记的训练数据集来改进没有标记信息的测试数据集。然而，这种有前途的领域适应范式在将类别分类器转移到目标任务方面提出了重大挑战.</p>
+<p>虽然深度神经网络基于其丰富的特征表示能力，极大地提高了各种机器学习问题应用的性能，但其训练过程在很大程度上依赖于大量的标记样本，所以各种应用程序任务手动注释大量此类数据是非常必要的在现实生活中，成本往往非常昂贵。因此，如何有效地降低机器学习中数据标注的巨大成本仍然是一个有待解决的问题。领域自适应方法[是一种研究得很好的策略，通过传递知识来解决这个问题，它使用一个有标记的训练数据集来改进没有标记信息的测试数据集。然而，这种有前途的领域适应任务在将类别分类器转移到目标任务方面提出了重大挑战。</p>
+<p>在统计学习中，大多数现有的域自适应方法通常假设训练和测试样本共享一致的类标签，但是遵循不同的分布，即无监督域自适应，将从源样本训练的分类器应用到目标样本。最近的研究表明，深层神经网络能够解开潜在数据集变化的解释因素，因此学习更多的域不变表示可以极大地提高域自适应的能力。沿着这条路线，这些基于特征的方法遵循的思想是将矩匹配、对抗网络和批量标准化统计嵌入深度模型，以学习领域可转移特征。</p>
+<p>尽管这些深域自适应方法通过减少特征分布差异来桥接源域和目标域，但假设不同的两个域共享相同的标签空间。然而，在现实世界的应用中，期望源域与目标域具有相同的类别标签通常是不现实的。<br>因此，本文重点研究了一种更为实际的场景，即源域标签空间包含目标域标签空间，即<strong>部分域自适应</strong>（PDA）。此外，通常假设源域具有足够的多样性和规模，其标签空间包括目标域的标签空间。因此，将源域和目标域的整体匹配方法应用于部分域自适应算法并不是一种有效的方法。</p>
+<p>最常见的部分域自适应方法执行特征学习和标签预测，将输入图像域映射到深层特征，然后对异常源类样本降低样本权重，以减少两个不同域之间的差异，最后生成预测的标签，如图1所示。例如，Cao等人提出了部分对抗域适应（PADA）和选择性对抗网络（SAN），另一个相关工作是IWAN方法。三种方法通过在对抗性学习网络中训练的区分两个域的域识别器中对每个样本进行加权来解决部分域自适应问题。另外，最新的工作是ETN方法，它通过进一步揭示可转移量词的鉴别器结构，提高了上述三种方法的权重质量。这些局部域自适应方法只关注<strong>高层次的特征，而忽略了挖掘低层次的特征</strong>来指导深域自适应模型生成细粒度的特征表示。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210227202256124.png" alt="image-20210227202256124"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210227203703520.png" alt="image-20210227203703520"></p>
+<ul>
+<li>提出了一种新的基于注意力引导的局部域自适应神经网络，以渐进的特征增强方式学习细粒度特征，提高模型的泛化能力。</li>
+<li>通过报告分类精度和注意后目标类数量变化的分类精度曲线，我们展示了我们的注意机制如何鼓励框架学习更精确的领域可转移表示。</li>
+<li>通过对Office-Home和Office-31数据集的大量实验，证明所提出方法的结果超过了现有的最新结果。</li>
+</ul>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="部分域适应"><a href="#部分域适应" class="headerlink" title="部分域适应"></a>部分域适应</h3><p>尽管标准域自适应技术已经取得了长足的进步，但如何有效地进行部分域自适应仍然是一个理论和实践上的未知数。因为它仍然需要一个普通的假设，即标签空间在源域和目标域中是相同的。在部分域自适应场景中，模型从一个具有丰富标签的大域转移到一个没有标签信息的小目标域，违反了这一假设。根据文献研究，目前已有四篇关于部分领域适应问题的研究进展。</p>
+<p>选择性对抗网络使用基于对抗学习的多个域鉴别器，引入加权机制，过滤掉属于离群点标签空间的源数据的相关部分。部分对抗域自适应是选择性对抗网络的一个改进版本，它只采用一个单域鉴别器来实现可转移特征的提取，并进一步引入类权重向量来量化每个源域类别的贡献。这些权重向量直接应用于源样本训练的分类器和源样本上的域鉴别器。重要性加权对抗网（IWAN）基于对抗学习方式，采用两个领域分类器对源实例进行加权，在离群点标签空间中选出源实例。另一个重要的工作是ETN方法，它学习如何适应相关样本，减少离群样本，用于训练标签分类器和域鉴别器。此外，它使用辅助域鉴别器和辅助标记预测来获得一个判别加权方案来量化源样本的可转移性。<strong>上述方法只利用上一卷积层的高层次特征表示，而忽略了低层次的结构特征和细粒度特征信息，这或多或少会降低模型在目标域上的性能</strong>。</p>
+<h3 id="自注意力"><a href="#自注意力" class="headerlink" title="自注意力"></a>自注意力</h3><p>最近，自我注意机制在一系列任务中取得了显著进展。研究人员提出了SCA-CNN网络，该网络在CNN图像字幕框架中融合了空间和通道注意。据报道，多层注意网络在图像分割、图像覆盖、图像分类等方面都取得了很好的效果。尽管它在各种计算机视觉和机器学习中取得了成功，但自我注意在领域适应中从未被探索过。我们的工作将非局部自我注意机制嵌入到深度部分域自适应模型中，通过逐步增强特征的方式来学习细粒度特征以提高模型性能的可行性和有效性。</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>我们的方法包含一个带有多个自我注意模块的共享特征提取器F、一个域鉴别器D和一个标签分类器G。我们的网络工作框架如图3。首先，自我注意模块能够提高可转移特征表征的能力，抑制不必要的特征表征。第二，提出了一种新的网络，称为多重自注意网络（MSAN），它与基本网络一起强调从低级结构特征到高级上下文特征的意义特征。此外，底层结构特征可以引导以渐进的特征增强方式学习更细粒度的高层上下文特征。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303115414985.png" alt="image-20210303115414985"></p>
+<h4 id="Multiple-self-attention-networks"><a href="#Multiple-self-attention-networks" class="headerlink" title="Multiple self-attention networks"></a>Multiple self-attention networks</h4><script type="math/tex; mode=display">
+m_{j i}=\frac{\exp \left(\mathrm{X} 1_{i} \cdot \mathrm{X} 2_{j}\right)}{\sum_{i=1}^{N} \exp \left(\mathrm{X} 1_{i} \cdot \mathrm{X} 2_{j}\right)}
+\\\mathrm{X}_{j}^{\prime}=\mu \sum_{i=1}^{N}\left(m_{j i} \mathrm{X} 3_{i}\right)+\mathrm{X}_{j}</script><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/1665919-20190424155202293-128757257.png" alt="img" style="zoom: 50%;" /></p>
+<h4 id="SAN"><a href="#SAN" class="headerlink" title="SAN"></a>SAN</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/20190416200902443.png" alt="img"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/20201112115255.png" alt="image-20201112115253734"></p>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125341967.png" alt="image-20210303125341967"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125427627.png" alt="image-20210303125427627"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125514872.png" alt="image-20210303125514872"></p>
+<p>基于ResNet-50的Office-31和Office-Home数据集的部分域适配结果如表1和表2所示。我们还比较了Office-31数据集和VGG-16数据集上的不同方法，结果如表3所示。<br>我们的模型在平均准确率方面优于所有其他方法，表明我们的方法在不同数据集上适用于不同的基网络。具体来说，结果揭示了几个观察结果。</p>
+<p>（1） 我们的方法显著提高了域对抗网络的性能，并取得了最新的成果。</p>
+<p>（2） 我们的方法还提高了PADA和SAN的（平均）分类精度。由于SAN是一种更先进的方法，导致提升空间相对较小，因此我们对PADA的推广更为明显。这证明了MSAN在训练过程中有效地学习更多领域可转移特征表示的有效性。</p>
+<p>（3） 如表1、表2和表3所示，多重自我注意网络成功地减少了两个不同领域的领域偏差。这意味着多个自注意网络能够有效地从底层结构特征和高层上下文特征中提取特征，并与基本网络一起实现部分域自适应任务。</p>
+<p>（4）通过基于VGG-16主干的训练，多个自我关注网络提高了Office-31数据集上PADA和SAN的性能。这表明，多个自注意网络也有利于基于不同基础网络的局部域适应任务，是一种通用的方法，可以很容易地插入到任何域适应网络。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20210303125709083.png" alt="image-20210303125709083"></p>
+<h2 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h2><p>在这项工作中，我们研究了如何学习更多的可转移的特征表示，这些特征表示来自高级上下文特征和低级结构特征，用于部分域自适应。以往的研究主要集中在高层次的上下文特征上，我们发现低层次的结构特征可以引导学高层次上下文特征。因此，引入的自我注意部分域自适应方法学习更多的域可转移特征表示，从而减轻由于离群源类引起的负迁移。在Office-31和Office-Home数据集上的综合实验表明，我们的模型能够产生显著的性能增益。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/03/MaPeitao/Hydrologic%20Time%20Series%20Anomaly%20Detection%20Based%20on%20Flink(1)/" rel="prev" title="mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink">
+      <i class="fa fa-chevron-left"></i> mpt 【Mathematical Problems in Engineering-2020】Hydrologic Time Series Anomaly Detection Based on Flink
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/" rel="next" title="hgh 关于时序异常检测-动态基线原型系统的提升点的思考">
+      hgh 关于时序异常检测-动态基线原型系统的提升点的思考 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">1.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E5%88%86%E5%9F%9F%E9%80%82%E5%BA%94"><span class="nav-number">4.1.</span> <span class="nav-text">部分域适应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="nav-number">4.2.</span> <span class="nav-text">自注意力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">4.3.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Multiple-self-attention-networks"><span class="nav-number">4.3.1.</span> <span class="nav-text">Multiple self-attention networks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SAN"><span class="nav-number">4.3.2.</span> <span class="nav-text">SAN</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">6.</span> <span class="nav-text">讨论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

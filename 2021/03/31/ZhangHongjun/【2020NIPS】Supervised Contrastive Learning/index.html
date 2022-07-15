@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Supervised Contrastive Learning关键词：对比学习；自监督； Abstract 对比学习在自我监督表征学习中的应用近年来得到了迅速的发展，在深度图像模型的无监督训练中取得了很好的效果。现代批量对比方法包含或显著优于传统的对比损失，如三元组、最大边际和N对损失。在这项工作中，我们将自我监督的批对比方法扩展到完全监督的设置，使我们能够有效地利用标签信息。属于同一类的点簇在嵌">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj 【NIPS2020】Supervised Contrastive Learning">
+<meta property="og:url" content="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Supervised Contrastive Learning关键词：对比学习；自监督； Abstract 对比学习在自我监督表征学习中的应用近年来得到了迅速的发展，在深度图像模型的无监督训练中取得了很好的效果。现代批量对比方法包含或显著优于传统的对比损失，如三元组、最大边际和N对损失。在这项工作中，我们将自我监督的批对比方法扩展到完全监督的设置，使我们能够有效地利用标签信息。属于同一类的点簇在嵌">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210329111039811.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331110557625.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331111544441.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210326104452766.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331112321937.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331112333082.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210329111415460.png">
+<meta property="article:published_time" content="2021-03-31T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-31T09:33:47.058Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="自监督">
+<meta property="article:tag" content="对比学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210329111039811.png">
+
+<link rel="canonical" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj 【NIPS2020】Supervised Contrastive Learning | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj 【NIPS2020】Supervised Contrastive Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-31 20:24:24 / Modified: 17:33:47" itemprop="dateCreated datePublished" datetime="2021-03-31T20:24:24+08:00">2021-03-31</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Supervised-Contrastive-Learning"><a href="#Supervised-Contrastive-Learning" class="headerlink" title="Supervised Contrastive Learning"></a><strong>Supervised Contrastive Learning</strong></h2><p>关键词：对比学习；自监督；</p>
+<p><strong>Abstract</strong></p>
+<p>对比学习在自我监督表征学习中的应用近年来得到了迅速的发展，在深度图像模型的无监督训练中取得了很好的效果。现代批量对比方法包含或显著优于传统的对比损失，如三元组、最大边际和N对损失。在这项工作中，我们将自我监督的批对比方法扩展到完全监督的设置，使我们能够有效地利用标签信息。属于同一类的点簇在嵌入空间中被拉到一起，同时将来自不同类的样本簇分开。我们分析了监督对比（SupCon）损失的两种可能形式，确定了损失的最佳表现公式。在ResNet-200上，我们在ImageNet数据集上实现了81.4%的top-1准确率，比该体系结构报告的最佳数字高出0.8%。<br>我们在其他数据集和两个ResNet变量上显示了一致的优于交叉熵的性能。这种损失显示了对自然损坏的健壮性的好处，并且对于超参数设置（如优化器和数据处理）更为稳定。</p>
+<a id="more"></a>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a><strong>1 Introduction</strong></h2><p>交叉熵损失是深度分类模型监督学习中应用最广泛的损失函数。许多研究探索了这种损失的缺点，如对噪声标签缺乏鲁棒性[64，46]，以及边缘差的可能性[10，31]，导致泛化性能降低。然而，在实践中，大多数建议的替代方案并没有更好地适用于大规模数据集，如ImageNet[7]，这一点可以通过继续使用交叉熵来实现最新的结果来证明.</p>
+<p>近年来，对比学习工作的重新兴起导致了自我监督表征学习的重大进展[55，18，38，48，22，3，15]。这些作品的共同思想是：在嵌入空间中把一个锚和一个“正”样本拉在一起，把锚从许多“负”样本中推开。由于没有可用的标签，正对通常由样本的数据扩充组成，负对由锚定和从minibatch中随机选择的样本组成。这在图2（左）中描绘。在[38，48]中，不同数据视图之间的对比损失与互信息最大化之间存在联系。</p>
+<p>在这项工作中，我们提出了一个监督学习的损失，建立在对比自我监督文献的基础上，利用标签信息。来自同一类的规范化嵌入比来自不同类的嵌入更紧密地联系在一起。我们在这项工作中的技术创新之处在于，除了许多负面因素外，还考虑了每个锚定的许多正面因素（与只使用一个正面因素的自我监督对比学习相反）。这些积极因素是从与锚定相同类别的样本中提取的，而不是像在自监督学习中那样作为锚定的数据扩充。虽然这是自我监督设置的简单扩展，但如何正确设置损失函数并不明显，我们分析了两种选择。</p>
+<p>我们的损失可以看作是triple loss[53]和N-pair loss[45]的推广.</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210329111039811.png" alt="image-20210329111039811"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331110557625.png" alt="image-20210331110557625"></p>
+<p>这是第一个对比损失一贯表现优于交叉熵的大规模分类问题。此外，它提供了一个统一的损失函数，可用于自监督或监督学习。</p>
+<p>我们的主要贡献总结如下:</p>
+<ol>
+<li>我们提出了一个新的扩展对比损失函数，每个锚点有多个正样本，从而适应对比学习的全监督设置。从分析和经验上，我们证明了原始的扩展的性能比我们提出的版本差得多。</li>
+<li>我们表明，我们的损失为许多数据集提供了一致的提高，在前1的准确性。它也更为鲁棒。</li>
+<li>我们的经验表明，我们的损失比交叉熵对一系列超参数不那么敏感。</li>
+</ol>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2 Related Work"></a><strong>2 Related Work</strong></h2><p><strong>交叉熵损失函数的缺点：</strong></p>
+<p>许多论文研究了交叉熵损失的其他缺点，如对噪声标签的敏感性[64，46]，存在对抗性样本[10，36]，以及较差的边缘[2]。虽然已经提出了替代损失函数，但实践中最有效的想法是改变参考标签分布的方法：如标签平滑[47,35]；数据增强方法：如Mixup[61]和CutMix[60]，以及知识提取[21]。</p>
+<h2 id="3-Method"><a href="#3-Method" class="headerlink" title="3 Method"></a><strong>3 Method</strong></h2><p>我们的方法在结构上与CMC和simCLR中用于自监督对比学习的方法相似，但对监督分类进行了修改。给定一批输入数据，我们首先应用两次数据增强，得到该批数据的两个副本。两个拷贝通过编码器网络向前传播以获得2048维的规范化嵌入。在训练过程中，这种表示通过投影网络进一步传播，投影网络在推理时被丢弃。<br>根据投影网络的输出计算监督对比损失。为了使用训练好的模型进行分类，我们使用交叉熵损失在冻结表示的基础上训练了一个线性分类器。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331111544441.png" alt="image-20210331111544441"></p>
+<p><strong>3.1 Representation Learning Framework</strong></p>
+<p>我们框架的主要组成部分是：</p>
+<ul>
+<li><p>数据扩充模块，Aug（·）。. 对于每个输入样本x，我们生成两个随机的增强数据x=Aug（x），每个增强数据表示不同的数据视图，并包含原始样本中的一些信息子集。第4节给出了增强的细节。</p>
+</li>
+<li><p>编码器网络，Enc（·），它把x映射到一个表示向量，r=Enc（x）。两个增强样本分别输入到同一个编码器，产生一对表示向量。r中被归一化为单位超球（在本文所有的实验中设置维度为2048）。与[42,52]的研究结果一致，我们的分析和实验表明，这种归一化提高了top-1的准确率。</p>
+</li>
+<li>投影网络，P roj（·），，将r映射到向量z=P roj（r）。我们将P roj（·）实例化为具有大小为2048的单个隐藏层和大小为DP=128的输出向量的多层感知器[14]，或者仅具有大小为DP=128的单个线性层；我们将最优P-roj（·）结构的研究留给以后的工作。我们再次将这个网络的输出标准化到单位超球面上，这样就可以使用内积来测量投影空间中的距离。在自我监督对比学习[48,3]中，我们在对比训练结束时抛弃了P-roj（·）。因此，我们的推理时间模型包含的参数数目与使用相同编码器Enc（·）的交叉熵模型完全相同。==这里的投影头，可以是MLP，也可以是Linear。simclr认为MLP的投影头比Linear的效果更好。另外，注意在投影头之前和之后，都对隐变量做了一次标准化。==</li>
+</ul>
+<p><strong>3.2 Contrastive Loss Functions</strong></p>
+<p>在这个框架下，我们现在来看看对比损失家族，从自我监督领域开始，分析使之适应监督领域的选择，表明一个公式是优越的。</p>
+<p><strong>3.2.1 Self-Supervised Contrastive Loss</strong></p>
+<p>传统的自监督损失函数：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}^{\text {self }}=\sum_{i \in I} \mathcal{L}_{i}^{\text {self }}=-\sum_{i \in I} \log \frac{\exp \left(\boldsymbol{z}_{i} \cdot \boldsymbol{z}_{j(i)} / \tau\right)}{\sum_{a \in A(i)} \exp \left(\boldsymbol{z}_{i} \cdot \boldsymbol{z}_{a} / \tau\right)}\tag1</script><p>注意，对于每个锚i，有1个正对和2n2个负对。==分母共有2n -1项（正项和负项）==。</p>
+<p><strong>3.2.2 Supervised Contrastive Losses</strong></p>
+<p>对于有监督学习，等式1中的对比损失无法处理由于标签的存在，多个样本已知属于同一类的情况。然而，推广到任意数量的正数，会导致在多个可能的函数之间进行选择。方程式。2和3给出了两种最直接的方法来概括公式1，以考虑有监督信息。</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\text {out }}^{s u p}=\sum_{i \in I} \mathcal{L}_{\text {out }, i}^{s u p}=\sum_{i \in I} \frac{-1}{|P(i)|} \sum_{p \in P(i)} \log \frac{\exp \left(\boldsymbol{z}_{i} \cdot \boldsymbol{z}_{p} / \tau\right)}{\sum_{a \in A(i)} \exp \left(\boldsymbol{z}_{i} \cdot \boldsymbol{z}_{a} / \tau\right)}\tag2</script><script type="math/tex; mode=display">
+\mathcal{L}_{i n}^{s u p}=\sum_{i \in I} \mathcal{L}_{i n, i}^{s u p}=\sum_{i \in I}-\log \left\{\frac{1}{|P(i)|} \sum_{p \in P(i)} \frac{\exp \left(\boldsymbol{z}_{i} \cdot \boldsymbol{z}_{p} / \tau\right)}{\sum_{a \in A(i)} \exp \left(\boldsymbol{z}_{i} \cdot \boldsymbol{z}_{a} / \tau\right)}\right\}\tag3</script><p>这两种损失都具有以下理想特性：</p>
+<ul>
+<li><p><strong>任意数量的正例对的推广。</strong>. Eqs的主要结构变化。公式1上的2和3是，现在，对于任何锚定，多视图批次中的所有阳性（即，基于增强的样本以及具有相同标签的任何剩余样本）都与分子有关。对于随机生成的批，其大小相对于类的数量而言较大，将出现多个附加项（平均而言，N/C，其中C是类的数量）。监督损失鼓励编码器对来自同一类的所有条目提供紧密对齐的表示，从而产生比由等式1生成的表示空间更健壮的表示空间聚类，这一点在Sec 4的实验中得到了支持。</p>
+</li>
+<li><p><strong>对比能力随着负面因素的增加而增加</strong>。其中，通过添加更多负性示例来提高信号和噪声（负）之间的辨别能力。这种特性对于自监督对比学习的表征学习具有重要意义，许多论文表现出随着否定数的增加而提高的表现</p>
+</li>
+<li><strong>执行难正/负挖掘的内在能力</strong>。当与标准化表示一起使用时，公式1中的损失会导致梯度结构，从而产生隐式硬正/负挖掘。难正/负样本（即，继续对比锚定对编码器有很大好处）的梯度贡献较大，而容易正/负样本（即，继续对比锚定对编码器只有微弱好处）的梯度贡献较小。此外，对于难正样本，效果随着负样本数量的增加（渐进地）增加。方程式。2和3都保留了这个有用的性质，并将其推广到所有的正样本。这种隐含的属性允许对比损失避开显式难样本发掘的需要，这是许多损失的一个微妙但关键的部分，例如三重态损失。</li>
+</ul>
+<p>然而，这两种损失公式并不相等。因为log是凹函数，所以Jensen不等式[23]表示L sup in≤Lsup out。因此，人们会期望L sup out是更好的监督损失函数（因为它的上限是L sup in）。这一结论也得到了理论上的支持。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210326104452766.png" alt="image-20210326104452766" style="zoom: 50%;" /></p>
+<p>在这篇文章的其余部分，我们只考虑了$\mathcal{L}_{\text {out }}^{\text {sup }}$。</p>
+<h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4 Experiments"></a><strong>4 Experiments</strong></h2><p>我们通过在包括CIFAR-10和CIFAR-100[27]和Ima  geNet[7]在内的许多常见图像分类基准上测量分类精度，来评估SupCon损失（L sup out，公式2）。我们还测试了ImageNet模型对常见图像损坏的鲁棒性[19]，并展示了性能如何随超参数和减少数据的变化而变化。对于编码器网络（Enc（·）），我们试验了三种常用的编码器架构：ResNet-50、ResNet-101和ResNet-200[17]、最终池层（DE=2048）的规范化激活被用作表示向量。我们试验了Aug（·）数据增强模块的四种不同实现：自动增强[5]；随机增强[6]；SimAugment[3]和Stacked RandAugment[49]（请参阅补充说明中的SimAugment和Stacked randagment实现的详细信息）。对于SupCon和交叉熵，AutoAugment都优于ResNet-50上的所有其他数据增强策略。对于这两种损失函数，叠加RandAugment对ResNet-200的性能最好。我们在附录中提供了更多细节</p>
+<p><strong>4.1 Classifification Accuracy</strong></p>
+<p>表2显示，SupCon在CIFAR-10、CIFAR-100和ImageNet数据集上的推广优于交叉熵、边缘分类器（使用标签）和无监督对比学习技术。表3显示了针对ImageNet的ResNet-50和ResNet-200（我们使用ResNet-v1[17]）的结果。我们在ResNet-50上通过AutoAugment实现了78.7%的最新精度。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331112321937.png" alt="image-20210331112321937"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210331112333082.png" alt="image-20210331112333082"></p>
+<p>Evaluation protocol（Data-Efficient Image Recognition with Contrastive Predictive Coding）</p>
+<ul>
+<li>Linear classification 线性分类是评价无监督图像表现质量的标准基准。在这种情况下，分类网络hψ被限制为一个池，然后是一个线性层，θ以外的参数保持不变。标记的数据集是整个ImageNet数据集，监督的损失超过标准交叉熵。我们使用与无监督学习阶段相同的数据扩充进行训练，在测试时不使用任何数据扩充，并使用单个作物进行评估</li>
+<li>Efficient classification 有效的分类直接测试CPC表示是否能够从很少的标签进行泛化。对于这个任务，分类器rhψ是一个任意深度的神经网络</li>
+<li>Transfer  learning 迁移到其他数据集上。</li>
+</ul>
+<hr>
+<p>一些想法：</p>
+<p>多视图对比学习CMC也可以使用这个损失函数，从而将多个正样本考虑进去。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210329111415460.png" alt="image-20210329111415460" style="zoom: 67%;" /></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3/" rel="tag"># 自监督</a>
+              <a href="/tags/%E5%AF%B9%E6%AF%94%E5%AD%A6%E4%B9%A0/" rel="tag"># 对比学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/31/XuWei/Learnable%20Dynamic%20Temporal%20Pooling%20for%20Time%20Series%20Classification/" rel="prev" title="xw 【AAAI2021】Learnable Dynamic Temporal pooling for Time Series Classification">
+      <i class="fa fa-chevron-left"></i> xw 【AAAI2021】Learnable Dynamic Temporal pooling for Time Series Classification
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/" rel="next" title="zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage">
+      zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Supervised-Contrastive-Learning"><span class="nav-number">1.</span> <span class="nav-text">Supervised Contrastive Learning</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1 Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">3.</span> <span class="nav-text">2 Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Method"><span class="nav-number">4.</span> <span class="nav-text">3 Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Experiments"><span class="nav-number">5.</span> <span class="nav-text">4 Experiments</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="基于关系思维的语音识别的深度图随机过程 作者：Hengguan Huang^1^, Fuzhao Xue^1^, Hao Wang^2^, Ye Wang^1^ 单位：^1^新加坡国立大学；^2^麻省理工学院 发表：ICML 2020">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nxj 【ICML2020】Deep Graph Random Process for Relational-Thinking-Based Speech Recognition">
+<meta property="og:url" content="http://example.com/2021/07/14/NingXiaojun/[ICML2020]%20Deep%20Graph%20Random%20Process%20for%20Relational-Thinking-Based%20Speech%20Recognition/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="基于关系思维的语音识别的深度图随机过程 作者：Hengguan Huang^1^, Fuzhao Xue^1^, Hao Wang^2^, Ye Wang^1^ 单位：^1^新加坡国立大学；^2^麻省理工学院 发表：ICML 2020">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210508163925213.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20201226225355424.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01paGFfU2luZ2g=,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140643962.png">
+<meta property="og:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140526155.png">
+<meta property="og:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140051859.png">
+<meta property="og:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140243808.png">
+<meta property="og:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210508164204021.png">
+<meta property="article:published_time" content="2021-07-14T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:28:17.432Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="元学习">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210508163925213.png">
+
+<link rel="canonical" href="http://example.com/2021/07/14/NingXiaojun/[ICML2020]%20Deep%20Graph%20Random%20Process%20for%20Relational-Thinking-Based%20Speech%20Recognition/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>nxj 【ICML2020】Deep Graph Random Process for Relational-Thinking-Based Speech Recognition | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/14/NingXiaojun/[ICML2020]%20Deep%20Graph%20Random%20Process%20for%20Relational-Thinking-Based%20Speech%20Recognition/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          nxj 【ICML2020】Deep Graph Random Process for Relational-Thinking-Based Speech Recognition
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-07-14 20:24:24 / Modified: 17:28:17" itemprop="dateCreated datePublished" datetime="2021-07-14T20:24:24+08:00">2021-07-14</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>基于关系思维的语音识别的深度图随机过程</strong></p>
+<p>作者：Hengguan Huang^1^, Fuzhao Xue^1^, Hao Wang^2^, Ye Wang^1^</p>
+<p>单位：^1^新加坡国立大学；^2^麻省理工学院</p>
+<p>发表：ICML 2020</p>
+<a id="more"></a>
+<hr>
+<h2 id="一、简介与思路"><a href="#一、简介与思路" class="headerlink" title="一、简介与思路"></a>一、简介与思路</h2><ul>
+<li><p><strong>关系思维</strong></p>
+<ul>
+<li><strong>关系思维 relational thinking</strong>：在学习的过程中，我们会接收到各种各样的信息，不管是来自视觉、听觉、触觉等，但是我们并不会有意识地去保存它们。在各种各样的信息之间隐藏着联系，这些信息及它们之间的联系组成了我们的percepts(感知)。</li>
+<li>与<strong>关系推断 Relational Reasoning</strong>的主要区别：relational reasoning 是有意识地处理这些 relation information。</li>
+</ul>
+</li>
+<li><p><strong>语音识别任务</strong></p>
+<ul>
+<li><p>人类对话本质上是两个或更多说话者之间交换思想的过程</p>
+</li>
+<li><p>机器学习中语音识别任务一般被分解为声学建模和语言解码两部分，而忽略了本质上的关系思维过程</p>
+</li>
+<li><p>关系思维中涉及的感知（例如，在听到声音时形成的心理印象）被认为是无数的，并且不能直接观察到</p>
+</li>
+</ul>
+</li>
+<li><p>明确地建模关系思维形成的感知仍然是一个<strong>挑战</strong></p>
+<ul>
+<li>混合声学递归神经网络隐马尔可夫模型(RNN-HMM模型)在许多方面仍然优于用于声学建模的端到端编码器-解码器方法</li>
+<li>RNNs在捕捉顺序输入的长期时间依赖性方面做得很好，但在表示复杂关系方面做得很差</li>
+</ul>
+</li>
+<li><p>提出一种<strong>贝叶斯非参数深度学习方法</strong>，深度图随机过程(DGP)</p>
+<ul>
+<li><p>将关系思维中涉及的感知建模为概率图，而在训练过程中不使用任何关系数据</p>
+<ul>
+<li>感知被建模为当前话语与其历史之间的关系</li>
+<li>由于知觉的无意识，我们假设这种关系存在的概率接近于零（类似于先验知识）</li>
+</ul>
+</li>
+<li><p>给定一个话语和它的历史，我们生成无限个由包含在DGP中的概率图表示的感知，其中每个节点描述一个话语的表示，每个边对应于两个节点之间的关系</p>
+</li>
+<li><p>假设感知图的边是按照伯努利分布分布的，边存在的概率接近于零</p>
+</li>
+<li><blockquote>
+<p>从直觉上来理解，在我们接收信息时，信息之间并没有生成稳定的信息，各个信息之间都是会产生关联的，并且基于我们的先验知识和历史信息，会在脑海中产生各种各样的理解 — 相当于接收到的信息的不同组合，而这个组合是有无限可能的。并且，由于这些percepts是无意识的，percept graph中边的概率是接近于0的。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>通过简单地对邻接矩阵求和来组合无数的图在计算上是很难的<strong>（计算与优化方面）</strong><ul>
+<li>创建一个等价的图来找到一个解析解，其中边由二项式变量表示<ul>
+<li>进一步通过一个具有有界近似误差的高斯分布为该二项式分布的推断和采样找到一个近似形式的解</li>
+</ul>
+</li>
+<li>为了将新图形转换为“有意识的”或特定任务的图形，我们使用另一个高斯变量对新图形的每条边进行加权，该高斯变量以从二项式变量得出的边为条件</li>
+<li>计算变换后的图上的图形嵌入，并将其用作声学建模的附加输入</li>
+<li>为了联合优化上述组件，我们采用了变分推理框架，并成功地导出了一个有效的证据下界</li>
+</ul>
+</li>
+</ul>
+<h2 id="二、相关工作"><a href="#二、相关工作" class="headerlink" title="二、相关工作"></a>二、相关工作</h2><h3 id="1-图的贝叶斯深度学习"><a href="#1-图的贝叶斯深度学习" class="headerlink" title="1. 图的贝叶斯深度学习"></a>1. 图的贝叶斯深度学习</h3><ul>
+<li><p>关系堆叠去噪自动编码器(relational stacked denoising auto-encoders, RSDAE)：将图结构结合到概率自动编码器中的原则模型，显著改善了表示学习；</p>
+</li>
+<li><p>关系深度学习(relational deep learning, RDL)：有监督和完全贝叶斯版本的RSDAE，以直接处理链接预测任务；</p>
+</li>
+<li><p>图形自动编码器(graph auto-encoders, GAEs)：以无监督的训练方式学习真实世界的图形数据，使用图卷积网络(GCN)编码器使用低维向量表示节点，并使用解码器重建邻接矩阵；</p>
+</li>
+</ul>
+<ol>
+<li>（↑这些方法应用在：发现化学分子、建模引用网络、构建知识图）</li>
+</ol>
+<ul>
+<li><p>正则图变分自动编码器(Regularized Graph Variational Autoencoders, RGVAE)：使用对立的正则化框架来正则化解码器的输出分布，从而改进GAEs；</p>
+</li>
+<li><p>(Bojchevski et al., 2018)使用随机游走进一步拓展了RGVAE；</p>
+</li>
+</ul>
+<ol>
+<li><strong>缺点：以上都是静态图，限制了它们在处理动态图的现实世界问题中的模型泛化能力；</strong></li>
+</ol>
+<ul>
+<li>变分图循环网络(Variational graph RNN, VGRNN)：通过结合GCN，RNN和GAEs来缓解这个问题，允许捕捉动态图的演变；</li>
+</ul>
+<ol>
+<li><strong>缺点：它们需要图注释（话语之间的关系标注，很多任务都没有关系标注）</strong></li>
+</ol>
+<h3 id="2-变分声学建模"><a href="#2-变分声学建模" class="headerlink" title="2. 变分声学建模"></a>2. 变分声学建模</h3><ul>
+<li><strong>RNN-HMM声学模型</strong>（作为一种HMM分类器）</li>
+</ul>
+<ol>
+<li>使用RNNHMM对语音信号建模时，会遇到许多不确定性：如背景噪声对语音信号的影响</li>
+<li><strong>缺点：RNN-HMM在处理这种不确定性方面是有限的，因为RNN本质上是一个确定性函数</strong></li>
+</ol>
+<ul>
+<li><p><strong>变分的RNN(variational RNN, VRNN)</strong>：引入了一个潜在变量$\bold{z}_{i,t}$，以捕捉时间t时声学特征的不确定性</p>
+<ul>
+<li><p>假设这样一个潜在变量具有高斯先验分布$p\left(\mathbf{z}<em>{i, t} \mid \mathbf{h}</em>{i, t-1}\right)$，该分布依赖于先前的RNN隐藏状态$\mathbf{h}_{i, t-1}$</p>
+</li>
+<li><p>它的后验分布由变分分布$q\left(\mathbf{z}<em>{i, t} \mid \mathbf{x}</em>{i, t}, \mathbf{h}_{i, t-1}\right)$近似，允许使用证据下界(ELBO)进行联合学习和推理：</p>
+</li>
+<li><script type="math/tex; mode=display">
+\begin{aligned}
+\sum_{i=1}^{M}\{& \operatorname{KL}\left(q\left(\mathbf{Z}_{i} \mid \mathbf{X}_{i}, \mathbf{H}_{i}\right) \| p\left(\mathbf{Z}_{i} \mid \mathbf{H}_{i}\right)\right) 
+\left.-\mathbb{E}_{\mathbf{Z}_{i}}\left[\log P\left(\mathbf{Y}_{i} \mid \mathbf{X}_{i}, \mathbf{Z}_{i}\right)\right]\right\}
+\end{aligned}</script></li>
+<li><p>后验分布的采样是通过使用基于重新参数化的蒙特卡罗(MC)估计来实现的</p>
+</li>
+<li><p>可以通过随机梯度下降来训练该模型</p>
+</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li><strong>缺点：VRNN-HMM声学模型的一个主要限制是：所学习的潜在分布表现出不可解释的表示，因为近似分布被假设为采取缺乏表达能力的一般形式</strong></li>
+</ol>
+<h2 id="三、关系思维建模"><a href="#三、关系思维建模" class="headerlink" title="三、关系思维建模"></a>三、关系思维建模</h2><p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210508163925213.png" alt="image-20210508163925213" style="zoom: 67%;" /></p>
+<h3 id="1-问题定义"><a href="#1-问题定义" class="headerlink" title="1. 问题定义"></a>1. 问题定义</h3><p>序列分类问题。</p>
+<h3 id="2-深度图随机过程（Deep-Graph-Random-Process，DGP）"><a href="#2-深度图随机过程（Deep-Graph-Random-Process，DGP）" class="headerlink" title="2. 深度图随机过程（Deep Graph Random Process，DGP）"></a>2. 深度图随机过程（Deep Graph Random Process，DGP）</h3><p>在声学建模中，每个<strong>节点</strong>代表一个话语，其嵌入是通过对第i个话语的声学特征序列进行编码的神经网络$f_{\theta}$来计算的：</p>
+<script type="math/tex; mode=display">
+\mathbf{v}_{i}=f_{\theta}\left(\mathbf{X}_{i}\right)</script><p>DGP的核心是一系列作为构建模块的<strong>深度伯努利过程（DBP）</strong>，每个过程负责在DGP的两个节点之间<strong>生成边</strong></p>
+<script type="math/tex; mode=display">
+\left\{\alpha_{i, j}^{(k)}\right\}_{k=1}^{+\infty} \sim \operatorname{DBP}\left(\operatorname{Bern}\left(\lambda_{i, j}\right)\right)</script><p>Bern()是<strong>伯努利分布</strong>，DGP由此<strong>生成无数概率图</strong>：</p>
+<script type="math/tex; mode=display">
+\left\{G^{(k)}\right\}_{k=1}^{+\infty} \sim \operatorname{DGP}\left(\mathbf{v}_{i-o: i},\left\{\operatorname{DBP}\left(\operatorname{Bern}\left(\lambda_{*, *}\right)\right)\right\}\right)</script><h4 id="1-无数概率图的耦合（汇总图的生成）"><a href="#1-无数概率图的耦合（汇总图的生成）" class="headerlink" title="(1) 无数概率图的耦合（汇总图的生成）"></a>(1) 无数概率图的耦合（汇总图的生成）</h4><p>耦合的目标是获得无限个感知的<strong>汇总(summary)</strong>。直接进行求和是复杂的。</p>
+<p>构建一个等价图，它可以作为原始无数图的总结或表示。它保留原始节点集，并通过从<strong>二项分布</strong>中采样来更新每个边：</p>
+<script type="math/tex; mode=display">
+\tilde{\alpha}_{i, j}=\sum_{k=1}^{+\infty} \alpha_{i, j}^{(k)}, \quad \tilde{\alpha}_{i, j} \sim \mathcal{B}\left(n, \lambda_{i, j}\right)</script><p>其中$n \rightarrow+\infty$ 、$\lambda_{i, j} \rightarrow 0$。</p>
+<p><strong>单个percepet graph中边是服从Bernuli分布的，单考虑一条边的话，summary graph中对应边就是重复的Bernuli抽样，所以可以把summary graph中的边看作是服从Binomial分布的</strong></p>
+<h4 id="2-汇总图-summary-graph-边的推断和采样"><a href="#2-汇总图-summary-graph-边的推断和采样" class="headerlink" title="(2) 汇总图(summary graph) 边的推断和采样"></a>(2) 汇总图(summary graph) 边的推断和采样</h4><p><strong>二项分布，且$n \rightarrow+\infty$ 、$\lambda_{i, j} \rightarrow 0$，是难以求解的，采用一个高斯分布来近似上文提到的二项分布。</strong></p>
+<p>假设边$(i,j)$服从二项分布$\mathcal{B}\left(n, \lambda<em>{i, j}\right)$，$n \rightarrow+\infty$ 、$\lambda</em>{i, j} \rightarrow 0$。</p>
+<p>从VRNN中得到启发，近似后验参数从RNN编码声学特征中估计的。但DGP包含近似后验$q\left(\tilde{\alpha}<em>{i, j} \mid \mathbf{X}</em>{i-o: i}\right)$，由于$n \rightarrow+\infty$，无法简易地进行推理、求解。</p>
+<blockquote>
+<h5 id="理论1："><a href="#理论1：" class="headerlink" title="理论1："></a>理论1：</h5><p>设$\mathcal{N}\left(\mu, \sigma^{2}\right)$表示$\mu&lt;1/2$的高斯分布，$\mathcal{B}\left(n, \lambda<em>{i, j}\right)$表示$n \rightarrow+\infty$ 、$\lambda</em>{i, j} \rightarrow 0$的二项分布。$n$递增，$\lambda$递减。<br>存在一个常数$m$，如果$m=n\lambda$，定义：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+f_{1}(x) &=\mathrm{KL}\left(\mathcal{N}(x, x(1-x)) \| \mathcal{N}\left(\mu, \sigma^{2}\right)\right) \\
+f_{2}(x) &=\mathrm{KL}(\mathcal{N}(x, x(1-x)) \| \mathcal{N}(n \lambda, n \lambda(1-\lambda))\\
+f_{2}^{*} &=\min _{x} f_{2}(x), \text { where } x \in(0,1)
+\end{aligned}</script><p>得到：$f_1(x)$在$(0,1)$上达到最小值，$f_2(x)-f_2^*$在$(0, \sqrt{2} / 2- 1/2)$上有界，其中：</p>
+<script type="math/tex; mode=display">
+x=m=\frac{1+l-\sqrt{1+l^{2}}}{2}, \text { where } l=\frac{2 \sigma^{2}}{1-2 \mu}</script><p><img src="https://img-blog.csdnimg.cn/20201226225355424.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L01paGFfU2luZ2g=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+</blockquote>
+<p>假设我们给定一个高斯分布$\mathcal{N}\left(\tilde{\mu}<em>{i, j}, \tilde{\sigma}</em>{i, j}^{2}\right)$，其参数$\tilde{\mu}<em>{i, j}$由神经网络具体参数化，可以保证$\tilde{\mu}</em>{i, j}&lt;1 / 2$（激活函数）。</p>
+<p>通过德·莫伊弗-拉普拉斯定理，可知$\mathcal{N}\left(n \lambda<em>{i, j}, n \lambda</em>{i, j}\left(1-\lambda<em>{i, j}\right)\right)$是$\mathcal{B}\left(n, \lambda</em>{i, j}\right)$的很好的<strong>近似</strong>。当n增加时，它们是渐近等价的。</p>
+<p>设$m<em>{i,j}=n\lambda</em>{i,j}$，利用定理1，可以避免无限参数$n$和近零参数$λ<em>{i,j}$的直接参数化，同时它允许使用 (Kingma &amp; Welling, 2013) 的<strong>重新参数化</strong>技巧。这个技巧**通过高斯代理从二项分布中抽取样本$\mathcal{N}\left(m</em>{i, j}, m<em>{i, j}\left(1-m</em>{i, j}\right)\right)$，$m<em>{i,j}=n\lambda</em>{i,j}$（每条边的近似高斯分布）**。</p>
+<h3 id="3-将DGP应用于声学建模"><a href="#3-将DGP应用于声学建模" class="headerlink" title="3. 将DGP应用于声学建模"></a>3. 将DGP应用于声学建模</h3><ul>
+<li><strong>高斯图变换</strong></li>
+</ul>
+<p>关系思维的另一个重要方面是，它<strong>将无数无意识的感知转化为可识别的知识概念</strong>；目标是从代表我们下游任务的无数感知图的摘要图中提取一个信息表示—声学建模；通过用<strong>高斯变量$s_{i,j}$对每个边进行加权</strong>来转换概要图来实现的：（很像注意力机制）</p>
+<script type="math/tex; mode=display">
+\bar{\alpha}_{i, j}=s_{i, j} * \tilde{\alpha}_{i, j}</script><p>进一步假设这样的高斯变量被限制在summary图的边$\tilde{\alpha}<em>{i, j}$上，以避免在边$\tilde{\alpha}</em>{i, j}$的一些值接近零时，这样的高斯变量的分布(如果它独立于边$\tilde{\alpha}_{i, j}$)随机地表现。其定义为:（<strong>假设：权重是以summary graph边的取值为条件的</strong>）</p>
+<script type="math/tex; mode=display">
+s_{i, j} \mid \tilde{\alpha}_{i, j} \sim \mathcal{N}\left(\tilde{\alpha}_{i, j} * \mu_{i, j}, \tilde{\alpha}_{i, j} * \sigma_{i, j}^{2}\right)</script><p>这种操作为高斯图变换。生成的图形称为特定任务的图（task-specific graph）。</p>
+<p><strong>得到task-specific graph后，即可按照GNN/GCN的方式获得graph embedding（注意：每处理一个utterance时都会有对应的task-specific graph）。</strong></p>
+<ul>
+<li><strong>图嵌入</strong></li>
+</ul>
+<p>然后，从节点$\bold{v}_i$对应于当前话语的变换图中提取图嵌入$\bold{e}_i$：</p>
+<script type="math/tex; mode=display">
+\mathbf{e}_{i}=\sum_{(j, k) \in\{(j, k) \mid j<k \leq i,(j, k) \in \bar{E}\}} \bar{\alpha}_{j, k} \bar{f}_{\theta}\left(\left[\mathbf{v}_{j}, \mathbf{v}_{k}\right]\right)</script><p>其中$f_θ$是神经网络，$\bar{E}$是变换图的边集。</p>
+<ul>
+<li><strong>整体模型</strong></li>
+</ul>
+<p>生成的图形嵌入$\bold{e}_i$作为我们的声学模型的附加输入</p>
+<p>整个框架称为关系思维网络(RTN)，使用简单循环单元SRU作为基本构件</p>
+<p>SRU简化了LSTM的体系结构，显著提高了计算速度，而几乎没有降低性能</p>
+<p>RTN的更新公式：（<strong>将graph embedding与原来的输入进行拼接，作为输入</strong>）</p>
+<script type="math/tex; mode=display">
+\begin{array}{c}
+{\left[\hat{\mathbf{r}}_{i, t}, \hat{\mathbf{f}}_{i, t}, \hat{\mathbf{c}}_{i, t}\right]=\mathbf{W}_{x}\left[\mathbf{x}_{i, t}, \mathbf{e}_{i}\right]+\mathbf{b}} \\
+\mathbf{r}_{i, t}=\sigma\left(\hat{\mathbf{r}}_{i, t}\right) \\
+\mathbf{f}_{i, t}=\sigma\left(\hat{\mathbf{f}}_{i, t}\right) \\
+\mathbf{c}_{i, t}=\mathbf{f}_{i, t} \odot \mathbf{c}_{i, t-1}+\left(1-\mathbf{f}_{i, t}\right) \odot \hat{\mathbf{c}}_{i, t} \\
+\mathbf{h}_{i, t}=\mathbf{r}_{i, t} \odot \mathbf{c}_{i, t}+\left(1-\mathbf{r}_{i, t}\right) \odot W_{h}\left[\mathbf{x}_{i, t}, \mathbf{e}_{i}\right]
+\end{array}</script><p>$\mathbf{r}<em>{i, t}$是重置门的输出，$\mathbf{f}</em>{i, t}$是遗忘门的输出，$\mathbf{c}_{i, t}$是记忆单元输出，$σ$是sigmoid激活函数。</p>
+<h3 id="4-Learning：训练-amp-优化"><a href="#4-Learning：训练-amp-优化" class="headerlink" title="4. Learning：训练&amp;优化"></a>4. Learning：训练&amp;优化</h3><p>采用变分推理来联合优化DGP、高斯图变换和声学模型</p>
+<p>DGP可以等效地表示为两种类型的随机变量：与<strong>感知图的边相关的伯努利变量</strong>和与<strong>summary图的边相关的二项式变量</strong></p>
+<p>虽然这两个随机变量在概率分布上有不同的形式，但我们可以用这两个不同的随机变量来描述相同的随机过程数据</p>
+<p>指定DGP的二项式变量完全决定了整个图随机过程。最终目标是<strong>最大化证据下界(ELBO)</strong>:</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\sum_{i=1}^{M}\left\{\operatorname{KL}\left(q\left(\tilde{\mathbf{A}}, \mathbf{S} \mid \mathbf{X}_{i-o: i}\right) \| p\left(\tilde{\mathbf{A}}, \mathbf{S} \mid \mathbf{X}_{i-o: i}\right)\right)\right.
+\left.-\mathbb{E}_{\tilde{\mathbf{A}}, \mathbf{S}}\left[\log P\left(\mathbf{Y}_{i} \mid \mathbf{X}_{i}, \tilde{\mathbf{A}}, \mathbf{S}\right)\right]\right\}
+\end{array}</script><p>其中，$\tilde{\mathbf{A}}=[\tilde{a}<em>{i,j}]$是汇总图的邻接矩阵；$\mathbf{S}=\left[\tilde{s}</em>{i, j}\right]$是高斯图变换矩阵；$p\left(\tilde{\mathbf{A}}, \mathbf{S} \mid \mathbf{X}<em>{i-o: i}\right)$是$\tilde{\mathbf{A}}$和$\mathbf{S}$上的联合先验分布，$q\left(\tilde{\mathbf{A}}, \mathbf{S} \mid \mathbf{X}</em>{i-o: i}\right)$是相应的近似后验分布</p>
+<p>由于<strong>S</strong>的每个元素都受汇总图同一边的二项式变量的制约，KL项可以进一步写成:</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+\sum_{(i, j) \in \tilde{E}}\left\{\operatorname {KL} \left(\mathcal{B}\left(n, \tilde{\lambda}_{i, j}\right) \| \mathcal{B}\left(n, \tilde{\lambda}_{i, j}^{(0)}\right)\right.\right. 
++\mathbb{E}_{\tilde{\alpha}_{i, j}}\left[\operatorname {KL} \left(\mathcal{N}\left(\tilde{\alpha}_{i, j} * \mu_{i, j}, \tilde{\alpha}_{i, j} * \sigma_{i, j}^{2}\right)\right.\right. 
+\left.\left.\| \mathcal{N}\left(\tilde{\alpha}_{i, j} * \mu_{i, j}^{(0)}, \tilde{\alpha}_{i, j} * \sigma_{i, j}^{(0)^{2}}\right)\right]\right\}
+\end{array}</script><p>由于$n \rightarrow+\infty$，第一项KL在计算上很难处理，要对其进行转化</p>
+<blockquote>
+<p><strong>理论2</strong></p>
+<p>给定两个二项分布$\mathcal{B}\left(n, \lambda\right)$、$\mathcal{B}\left(n, \lambda^{0}\right)$，其中$n$是增加的，而$λ$和$λ_0$是减少的</p>
+<p>存在一个实常数$m$和另一个实常数$m^{(0)}$，如果$m = nλ$和$m^{(0)}= nλ^{(0)}$，并且如果$λ &gt; λ^{(0)}$，有:</p>
+<script type="math/tex; mode=display">
+\begin{array}{r}
+\mathrm{KL}\left(\mathcal{B}(n, \lambda) \| \mathcal{B}\left(n, \lambda^{0}\right)\right)<m \log \frac{m}{m^{(0)}} 
++(1-m) \log \frac{1-m+m^{2} / 2}{1-m^{(0)}+m^{(0)^{2} / 2}}
+\end{array}</script></blockquote>
+<p>根据定理2，可以得到一个与n无关的封闭形式的解</p>
+<h2 id="四、实验及分析"><a href="#四、实验及分析" class="headerlink" title="四、实验及分析"></a>四、实验及分析</h2><ul>
+<li><p><strong>使用当前语句与历史9句话来构建图</strong></p>
+</li>
+<li><p><strong>CHiME-2、CHiME-5数据集</strong></p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140643962.png" alt="image-20210707140643962" style="zoom:80%;" /></p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140526155.png" alt="image-20210707140526155" style="zoom:80%;" /></p>
+</li>
+<li><p><strong>RelationalSWB数据集</strong></p>
+<ul>
+<li><p>DGP关系的<strong>定量评价</strong></p>
+<ul>
+<li><p>在RelationalSWB数据集评估了图的边与基本事实关系的匹配程度</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140051859.png" alt="image-20210707140051859" style="zoom: 80%;" /></p>
+</li>
+<li><p>在RelationalSWB数据集的实验结果：</p>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210707140243808.png" alt="image-20210707140243808" style="zoom:80%;" /></p>
+</li>
+</ul>
+</li>
+<li><p>DGP对SWB和SwDA的<strong>定性评价</strong></p>
+<ul>
+<li>右边显示的总结图比左边的连接更密集</li>
+<li>能够捕获话语之间的强弱关系</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://funera-hk.oss-cn-hongkong.aliyuncs.com/img/image-20210508164204021.png" alt="image-20210508164204021" style="zoom:67%;" /></p>
+<h2 id="五、结论"><a href="#五、结论" class="headerlink" title="五、结论"></a>五、结论</h2><ul>
+<li><p>提出了一种<strong>新的图学习方法</strong>，称为<strong>深度图随机过程(DGP)</strong>，用于<strong>关系思维建模</strong></p>
+</li>
+<li><p>模型<strong>可以生成</strong>表示话语之间复杂<strong>关系的图</strong>，而<strong>无需</strong>在训练过程中使用任何<strong>关系数据</strong></p>
+</li>
+<li><p>DGP可以<strong>方便</strong>地与神经网络模型相结合，用于下游任务</p>
+</li>
+<li><p>实验结果表明，该方法在语音识别方面<strong>优于</strong>其他RNN模型</p>
+</li>
+</ul>
+<hr>
+<p><strong>相关资料</strong>：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/26694486/answer/349872296">如何从深刻地理解随机过程的含义？ - 知乎 (zhihu.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/54101808">概率图模型 - 知乎 (zhihu.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/352295592">贝叶斯深度学习是什么，和传统神经网络有何不同？ - 知乎 (zhihu.com)</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Miha_Singh/article/details/111701816">Deep Graph random Process for Relational-Thinking-based Speech Recognition_Milkha的博客-CSDN博客</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qy20115549/article/details/93074519">变分推断中的ELBO(证据下界)_qy20115549的博客-CSDN博客</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/yifdu25/p/8181185.html">变分推断（Variational Inference） - 彼岸花杀是条狗 - 博客园 (cnblogs.com)</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%85%83%E5%AD%A6%E4%B9%A0/" rel="tag"># 元学习</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/14/DengJiaoxue/Contrastive%20Learning%20with%20Hard%20Negative/" rel="prev" title="djx 【ICLR2021】Contrastive Learning with Hard Negative Samples">
+      <i class="fa fa-chevron-left"></i> djx 【ICLR2021】Contrastive Learning with Hard Negative Samples
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/21/WuTao/Understanding%20Electricity-Theft%20Behavior%20via%20Multi-Source%20Data/" rel="next" title="wt【WWW2021】Understanding Electricity-Theft Behavior via Multi-Source Data">
+      wt【WWW2021】Understanding Electricity-Theft Behavior via Multi-Source Data <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%AE%80%E4%BB%8B%E4%B8%8E%E6%80%9D%E8%B7%AF"><span class="nav-number">1.</span> <span class="nav-text">一、简介与思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">二、相关工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%9B%BE%E7%9A%84%E8%B4%9D%E5%8F%B6%E6%96%AF%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0"><span class="nav-number">2.1.</span> <span class="nav-text">1. 图的贝叶斯深度学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%8F%98%E5%88%86%E5%A3%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1"><span class="nav-number">2.2.</span> <span class="nav-text">2. 变分声学建模</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%85%B3%E7%B3%BB%E6%80%9D%E7%BB%B4%E5%BB%BA%E6%A8%A1"><span class="nav-number">3.</span> <span class="nav-text">三、关系思维建模</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">1. 问题定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%B7%B1%E5%BA%A6%E5%9B%BE%E9%9A%8F%E6%9C%BA%E8%BF%87%E7%A8%8B%EF%BC%88Deep-Graph-Random-Process%EF%BC%8CDGP%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">2. 深度图随机过程（Deep Graph Random Process，DGP）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%97%A0%E6%95%B0%E6%A6%82%E7%8E%87%E5%9B%BE%E7%9A%84%E8%80%A6%E5%90%88%EF%BC%88%E6%B1%87%E6%80%BB%E5%9B%BE%E7%9A%84%E7%94%9F%E6%88%90%EF%BC%89"><span class="nav-number">3.2.1.</span> <span class="nav-text">(1) 无数概率图的耦合（汇总图的生成）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%B1%87%E6%80%BB%E5%9B%BE-summary-graph-%E8%BE%B9%E7%9A%84%E6%8E%A8%E6%96%AD%E5%92%8C%E9%87%87%E6%A0%B7"><span class="nav-number">3.2.2.</span> <span class="nav-text">(2) 汇总图(summary graph) 边的推断和采样</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%90%86%E8%AE%BA1%EF%BC%9A"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">理论1：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%B0%86DGP%E5%BA%94%E7%94%A8%E4%BA%8E%E5%A3%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1"><span class="nav-number">3.3.</span> <span class="nav-text">3. 将DGP应用于声学建模</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Learning%EF%BC%9A%E8%AE%AD%E7%BB%83-amp-%E4%BC%98%E5%8C%96"><span class="nav-number">3.4.</span> <span class="nav-text">4. Learning：训练&amp;优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AE%9E%E9%AA%8C%E5%8F%8A%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">四、实验及分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%BB%93%E8%AE%BA"><span class="nav-number">5.</span> <span class="nav-text">五、结论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

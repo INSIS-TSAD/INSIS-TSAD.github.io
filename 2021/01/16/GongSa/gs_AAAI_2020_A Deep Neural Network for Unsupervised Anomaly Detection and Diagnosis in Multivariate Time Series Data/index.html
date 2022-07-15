@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Zhang C, Song D, Chen Y, et al. A deep neural network for unsupervised anomaly detection and diagnosis in multivariate time series data[C]&#x2F;&#x2F;Proceedings of the AAAI Conference on Artificial Intelligen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
+<meta property="og:url" content="http://example.com/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Zhang C, Song D, Chen Y, et al. A deep neural network for unsupervised anomaly detection and diagnosis in multivariate time series data[C]&#x2F;&#x2F;Proceedings of the AAAI Conference on Artificial Intelligen">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJykuV.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyij0.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJy99s.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyShj.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJszNQ.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyPcq.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyABT.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyZEF.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyEHU.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyeN4.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJz6df.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJxUvn.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJxfDx.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJxwD0.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJxduq.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJx8US.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJx0bV.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJxWK1.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJx6C4.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJyeN4.png">
+<meta property="article:published_time" content="2021-01-16T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:42:43.442Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="多变量时间序列">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="生成式模型">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/01/12/sJykuV.png">
+
+<link rel="canonical" href="http://example.com/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-16 20:24:24 / Modified: 11:42:43" itemprop="dateCreated datePublished" datetime="2021-01-16T20:24:24+08:00">2021-01-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gs/" itemprop="url" rel="index"><span itemprop="name">gs</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Zhang C, Song D, Chen Y, et al. A deep neural network for unsupervised anomaly detection and diagnosis in multivariate time series data[C]//Proceedings of the AAAI Conference on Artificial Intelligence. 2019, 33: 1409-1416.</p>
+</blockquote>
+<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a>背景介绍</h3><p>目前，多变量时间序列数据在各种现实系统中越来越受到重视，如发电厂等。</p>
+<p>多变量时间序列异常检测与诊断是指在一定的时间步长中<strong>识别异常状态</strong>，找出<strong>异常的根本原因</strong>。</p>
+<p>然而，建立这样一个系统是具有挑战性的：</p>
+<ul>
+<li>需要捕获每个时间序列中的时间依赖性</li>
+<li>需要对不同时间序列对之间的相互关系进行编码</li>
+<li>该系统应该对噪声具有鲁棒性</li>
+<li>根据不同事件的严重程度为操作员提供不同级别的异常评分</li>
+<li>需要面对标签稀缺的问题</li>
+</ul>
+<p>尽管已经开发了大量的非监督异常检测算法，但其中很少有能够共同应对这些挑战的。</p>
+<a id="more"></a> 
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJykuV"><img src="https://s3.ax1x.com/2021/01/12/sJykuV.png" alt="sJykuV.png"></a></p>
+<h4 id="相关工作非监督的方法效果较差的原因"><a href="#相关工作非监督的方法效果较差的原因" class="headerlink" title="相关工作非监督的方法效果较差的原因"></a>相关工作非监督的方法效果较差的原因</h4><ul>
+<li><strong>多元时间序列数据存在时间相关性。</strong>基于距离/聚类的方法<code>kNN</code>，基于分类的方法<code>OC-SVM</code>,基于密度的方法<code>DAGMM</code>（深度自编码高斯混合模型），都不能捕获跨不同时间步长的时间依赖性</li>
+<li><strong>多变量时间序列数据在实际应用中往往含有噪声。</strong>噪声可能会影响时间预测模型的泛化能力，如自回归移动平均（<code>ARMA</code>）和<code>LSTM Encoder-Decoder</code> ，使得结果假阳性增多</li>
+<li><strong>在实际应用中，根据不同事件的严重程度，为操作人员提供不同程度的异常评分是很有意义的。</strong></li>
+</ul>
+<h4 id="本文贡献"><a href="#本文贡献" class="headerlink" title="本文贡献"></a>本文贡献</h4><ul>
+<li><strong>异常检测与诊断是异常检测与诊断的三大基本任务。</strong>异常检测、根本原因识别和异常严重程度(持续时间)解释。不像以前的研究是独立地解决每个问题，我们是共同地解决这些问题的。</li>
+<li><strong>提出了系统特征矩阵的概念，并利用卷积编码器对时序间的相关关系进行编码，将时间序列与基于注意力机制的卷积<code>LSTM</code>网络相结合，利用卷积解码器重构特征矩阵。</strong><code>MSCRED</code>是第一个考虑多变量时间序列相关性的异常检测模型，可以联合解决这三个任务。</li>
+<li><strong>我们对合成数据集和发电厂数据集进行了广泛的实证研究。</strong>我们的结果表明<code>MSCRED</code>优于最先进的基线方法。</li>
+</ul>
+<h3 id="MSCRED框架"><a href="#MSCRED框架" class="headerlink" title="MSCRED框架"></a><code>MSCRED</code>框架</h3><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyij0"><img src="https://s3.ax1x.com/2021/01/12/sJyij0.png" alt="sJyij0.png"></a></p>
+<h4 id="特征矩阵"><a href="#特征矩阵" class="headerlink" title="特征矩阵"></a>特征矩阵</h4><p>特征矩阵：$M^t$</p>
+<p>两个时序段：$x_i^w=(x_i^w-t,x_i^w-t+1,…,x_i^w)$</p>
+<p>​                    $x_j^w=(x_j^w-t,x_j^w-t+1,…,x_j^w)$</p>
+<p>特征矩阵的每一项：<script type="math/tex">m_{ij}^t=\frac{\sum_{\delta=0}^w x_i^{t-\delta}x_j^{t-\delta} }{\kappa}</script></p>
+<p>窗口大小：$w=10,30,60$</p>
+<p>段滑窗：$10$</p>
+<blockquote>
+<p>该方法不仅能捕获两个时间序列之间的形状相似性和值尺度相关性，而且对输入噪声具有很强的鲁棒性，因为特定时间序列的波动对特征矩阵的影响很小</p>
+</blockquote>
+<h4 id="卷积编码器"><a href="#卷积编码器" class="headerlink" title="卷积编码器"></a>卷积编码器</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJy99s"><img src="https://s3.ax1x.com/2021/01/12/sJy99s.png" alt="sJy99s.png"></a></p>
+<p>输入：$\chi^{t,0}\in R^{n\times n\times s}$</p>
+<p>输出：$\chi^{t,l}=f(W^{l}*\chi^{t,l-1}+b^l)$ 激活函数： Scaled Exponential Linear Unit</p>
+<p><code>Conv1-Conv4</code>：$3\times 3 \times 3$ 的32核，$3\times 3 \times 32$ 的64核，$2\times 2 \times 64$ 的128核，$2\times 2 \times 128$ 的256核；步长：$1\times 1$, $2\times 2$, $2\times 2$, $2\times 2$</p>
+<h4 id="基于注意力机制的ConvLSTM"><a href="#基于注意力机制的ConvLSTM" class="headerlink" title="基于注意力机制的ConvLSTM"></a>基于注意力机制的<code>ConvLSTM</code></h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyShj"><img src="https://s3.ax1x.com/2021/01/12/sJyShj.png" alt="sJyShj.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJszNQ"><img src="https://s3.ax1x.com/2021/01/12/sJszNQ.png" alt="sJszNQ.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyPcq"><img src="https://s3.ax1x.com/2021/01/12/sJyPcq.png" alt="sJyPcq.png"></a></p>
+<h4 id="卷积解码器"><a href="#卷积解码器" class="headerlink" title="卷积解码器"></a>卷积解码器</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyABT"><img src="https://s3.ax1x.com/2021/01/12/sJyABT.png" alt="sJyABT.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyZEF"><img src="https://s3.ax1x.com/2021/01/12/sJyZEF.png" alt="sJyZEF.png"></a></p>
+<p><code>DeConv1-DeConv4</code>：$3\times 3 \times 3$ 的32核，$3\times 3 \times 32$ 的64核，$2\times 2 \times 64$ 的128核，$2\times 2 \times 128$ 的256核；步长：$1\times 1$, $2\times 2$, $2\times 2$, $2\times 2$</p>
+<h4 id="Loss-Function"><a href="#Loss-Function" class="headerlink" title="Loss Function"></a>Loss Function</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyEHU"><img src="https://s3.ax1x.com/2021/01/12/sJyEHU.png" alt="sJyEHU.png"></a></p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><h4 id="回答的问题"><a href="#回答的问题" class="headerlink" title="回答的问题"></a>回答的问题</h4><p><code>RQ1</code> <code>MSCRED</code>在多变量时间序列异常检测方面是否优于基线方法?</p>
+<p><code>RQ2</code> <code>MSCRED</code>的每个组件都怎样影响其性能？</p>
+<p><code>RQ3</code> <code>MSCRED</code>是否能做到异常跟因检测？</p>
+<p><code>RQ4</code> <code>MSCRED</code>能否对异常严重性做有效的解释？</p>
+<p><code>RQ5</code> <code>MSCRED</code>是否能对输入噪音具有鲁棒性？</p>
+<h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p><strong>Synthetic data</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyeN4"><img src="https://s3.ax1x.com/2021/01/12/sJyeN4.png" alt="sJyeN4.png"></a></p>
+<p><strong>Power plant data</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJz6df"><img src="https://s3.ax1x.com/2021/01/12/sJz6df.png" alt="sJz6df.png"></a></p>
+<p>合成数据中生成的5个异常持续时间属于1-3种尺度（30,60,90）</p>
+<p>电厂数据中一个是实际异常，4个是随机植入的</p>
+<h4 id="Baseline-methods"><a href="#Baseline-methods" class="headerlink" title="Baseline methods"></a>Baseline methods</h4><p><strong>分类模型：</strong><code>OC-SVM</code></p>
+<p><strong>密度估计模型：</strong><code>DAGMM</code>（深度自编码高斯混合模型）</p>
+<p><strong>预测模型：</strong><code>HA</code>(History Average) <code>ARMA</code> <code>LSTM-ED</code></p>
+<p><strong><code>MSCRED</code>变体:</strong></p>
+<p>​    （1）去除注意力模块和最开始的三个<code>ConvLSTM</code> </p>
+<p>​    （2）去除注意力模块和最开始的两个<code>ConvLSTM</code> </p>
+<p>​    （3）去除注意力模块</p>
+<h4 id="评价指标"><a href="#评价指标" class="headerlink" title="评价指标"></a>评价指标</h4><p><strong><code>Precision</code>, <code>Recall</code>, <code>F1-Score</code></strong></p>
+<h4 id="性能评估"><a href="#性能评估" class="headerlink" title="性能评估"></a>性能评估</h4><h5 id="RQ1-MSCRED在多变量时间序列异常检测方面是否优于基线方法"><a href="#RQ1-MSCRED在多变量时间序列异常检测方面是否优于基线方法" class="headerlink" title="RQ1 MSCRED在多变量时间序列异常检测方面是否优于基线方法?"></a><code>RQ1</code> <code>MSCRED</code>在多变量时间序列异常检测方面是否优于基线方法?</h5><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJxUvn"><img src="https://s3.ax1x.com/2021/01/12/sJxUvn.png" alt="sJxUvn.png"></a></p>
+<ul>
+<li>时间预测模型要比分类和基于密度的模型效果好一些</li>
+<li><code>LSTM-ED</code>比<code>ARMA</code>效果好，深度学习模型可以捕获时间信息</li>
+<li><code>MSCRED</code>表现最好</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJxfDx"><img src="https://s3.ax1x.com/2021/01/12/sJxfDx.png" alt="sJxfDx.png"></a></p>
+<h5 id="RQ2-MSCRED的每个组件都怎样影响其性能？"><a href="#RQ2-MSCRED的每个组件都怎样影响其性能？" class="headerlink" title="RQ2 MSCRED的每个组件都怎样影响其性能？"></a><code>RQ2</code> <code>MSCRED</code>的每个组件都怎样影响其性能？</h5><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJxwD0"><img src="https://s3.ax1x.com/2021/01/12/sJxwD0.png" alt="sJxwD0.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJxduq"><img src="https://s3.ax1x.com/2021/01/12/sJxduq.png" alt="sJxduq.png"></a></p>
+<h5 id="RQ3-MSCRED是否能做到异常跟因检测？"><a href="#RQ3-MSCRED是否能做到异常跟因检测？" class="headerlink" title="RQ3 MSCRED是否能做到异常跟因检测？"></a><code>RQ3</code> <code>MSCRED</code>是否能做到异常跟因检测？</h5><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJx8US"><img src="https://s3.ax1x.com/2021/01/12/sJx8US.png" alt="sJx8US.png"></a></p>
+<blockquote>
+<p>top-k 方式判定异常跟因 图5 k=3</p>
+</blockquote>
+<h5 id="RQ4-MSCRED能否对异常严重性做有效的解释？"><a href="#RQ4-MSCRED能否对异常严重性做有效的解释？" class="headerlink" title="RQ4 MSCRED能否对异常严重性做有效的解释？"></a><code>RQ4</code> <code>MSCRED</code>能否对异常严重性做有效的解释？</h5><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJx0bV"><img src="https://s3.ax1x.com/2021/01/12/sJx0bV.png" alt="sJx0bV.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJxWK1"><img src="https://s3.ax1x.com/2021/01/12/sJxWK1.png" alt="sJxWK1.png"></a></p>
+<h5 id="RQ5-MSCRED是否能对输入噪音具有鲁棒性？"><a href="#RQ5-MSCRED是否能对输入噪音具有鲁棒性？" class="headerlink" title="RQ5 MSCRED是否能对输入噪音具有鲁棒性？"></a><code>RQ5</code> <code>MSCRED</code>是否能对输入噪音具有鲁棒性？</h5><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJx6C4"><img src="https://s3.ax1x.com/2021/01/12/sJx6C4.png" alt="sJx6C4.png"></a></p>
+<blockquote>
+<p>噪声的控制在于$\lambda$的取值</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJyeN4"><img src="https://s3.ax1x.com/2021/01/12/sJyeN4.png" alt="sJyeN4.png"></a></p>
+</blockquote>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文综合异常检测和诊断提出了一个创新的模型<code>MSCRED</code>，该模型可以采用不同尺度（解析度）对系统状态（多元时间序列）构造特征矩阵来描述不同时间段里整个系统状态，采用基于注意力机制的深度编码器解码器来重构特征矩阵，最终判定异常的方式是使用重构误差。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E5%8F%98%E9%87%8F%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 多变量时间序列</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/%E7%94%9F%E6%88%90%E5%BC%8F%E6%A8%A1%E5%9E%8B/" rel="tag"># 生成式模型</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/" rel="prev" title="gs Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases">
+      <i class="fa fa-chevron-left"></i> gs Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/" rel="next" title="xw caNet:Frequency Channel Attention Networks">
+      xw caNet:Frequency Channel Attention Networks <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">背景介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C%E9%9D%9E%E7%9B%91%E7%9D%A3%E7%9A%84%E6%96%B9%E6%B3%95%E6%95%88%E6%9E%9C%E8%BE%83%E5%B7%AE%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.1.</span> <span class="nav-text">相关工作非监督的方法效果较差的原因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E6%96%87%E8%B4%A1%E7%8C%AE"><span class="nav-number">1.2.</span> <span class="nav-text">本文贡献</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MSCRED%E6%A1%86%E6%9E%B6"><span class="nav-number">2.</span> <span class="nav-text">MSCRED框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E7%9F%A9%E9%98%B5"><span class="nav-number">2.1.</span> <span class="nav-text">特征矩阵</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">卷积编码器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6%E7%9A%84ConvLSTM"><span class="nav-number">2.3.</span> <span class="nav-text">基于注意力机制的ConvLSTM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E8%A7%A3%E7%A0%81%E5%99%A8"><span class="nav-number">2.4.</span> <span class="nav-text">卷积解码器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Loss-Function"><span class="nav-number">2.5.</span> <span class="nav-text">Loss Function</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">3.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E7%AD%94%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.1.</span> <span class="nav-text">回答的问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">3.2.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Baseline-methods"><span class="nav-number">3.3.</span> <span class="nav-text">Baseline methods</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">3.4.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%AF%84%E4%BC%B0"><span class="nav-number">3.5.</span> <span class="nav-text">性能评估</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RQ1-MSCRED%E5%9C%A8%E5%A4%9A%E5%8F%98%E9%87%8F%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E6%96%B9%E9%9D%A2%E6%98%AF%E5%90%A6%E4%BC%98%E4%BA%8E%E5%9F%BA%E7%BA%BF%E6%96%B9%E6%B3%95"><span class="nav-number">3.5.1.</span> <span class="nav-text">RQ1 MSCRED在多变量时间序列异常检测方面是否优于基线方法?</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#RQ2-MSCRED%E7%9A%84%E6%AF%8F%E4%B8%AA%E7%BB%84%E4%BB%B6%E9%83%BD%E6%80%8E%E6%A0%B7%E5%BD%B1%E5%93%8D%E5%85%B6%E6%80%A7%E8%83%BD%EF%BC%9F"><span class="nav-number">3.5.2.</span> <span class="nav-text">RQ2 MSCRED的每个组件都怎样影响其性能？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#RQ3-MSCRED%E6%98%AF%E5%90%A6%E8%83%BD%E5%81%9A%E5%88%B0%E5%BC%82%E5%B8%B8%E8%B7%9F%E5%9B%A0%E6%A3%80%E6%B5%8B%EF%BC%9F"><span class="nav-number">3.5.3.</span> <span class="nav-text">RQ3 MSCRED是否能做到异常跟因检测？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#RQ4-MSCRED%E8%83%BD%E5%90%A6%E5%AF%B9%E5%BC%82%E5%B8%B8%E4%B8%A5%E9%87%8D%E6%80%A7%E5%81%9A%E6%9C%89%E6%95%88%E7%9A%84%E8%A7%A3%E9%87%8A%EF%BC%9F"><span class="nav-number">3.5.4.</span> <span class="nav-text">RQ4 MSCRED能否对异常严重性做有效的解释？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#RQ5-MSCRED%E6%98%AF%E5%90%A6%E8%83%BD%E5%AF%B9%E8%BE%93%E5%85%A5%E5%99%AA%E9%9F%B3%E5%85%B7%E6%9C%89%E9%B2%81%E6%A3%92%E6%80%A7%EF%BC%9F"><span class="nav-number">3.5.5.</span> <span class="nav-text">RQ5 MSCRED是否能对输入噪音具有鲁棒性？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

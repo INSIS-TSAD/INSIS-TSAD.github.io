@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：时间序列预测； 1摘要Informer的主要工作是使用Transfomer实现长序列预测（Long Sequence Time-Series Forecasting）,以下称为LSTF。针对Transfomer在长序列预测中的不足（平方时间复杂度、高内存占用和现有编解码结构的局限性），提出ProbSparse注意力机制、自注意力蒸馏技术和生成式解码器等模块解决或缓解上述问题。  首先，LS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting">
+<meta property="og:url" content="http://example.com/2021/03/24/WuTao/informer/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：时间序列预测； 1摘要Informer的主要工作是使用Transfomer实现长序列预测（Long Sequence Time-Series Forecasting）,以下称为LSTF。针对Transfomer在长序列预测中的不足（平方时间复杂度、高内存占用和现有编解码结构的局限性），提出ProbSparse注意力机制、自注意力蒸馏技术和生成式解码器等模块解决或缓解上述问题。  首先，LS">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=X%5Et+%3D+%7Bx_1%5E%7Bt%7D%2C...%2Cx_%7BL_x%7D%5E%7Bt%7D+%7C+x_i%5E%7Bt%7D+%5Cin+R%5E%7Bd_x%7D%7D">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=Y_t%3D%7By_1%5E%7Bt%7D%2C...%2Cy_%7BL_y%7D%5E%7Bt%7D+%7C+y_i%5Et+%5Cin+R%5E%7Bd_y%7D%7D">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=d_y+%3E%3D+1">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=X%5Et">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=H%5Et">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=Y%5Et">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=h%5Et_k">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=h_%7Bk%2B1%7D%5Et">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=y_%7Bk%2B1%7D%5Et">
+<meta property="og:image" content="c:/Users/linestao/AppData/Roaming/Typora/typora-user-images/image-20210324140229564.png">
+<meta property="og:image" content="c:/Users/linestao/AppData/Roaming/Typora/typora-user-images/image-20210324135837567.png">
+<meta property="og:image" content="c:/Users/linestao/AppData/Roaming/Typora/typora-user-images/image-20210324133904112.png">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-f8c1aab1c053777f1626ac211360aba7_720w.jpg">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=M%28q_i%2C+K%29+%3D+ln%5Csum_%7Bj%3D1%7D%5E%7BL_K%7De%5E%7B%5Cfrac%7Bq_ik_j%5ET%7D%7B%5Csqrt+d%7D%7D-%5Cfrac%7B1%7D%7BL_K%7D%5Csum_%7Bj%3D1%7D%5E%7BL_K%7D%5Cfrac%7Bq_ik_j%5ET%7D%7B%5Csqrt+d%7D">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=A%28Q%2CK%2CV%29%3DSoftmax%28%5Cfrac%7B%5Cbar+QK%5ET%7D%7B%5Csqrt+d%7Dv%29">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=%5Cbar+Q">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=O%28lnL_Q%29">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=O%28L_QL_K%29">
+<meta property="og:image" content="https://pic3.zhimg.com/80/v2-62c59f9dc721dde004b879bffeb05002_720w.jpg">
+<meta property="og:image" content="c:/Users/linestao/AppData/Roaming/Typora/typora-user-images/image-20210324134420733.png">
+<meta property="article:published_time" content="2021-03-24T08:20:10.000Z">
+<meta property="article:modified_time" content="2021-03-24T14:42:43.056Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列预测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.zhihu.com/equation?tex=X%5Et+%3D+%7Bx_1%5E%7Bt%7D%2C...%2Cx_%7BL_x%7D%5E%7Bt%7D+%7C+x_i%5E%7Bt%7D+%5Cin+R%5E%7Bd_x%7D%7D">
+
+<link rel="canonical" href="http://example.com/2021/03/24/WuTao/informer/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/24/WuTao/informer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-24 16:20:10 / Modified: 22:42:43" itemprop="dateCreated datePublished" datetime="2021-03-24T16:20:10+08:00">2021-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wt/" itemprop="url" rel="index"><span itemprop="name">wt</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：时间序列预测；</p>
+<h3 id="1摘要"><a href="#1摘要" class="headerlink" title="1摘要"></a>1摘要</h3><p>Informer的主要工作是使用Transfomer实现长序列预测（Long Sequence Time-Series Forecasting）,以下称为LSTF。针对Transfomer在长序列预测中的不足（平方时间复杂度、高内存占用和现有编解码结构的局限性），提出ProbSparse注意力机制、自注意力蒸馏技术和生成式解码器等模块解决或缓解上述问题。</p>
+<ol>
+<li>首先，LSTF任务具有重要研究意义，对政策计划和投资避险等多种需要长时预测的任务至关重要；</li>
+<li>目前现有方法多专注于短期预测，模型缺乏长期预测能力；</li>
+<li>Transformer具有较强捕获长距离依赖的能力，但是，在计算时间复杂度和空间复杂度以及如何加强长序列输入和输出关联上都需要优化；</li>
+</ol>
+<a id="more"></a>
+<p>本文提出的方案同时解决了上面的三个问题，我们研究了在self-attention机制中的稀疏性问题，本文的贡献有如下几点：</p>
+<ul>
+<li>我们提出Informer来成功地提高LSTF问题的预测能力，这验证了类Transformer模型的潜在价值，以捕捉长序列时间序列输出和输入之间的单个的长期依赖性；</li>
+<li>我们提出了ProbSparse self-attention机制来高效的替换常规的self-attention并且获得了O(LlogL)的时间复杂度以及O(LlogL)的内存使用率；</li>
+<li>我们提出了self-attention distilling操作，它大幅降低了所需的总空间复杂度；</li>
+<li>我们提出了生成式的Decoder来获取长序列的输出，这只需要一步，避免了在inference阶段的累计误差传播；</li>
+</ul>
+<p>输入: <img src="https://www.zhihu.com/equation?tex=X%5Et+%3D+%7Bx_1%5E%7Bt%7D%2C...%2Cx_%7BL_x%7D%5E%7Bt%7D+%7C+x_i%5E%7Bt%7D+%5Cin+R%5E%7Bd_x%7D%7D" alt="[公式]"> 时间 t</p>
+<p>输出：<img src="https://www.zhihu.com/equation?tex=Y_t%3D%7By_1%5E%7Bt%7D%2C...%2Cy_%7BL_y%7D%5E%7Bt%7D+%7C+y_i%5Et+%5Cin+R%5E%7Bd_y%7D%7D" alt="[公式]"> 时间 t， 且<img src="https://www.zhihu.com/equation?tex=d_y+%3E%3D+1" alt="[公式]"></p>
+<h3 id="2-编解码结构"><a href="#2-编解码结构" class="headerlink" title="2. 编解码结构"></a><strong>2. 编解码结构</strong></h3><p>编解码结构通常这样设计：将输入<img src="https://www.zhihu.com/equation?tex=X%5Et" alt="[公式]">编码为隐层状态<img src="https://www.zhihu.com/equation?tex=H%5Et" alt="[公式]">，然后将隐层状态解码为输出表示<img src="https://www.zhihu.com/equation?tex=Y%5Et" alt="[公式]">。通常推理阶段采用step-by-step方式，即动态解码。具体为：输入上一步隐层状态<img src="https://www.zhihu.com/equation?tex=h%5Et_k" alt="[公式]">和上一步的输出计算k+1步的隐层状态<img src="https://www.zhihu.com/equation?tex=h_%7Bk%2B1%7D%5Et" alt="[公式]">，然后预测第k+1步的输出<img src="https://www.zhihu.com/equation?tex=y_%7Bk%2B1%7D%5Et" alt="[公式]">。</p>
+<h3 id="3-输入表示"><a href="#3-输入表示" class="headerlink" title="3. 输入表示"></a><strong>3. 输入表示</strong></h3><p><strong>方法介绍</strong></p>
+<p><img src="C:\Users\linestao\AppData\Roaming\Typora\typora-user-images\image-20210324140229564.png" alt="image-20210324140229564"></p>
+<p>在LSTF问题中，时序建模不仅需要局部时序信息还需要层次时序信息，如星期、月和年等，以及突发事件或某些节假日等。经典自注意力机制很难直接适配，可能会带来query和key的错误匹配问题，影响预测性能表现。</p>
+<p><img src="C:\Users\linestao\AppData\Roaming\Typora\typora-user-images\image-20210324135837567.png" alt="image-20210324135837567"></p>
+<p> 左边：编码过程，编码器接收长序列输入（绿色部分），通过ProbSparse自注意力模块和自注意力蒸馏模块，得到特征表示。（堆叠结构增加模型鲁棒性）</p>
+<p>右边：解码过程，解码器接收长序列输入（预测目标部分设置为0），通过多头注意力与编码特征进行交互，最后直接预测输出目标部分（橙黄色部分）。</p>
+<p><img src="C:\Users\linestao\AppData\Roaming\Typora\typora-user-images\image-20210324133904112.png" alt="image-20210324133904112" style="zoom: 150%;" /></p>
+<p>Informer编码器的架构。 （1）每个水平堆栈代表图（2）中的单个编码器副本; （2）较高的堆栈是主堆栈，它接收整个输入序列，而第二个堆栈则占输入的一半。 （3）红色层是自注意机制的点积矩阵，通过在每层上进行自注意蒸馏而逐渐减少级联； （4）将2堆栈的功能图连接为编码器的输出。</p>
+<h3 id="4-设计的关键"><a href="#4-设计的关键" class="headerlink" title="4.设计的关键"></a>4.设计的关键</h3><p>作者的insight是，如果将self-attention中的点积结果进行可视化分析，会发现服从长尾分布，</p>
+<p><img src="https://pic4.zhimg.com/80/v2-f8c1aab1c053777f1626ac211360aba7_720w.jpg" alt="img"></p>
+<p>也就是少数的几个query和key的点积计算结果主导了softmax后的分布，这种稀疏性分布是有现实含义的：序列中的某个元素一般只会和少数几个元素具有较高的相似性/关联性。</p>
+<p>经过简化后，作者定义第i个Query的稀疏性度量公式为：<img src="https://www.zhihu.com/equation?tex=M%28q_i%2C+K%29+%3D+ln%5Csum_%7Bj%3D1%7D%5E%7BL_K%7De%5E%7B%5Cfrac%7Bq_ik_j%5ET%7D%7B%5Csqrt+d%7D%7D-%5Cfrac%7B1%7D%7BL_K%7D%5Csum_%7Bj%3D1%7D%5E%7BL_K%7D%5Cfrac%7Bq_ik_j%5ET%7D%7B%5Csqrt+d%7D" alt="[公式]"></p>
+<p>第一项是在qi所有keys的Log-Sum-Exp(LSE)，第二项是arithmetic均值</p>
+<p>如果第i个query的M值较大，说明它的注意力概率p相较其他部分差异性较大，比较大可能性是重要性部分。</p>
+<p>基于上述度量方法，ProbSparse自注意力计算方式可以表示为：<img src="https://www.zhihu.com/equation?tex=A%28Q%2CK%2CV%29%3DSoftmax%28%5Cfrac%7B%5Cbar+QK%5ET%7D%7B%5Csqrt+d%7Dv%29" alt="[公式]">，其中<img src="https://www.zhihu.com/equation?tex=%5Cbar+Q" alt="[公式]">为稀疏矩阵包含TOP u个query。通过该优化，没对query-key计算需要<img src="https://www.zhihu.com/equation?tex=O%28lnL_Q%29" alt="[公式]">计算复杂度。计算M的计算复杂度为<img src="https://www.zhihu.com/equation?tex=O%28L_QL_K%29" alt="[公式]">的二次方。所以，作者采用近似思想进行了进一步的优化与化简。</p>
+<h3 id="Self-attention-Distilling"><a href="#Self-attention-Distilling" class="headerlink" title="Self-attention Distilling"></a>Self-attention Distilling</h3><p>self-attention蒸馏的insight是随着Encoder层数的加深，由于序列中每个位置的输出已经包含了序列中其他元素的信息(self-attention的本职工作)，我们可以缩短输入序列的长度。”蒸馏”操作主要为使用1D卷积和最大池化，将上一层的输出送至魔改后的多头注意力模块之前做维度修剪和降低内存占用。</p>
+<p>所以Encoder类似于金字塔结构：</p>
+<p><img src="https://pic3.zhimg.com/80/v2-62c59f9dc721dde004b879bffeb05002_720w.jpg" alt="img"></p>
+<p>如何缩短序列长度呢？卷积+最大池化。</p>
+<p>基本上每一层序列长度会减半。</p>
+<p>decoder上：一次前向计算，预测长序列输出。采用标准解码器结构，即堆叠两个相同的多头注意力层。不同的是，本文采用的是生成式预测（不是step-by-step方式）直接输出多步预测结果。</p>
+<h3 id="5-结果"><a href="#5-结果" class="headerlink" title="5.结果"></a>5.结果</h3><p><img src="C:\Users\linestao\AppData\Roaming\Typora\typora-user-images\image-20210324134420733.png" alt="image-20210324134420733"></p>
+<p>本文研究了长序列时间序列预测问题，提出了长序列预测的Informer方法。具体地：</p>
+<ul>
+<li>设计了ProbSparse self-attention和提取操作来处理vanilla Transformer中二次时间复杂度和二次内存使用的挑战。</li>
+<li>generative decoder缓解了传统编解码结构的局限性。</li>
+<li>通过对真实数据的实验，验证了Informer对提高预测能力的有效性</li>
+</ul>
+<p>有知乎答主 表示Informer的主要目的就是效率优化：对self-attention的时间空间优化、卷积池化蒸馏 </p>
+<p>源码地址： <a target="_blank" rel="noopener" href="https://github.com/zhouhaoyi/Informer2020">https://github.com/zhouhaoyi/Informer2020</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B/" rel="tag"># 时间序列预测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/" rel="prev" title="syd 【AAAI 2021】Maximum Roaming Multi-Task Learning">
+      <i class="fa fa-chevron-left"></i> syd 【AAAI 2021】Maximum Roaming Multi-Task Learning
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/" rel="next" title="yjn 【ICLR 2021】Unsupervised Representation Learning for Time Series with Temporal Neighborhood Coding">
+      yjn 【ICLR 2021】Unsupervised Representation Learning for Time Series with Temporal Neighborhood Coding <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">1摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%BC%96%E8%A7%A3%E7%A0%81%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">2. 编解码结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%BE%93%E5%85%A5%E8%A1%A8%E7%A4%BA"><span class="nav-number">3.</span> <span class="nav-text">3. 输入表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%85%B3%E9%94%AE"><span class="nav-number">4.</span> <span class="nav-text">4.设计的关键</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Self-attention-Distilling"><span class="nav-number">5.</span> <span class="nav-text">Self-attention Distilling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BB%93%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">5.结果</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

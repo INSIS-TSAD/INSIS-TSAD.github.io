@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="时间序列异常点的无监督检测是一个具有挑战性的问题，它需要模型推导出一个可识别的准则。以往的方法主要是通过学习点表示或成对关联来解决这一问题，但这两种方法都不足以对于复杂情况进行检测。近年来，Transformers在点态表示和成对关联的统一建模中表现出了巨大的威力，我们发现每个时间点的自我注意权重分布可以体现出与整个序列的丰富关联。我们的主要观察结果是，由于异常的罕见性，从异常点到整个序列建立非平">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wt【ICLR2022】Amomaly Transformer">
+<meta property="og:url" content="http://example.com/2022/03/02/WuTao/ANOMALY%20TRANSFORMER%20TIME%20SERIES%20ANOMALY%20DETECTION%20WITH%20ASSOCIATION%20DISCREPANCY/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="时间序列异常点的无监督检测是一个具有挑战性的问题，它需要模型推导出一个可识别的准则。以往的方法主要是通过学习点表示或成对关联来解决这一问题，但这两种方法都不足以对于复杂情况进行检测。近年来，Transformers在点态表示和成对关联的统一建模中表现出了巨大的威力，我们发现每个时间点的自我注意权重分布可以体现出与整个序列的丰富关联。我们的主要观察结果是，由于异常的罕见性，从异常点到整个序列建立非平">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171532932.png">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=P%5El">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=%5Csigma">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=S%5El">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171549339.png">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=%5Cmathcal%7BP%7D%5El">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=S%5El">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=AssDis%28%5Cmathcal%7BP%7D%2C+%5Cmathcal%7BS%7D%3B%5Cmathcal%7BX%7D%29%3D%5CBig%5B+++%5Cfrac%7B1%7D%7BL%7D%5Csum_%7Bl%3D1%7D%5E%7BL%7D++%5Cbig%28++KL%28%5Cmathcal%7BP%7D_%7Bi%2C%3A%7D%5El+%7C%7C+%5Cmathcal%7BS%7D_%7Bi%2C%3A%7D%5El%29+%2B+KL%28%5Cmathcal%7BS%7D_%7Bi%2C%3A%7D%5El+%7C%7C+%5Cmathcal%7BP%7D_%7Bi%2C%3A%7D%5El%29+%5Cbig%29+++%5CBig%5D_%7Bi%3D1%2C%5Ccdots%2CN%7D">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171605065.png">
+<meta property="og:image" content="https://pic2.zhimg.com/80/v2-3b81acaaffb3719a9a9802fd82ab1065_720w.jpg">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=%5Csigma">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=P">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=S">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=S">
+<meta property="og:image" content="https://pic1.zhimg.com/80/v2-53d9ecf16b969a98e3e23c7b193f6890_720w.jpg">
+<meta property="og:image" content="https://pic2.zhimg.com/80/v2-58a56382fb82761e76a2c7ade332c1d9_720w.jpg">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171638524.png">
+<meta property="og:image" content="c:/Users/30331/AppData/Roaming/Typora/typora-user-images/image-20220302171648598.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171708687.png">
+<meta property="article:published_time" content="2022-03-02T08:20:10.000Z">
+<meta property="article:modified_time" content="2022-03-02T09:17:42.686Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171532932.png">
+
+<link rel="canonical" href="http://example.com/2022/03/02/WuTao/ANOMALY%20TRANSFORMER%20TIME%20SERIES%20ANOMALY%20DETECTION%20WITH%20ASSOCIATION%20DISCREPANCY/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>wt【ICLR2022】Amomaly Transformer | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/03/02/WuTao/ANOMALY%20TRANSFORMER%20TIME%20SERIES%20ANOMALY%20DETECTION%20WITH%20ASSOCIATION%20DISCREPANCY/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          wt【ICLR2022】Amomaly Transformer
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-03-02 16:20:10 / Modified: 17:17:42" itemprop="dateCreated datePublished" datetime="2022-03-02T16:20:10+08:00">2022-03-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/wt/" itemprop="url" rel="index"><span itemprop="name">wt</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>时间序列异常点的无监督检测是一个具有挑战性的问题，它需要模型推导出一个可识别的准则。以往的方法主要是通过学习点表示或成对关联来解决这一问题，但这两种方法都不足以对于复杂情况进行检测。近年来，Transformers在点态表示和成对关联的统一建模中表现出了巨大的威力，我们发现每个时间点的自我注意权重分布可以体现出与整个序列的丰富关联。我们的主要观察结果是，由于异常的罕见性，从异常点到整个序列建立非平凡的关联非常困难，因此，异常的关联应主要集中在其相邻的时间点上。这种相邻的关联性偏差意味着一种基于关联的标准，可以在正常点和异常点之间进行固有的区分，我们通过关联差异来强调这一点。在技术上，我们提出了一种新的异常注意机制来计算关联差异的  Anomaly Transformer。设计了一种极大极小策略来增强关联差异的正常-异常区分能力。</p>
+<a id="more"></a>
+<h2 id="1、INTRODUCTION"><a href="#1、INTRODUCTION" class="headerlink" title="1、INTRODUCTION"></a>1、INTRODUCTION</h2><p>现实世界中的系统总是以连续的方式工作，它可以生成由多个传感器监测的多个连续测量，如工业设备、空间探测器等。从大规模系统监测数据中发现故障可以简化为从时间序列中检测异常时间点，这对于确保安全和避免经济损失是非常有意义的。但异常通常很罕见，并且被大量的正常点隐藏，这使得数据标记困难且昂贵。因此，我们将重点放在<strong>无监督的时间序列异常检测</strong>上。</p>
+<p>无监督时间序列异常检测在实践中极具挑战性。模型应该通过无监督任务从复杂的时间动态中学习信息表示。不过，它也应该有能力推导出一个可区分的标准，可以从大量正常时间序列中检测罕见的异常。各种经典异常检测方法提供了许多无监督的范例，但是经典异常检测方法（例如LOF、OC-SVM）很少考虑时间信息，这使得他们在时序场景中应用受限。</p>
+<p>因此研究人员开始将目光投向深度学习领域，往往是通过循环网络（RNN）学习时序数据点级别的表征，进而依靠重建或预测误差（自回归）进行判定，这里，一个自然而实用的异常检测标准是逐点重建或预测误差。然而，由于异常的罕见性，对于复杂的时间模式，逐点表示的信息较少，并且可以由正常的时间序列数据主导，使得异常不易区分。此外，重建或预测误差是逐点计算的，这无法提供对时间上下文信息的全面描述。 </p>
+<p>另一类主要的方法是基于显式关联建模来检测异常。向量自回归和状态空间模型属于这一类。通过将不同时间点的时间序列表示为顶点，并通过随机游走检测异常，该图也被用于明确捕捉关联（Cheng等人，2008；2009）。一般来说，这些经典方法很难学习信息表示和对细粒度关联建模。最近，图形神经网络（GNN）已被应用于学习多元时间序列中多变量之间的动态图，虽然学习到的图更具表现力，但仍然局限于单个时间点，这对于复杂的时间模式来说是不够的。此外，基于子序列的方法通过计算子序列之间的相似性来检测异常（Boniol&amp;Palpanas，2020）。在探索更广泛的时间背景时，这些方法无法捕捉每个时间点和整个序列之间的细粒度时间关联</p>
+<p>因此，如何获取更具信息含量的表征，进而定义更加具有区分性的判据对于时序异常检测尤为关键。</p>
+<p>transformer的成功归功于对序列长程全局依赖的建模学习（global representation and long-range relation），我们发现每个时间点的时间关联（association）都可以从自我注意图中获得，该图表现为其关联权重在时间维度上对所有时间点的分布。每个时间点的关联分布可以为时间上下文提供更详细的描述，指示动态模式，例如时间序列的周期或趋势。我们将上述关联分布命名为序列关联（series-association），可通过transformer从原始序列中发现</p>
+<p>同时，相比于正常点来说，异常点很难与序列的所有点都构建很强的关联，且由于连续性往往更加关注邻近区域。异常关联应集中在相邻时间点， 这些时间点更有可能包含类似的异常模式。这种相邻的关联性偏差称为先验关联（prior-association）。 相比之下，主要的正常时间点可以发现与整个序列的信息关联，而不限于相邻区域。基于这一观察，我们试图利用关联分布的正常异常区分能力。这为每个时间点带来了一个新的异常标准，该标准通过每个时间点的先验关联与其序列关联之间的距离来量化，称为关联差异。如上所述，由于异常的关联更可能是相邻的，因此异常将呈现比正常时间点更小的关联差异。 </p>
+<p>基于上述观察，我们提出了Anomaly Transformer模型用于建模时序关联，为了计算关联差异，我们将自我注意机制改进为异常注意，它包含两个分支结构，分别对每个时间点的先验关联和序列关联进行建模。先验关联使用可学习的高斯核表示每个时间点的邻接关联偏差，而序列关联对应于从原始序列中学习的自我注意权重。 同时利用极小极大（Minimax）关联学习策略进一步突出正常、异常点之间差别，实现了基于关联差异（Association Discrepancy）的时序异常检测。Anomaly Transformer在不同领域的5个数据集上都取得了SOTA的效果。</p>
+<h2 id="2、方法："><a href="#2、方法：" class="headerlink" title="2、方法："></a>2、方法：</h2><p>作者强调无监督时间序列异常检测的关键是学习信息表示和找到可区分的标准。我们提出了Anomaly Transformer 来发现更多信息关联，并通过学习关联差异来解决这个问题，</p>
+<p>Anomaly transformer模型包含用于建模时序关联的Anomaly-Attention，其整体结构是Anomaly-Attention和前馈层的交替堆叠，这有利于模型从多层次深度特征中学习潜在的时序关联。</p>
+<p>如下图所示，Anomaly-Attention（左）同时建模了数据的先验关联（Prior-Association，即更关注邻近区域的先验）和序列关联（Series-Association，即从数据中挖掘的依赖）。除了重建误差之外，我们的模型还采用了极小极大策略（Minimax）用于进一步增大异常点和正常点所具有的关联差异的差距。该策略带有一个特殊设计的停止梯度机制（灰色箭头），以约束先验关联和序列关联，从而获得更明显的关联差异。 </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171532932.png" alt="image-20220301223654604"></p>
+<h3 id="2-1-Anomaly-Attention的具体设计"><a href="#2-1-Anomaly-Attention的具体设计" class="headerlink" title="2.1 Anomaly-Attention的具体设计"></a>2.1 Anomaly-Attention的具体设计</h3><p>我们提出的一种新的注意力机制Anomaly-Attention，用于统一建模先验关联和序列关联，进而方便关联差异的计算。</p>
+<ul>
+<li><p>对于先验关联<img src="https://www.zhihu.com/equation?tex=P%5El" alt="[公式]">，我们采用了可学习的高斯核函数，其中心在对应时间点的索引上。这种设计可以利用高斯分布的单峰特点，使数据更加关注邻近的点。同时，为了使得先验关联能够适应不同的时序模式，高斯核函数包含可学习的尺度参数<img src="https://www.zhihu.com/equation?tex=%5Csigma" alt="[公式]">。</p>
+</li>
+<li><p>对于序列关联<img src="https://www.zhihu.com/equation?tex=S%5El" alt="[公式]">，它是由标准Transformer中注意力计算获得，一个点的序列关联即是该点在注意力矩阵中对应行的注意力权重分布。该分支是为了挖掘原始序列中的关联，让模型自适应地捕捉最有效果的关联。</p>
+<p>与逐点表征相比，我们的两种关联都很好地表示了每个点在时间维度上的依赖，这使得表征具有了更丰富的信息。它们也分别反映了邻近先验和习得的真实关联。这两者之间的差异，即为关联差异（Association Discrepancy)，可以天然地将正常点和异常点区分开来。</p>
+</li>
+</ul>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171549339.png" alt="image-20220302171549339"></p>
+<h4 id="2-1-1-关联差异（Association-Discrepancy）"><a href="#2-1-1-关联差异（Association-Discrepancy）" class="headerlink" title="2.1.1 关联差异（Association Discrepancy）"></a>2.1.1 <strong>关联差异（Association Discrepancy）</strong></h4><p>通过上面的网络结构获得了<strong>Prior-association</strong> <img src="https://www.zhihu.com/equation?tex=%5Cmathcal%7BP%7D%5El" alt="[公式]">和<strong>Series-association</strong><img src="https://www.zhihu.com/equation?tex=S%5El" alt="[公式]">后，可以定义Association discrpancy</p>
+<p><img src="https://www.zhihu.com/equation?tex=AssDis%28%5Cmathcal%7BP%7D%2C+%5Cmathcal%7BS%7D%3B%5Cmathcal%7BX%7D%29%3D%5CBig%5B+++%5Cfrac%7B1%7D%7BL%7D%5Csum_%7Bl%3D1%7D%5E%7BL%7D++%5Cbig%28++KL%28%5Cmathcal%7BP%7D_%7Bi%2C%3A%7D%5El+%7C%7C+%5Cmathcal%7BS%7D_%7Bi%2C%3A%7D%5El%29+%2B+KL%28%5Cmathcal%7BS%7D_%7Bi%2C%3A%7D%5El+%7C%7C+%5Cmathcal%7BP%7D_%7Bi%2C%3A%7D%5El%29+%5Cbig%29+++%5CBig%5D_%7Bi%3D1%2C%5Ccdots%2CN%7D" alt="[公式]"></p>
+<p>上式利用了symmetrized KL散度计算每层中得到的两个分布的差异，这代表了这两个分布之间的信息增益，每个时间点对应一个值，异常数据相比正常数据AssDis的值会较小。</p>
+<h3 id="2-2-极大极小策略"><a href="#2-2-极大极小策略" class="headerlink" title="2.2 极大极小策略"></a>2.2 极大极小策略</h3><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171605065.png" alt="image-20220302171605065"></p>
+<p>为了无监督地学习表征，我们利用重建误差来进行模型优化。同时，为了加大正常点和异常点之间的差距，我们使用了一个额外关联差异损失来增大关联差异。在这种设计下，由于先验关联的单峰特性，新增的关联差异损失会驱使序列关联更加关注非邻近的区域，从而使得异常点的重建更加的艰难，进而更加可辨别。</p>
+<p><img src="https://pic2.zhimg.com/80/v2-3b81acaaffb3719a9a9802fd82ab1065_720w.jpg" alt="img"></p>
+<p>然而直接最小化关联差异将使得高斯核的尺度参数<img src="https://www.zhihu.com/equation?tex=%5Csigma" alt="[公式]">急剧变小，结果就会导致先验分布无意义。因此，为了更好的控制关联学习的过程，我们采用了一种Minimax策略。在最小化阶段，先验关联将高斯核导出的分布族中的关联差异最小化。在最大化阶段，序列关联使重构损失下的关联差异最大化。</p>
+<p>在最小化阶段，我们让先验关联<img src="https://www.zhihu.com/equation?tex=P" alt="[公式]">近似从原始时序中学得的序列关联<img src="https://www.zhihu.com/equation?tex=S" alt="[公式]">，该过程将使得先验关联适应不同的时序模式。在最大化阶段，我们优化序列关联<img src="https://www.zhihu.com/equation?tex=S" alt="[公式]">来最大化关联之间的差异，该过程将使得序列关联更加注意非临接的点，使得异常点的重建更加困难。</p>
+<p><img src="https://pic1.zhimg.com/80/v2-53d9ecf16b969a98e3e23c7b193f6890_720w.jpg" alt="img"></p>
+<p>最终，我们将标准化后的关联差异与重建误差结合起来制定了新的<strong>异常检测判据</strong>：</p>
+<p><img src="https://pic2.zhimg.com/80/v2-58a56382fb82761e76a2c7ade332c1d9_720w.jpg" alt="img"></p>
+<h2 id="实验结果与可视化分析"><a href="#实验结果与可视化分析" class="headerlink" title="实验结果与可视化分析"></a>实验结果与可视化分析</h2><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171638524.png" alt="image-20220302171638524"></p>
+<p>消融实验：</p>
+<p><img src="C:\Users\30331\AppData\Roaming\Typora\typora-user-images\image-20220302171648598.png" alt="image-20220302171648598"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220302171708687.png" alt=""></p>
+<p>总结：</p>
+<p>本文研究无监督时间序列异常检测问题。与以前的方法不同，我们通过transformer学习了更多信息的时间点关联。在关联差异关键观测的基础上，提出了一种异常变压器(Anomaly Transformer)，该变压器包含一个具有双分支结构的异常注意来体现关联差异。采用极大极小策略进一步放大正常和异常时间点之间的差异。通过引入关联差异，提出了基于关联的准则，提高了重构性能</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/02/23/DengJiaoxue/SELF-SUPERVISED%20LEARNING%20FOR%20FEW-SHOT%20IMAGE%20CLASSIFICATION%E3%80%90ICASSP2021%E3%80%91/" rel="prev" title="djx ELF-SUPERVISED LEARNING FOR FEW-SHOT IMAGE CLASSIFICATION【ICASSP2021】">
+      <i class="fa fa-chevron-left"></i> djx ELF-SUPERVISED LEARNING FOR FEW-SHOT IMAGE CLASSIFICATION【ICASSP2021】
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/13/WangXuehui/AdaRNN%20Adaptive%20Learning%20and%20Forecasting%20of%20Time%20Series%E3%80%90CIKM%202021%E3%80%91/" rel="next" title="wxh【CIKM-2021】AdaRNN--Adaptive Learning and Forecasting of Time Series">
+      wxh【CIKM-2021】AdaRNN--Adaptive Learning and Forecasting of Time Series <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1%E3%80%81INTRODUCTION"><span class="nav-number">1.</span> <span class="nav-text">1、INTRODUCTION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2%E3%80%81%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">2、方法：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Anomaly-Attention%E7%9A%84%E5%85%B7%E4%BD%93%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Anomaly-Attention的具体设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E5%85%B3%E8%81%94%E5%B7%AE%E5%BC%82%EF%BC%88Association-Discrepancy%EF%BC%89"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 关联差异（Association Discrepancy）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%9E%81%E5%A4%A7%E6%9E%81%E5%B0%8F%E7%AD%96%E7%95%A5"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 极大极小策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C%E4%B8%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">实验结果与可视化分析</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

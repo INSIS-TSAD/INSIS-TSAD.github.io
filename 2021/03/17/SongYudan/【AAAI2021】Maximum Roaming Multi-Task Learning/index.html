@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：多任务学习 Abstract多任务参数联合优化是MTL中一个活跃的研究问题，对不同任务的参数进行划分（不相交或有重叠），可以放宽共享权值的优化约束，但是这种方法会削弱多任务产生的inductive bias（MTL的思想）。本文提出了新的划分参数空间的方法（Maximum Roaming），且不会削弱inductive bias。该方法受dropout启发，随机改变参数分区，迫使参数在规定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd 【AAAI 2021】Maximum Roaming Multi-Task Learning">
+<meta property="og:url" content="http://example.com/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：多任务学习 Abstract多任务参数联合优化是MTL中一个活跃的研究问题，对不同任务的参数进行划分（不相交或有重叠），可以放宽共享权值的优化约束，但是这种方法会削弱多任务产生的inductive bias（MTL的思想）。本文提出了新的划分参数空间的方法（Maximum Roaming），且不会削弱inductive bias。该方法受dropout启发，随机改变参数分区，迫使参数在规定">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210314121704175.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315105551576.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315110527668.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315111601592.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315112647638.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315113735399.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315115830436.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315142113901.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210316144413690.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210316144443632.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315163905359.png">
+<meta property="og:image" content="c:/Users/Meow/AppData/Roaming/Typora/typora-user-images/image-20210316154859336.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210316155919158.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315165621540.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315165634470.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315165737427.png">
+<meta property="article:published_time" content="2021-03-17T08:20:10.000Z">
+<meta property="article:modified_time" content="2021-03-17T13:21:29.089Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="多任务学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210314121704175.png">
+
+<link rel="canonical" href="http://example.com/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd 【AAAI 2021】Maximum Roaming Multi-Task Learning | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/SongYudan/%E3%80%90AAAI2021%E3%80%91Maximum%20Roaming%20Multi-Task%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd 【AAAI 2021】Maximum Roaming Multi-Task Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-17 16:20:10 / Modified: 21:21:29" itemprop="dateCreated datePublished" datetime="2021-03-17T16:20:10+08:00">2021-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：多任务学习</p>
+<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>多任务参数<strong>联合优化</strong>是MTL中一个活跃的研究问题，对不同任务的参数进行<strong>划分</strong>（不相交或有重叠），可以放宽共享权值的优化约束，但是这种方法会<strong>削弱</strong>多任务产生的inductive bias（MTL的思想）。本文提出了新的划分参数空间的方法（Maximum Roaming），且不会削弱inductive bias。该方法受dropout启发，<strong>随机</strong>改变参数分区，迫使参数在规定的频率下尽可能<strong>多</strong>地查看任务，使网络全面适应每次更新。实验表明，与普通的分区优化策略相比，roaming带来的正则化对性能的影响更大，且整体方法灵活、易于应用。</p>
+<a id="more"></a>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210314121704175.png" alt="image-20210314121704175"></p>
+<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p>MTL旨在通过共同学习多个任务，提高<strong>泛化</strong>性；利用不同任务的训练信号中所包含的多个领域特定信息，作为<strong>inductive bias</strong>，起<strong>正则器</strong>的作用。但是针对多个任务优化同一批参数，可能出现某一任务的提升会导致其他任务性能的下降，即<strong>任务干扰</strong>；不同任务所需要的表示具有<strong>特异性</strong>。</p>
+<p>已有方法：用task-sepcific参数扩大网络，给任务以更大的专业化空间；采用架构适配以适应特定的任务集。但是这些方法都没有解决<strong>共享部分的任务干扰</strong>，也不能很好地随任务数量扩展。也可以通过构造特定任务参数划分，参数被更少的任务限制，这会削弱inductive bias。</p>
+<p>本文提出<strong>动态划分策略</strong>——Maximum Roaming方法，控制任务干扰的前提下，产生inductive bias。该方法受dropout思想启发，参数可以在几个特定任务的子网中roam（漫游），从maximum的任务中进行学习，建立更鲁棒的表示；且该方法不是寻找一个最优的划分，而是连续的随机划分、<strong>随机给任务分配参数</strong>，允许它们从每个任务中学习，实验证明了该方法相较于SOTA的提升。</p>
+<h3 id="2-Related-work"><a href="#2-Related-work" class="headerlink" title="2. Related work"></a>2. Related work</h3><p>解决任务干扰引发的问题的三个方法：</p>
+<p><strong>loss加权</strong>：在优化目标中通过加权来平衡不同任务的loss，但是这些方法并不旨在<strong>解决</strong>任务干扰，只是调整每个任务在总目标中所占量级的大小。Maximum Roaming方法是明确地控制任务干扰。</p>
+<p><strong>多目标优化</strong>：把MTL转化为多目标优化问题。一些现有方法使得参数最后到达一个帕累托最优状态，即不存在参数更新方向，使得某一任务性能提升且不损害其他任务性能；但是强烈的任务干扰会导致<strong>参数停滞</strong>。</p>
+<p><strong>参数划分</strong>：将注意力机制用于卷积filter级别，使得每个<strong>任务</strong>在每一<strong>层</strong>选择其需要的参数<strong>子集</strong>，选择范围越大，使用给定参数的任务就越少，减少任务干扰。但是已有的方法会<strong>削弱</strong>inductive bias，不考虑每个任务对每个参数学习过程的贡献，而我们的方法使得每个参数有序地从每个任务中进行学习。</p>
+<h3 id="3-Preliminaries"><a href="#3-Preliminaries" class="headerlink" title="3. Preliminaries"></a>3. Preliminaries</h3><p>定义训练集：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315105551576.png" alt="image-20210315105551576" style="zoom:67%;" /></p>
+<p>$T$是任务个数，$N$是数据个数，用标准的深度为$D$的共享卷积网络学习$T$个任务，并在预测层对每个任务$t$都有输出，卷积核为要学习的参数，第$d$层网络的参数量记为$S^{(d)}$，用$S_{max}$代表$d$层中参数的最大值。</p>
+<p>标准的MTL共享所有参数，任务$t$第$d$层的输出为：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315110527668.png" alt="image-20210315110527668" style="zoom:67%;" /></p>
+<p>$H$为隐藏层输入，$K^{(d)}$是第$d$层的卷积核。</p>
+<h4 id="3-1-参数划分"><a href="#3-1-参数划分" class="headerlink" title="3.1 参数划分"></a>3.1 参数划分</h4><p>二元参数划分矩阵：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315111601592.png" alt="image-20210315111601592" style="zoom:67%;" /></p>
+<p>$m_t^{(d)}$是$d$层与任务$t$相关的列向量，用以下操作可以为每一个任务$t$选择一个参数子集：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315112647638.png" alt="image-20210315112647638" style="zoom:67%;" /></p>
+<p>隐输入也取决于任务：每个任务有<strong>独立</strong>的forward pass，反向传播与特定任务相关的loss，每个参数会收到使用该参数的任务传回的梯度信息。</p>
+<h4 id="3-2-参数划分初始化"><a href="#3-2-参数划分初始化" class="headerlink" title="3.2 参数划分初始化"></a>3.2 参数划分初始化</h4><p>划分矩阵中的参数都满足参数为$p$的伯努利分布：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315113735399.png" alt="image-20210315113735399" style="zoom:67%;" /></p>
+<p>$p$控制<strong>共享率</strong>（每一层都相同），各任务参数的重叠率，如某个参数从不同任务收到的梯度信息的数量。这个数目越小，有冲突信息的概率就越低，可以减少任务干扰，简化优化问题。同时也削弱了inductive bias，影响MTL效果。</p>
+<p>保证网络容量，对参数加以限制：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315115830436.png" alt="image-20210315115830436" style="zoom:67%;" /></p>
+<p>=1，即$p=0$，不相交参数划分；=$T$，即$p=1$，完全共享网络。</p>
+<blockquote>
+<p><strong>dropout</strong>思想：使参数在不同的<strong>随机</strong>抽样的<strong>子网</strong>中连续学习有效表示。</p>
+</blockquote>
+<p>通过规律地<strong>更新</strong>参数划分<strong>矩阵</strong>，使参数依次从每个任务中进行<strong>学习</strong>，即在任务中roam，有序建立inductive bias。这就是Maximum Roaming MTL，包括两个核心要点：1）参数划分矩阵的更新策略；2）更新划分矩阵时如何选择要更新的参数</p>
+<h3 id="4-Maximum-Roaming-Multi-Task-Learning"><a href="#4-Maximum-Roaming-Multi-Task-Learning" class="headerlink" title="4. Maximum Roaming Multi-Task Learning"></a>4. Maximum Roaming Multi-Task Learning</h3><p>介绍本方法的核心内容</p>
+<blockquote>
+<p>假设1：同时优化不同任务的参数可以得到inductive bias，也可以通过对不同任务子集的<strong>顺序优化</strong>得到。</p>
+</blockquote>
+<p>根据假设1，划分矩阵可以<strong>随时间</strong>演化，用3中的方法初始化，经过每一步$c$，矩阵的值就会<strong>更新</strong>，在满足约束的前提下，参数可以在不同的任务间roam。</p>
+<blockquote>
+<p>定义1：$A_t(c)$是任务$t$在第$c$步的参数目录，把$c$步之前的参数并集得到$B_t(c)$，即到$c$步时任务$t$访问过的参数集合，到$c+1$步时，划分矩阵按照以下规则更新：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315142113901.png" alt="image-20210315142113901" style="zoom:80%;" /></p>
+</blockquote>
+<p>$\Delta$控制矩阵更新<strong>频率</strong>，一般比较大（网络可以在一个设定下<strong>充分</strong>学习，如果更新太频繁，会导致更大的任务干扰），$c=E/\Delta$，$E$代表训练轮数，在每$\Delta$轮中用相同的参数划分进行训练，每次更新一个参数。</p>
+<blockquote>
+<p>引理1：更新频率$\Delta$有以下属性：</p>
+<ol>
+<li>更新会在$\Delta(1-p)S_{max}$训练步内完成</li>
+<li>更新完成时，每个参数至少被每个任务训练了$\Delta$轮</li>
+<li>在整个更新过程中，隶属于每个任务的参数量是不变的（不同任务参数划分之间的重叠保持不变，<strong>控制任务干扰</strong>）</li>
+</ol>
+</blockquote>
+<p>证明：1）$B_t(c)$初始化为$pS$，每$\Delta$轮增加1</p>
+<p>经过$c$步后，每个参数$i$被任务$t$使用的概率是：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210316144413690.png" alt="image-20210316144413690" style="zoom:67%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210316144443632.png" alt="image-20210316144443632" style="zoom:67%;" /></p>
+<p>$r(c)$是更新进度。此式说明，随着不断的更新，<strong>概率会增加、最大化</strong>，与该参数相关的任务数量也会增加，由此学到inductive bias。</p>
+<p>综上所述，在控制任务干扰的前提下学到inductive bias。</p>
+<h3 id="5-Experiments"><a href="#5-Experiments" class="headerlink" title="5. Experiments"></a>5. Experiments</h3><h4 id="5-1-数据集"><a href="#5-1-数据集" class="headerlink" title="5.1 数据集"></a>5.1 数据集</h4><p><strong>Celeb-A：</strong>超过200k张名人图片，40种不同的面部属性，将40个属性划分为<strong>8</strong>组，每组创建一个属性预测任务，简化计算。</p>
+<p><strong>CityScapes：</strong>5000张街景图像，有像素级标注。7个语义分割、1个深度估计，共<strong>8</strong>个任务。</p>
+<p><strong>NYUv2</strong>：1449张室内图片，包含464种不同的场景。13个语义分割、深度估计、表面法线估计，共<strong>15</strong>个任务。</p>
+<h4 id="5-2-baselines"><a href="#5-2-baselines" class="headerlink" title="5.2 baselines"></a>5.2 baselines</h4><ul>
+<li>MTL 标准完全共享网络，各任务权重相同</li>
+<li>GradNorm 完全共享网络，各任务权重可学习</li>
+<li>MGDA-UB 完全共享网络，将MTL看作多目标优化问题</li>
+<li>SE-MTL 参数划分方法，有可训练实值掩码</li>
+<li>STL 单任务模型，每个任务一个模型</li>
+</ul>
+<h4 id="5-3-面部属性检测实验"><a href="#5-3-面部属性检测实验" class="headerlink" title="5.3 面部属性检测实验"></a>5.3 面部属性检测实验</h4><p>采用ResNet-18作为骨干网络</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315163905359.png" alt="image-20210315163905359"></p>
+<p><strong>Roaming的影响</strong>：研究参数roaming对MTL性能的影响。图1左给出了Max Roaming方法与固定分区方法F-scores（更新全部完成时）随共享率$p$的变化。与固定分区相比，Max Roaming可以提升性能。</p>
+<p><strong>$\Delta$和更新进度$r(c)$的影响：</strong>$p$设为0.5，图1中给出了结果，当$\Delta$大于0.05时，$\Delta$越大，F-scores越大，所以$\Delta$不能过小；随着更新进行，F-scores增加。</p>
+<p><strong>随机选择的影响：</strong>更新时如何选择要更新的参数？MR是随机选择，从$i<em>-$、$i</em>+$所属的集合的均匀分布中选择。另外设计了一种<strong>确定性更新方法</strong>——根据最小化平均余弦相似度，选择最有可能为任务提供额外信息的参数，丢弃冗余参数。原则如下：</p>
+<p><img src="C:\Users\Meow\AppData\Roaming\Typora\typora-user-images\image-20210316154859336.png" alt="image-20210316154859336" style="zoom:67%;" /></p>
+<p>$K$是各参数的卷积核，图1右给出了确定性选择参数vs随机选择参数的F-scores，在更新初期表现差不多，随着更新的进行，MR方法优于确定选择方法。</p>
+<p>表1给出了MR与其他baselines的总体比较。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210316155919158.png" alt="image-20210316155919158" style="zoom:80%;" /></p>
+<h4 id="5-3-场景理解"><a href="#5-3-场景理解" class="headerlink" title="5.3 场景理解"></a>5.3 场景理解</h4><p>MR在另外两个数据集上的应用，表2-4给出了结果。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315165621540.png" alt="image-20210315165621540" style="zoom: 67%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315165634470.png" alt="image-20210315165634470" style="zoom: 67%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20210315165737427.png" alt="image-20210315165737427" style="zoom:67%;" /></p>
+<p><strong>MR方法在语义分割、法线估计任务种表现最好，在深度估计中排第二。</strong>因为MR方法保留了inductive bias，可以提升比较<strong>相似</strong>的任务的性能（也就是分割任务）。与单任务相比，MTL随着任务数量增多性能可能会下降，可能不如单任务模型。</p>
+<h3 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h3><p>提出了Maximum Roaming——动态参数划分方法，以减少任务干扰，同时充分利用多任务带来的inductive bias，该方法使参数能够连续从尽可能多的任务中学习。与其他分区方法相比，更快，无需额外参数。实验将MR应用于卷积网络，实现了性能的提升。</p>
+<hr>
+<p>code link：<a target="_blank" rel="noopener" href="https://github.com/lucaspascal/Maximum-Roaming-Mutli-Task-Learning">https://github.com/lucaspascal/Maximum-Roaming-Mutli-Task-Learning</a>.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%AD%A6%E4%B9%A0/" rel="tag"># 多任务学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/17/BaiYunfei/ShapeNet(1)/" rel="prev" title="byf 【AAAI-2021】ShapNet">
+      <i class="fa fa-chevron-left"></i> byf 【AAAI-2021】ShapNet
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/24/WuTao/informer/" rel="next" title="wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting">
+      wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Related-work"><span class="nav-number">3.</span> <span class="nav-text">2. Related work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Preliminaries"><span class="nav-number">4.</span> <span class="nav-text">3. Preliminaries</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E5%8F%82%E6%95%B0%E5%88%92%E5%88%86"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 参数划分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E5%8F%82%E6%95%B0%E5%88%92%E5%88%86%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 参数划分初始化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Maximum-Roaming-Multi-Task-Learning"><span class="nav-number">5.</span> <span class="nav-text">4. Maximum Roaming Multi-Task Learning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Experiments"><span class="nav-number">6.</span> <span class="nav-text">5. Experiments</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 数据集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-baselines"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 baselines</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-%E9%9D%A2%E9%83%A8%E5%B1%9E%E6%80%A7%E6%A3%80%E6%B5%8B%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 面部属性检测实验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-3-%E5%9C%BA%E6%99%AF%E7%90%86%E8%A7%A3"><span class="nav-number">6.4.</span> <span class="nav-text">5.3 场景理解</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">7.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

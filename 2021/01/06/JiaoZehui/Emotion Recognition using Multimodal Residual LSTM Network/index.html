@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="摘要使用脑电图(EEG)和其他生理信号的传统LSTM网络捕获时间信息的方法对多模态情绪识别非常有用。然而，使用更深的LSTM网络的多模态和深层次时间特征学习之间的依赖性仍有待研究。 我们提出了一种用于情感识别的多模态残差LSTM网络。MMResLSTM网络共享每个LSTM层中模态的权重，以学习脑电图和其他生理信号之间的相关性。 使用公开可用的DEAP数据集进行评估。实验结果表明，该网络的arous">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh Emotion Recognition using Multimodal Residual LSTM Network">
+<meta property="og:url" content="http://example.com/2021/01/06/JiaoZehui/Emotion%20Recognition%20using%20Multimodal%20Residual%20LSTM%20Network/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="摘要使用脑电图(EEG)和其他生理信号的传统LSTM网络捕获时间信息的方法对多模态情绪识别非常有用。然而，使用更深的LSTM网络的多模态和深层次时间特征学习之间的依赖性仍有待研究。 我们提出了一种用于情感识别的多模态残差LSTM网络。MMResLSTM网络共享每个LSTM层中模态的权重，以学习脑电图和其他生理信号之间的相关性。 使用公开可用的DEAP数据集进行评估。实验结果表明，该网络的arous">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004104931374.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004152911263.png">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=g">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=b">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/v2-c039daa05cd9d5c3936c4513422690b0_1440w.jpg">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004161602843.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004163128402.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004165251317.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004165314035.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004165338427.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:46:10.055Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004104931374.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/JiaoZehui/Emotion%20Recognition%20using%20Multimodal%20Residual%20LSTM%20Network/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh Emotion Recognition using Multimodal Residual LSTM Network | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/Emotion%20Recognition%20using%20Multimodal%20Residual%20LSTM%20Network/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh Emotion Recognition using Multimodal Residual LSTM Network
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:46:10" itemprop="dateModified" datetime="2021-01-16T11:46:10+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>使用脑电图(EEG)和其他生理信号的传统LSTM网络捕获时间信息的方法对<strong>多模态情绪识别</strong>非常有用。然而，使用更深的LSTM网络的多模态和深层次时间特征学习之间的依赖性仍有待研究。</p>
+<p>我们提出了一种用于情感识别的多模态残差LSTM网络。MMResLSTM网络共享每个LSTM层中模态的权重，以学习脑电图和其他生理信号之间的相关性。</p>
+<p>使用公开可用的DEAP数据集进行评估。实验结果表明，该网络的arousal分类准确率为92.87%，valence为92.30%</p>
+<a id="more"></a> 
+<h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>会议: </strong>ACM International Conference on Multimedia </p>
+<p><strong>作者:</strong>  <img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004104931374.png" alt="image-20201004104931374"></p>
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Multimodal emotion recognition; long-short-term memory network; electroencephalography</strong></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>受深度神经网络在许多识别分类任务中的巨大成功的启发，已经提出了几种深度学习架构来改善脑电图(EEG)信号和其他生理信号的多模态情感分类的效果，包括<strong>自编码器、卷积神经网络(CNN)和递归神经网络(RNN)</strong></p>
+<p>各种研究表明，因为考虑时间信息，RNN时间特征提取模块的效果较好。然而，多模态之间的<strong>时间相关性信息</strong>，以及使用更深层次的神经网络的<strong>深层时间特征学习</strong>，还有待研究。</p>
+<p>尽管不同设备从不同位置收集<strong>多种模态</strong>的信号有不同的反射延迟，但是它们却共同反映了相同情绪在随时间变化。因此多模态的信息还是很重要的。</p>
+<p>随着残差学习的使用和神经元层的归一化，DNN可以更高效地收敛，从而优化训练的时间成本。类似于残差学习，我们假设具有<strong>残差连接的深层神经网络</strong>可以学习更复杂的高级情感识别特征，因此优于其他神经网络架构。</p>
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><p>我们有六种常用的情绪识别数据集：DEAP (2012), MAHNOB-HCI (2012), SEED (2015), HR-EEG4EMO (2017), DREAMER (2018), SEED-IV(2019)。</p>
+<p>在典型的时间序列信号中，常规的脑电信号特征包括<strong>时域、频域和时频域特征</strong>，可以使用SVM、MLP、经验模式分解等方法提取特征。深度学习出现后，端到端的方式更为常用，即利用网络自动提取特征。</p>
+<p>虽然DEAP数据集有四个情感标签:arousal, valence, dominance, liking，但并不是所有的标签都用于相关研究。大多数关于DEAP数据集的研究已经将情绪识别问题视为两个独立的二分类任务。</p>
+<p>在新的研究中，情绪识别已经使用各种模态，如面部表情，声音，脑电图，瞳孔直径(EEG)，眼电描记术(EOG) 。</p>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="多模态LSTM"><a href="#多模态LSTM" class="headerlink" title="多模态LSTM"></a>多模态LSTM</h3><p>传统上，为了使用脑电图和其他生理信号实现多模态情感识别，多模态架构或者为不同的模态<strong>建立并行的LSTM</strong>，或者直接<strong>拼接多模态数据</strong>以产生更大的输入。</p>
+<p>第一种方法包含用于不同模态的并行LSTM，对于训练是更有效的，因为每个LSTM具有相似属性的输入；它也更易于解释，因为来自不同模态的信息是分开存储的。然而，这种体系结构没有为多模态之间的相关性学习做准备，因为各模态之间是完全独立的。</p>
+<p>第二种方法尽管网络可以自由地同时访问多个模态的信息，但是交叉的模态相关性并没有被明确地学习。在LSTM，模态内关系和模态间关系没有区别。同时，这种方法更容易过拟合。</p>
+<p>下图为多模态LSTM：</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004152911263.png" alt="image-20201004152911263"></p>
+<p>$W<em>{h *}$ 是共享的，因为它更能学到时域的特性。通过$W</em>{h *}$ ，多模态LSTM可以在学习过程中起到交互的作用。time steps也被共享。</p>
+<h3 id="残差网络"><a href="#残差网络" class="headerlink" title="残差网络"></a>残差网络</h3><h3 id="层归一化"><a href="#层归一化" class="headerlink" title="层归一化"></a>层归一化</h3><p>层归一化是通过归一化神经元的活动来减少深层神经元的训练时间。这对于RNNs中的隐藏态是有效的。</p>
+<script type="math/tex; mode=display">
+\begin{aligned} \mu_{t} &=\frac{1}{H} \sum_{i=1}^{H}\left(h_{t}\right)_{i} \\ \delta_{t} &=\sqrt{\frac{1}{H} \sum_{i=1}^{H}\left(\left(h_{t}\right)_{i}-\mu_{t}\right)^{2}} \\ y_{t} &=f\left(\frac{g}{\delta_{t}} \odot\left(h_{t}-\mu_{t}\right)+b\right) \end{aligned}</script><p>LN中这组参数叫做增益（gain） <img src="https://www.zhihu.com/equation?tex=g" alt="[公式]"> 和偏置（bias） <img src="https://www.zhihu.com/equation?tex=b" alt="[公式]"> ，是可以学习的。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/v2-c039daa05cd9d5c3936c4513422690b0_1440w.jpg" alt="img"></p>
+<p>图1为LN，图二是BN。</p>
+<h3 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004161602843.png" alt="image-20201004161602843" style="zoom:50%;" /></p>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>我们使用DEAP数据集评估了模型的性能。DEAP数据集包含EEG和周边生理信号(PPS)，其中包括EOG和EMG数据。在这个数据集中，32名受试者观看了40个刺激情绪的视频片段。每个视频都是一分钟长。</p>
+<p>我们的模型是为了每个受试者单独训练和测试的，因此使我们的方法依赖于受试者。</p>
+<ol>
+<li>根据我们对以往任务的研究的回顾，缺乏独立于受试者的研究。依赖受试者的方法能够进行更多的比较。</li>
+<li>独立于受试者的方法可能会引起个人隐私问题，因为它需要收集私人脑电图数据和建立一个大型情绪数据库。</li>
+</ol>
+<h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><ol>
+<li>原始脑电信号和PPS被下采样到128赫兹。对于脑电信号，去除了EOG伪影。</li>
+<li>使用4.0-45.0Hz的带通频率滤波器。</li>
+<li>EEG信号被平均到公共参考。</li>
+</ol>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004163128402.png" alt="image-20201004163128402"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004165251317.png" alt="image-20201004165251317"></p>
+<p>图为LSTM和残差LSTM以及多模态的LSTM对比。<img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004165314035.png" alt="image-20201004165314035"></p>
+<p>图为LSTM对于每个个体的表现。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201004165338427.png" alt="image-20201004165338427"></p>
+<p>图为MM-ResLSTM和其他方法的对比。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>在本研究中，我们提出了多模态深度LSTM网络，通过残差学习和权值共享来增强效果。该网络以端到端的方式运行，以隐含地提取高级时间特征。在DEAP数据集上的实验表明，所提出的方法分别以92.87%和92.30%的准确率对arousal和valence进行分类，从而优于现有的方法。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/Improving%20EEG-Based%20Emotion%20Classification%20Using%20Conditional%20Transfer%20Learning/" rel="prev" title="jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning">
+      <i class="fa fa-chevron-left"></i> jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/Deep%20Transfer%20Learning%20for%20Single-Channel%20Automatic%20Sleep%20Staging%20with%20Channel%20Mismatch/" rel="next" title="jzh Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch">
+      jzh Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">4.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">6.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E6%A8%A1%E6%80%81LSTM"><span class="nav-number">6.1.</span> <span class="nav-text">多模态LSTM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C"><span class="nav-number">6.2.</span> <span class="nav-text">残差网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%82%E5%BD%92%E4%B8%80%E5%8C%96"><span class="nav-number">6.3.</span> <span class="nav-text">层归一化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84"><span class="nav-number">6.4.</span> <span class="nav-text">模型结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">7.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">7.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-number">7.2.</span> <span class="nav-text">数据处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">7.3.</span> <span class="nav-text">结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

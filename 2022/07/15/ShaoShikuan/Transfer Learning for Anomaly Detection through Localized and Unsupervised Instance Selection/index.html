@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="作者  Vincent Vercruyssen, Wannes Meert, Jesse Davis DTAI group, KU Leuven, Belgiumfirstname.lastname@kuleuven.be  会议  2020 AAAI  介绍 ​    异常检测可以自然地作为一项无监督的学习任务，无监督的方法利用了异常不经常发生的假设，即异常会落在整个实例空间中的低密度区域。但">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssk Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection">
+<meta property="og:url" content="http://example.com/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="作者  Vincent Vercruyssen, Wannes Meert, Jesse Davis DTAI group, KU Leuven, Belgiumfirstname.lastname@kuleuven.be  会议  2020 AAAI  介绍 ​    异常检测可以自然地作为一项无监督的学习任务，无监督的方法利用了异常不经常发生的假设，即异常会落在整个实例空间中的低密度区域。但">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201006113453.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201006172520.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201006174619.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201006175121.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo\微信截图_20201006175501.png">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo\微信截图_20201006175657.png">
+<meta property="article:published_time" content="2022-07-15T02:46:24.061Z">
+<meta property="article:modified_time" content="2021-01-16T03:50:13.807Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://echo23334.gitee.io/pic_repo/微信截图_20201006113453.png">
+
+<link rel="canonical" href="http://example.com/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ssk Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ssk Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-07-15 10:46:24" itemprop="dateCreated datePublished" datetime="2022-07-15T10:46:24+08:00">2022-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:50:13" itemprop="dateModified" datetime="2021-01-16T11:50:13+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>作者</li>
+</ul>
+<p>Vincent Vercruyssen, Wannes Meert, Jesse Davis</p>
+<p>DTAI group, KU Leuven, Belgium<br>firstname.lastname@kuleuven.be</p>
+<ul>
+<li>会议</li>
+</ul>
+<p>2020 AAAI</p>
+<ul>
+<li><p>介绍</p>
+<p>​    异常检测可以自然地作为一项无监督的学习任务，无监督的方法利用了异常不经常发生的假设，即异常会落在整个实例空间中的低密度区域。但是现实世界的数据经常违背这一假设，例如系统维护会不定期的发生，但不是异常。带标签的数据提供了修正这一差错的可能性，但是完全的监督方法却是不可行的，因为收集现实世界的异常标签是非常昂贵的。激发了对异常检测的半监督方法的研究兴趣，通常与主动学习结合来有效地收集标签。</p>
+<a id="more"></a>
+<p>​    现实世界的异常检测任务经常会涉及监控大量的资产，而每一项资产只有细微的差别。这些场景经常会发生在一个工厂的许多机器和零售商店的所有连锁店中。这些场景需要监控大量的资产，因此即便使用主动学习的策略也很难为每一个资产收集所有标签。鉴于这些涉及相似异常检测任务的场景，我们可以使用迁移学习将有标签的实例从一个任务迁移到另一个任务。</p>
+<p>​    所以本文提出了一种专门针对异常检测的新型迁移学习算法-LOCIT。它的流程分为两步。首先，给定一部分带标签的源数据集和一个没有标签的目标数据集，LOCIT选择在源数据集和目标数据中有相似的局部数据分布的数据实例，将其迁移到目标数据集中，接下来，它使用半监督的最近邻方法分配异常分数，该方法同时考虑已迁移的带标签的源实例和不带标签的目标实例。</p>
+</li>
+<li><p>贡献</p>
+<ul>
+<li>提出一种用于异常检测的新的迁移学习算法：LOCIT(localized instance-transfer algorithm)，检查实例的局部数据分布在源和目标(目标问题)域中是否相似，以不依赖标签的方式决定是否将每个源实例迁移到目标域。</li>
+<li>使用一种半监督异常检测方法，SSKNNO，它结合未标记实例和标记实例(迁移之后的)计算每个目标实例的异常分数。</li>
+</ul>
+</li>
+<li><p>基础概念</p>
+<ul>
+<li><p>用于异常检测的迁移学习</p>
+<p>​    迁移学习的目的是通过给定的一个相关数据集(源域)的数据来学到另一个数据集(目标域)的模型，本文关注的是异常检测，所以任务就是给目标数据集中的每一个实例分配一个分数来量化异常程度，使用$D_S(D_T)$表示源域(目标域)，使用$x_s(x_t)$表示源域或目标域数据集中的实例。</p>
+<p>​    三个常见的迁移学习假设适用于异常检测任务。首先源数据和目标数据来自相同维度的空间。其次，源域和目标域的边缘分布不同(covariate shift assumption)。第三，条件分布会因上下文的变化而不同:同一行为在两个领域中可能具有不同的含义(concept shift assumption)。</p>
+</li>
+<li><p>Nearest Neighbors and KNNO</p>
+<p>​    实例$x$的$k$距离指的是在数据集$D$中离它最近的第$k$个邻居的距离，表示为$k-dist(x,D)$，在$D$中离$x$的最近的$k$个邻居表示为$N_k(x,D)$。在加权距离KNN中标准的权重函数为$\omega(x_i,x_j)=\frac{1}{\delta (x_i,x_j)^2}$，其中$\delta $是两个实例$x_i$和$x_j$的欧氏距离。最后KNNO根据实例的$k$距离将一个数据集中的所有实例进行排序，越高的距离意味着越多的异常实例。</p>
+</li>
+</ul>
+</li>
+<li><p>LOCIT</p>
+<p>问题：</p>
+<p>​    给定：来自相同特征空间的一个已标记的源数据集$D_S$和一个未标记的目标数据集$D_T$</p>
+<p>​    求：使用$D_T$和$D_S$的一个子集来给$D_T$中的每一个实例分配一个异常分数</p>
+<p>LOCIT分两步解决上面任务，首先通过检查实例的本地数据分布在源和目标域中是否相似，以不依赖标签的方式决定是否将每个源实例迁移到目标域。LOCIT采用无监督迁移方式，因为目标标签不可用，而且源标签的值不应该影响迁移决定。其次，LOCIT使用一种新的半监督异常检测算法给每个目标实例分配一个异常分数。</p>
+<ul>
+<li><p>本地实例的迁移(Localized Instance-Based Transfer)</p>
+<p>​    实例迁移函数$f(x_S;D_S,D_T)\mapsto{0,1}$决定是否将一个源实例$x_S \in D_S$迁移到目标域中。最理想的情况是，每一个已经迁移的源实例在两个域中有相同的含义。只有当源异常(正常)实例与目标异常(正常)实例相似时，将源异常(正常)实例迁移到目标域中才有意义。因此LOCIT做了一个假设：如果一个实例周围的源和目标边缘分布的局部结构相似，则实例在源和目标域中具有相似的意义，这里的分布结构由一阶和二阶统计量表征。</p>
+<ul>
+<li><p>表征实例的局部结构</p>
+<p>​    给定一个源实例$x<em>S$，LOCIT使用$x_S$的$\psi $个源域中最近的邻居集合$N</em>\psi (x<em>S,D_S)$定义了局部的源分布。同样局部的目标分布也是基于$x_S$的$\psi $个目标域中最近的邻居集合$N</em>\psi (x<em>S,D_T)$。假设是：如果$N</em>\psi (x<em>S,D_S)$与$N</em>\psi (x<em>S,D_T)$之间的分布相似，那么$x_S$就可以被迁移。相似性由下面$N</em>\psi (x<em>S,D_S)$和$N</em>\psi (x_S,D_T)$的两个一阶和二阶统计量来度量。</p>
+</li>
+<li><p>位置距离</p>
+<p>​    下面的公式定义了两个邻居集合$N1$和$N2$的质心之间的差值(即算术平均值)的l2-范数:</p>
+<script type="math/tex; mode=display">
+d_1(N1,N2)=||\frac{1}{k}(\sum_{x_i\in N_1}x_i-\sum_{x_j \in N_2}x_j)||_2</script><p>​    在这里，LOCIT计算了$d<em>1(N</em>\psi(x<em>S,D_S),N</em>\psi(x_S,D_T))$.直观上来看，$d_1$越大，表示两个集合覆盖的区域重叠的部分越少，也就减少了迁移这个实例的机会。</p>
+</li>
+<li><p>相关距离</p>
+<p>​    这是两个邻居集合协方差矩阵的相对距离：</p>
+<script type="math/tex; mode=display">
+d_2(N1,N2)=\frac{||C_{N1}-C_{N2}||_F}{||C_{N1}||_F}</script><p>​    其中$||.||<em>F$是$F$范数，$C$是协方差矩阵。LOCIT计算了$d_2(N</em>\psi(x<em>S,D_S),N</em>\psi(x_S,D_T))$。如果$d_2$很大，这表明潜在的局部源和目标分布在形状或方向上是不同的，这再一次较少了迁移的机会。邻居集的大小$\psi$是唯一一个在LOCIT迁移过程中的超参数。</p>
+</li>
+<li><p>学习实例迁移函数</p>
+<p>​    实例迁移函数$f$需要结合$d_1$和$d_2$提供的信息来决定是否迁移$x_s$，LOCIT在目标分布上学习了一个SVM分类器来作为$f$，分类器通过查看源实例在源数据和目标数据中的邻居集之间的相关距离和位置距离来预测源实例$x_s$是否属于目标域。</p>
+<p>​    为了训练分类器，LOCIT仅考虑目标数据来生成训练数据。它利用了光滑性假设，即相邻的目标实例应该具有类似的局部分布，而远处的实例则不应该具有。因此，正训练样本是由每一个实例$x<em>t \in D_T$通过找到它的最近的邻居$x_n \in D_T $\ ${x_t}$，并且计算$d_1(N</em>\psi(x<em>t,D_T),N</em>\psi(x<em>n,D_T))$和$d_2(N</em>\psi(x<em>t,D_T),N</em>\psi(x_n,D_T))$来产生。同样的，负样本的产生是计算每一个实例$x_t \in D_T$的特征向量包括$x_t$的邻居集和距离最远的邻居$x_f \in D_T$\ ${x_t}$之间的距离。下图比较了LOCIT和一种流行的全局域策略CORAL</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/微信截图_20201006113453.png" alt="微信截图_20201006113453" style="zoom:60%;" /></p>
+</li>
+</ul>
+</li>
+<li><p>在目标域中预测(Prediction in the Target Domain)</p>
+<p>​    迁移之后，在对目标实例进行预测时存在两个挑战。首先，目标域现在混合包含带标签和未带标签的实例。其次，由于这是一个异常检测问题，目标实例邻居中的已知标签不一定提供其标签对应的信息。</p>
+<p>​    接下来就是LOCIT的第二个贡献，一种半监督异常检测方法SSKNNO，它结合未标记实例和(迁移的)标记实例计算每个目标实例的异常分数。一方面，在计算得分时考虑了未标记目标实例的局部分布。另一方面，它通过比较目标数据中(迁移的)标记实例和未标记实例的邻居来给这个分数加权。</p>
+<p>​    令$D^<em>=D<em>T\cup D</em>{trans}$表示包含目标实例和已迁移源实例的集合，对于一个目标实例$x_t$，找到所有邻居的集合$N_k(x_t,D^</em>)$并将集合中已标记的子集表示为$L_k(x_t,D^*)$。在$x_t$的邻居中已标记实例的权重现在是$W_l$：</p>
+<script type="math/tex; mode=display">
+W_l(x_t)=\frac{|x_i:x_i \in L_k(x_t,D^*)\wedge x_t \in N_k(x_i,D^*)|}{k}</script><p>​    直观来看，当给$x_t$分配一个异常分数时，如果一个源实例和$x_t$很相似时，我们就只想考虑这个迁移过的源实例的标签。例如，如果$x_t$是一个孤立的实例，那么它的$k$个最近的邻居将是很远的。即使贴上了标签，这些实例也不能很好地预测$x_t$的标签。这反映在$W_l(x_t)$，仅仅考虑那些$x_t$邻居中的实例(这些实例中$x_t$也是他们的近邻)。</p>
+<p>​    这个权重现在可以被用来计算实例$x_t$的异常分数$a(x_t)$，加权组合了一个无监督成$a_u$(考虑局部数据分布)和一个有监督成分$a_l$(考虑附近的有标签实例)，表示如下：</p>
+<script type="math/tex; mode=display">
+a(x_t) = (1 −W_l(x_t)) a_u(x_t) +W_l(x_t) a_l(x_t) \space\space\space\space\space\space\space\space\space\space\space\space\space\space(4)</script><p>​    有监督分数$a_l$为$x_t$相邻实例标签的距离加权平均值:</p>
+<script type="math/tex; mode=display">
+a_l(x_t)=\frac{\sum_{x_i \in L_k}\mathfrak{1}_{x_i=anomaly}(x_i)w(x_i;x_t)}{\sum_{x_i \in L_k}w(x_i;x_t)}</script><p>​    其中$w$在前面定义为欧氏距离；$\mathfrak{1}_{y_i=1}(x_i)$是1，如果专家给$x_i$标注的标签为异常。无监督分数$a_u$使用基于KNNO算法的$k-dist$，但使用了指数函数把范围限定在了$[0,1]$之间：</p>
+<script type="math/tex; mode=display">
+a_u(x_t)=1-exp(-\frac{k-dist(x_t,D^*)^2}{2 \gamma ^2})</script><p>​    其中，$\gamma$是假设的异常百分比为，设为源域中已知异常所占的比例。下图展示了SSKNNO方法</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201006172520.png" alt="微信截图_20201006172520" style="zoom:80%;" /></p>
+<p>​    在极端情况下，权值$W_l(x_t)$可以是0或1。如果$x_t$的邻居都没有被标记，$L_k$为空，$W_l(x_t)$变为零，公式4将简化为相应的KNNO分数。如果LOCIT的迁移函数没有选择实例来迁移，就会发生这种情况。反过来，如果$x_t$的所有邻域都被标记，并且$x_t$属于每一个邻域的邻域集，那么最终的异常值就是标准的加权KNN分类器。</p>
+</li>
+</ul>
+</li>
+<li><p>基准实验评估</p>
+<ul>
+<li><p>比较的方法</p>
+<p>​    比较了12个方法，可以分为三个范畴：异常检测的基线算法(KNNO，LOF，IFOREST，HBOS)、迁移学习的基线方法(TRANSFERALL，CORAL，TCA，GFK，JDA，TJM，JGSA，CBIT，迁移之后使用一个KNN分类器来分类)、LOCIT(本文的算法)</p>
+</li>
+<li><p>实验结果</p>
+<p>​    </p>
+</li>
+</ul>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201006174619.png" alt="微信截图_20201006174619" style="zoom:80%;" /></p>
+</li>
+</ul>
+<p>  <img src="http://echo23334.gitee.io/pic_repo/微信截图_20201006175121.png" alt="微信截图_20201006175121" style="zoom:80%;" /></p>
+<p>  <img src="http://echo23334.gitee.io/pic_repo\微信截图_20201006175501.png" alt="微信截图_20201006175501" style="zoom:80%;" /></p>
+<ul>
+<li><p>真实世界实验评估</p>
+<ul>
+<li><p>数据和方法</p>
+<p>​    我们有三家商店三年的用水量历史时间序列数据。数据由每五分钟记录一次的单变量测量数据组成。在每个商店，公司专家标记了大约10%的数据，每个提供的标签显示一个小时的区块(例如，01:00-02:00)是否显示正常行为。其余的数据没有标记。</p>
+</li>
+<li><p>实验结果</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="http://echo23334.gitee.io/pic_repo\微信截图_20201006175657.png" alt="微信截图_20201006175657" style="zoom:80%;" /></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/" rel="prev" title="mzy 【ICCV-2019】一种严格的对于时间序列可解释性的评估方法">
+      <i class="fa fa-chevron-left"></i> mzy 【ICCV-2019】一种严格的对于时间序列可解释性的评估方法
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="摘要我们提出了一种使用自我监督学习的基于心电图（ECG）的情绪识别系统。我们提出的体系结构由两个主要网络组成，一个信号转换识别网络和一个情感识别网络。首先，未标记的数据用于成功训练前一个网络，以在自我监督的学习步骤中检测特定的预定信号转换。接下来，将该网络的卷积层的权重转移到情感识别网络，并训练两个密集层以对唤醒和化合价进行分类。我们表明，我们的自我监督方法可帮助模型学习情感识别所需的ECG特征集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型">
+<meta property="og:url" content="http://example.com/2021/01/26/DengJiaoxue/ecg_ssl/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="摘要我们提出了一种使用自我监督学习的基于心电图（ECG）的情绪识别系统。我们提出的体系结构由两个主要网络组成，一个信号转换识别网络和一个情感识别网络。首先，未标记的数据用于成功训练前一个网络，以在自我监督的学习步骤中检测特定的预定信号转换。接下来，将该网络的卷积层的权重转移到情感识别网络，并训练两个密集层以对唤醒和化合价进行分类。我们表明，我们的自我监督方法可帮助模型学习情感识别所需的ECG特征集">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:/Users/-XY/AppData/Roaming/Typora/typora-user-images/image-20210117224634937.png">
+<meta property="og:image" content="c:/Users/-XY/AppData/Roaming/Typora/typora-user-images/image-20210118194936442.png">
+<meta property="og:image" content="c:/Users/-XY/AppData/Roaming/Typora/typora-user-images/image-20210113221406248.png">
+<meta property="og:image" content="c:/Users/-XY/AppData/Roaming/Typora/typora-user-images/image-20210115232456063.png">
+<meta property="og:image" content="c:/Users/-XY/AppData/Roaming/Typora/typora-user-images/image-20210115234233360.png">
+<meta property="og:image" content="c:/Users/-XY/Desktop/SSL-ECG/images_ssl_architecture.jpg">
+<meta property="article:published_time" content="2021-01-26T07:00:24.000Z">
+<meta property="article:modified_time" content="2021-01-26T11:47:03.553Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="自监督">
+<meta property="article:tag" content="表示学习">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="睡眠分期">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/-XY/AppData/Roaming/Typora/typora-user-images/image-20210117224634937.png">
+
+<link rel="canonical" href="http://example.com/2021/01/26/DengJiaoxue/ecg_ssl/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/26/DengJiaoxue/ecg_ssl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-26 15:00:24 / Modified: 19:47:03" itemprop="dateCreated datePublished" datetime="2021-01-26T15:00:24+08:00">2021-01-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h5 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h5><p>我们提出了一种使用自我监督学习的基于心电图（ECG）的情绪识别系统。我们提出的体系结构由两个主要网络组成，一个信号转换识别网络和一个情感识别网络。首先，未标记的数据用于成功训练前一个网络，以在自我监督的学习步骤中检测特定的预定信号转换。接下来，将该网络的卷积层的权重转移到情感识别网络，并训练两个密集层以对唤醒和化合价进行分类。我们表明，我们的自我监督方法可帮助模型学习情感识别所需的ECG特征集，其性能与模型的完全监督版本相同或更好。我们提出的方法性能优于使用两个公开可用的数据集SWELL和AMIGOS的基于ECG的最先进的情感识别技术。进一步的分析凸显了我们的自我监督方法的优势，即需要更少的数据来获得可接受的结果。</p>
+<a id="more"></a>
+<h5 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h5><p>心电图（ECG）已被证明是情绪识别系统的可靠信息来源[1-4]。自动化的xi人机交互系统产生重大影响。 ECG和其他生理信号已在几种情感计算应用中使用。例如，[5]在驾驶任务期间使用ECG，肌电图（EMG）和皮肤电反应（GSR）进行了压力检测。在[6]中，提出了一种用于计算机游戏的动态难度调整机制，通过分析ECG和GSR为个人用户提供量身定制的游戏体验。 [3，7]中提出了一种基于ECG的深度多任务学习框架，用于自适应仿真。目的是根据个人用户的专业水平和认知负担，为其提供个性化的培训体验。  </p>
+<p>尽管ECG在情感计算方面具有巨大潜力，但我们经常缺少足够的标记数据来训练深度监督模型。为了解决这个问题，我们提出了一种基于自我监督学习的深度学习解决方案[8]。自我监督学习是一种表示学习方法，其中使用自动生成的标签而不是人工注释的标签来训练模型。</p>
+<p>自我监督学习有很多优点。</p>
+<p>首先，通过学习更通用的特征而不是特定于任务的特征，使用这种方法学习的特征流形通常对于实例间和实例内变异是不变的[9]。【特征不变性】这些模型可以重用于同一域中的不同任务。此外，自我监督模型实现较高的分类性能时需要较少数量的人工注释标签。</p>
+<p>在本文中，我们首次提出了使用多任务自我监督学习的基于ECG的情绪识别。我们使用两个公开可用的数据集，SWELL [10]和AMIGOS [11]。</p>
+<p>1、首先，要训练具有自动生成的标签的网络，我们执行6种不同的信号转换任务。</p>
+<p>2、将6个变换后的信号与原始信号一起用于以自我监督的方式训练多任务卷积神经网络（CNN）。所提出的CNN体系结构由3个卷积块作为共享层，然后是2个特定于任务的密集层。</p>
+<p>3、我们将使用预先训练的模型进行情感分类。为此，我们将预先训练的网络的权重转移到新的网络，并训练一个简单的完全连接的层，并在两个数据集上测试框架。</p>
+<p>我们的分析表明，以完全监督的方式进行训练时，与同一个网络相比，我们的自我监督模型更好或更具有竞争力。最后，我们为SWELL和AMIGOS数据集的<!--arousal(即兴奋程度)，valence(即good or bad)-->设置了最新技术。</p>
+<h5 id="2-相关工作"><a href="#2-相关工作" class="headerlink" title="2. 相关工作"></a>2. 相关工作</h5><p>pretext task—-generate automatic labels</p>
+<p>self-supervised learning helps convolution networks learn high-level features</p>
+<p>参考文献12: performed 3D pose estimation using selfsupervised learning </p>
+<p>1、used available 2D pose data and performed epipolar geometry to calculate 3D poses in self-supervised manner   </p>
+<p>2、the obtained 3D poses were used to train a model to perform 3D pose estimation</p>
+<p>  参考文献16：a self-supervised learning method was used for action recognition  </p>
+<p>1、using a 3D convolution neural network to predict the order of shuffled video clips  </p>
+<p>2、the pre-trained model was fine-tuned using nearest neighbour technique for action recognition.  </p>
+<p>描述自监督学习在相关任务中的应用情况</p>
+<h5 id="3-方法"><a href="#3-方法" class="headerlink" title="3. 方法"></a>3. 方法</h5><h6 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h6><p><img src="C:\Users\-XY\AppData\Roaming\Typora\typora-user-images\image-20210117224634937.png" alt="image-20210117224634937"></p>
+<h6 id="Self-supervised-Learning-自监督学习"><a href="#Self-supervised-Learning-自监督学习" class="headerlink" title="Self-supervised Learning  自监督学习"></a>Self-supervised Learning  自监督学习</h6><p>令$T<em>{P} $ 和$T</em>{d}$ 为前置任务pretext和下游任务downstream。前置任务使用人工生成的伪标签$P<em>{j}$训练，下游任务使用真实标签$y</em>{i}$训练。令$(X<em>{j},P</em>{j})$ 为一组输入元组和伪标签，$j\in[0,N]$ 其中0是初始信号，$0,1,…,N$ 表示进行信号转换的次数。</p>
+<p>目的是为了获得一个可以区分下游分类任务的特征流形$F$ 。【<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43870329/article/details/107558035】">https://blog.csdn.net/weixin_43870329/article/details/107558035】</a></p>
+<p>操作：定义一个模型$\psi<em>{j}$,$F=\gamma(X</em>{j},\theta)$ ，$\theta$ 是可测试参数集，$\psi<em>{j}$是第j个转换任务的预测概率。通过最小化信号转换网络$L</em>{j}$各个损耗的加权平均值找到最佳参数$\theta$ ,其中$L<em>{j}=[P</em>{j}log\psi<em>{j}+(1-P</em>{j})log(1-\psi<em>{j})]$ 总损失表示为$\sum</em>{j=0}^{N}\alpha<em>{j}L</em>{j}$ 其中$\alpha_{j}$ 为第$j$ 个任务的损失系数。</p>
+<p>因此，我们可以使用特征流形$F$来执行$T<em>{d}$ 下游任务，因为它包含有关原始信号$X</em>{0}$的有用信息。</p>
+<p>操作：1、设置模型$\rho=\zeta(F,\theta’)$ 其中$\theta’$ 为可测试参数集，$\rho$ 为下游任务分类的参数向量。</p>
+<p>2、计算最佳$\theta’$ 参数使得交叉熵损失函数最小。交叉熵损失为$\sum<em>{i=1}^{M}y</em>{i}log{\rho_{i}}$,其中M是分类数。</p>
+<h6 id="Signal-Transformation-Tasks-信号转换任务"><a href="#Signal-Transformation-Tasks-信号转换任务" class="headerlink" title="Signal Transformation Tasks                              信号转换任务"></a>Signal Transformation Tasks                              信号转换任务</h6><p>在pretext任务中，我们训练自监督网络使网络去学习数据的时空特征与抽象表示。对于开发的信号转换识别网络，执行了以下六种变换：</p>
+<p>（1）噪声添加：将随机高斯噪声添加到ECG信号</p>
+<p>（2）缩放：ECG信号的幅度缩放20％</p>
+<p>（3）负数：ECG信号的幅度乘以-1，导致原始信号发生垂直翻转。</p>
+<p>（4）水平翻转：ECG信号沿时间轴水平翻转。按时间轴裁剪信号。</p>
+<p>（5）排列：心电图段分为10个子段并随机排列，随机排列它们的时间位置</p>
+<p>（6）时间扭曲：ECG信号的随机片段沿x轴拉伸和压缩</p>
+<p>将原始信号与变换后的信号堆叠形成输入矩阵，同时，将0,1,…,6变换对应的标签堆叠创建相应的输出向量。</p>
+<p>根据经验选择信号转换中的参数，目的是最大程度地提高最终的情绪识别性能。</p>
+<h6 id="Network-Architecture-网络架构"><a href="#Network-Architecture-网络架构" class="headerlink" title="Network Architecture                                          网络架构"></a>Network Architecture                                          网络架构</h6><p><strong>信号转换识别网络:</strong>我们的多任务信号转换识别网络包括3个卷积层和两个密集层。卷积层对不同任务是共享的，而密集层是对特定任务的。每个卷积块包括$2*1$ 维具有ReLu激活函数的卷积层，然后是大小为8的最大合并层。在卷积层中，我们通常会增长过滤器的数量，从32到64和128。在每个卷积块之后，内核大小逐渐从32分别减小到16和8。最后，在卷积层的末尾，执行全局最大池化。紧随其后的密集层包括2个具有128个隐藏节点的完全连接层，其后是一个S型层（sigmoid layer）。使用60%的dropout在密集层并且使用$\beta=0.0001$ 的$L2$正则化来克服过拟合。</p>
+<p><img src="C:\Users\-XY\AppData\Roaming\Typora\typora-user-images\image-20210118194936442.png" alt="image-20210118194936442"></p>
+<p><strong>情绪识别网络</strong>：我们开发了一个简单的情感识别网络，该网络具有与信号转换识别网络相同的卷积层，并具有2个具有64个隐藏节点的密集层，然后是S形层（sigmoid层）。然后，我们将权重从信号转换识别网络的卷积层转移到该网络的卷积层。然后，将ECG信号和情绪标签用作训练此网络的输入和输出。应当注意，从信号变换识别网络的卷积层传递的权重是冻结的，因此不进行重新训练（仅训练密集层）。我们使网络的全连接层保持简单，以便能够评估我们的方法在信号转换任务的自我监督学习方面的性能。</p>
+<h5 id="4-实验与结果"><a href="#4-实验与结果" class="headerlink" title="4. 实验与结果"></a>4. 实验与结果</h5><h6 id="数据"><a href="#数据" class="headerlink" title="数据"></a>数据</h6><p>SWELL和AMIGOS数据集</p>
+<p>SWELL数据集是从25名参与者那里收集的，目的是了解典型办公环境中不同工作条件下员工的心理压力和情绪属性。这些条件中的每一个都被设计为持续30-45分钟。<a target="_blank" rel="noopener" href="http://cs.ru.nl/~skoldijk/SWELL-KW/Dataset.html">http://cs.ru.nl/~skoldijk/SWELL-KW/Dataset.html</a></p>
+<p>AMIGOS数据集是从40名参与者中收集的，其中情感视频片段被单独和分组显示给参与者，以引发情感反应。数据集包括两个实验的参与者配置文件（匿名参与者的数据、个性特征和情绪 （PANAS） 配置文件）、参与者评分、外部注释、神经生理记录（EEG、ECG 和 GSR 信号）以及视频录制（正面高清、全身和深度<strong>视频</strong>）：<a target="_blank" rel="noopener" href="http://www.eecs.qmul.ac.uk/mmv/datasets/amigos/index.html">http://www.eecs.qmul.ac.uk/mmv/datasets/amigos/index.html</a></p>
+<ol>
+<li><strong>短视频实验：</strong>在这个实验中，40名志愿者观看了16个电影短片。每个参与者在单独的设置中，并评价每个视频在价值，觉醒，支配地位，熟悉和喜好，并选择的基本情绪（中性，幸福，悲伤，惊喜，恐惧，愤怒和厌恶），他们觉得在视频中。</li>
+<li><strong>长视频实验：</strong>在这个实验中，37名前一实验的参与者观看了一组4个长情感视频摘录的电影。17名参与者在单个环境中进行实验，而其他20名参与者在小组设置中进行实验，5组为4人。每个参与者对每个视频的评价是价、觉醒、支配、熟悉和喜好，并选择他们在视频中感受到的基本情绪（中性、幸福、悲伤、惊喜、恐惧、愤怒和厌恶）。</li>
+</ol>
+<p>两个实验的视频在价量尺度上外部注释，并由 3 个注释器唤醒。</p>
+<p>在这两个数据集中，参与者的自我评估情感得分均以1到9的范围来记录arousal和valence。</p>
+<p>使用具有自粘电极的MOBI设备（TMSI）[18]以2048 Hz的采样频率记录了SWELL数据集，而使用Shimmer传感器[19]以256 Hz的采样频率收集了AMIGOS。我们对ECG信号执行的预处理非常少。由于以不同的采样率记录了两个数据集，因此首先将SWELL ECG信号下采样到256 Hz。然后，通过应用通带频率为0.8 Hz的高通IIR滤波器，消除两个数据集的ECG基线漂移</p>
+<h6 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h6><p>ECG信号被分割为10秒的固定窗口大小。每个段用于生成6个变换变量，用于训练信号变换识别网络。我们提出的架构是在Nvidia 2070 Ti GPU上使用TensorFlow实现的。<br>        为了训练这两个网络（信号转换识别和情感识别），使用==Adam优化器==[20]的学习率为0：001，批量为128。信号转换识别网络的训练时间为30个时期，而情感识别网络的训练时间为30个时期。训练了100个纪元，因为达到了不同数目的纪元达到了稳态。与[11，21–23]相似，通过设置等于均值的阈值，将两个数据集的情感属性（输出标签）转换为二进制类别。我们使用==10倍交叉验证来评估我们提出的模型的性能==。</p>
+<h6 id="性能与对比"><a href="#性能与对比" class="headerlink" title="性能与对比"></a>性能与对比</h6><p>图2显示在学习信号转换任务时的13个时期，信号转换识别模型达到稳态。</p>
+<p><img src="C:\Users\-XY\AppData\Roaming\Typora\typora-user-images\image-20210113221406248.png" alt="image-20210113221406248"></p>
+<p>表2和表3展示了我们的自我监督方法进行情感分类的效果。==[参数？？]==</p>
+<p><img src="C:\Users\-XY\AppData\Roaming\Typora\typora-user-images\image-20210115232456063.png" alt="image-20210115232456063"></p>
+<p>结果表明，对于唤醒和效价分类，我们的模型使用SWELL可以达到96％和95.6％的准确度，而使用AMIGOS可以达到85.1％和84％的准确度。为了进一步评估我们模型的性能，我们仅使用标记的数据集进行训练时，将结果与情感识别网络的完全监督版本进行比较。参见表2和表3。比较表明，自监督方法比完全监督方法具有竞争力或更好，说明了我们方法的有效性。</p>
+<p>接下来，我们将我们的结果与先前在这两个数据集上进行的情绪识别工作进行比较。应当指出，使用ECG模态对SWELL数据集进行的先前工作主要集中在压力检测上，而不是对arousal和valence进行分类。在[24]中，该数据集被用于使用支持向量机（SVM）对应力水平进行二进制分类，报告使用ECG和GSR时基线精度为64.1％。同样在[23]中，使用SVM分类器执行压力检测，报告的准确性为86.36％。使用贝叶斯信念网络（BBN）在[22]中执行了类似的任务，报告的准确性为92.6％。虽然在[25]中进行了arousal和valence的估算，但该问题被表述为回归，因此无法与我们的分类方法进行有效比较。结果，我们还对该数据集进行了压力检测，并在自我监督和完全监督的方法分别达到了98.3％和98.4％的精度。表2在同一数据集上<!--比较了我们的自我监督模型和过去的监督工作，表明所提出的模型的执行精度更高。--></p>
+<p>对于AMIGOS数据集，基线分类结果在[11]中提供，其中arousal和valence的分类使用高斯朴素贝叶斯分类器进行，两个任务的F1分数分别为54：5％和55：1％。在[21]中，使用CNN进行分类，其arousal和valence的准确度分别为81％和71％。 [26]等其他作品也对AMIGOS进行了情感识别。但是，使用了不同的验证方案。表3展示了我们与先前工作相比的结果，再次显示了自我监督方法在同一数据集上的表现优于先前工作。</p>
+<p>接下来，<!--为了评估自我监督方法对充分训练模型所需的标记数据量的影响-->，我们仅使用1％的标记数据来训练自我监督和完全监督的分类方法。我们首先使用整个未标记的数据集来训练使用自动生成的标签（信号转换）的信号转换识别网络。然后，在从自监督网络传递权重后，每类用户每类的标记数据的1％用于训练和测试情感识别网络。接下来，我们还使用相同的1％数据集来训练独立的CNN，而无需进行自我监督。图3显示了在完全监督下的结果。</p>
+<p><img src="C:\Users\-XY\AppData\Roaming\Typora\typora-user-images\image-20210115234233360.png" alt="image-20210115234233360"></p>
+<h5 id="code"><a href="#code" class="headerlink" title="code"></a>code</h5><p><img src="C:\Users\-XY\Desktop\SSL-ECG\images_ssl_architecture.jpg" alt=""></p>
+<ul>
+<li><p>implementation: 实现部分</p>
+<p> this directory contains all of our source codes.</p>
+<ul>
+<li>Please create similar directory structure in your working directory:<ul>
+<li><em>data_folder</em>: Keep your data in numpy format here.</li>
+<li><em>implementation</em>: Keep the <a href="">codes</a> here.</li>
+<li><em>summaries</em>: Tensorboard summaries will be saved here.</li>
+<li><em>output</em>: Loss and Results will be stored here.</li>
+<li><em>models</em>: Self-supervised models will be stored here.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>load_model: </p>
+<p>this directory contains the pretrained self-supervised model and sample codes to use it.  预训练的自监督模型和样本代码</p>
+<ul>
+<li>The saved pretrained model can be used in order to extract features from raw ECG signals, which can be further used to perform downstream tasks.</li>
+<li>特征提取: <a href="">extract_features.py</a>.</li>
+<li>为了提取特征，输入的数据形式为 <em>batch_size x window_size</em>. </li>
+<li>我们选择 <em>window_size of 10 seconds X 256 Hz = 2560 samples</em>, where 256 Hz refers to the sampling rate. A sample ECG signal is given <a href="">here</a>.</li>
+<li>提供 sample code为了保存预训练过的网络的权重 <a href="">save_weights.py</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3/" rel="tag"># 自监督</a>
+              <a href="/tags/%E8%A1%A8%E7%A4%BA%E5%AD%A6%E4%B9%A0/" rel="tag"># 表示学习</a>
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F/" rel="tag"># 睡眠分期</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/20/ShaoShikuan/multisource%20transfer%20learning%20for%20cross-subject%20eeg%20emotion%20recognition/" rel="prev" title="ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition">
+      <i class="fa fa-chevron-left"></i> ssk Multisource Transfer Learning for Cross-Subject EEG Emotion Recognition
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/01/SongYudan/%E3%80%90ICML2018%E3%80%91GradNorm_notes/" rel="next" title="syd 【ICML2018】GradNorm:Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks">
+      syd 【ICML2018】GradNorm:Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">3.</span> <span class="nav-text">2. 相关工作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">3. 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Pipeline"><span class="nav-number">4.1.</span> <span class="nav-text">Pipeline</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Self-supervised-Learning-%E8%87%AA%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0"><span class="nav-number">4.2.</span> <span class="nav-text">Self-supervised Learning  自监督学习</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Signal-Transformation-Tasks-%E4%BF%A1%E5%8F%B7%E8%BD%AC%E6%8D%A2%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.3.</span> <span class="nav-text">Signal Transformation Tasks                              信号转换任务</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Network-Architecture-%E7%BD%91%E7%BB%9C%E6%9E%B6%E6%9E%84"><span class="nav-number">4.4.</span> <span class="nav-text">Network Architecture                                          网络架构</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E5%AE%9E%E9%AA%8C%E4%B8%8E%E7%BB%93%E6%9E%9C"><span class="nav-number">5.</span> <span class="nav-text">4. 实验与结果</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE"><span class="nav-number">5.1.</span> <span class="nav-text">数据</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">5.2.</span> <span class="nav-text">模型训练</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E4%B8%8E%E5%AF%B9%E6%AF%94"><span class="nav-number">5.3.</span> <span class="nav-text">性能与对比</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#code"><span class="nav-number">6.</span> <span class="nav-text">code</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

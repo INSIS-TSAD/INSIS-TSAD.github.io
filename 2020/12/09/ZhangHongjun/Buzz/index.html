@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="自编码器-异常检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj 自编码器 异常检测">
+<meta property="og:url" content="http://example.com/2020/12/09/ZhangHongjun/Buzz/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="自编码器-异常检测">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021105152.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021113221.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106132206049.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021155142.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021194859.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021203227.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021210122.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021210218.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021211803.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021205159.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021203757.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022154945.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022151230.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022155242.png">
+<meta property="article:published_time" content="2020-12-09T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:41:21.347Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021105152.png">
+
+<link rel="canonical" href="http://example.com/2020/12/09/ZhangHongjun/Buzz/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj 自编码器 异常检测 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/12/09/ZhangHongjun/Buzz/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj 自编码器 异常检测
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-12-09 20:24:24" itemprop="dateCreated datePublished" datetime="2020-12-09T20:24:24+08:00">2020-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:41:21" itemprop="dateModified" datetime="2021-01-16T11:41:21+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="自编码器-异常检测"><a href="#自编码器-异常检测" class="headerlink" title="自编码器-异常检测"></a>自编码器-异常检测</h2><a id="more"></a> 
+<h3 id="1-1-VAE"><a href="#1-1-VAE" class="headerlink" title="1.1 VAE"></a>1.1 VAE</h3><p><strong>Paper</strong>：<em>Variational Autoencoder based Anomaly Detection using Reconstruction Probability</em></p>
+<p> 2015，<a target="_blank" rel="noopener" href="https://scholar.google.com/citations?user=ULc8ybUAAAAJ&amp;hl=zh-CN&amp;oi=sra">J An</a>, <a target="_blank" rel="noopener" href="https://scholar.google.com/citations?user=dEdyEc0AAAAJ&amp;hl=zh-CN&amp;oi=sra">S Cho</a> - Special Lecture on IE</p>
+<h4 id="1-1-1-autoencoder-based-anomaly-detection"><a href="#1-1-1-autoencoder-based-anomaly-detection" class="headerlink" title="1.1.1 autoencoder based anomaly detection"></a>1.1.1 autoencoder based anomaly detection</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021105152.png" alt="image-20201021105145861" style="zoom:67%;" /></p>
+<p>一般认为使用正常样本将编码器训练好之后，正常样本能够很好地被重构出来， 而异常样本不能被很好地重构出来。</p>
+<p>loss function:</p>
+<script type="math/tex; mode=display">
+E=\sum_{i=1}^{N}\left\|x^{(i)}-g_{\theta}\left(f_{\phi}\left(x^{(i)}\right)\right)\right\|</script><p>detection, anomaly score ( reconstrction error):</p>
+<script type="math/tex; mode=display">
+\operatorname{error}(i)=\left\|x^{(i)}-g_{\theta}\left(f_{\phi}\left(x^{(i)}\right)\right)\right\|</script><h4 id="1-1-2-Variational-autoencoder-based-anomaly-detection"><a href="#1-1-2-Variational-autoencoder-based-anomaly-detection" class="headerlink" title="1.1.2 Variational autoencoder based anomaly detection"></a>1.1.2 Variational autoencoder based anomaly detection</h4><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021113221.png" style="zoom: 50%;" /></p>
+<p>一般假设z的先验分布是标准正态分布：</p>
+<script type="math/tex; mode=display">
+p_\theta z =\mathcal{N}(0, \mathrm{I})</script><p>z的后验分布是正态分布:</p>
+<script type="math/tex; mode=display">
+q_{\phi}(\mathbf{z} \mid \mathbf{x})=\mathcal{N}\left(\boldsymbol{\mu}_{\mathbf{z}}, \boldsymbol{\sigma}_{\mathbf{z}}^{2} \mathbf{I}\right)</script><p>这个$\mu<em>{\mathbf{z}}$ 和 $\sigma </em>{\mathbf{z}}$ 就是编码器生成的z的均值和方差。</p>
+<p>解码器（decoder）输出的， 是x的后验分布  $p_{\theta}(\mathrm{x} \mid \mathrm{z})$，的均值， 在这个分布上采样， 才得到我们想要的重构后的$\vec{x}^{\prime}$。</p>
+<p>object function， 最小化以下函数 ：</p>
+<script type="math/tex; mode=display">
+E=\sum_{i=1}^{N}D_{K L}\left(q_{\phi}\left(z \mid x^{(i)}\right) \| p_{\theta}(z)\right)-\frac{1}{L} \sum_{l=1}^{L}\left(\log p_{\theta}\left(x^{(i)} \mid z^{(i, l)}\right)\right)</script><p><strong>其中，前一项</strong>， $D<em>{K L}\left(q</em>{\phi}\left(z \mid x^{(i)}\right) | p<em>{\theta}(z)\right)$，是z的近似后验分布 $q</em>{\phi}\left(z \mid x^{(i)}\right)$ ， 和z的先验分布 $p<em>\theta z =\mathcal{N}(0, \mathrm{I})$， 这两个分布的KL散度，放在损失函数里面，是希望 encoder 生成的z的后验分布 $q</em>{\phi}\left(z \mid x^{(i)}\right)$ ，逼近假设的z的先验分布 $p_\theta z =\mathcal{N}(0, \mathrm{I})$。</p>
+<p><strong>其中，后一项</strong>，$\frac{1}{L} \sum<em>{l=1}^{L}\left(\log p</em>{\theta}\left(x^{(i)} \mid z^{(i, l)}\right)\right)$， 用来度量输入样本x和x的后验分布的距离。用正态分布来举例：</p>
+<p>正态分布：</p>
+<script type="math/tex; mode=display">
+f(x)=\frac{1}{\sqrt{2 \pi} \sigma} \exp \left(-\frac{(x-\mu_x)^{2}}{2 \sigma^{2}}\right)</script><p>综上所述，在vae训练过程中，目标函数不仅约束了重构样本$\hat{x}$, 还约束了中间隐变量z，让z的分布往假设的先验分布$p_\theta z =\mathcal{N}(0, \mathrm{I})$靠近。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210106132206049.png" alt="image-20210106132206049"></p>
+<p>在检测阶段，异常分数为：</p>
+<script type="math/tex; mode=display">
+score(i) =-\frac{1}{L} \sum_{l=1}^{L} p_{\theta}\left(x^{(i)} \mid \boldsymbol{\mu}_{\hat{\boldsymbol{x}}^{(i, l)}}, \boldsymbol{\sigma}_{\hat{\boldsymbol{x}}^{(i, l)}}\right)</script><p>重构的样本与输入样本越相近， 这个异常分数越小。设定一个阈值， 当这个重构概率大于阈值时， 就认为它是异常样本。</p>
+<h3 id="1-2-donut-VAE"><a href="#1-2-donut-VAE" class="headerlink" title="1. 2. donut(VAE)"></a>1. 2. donut(VAE)</h3><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection via Variational Auto-Encoder for Seasonal KPIs in Web Applications</em></p>
+<p>2018， 裴丹， The Web Conference 2018 - Proceedings of the World Wide Web Conference, WWW 2018</p>
+<p>关键词：周期性KPI</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021155142.png" alt="image-20201021154918466" style="zoom:67%;" /></p>
+<p>大体上还是VAE， 中间加了一些小技巧。</p>
+<p><strong>trick1：</strong>计算方差时使用soft plus</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021194859.png" alt="image-20201021194859135"></p>
+<p>一般的vae获得方差$\sigma$的方式：方差$\sigma &gt;= 0$, 隐藏层输出$h$不符合这个条件。可以假设$h = log \sigma$, 这样$\sigma = exp(h)$ 就满足大于等于0的条件。而在异常检测场景中，我们感兴趣的KPI的局部变化非常小，即$\sigma \rightarrow 0$, 导致$h \rightarrow -\infty$, 在计算的时候会问题。</p>
+<p>改用softplus：$\sigma_=\operatorname{SoftPlus}(h)+{\epsilon}=log(1+exp(h))+\epsilon$, 其中$\epsilon$是很小的，大于零的超参，本文设置为$\epsilon=10^{-4}$。</p>
+<p><strong>trick2：</strong>修改损失函数</p>
+<p>原来的vae目标函数为</p>
+<script type="math/tex; mode=display">
+=\mathbb{E}_{q_{\phi}(\mathrm{z} \mid \mathrm{x})}\left[\log p_{\theta}(\mathrm{x} \mid \mathrm{z})+\log p_{\theta}(\mathrm{z})-\log q_{\phi}(\mathrm{z} \mid \mathrm{x})\right]</script><p>考虑缺失点和异常值点, 修改目标函数为:</p>
+<script type="math/tex; mode=display">
+\tilde{\mathcal{L}}(\mathrm{x})=\mathbb{E}_{\boldsymbol{q}_{\phi}(\mathbf{z} \mid \mathbf{x})}\left[\sum_{\boldsymbol{w}=1}^{W} \alpha_{\boldsymbol{w}} \log p_{\theta}\left(x_{\boldsymbol{w}} \mid \mathbf{z}\right)+\beta \log p_{\theta}(\mathbf{z})-\log q_{\phi}(\mathbf{z} \mid \mathbf{x})\right]</script><p>$\alpha<em>w\in \left{ 0,1 \right} $, 正常点取1,异常点取0, $\beta$是放缩系数,$\beta=\left(\sum</em>{w=1}^{W} \alpha_{w}\right) / W$</p>
+<p><strong>trick3</strong>:检测时, 异常值和缺失值补全</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021203227.png" alt="image-20201021203227211"></p>
+<p>在一个窗口中,异常点和缺失点,先使用训练好的vae,经过M次迭代, 得到新的窗口序列, 然后再进行异常检测.</p>
+<p>效果: 降噪</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021210122.png" alt="image-20201021210122601"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021210218.png" alt="image-20201021210218109"></p>
+<p>甚至修复:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021211803.png" alt="image-20201021211803428"></p>
+<h3 id="1-3-bagel-CVAE"><a href="#1-3-bagel-CVAE" class="headerlink" title="1.3. bagel(CVAE)"></a>1.3. bagel(CVAE)</h3><p><strong>Paper</strong>：<em>Robust and Unsupervised KPI Anomaly Detection Based on Conditional Variational Autoencoder</em></p>
+<p>2018 ,裴丹， <em>2018 IEEE 37th International Performance Computing and Communications Conference, IPCCC</em></p>
+<p><strong>time information related anomalies</strong>:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021205159.png" alt="image-20201021205159731"></p>
+<p>如上图的周期性KPI, 在最右边的蓝色框内为正常序列, 但是前后被异常序列包围. 由于Donut是使用滑动窗口的方法采样,而且训练的时候是将样本顺序打乱之后输入到网络中,所以面对这样的样本时, 很容易出现虚假警报. 本文提出使用CVAE的方法, 引入时间信息来解决这个问题.</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201021203757.png" alt="image-20201021203757438" style="zoom:67%;" /></p>
+<h3 id="2-buzz-adversarial-training-VAE"><a href="#2-buzz-adversarial-training-VAE" class="headerlink" title="2. buzz(adversarial training VAE)"></a>2. buzz(adversarial training VAE)</h3><p><strong>Paper</strong>：<em>Unsupervised Anomaly Detection for Intricate KPIs via Adversarial Training of VAE</em></p>
+<p>2019,裴丹， <em>Proceedings - IEEE INFOCOM</em></p>
+<p>以上介绍的方法, 都只适用于周期性的KPI. 本文的模型适用于复杂的kpi</p>
+<p><strong>复杂的kpi:</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022154945.png" alt="image-20201022154945274"></p>
+<p>KPI分为两种, 一种为周期平滑的KPI, 另外一种为复杂的KPI. 前者通常是服务级别的指标,比如每分钟交易次数. 后者是更加底层的指标,比如 每秒的I/O请求数量, 通常粒度更细.  通常可以认为, 周期性kpi的噪声是独立的高斯噪声, 而复杂KPI的噪声不是这种简单的高斯噪声.</p>
+<p>复杂的kpi 虽然局部的抖动很严重, 但是 总体上还是有一定的模式.</p>
+<p><strong>网络结构:</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022151230.png" alt="image-20201022151230779"></p>
+<p>window size=128, reshape: [8, 16], 然后卷积</p>
+<p><strong>训练流程:</strong></p>
+<p>两个超参数:s=32, b=8</p>
+<p>取时刻点集合$\mathcal{W}= \left{w<em>{1}, w</em>{2}, \ldots, w<em>{b}\right}$,  是一个mini_batch的时刻点集合. 满足一下条件:$w</em>{i}$是s的倍数,  这样, 每个单元的数据是$\mathbf{x}^{(w)}, \mathbf{x}^{(w+1)}, \ldots, \mathbf{x}^{(w+s-1)}$,</p>
+<p>训练过程中, 每经过40个epoch, 更新$s = s /2, b=b*2$, 直到$s=1$</p>
+<p><strong>目标函数:</strong></p>
+<p>最大化该函数</p>
+<p>令判别器为 $F$, 生成器为$G$,  </p>
+<script type="math/tex; mode=display">
+\tilde{\mathcal{L}}_{B u z z}=-\lambda \sup _{F}\left[\sum_{w \in \mathcal{W}}(|\mathcal{T}(F, w)|-\eta \mathcal{R}(F, w))\right]-\mathcal{K}-\log Z(\lambda)</script><p>其中一项:</p>
+<script type="math/tex; mode=display">
+\mathcal{K}=\frac{1}{b s} \sum_{w \in \mathcal{W}} \sum_{i=0}^{s-1} \mathrm{KL}\left[q_{\phi}\left(\mathbf{z} \mid \mathbf{x}^{(w+i)}\right) \| \mathcal{N}(\mathbf{0}, \mathbf{1})\right]</script><p>$\mathcal{K}$是隐变量$z$的先验分布和后验分布的KL散度, 意义是让z的后验分布往先验分布靠拢.</p>
+<p>其中另外一项:</p>
+<script type="math/tex; mode=display">
+\mathcal{T}(F, w)=\frac{1}{b s} \sum_{i=0}^{s-1} \mathbb{E}_{q_{\phi}\left(\mathbf{z} \mid \mathbf{x}^{(w+i)}\right)}\left[F\left(\mathbf{x}^{(w+i)}\right)-F(G(\mathbf{z}))\right]</script><p>目的是让判别器F, 判别原始样本$\mathbf{x}^{(w+i)}$, 判别生成的样本$G(\mathbf{z})$.两者的输出差距越大越好.</p>
+<p><strong>检测方法:</strong></p>
+<p>先用训练好的vae,重构x,得到$\overline{\mathbf{x}} \leftarrow \mathbf{x}$, 然后计算$\log p<em>{\theta}(\mathbf{x})-\log p</em>{\theta}(\overline{\mathbf{x}})$,</p>
+<script type="math/tex; mode=display">
+\log \frac{1}{L} \sum_{l=1}^{L}\left[\frac{p_{\theta}\left(\mathbf{x} \mid \mathbf{z}^{(l)}\right) p_{\theta}\left(\mathbf{z}^{(l)}\right)}{q_{\phi}\left(\mathbf{z}^{(l)} \mid \overline{\mathbf{x}}\right)}\right]-\log \frac{1}{L} \sum_{l=1}^{L}\left[\frac{p_{\theta}\left(\overline{\mathbf{x}} \mid \mathbf{z}^{(l)}\right) p_{\theta}\left(\mathbf{z}^{(l)}\right)}{q_{\phi}\left(\mathbf{z}^{(l)} \mid \overline{\mathbf{x}}\right)}\right]</script><p>结果:</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/20201022155242.png" alt="image-20201022155242807"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/DEEP%20SEMI-SUPERVISED%20ANOMALY%20DETECTION/" rel="prev" title="zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION">
+      <i class="fa fa-chevron-left"></i> zhj DEEP SEMI-SUPERVISED ANOMALY DETECTION
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/16/ZhangHongjun/2012_NeuriPS-2020-What%20Makes%20for%20Good%20Views%20for%20ContrastiveLearning/" rel="next" title="zhj 【NIPS 2020】 What Makes Good Views for Contrastive Learning">
+      zhj 【NIPS 2020】 What Makes Good Views for Contrastive Learning <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E7%BC%96%E7%A0%81%E5%99%A8-%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B"><span class="nav-number">1.</span> <span class="nav-text">自编码器-异常检测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-VAE"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 VAE</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-1-autoencoder-based-anomaly-detection"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 autoencoder based anomaly detection</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-2-Variational-autoencoder-based-anomaly-detection"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 Variational autoencoder based anomaly detection</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-donut-VAE"><span class="nav-number">1.2.</span> <span class="nav-text">1. 2. donut(VAE)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-bagel-CVAE"><span class="nav-number">1.3.</span> <span class="nav-text">1.3. bagel(CVAE)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-buzz-adversarial-training-VAE"><span class="nav-number">1.4.</span> <span class="nav-text">2. buzz(adversarial training VAE)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

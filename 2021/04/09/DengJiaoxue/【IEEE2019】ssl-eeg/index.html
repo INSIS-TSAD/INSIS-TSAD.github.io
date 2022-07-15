@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：EEG；自监督学习；对比学习 有监督学习方法受到数据收集与标记成本的限制，而自监督学习方法作为一个pre-training或者feature learning的方法，在计算机视觉和时间序列分析等领域的前景十分的广阔。本文中，我们提出的自监督模型可用于学习信息性表示（informative representations）。一种成功的方法依赖于预测是否从相同的时间上下文中采样了时间窗口。正如">
+<meta property="og:type" content="article">
+<meta property="og:title" content="djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS">
+<meta property="og:url" content="http://example.com/2021/04/09/DengJiaoxue/%E3%80%90IEEE2019%E3%80%91ssl-eeg/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：EEG；自监督学习；对比学习 有监督学习方法受到数据收集与标记成本的限制，而自监督学习方法作为一个pre-training或者feature learning的方法，在计算机视觉和时间序列分析等领域的前景十分的广阔。本文中，我们提出的自监督模型可用于学习信息性表示（informative representations）。一种成功的方法依赖于预测是否从相同的时间上下文中采样了时间窗口。正如">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201110146.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201207638.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201230631.png">
+<meta property="og:image" content="c:/Users/30331/AppData/Roaming/Typora/typora-user-images/image-20210409201246631.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201319626.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201347481.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201406945.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201423387.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201431798.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201503906.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201512739.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201537136.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201558044.png">
+<meta property="article:published_time" content="2021-04-09T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-04-09T12:16:12.493Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="自监督学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201110146.png">
+
+<link rel="canonical" href="http://example.com/2021/04/09/DengJiaoxue/%E3%80%90IEEE2019%E3%80%91ssl-eeg/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/09/DengJiaoxue/%E3%80%90IEEE2019%E3%80%91ssl-eeg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          djx 【IEEE2019】SELF-SUPERVISED REPRESENTATION LEARNING FROM EEG SIGNALS
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-09 20:24:24 / Modified: 20:16:12" itemprop="dateCreated datePublished" datetime="2021-04-09T20:24:24+08:00">2021-04-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：EEG；自监督学习；对比学习</p>
+<p>有监督学习方法受到数据收集与标记成本的限制，而自监督学习方法作为一个pre-training或者feature learning的方法，在计算机视觉和时间序列分析等领域的前景十分的广阔。本文中，我们提出的自监督模型可用于学习信息性表示（informative representations）。一种成功的方法依赖于预测是否从相同的时间上下文中采样了时间窗口。正如临床相关任务（睡眠评分）和两个脑电图数据集所证明的那样，我们的方法在低数据情况下优于纯监督方法，同时无需获取标签即可捕获重要的生理信息。</p>
+<a id="more"></a>
+<p>借助SSL，数据的结构可用于将无监督的学习问题转变为有监督的学习问题，称为“前置任务” [3]。<br>在自我监督的前置任务上学习的表示然后可以在监督的下游任务上重用，从而可能大大减少所需的带标签示例的数量。</p>
+<p>Hyvérinen从非线性独立组件分析的角度正式对SSL提出了一种general且有理论依据的方法。</p>
+<p>该方法中提出SSL任务是通过使用辅助变量u（time index、segment index、history of the data）来构建，以训练对比分类器。此分类器学习预测样本与辅助变量是否配对。</p>
+<p>本文提出的自监督方法是为了从无标签的EEG信号中学习端到端的特征。引入了两个时间对比学习任务：relative positioning 和 temporal shuffling。实验中显示这些基于预测时间窗口是否在时间上接近的对比学习任务可用于学习 EEG 功能，这些特征可以捕获数据背后的结构的多个组件。文中证明了这些功能在下游任务中重复使用时的效果优于无监督模型与传统的监督模型。</p>
+<h3 id="section2：the-SSL-tasks-and-learning-problems"><a href="#section2：the-SSL-tasks-and-learning-problems" class="headerlink" title="section2：the SSL tasks and learning problems"></a>section2：the SSL tasks and learning problems</h3><p>$S\in R^{M*C}$：输入数据      $M$ ：时间样本数    $C$：通道数</p>
+<p>$y\in -1 ,1$ ：二标签</p>
+<p>$T$：每个时间窗口的采样点数量</p>
+<p>$\tau_{pos}$：positive context的持续时间</p>
+<p>$\tau_{neg}$：对应于每个窗口周围的negative context的范围</p>
+<h5 id="2-1-pretext—-relative-position"><a href="#2-1-pretext—-relative-position" class="headerlink" title="2.1 pretext—-relative position"></a>2.1 pretext—-relative position</h5><p>假设：相邻的时间窗口对应的标签相同</p>
+<p>对时间窗口进行取样，$x_{t}$是锚窗口anchor window</p>
+<p>将自定义的$N$个标签对定义为：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201110146.png" alt="image-20210409201110146"></p>
+<h5 id="2-2-pretext—-temporal-shuffling"><a href="#2-2-pretext—-temporal-shuffling" class="headerlink" title="2.2 pretext—-temporal shuffling"></a>2.2 pretext—-temporal shuffling</h5><p>从positive context 中取样第三个样本$x<em>{t^{‘’}}$，并用它提供额外的参考点与$x</em>{t^{‘}}$对比。此时标签给予以下定义：</p>
+<p>$y_{i}={\begin{array}{rcl}1 &amp; \mbox if &amp; t&lt;t^{‘}<t^{''}\\-1 & \mbox if & t>t^{‘} or t^{‘}&gt;t^{“} \end{array}$</p>
+<h5 id="2-3-feature-extractor"><a href="#2-3-feature-extractor" class="headerlink" title="2.3 feature extractor"></a>2.3 feature extractor</h5><p>为了了解端到端如何根据时间窗口的相对位置或顺序来区分时间窗口，我们引入了一个特征提取器：</p>
+<p>$h:R^{T*C}\to R^{D}$ 参数$\Theta$ 将窗口$x$映射到其特征空间上。然后使用对比模块聚合每个窗口的特征表示。</p>
+<p>对于RP pretext：$g_{RP}:R^{D}*R^{D}\to R^{D}$ </p>
+<p>​                            例如通过计算an elementwise absolute difference  </p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201207638.png" alt="image-20210409201207638" style="zoom: 50%;" /></p>
+<p>对于TS pretext：$g_{TS}:R^{D}<em>R^{D}</em>R^{D}\to R^{2D}$  通过合并绝对差异</p>
+<p>​                              $g_{TS}(h(x),h(x^{‘},h(x’’))=(abs(h(x)-h(x^{‘})),abs((h(x^{‘})-h(x^{‘’})))\in R^{2D}$</p>
+<h5 id="2-4-predict"><a href="#2-4-predict" class="headerlink" title="2.4 predict"></a>2.4 predict</h5><p>一个带有参数$\omega \in R^{D}$ or $\in R^{2D}$和偏差$\omega_{0}$的线性上下文判别模型用于预测相关目标$y$</p>
+<p>联合损失函数写为：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201230631.png" alt="image-20210409201230631"></p>
+<p>按照$y$使用的惯例，预测目标是<img src="C:\Users\30331\AppData\Roaming\Typora\typora-user-images\image-20210409201246631.png" alt="image-20210409201246631" style="zoom: 50%;" />的符号</p>
+<p>RP 和 TS 模型都可分别被视为具有两个或三个子网络的siamese神经网络。</p>
+<h3 id="section-3：在睡眠数据上的应用"><a href="#section-3：在睡眠数据上的应用" class="headerlink" title="section 3：在睡眠数据上的应用"></a>section 3：在睡眠数据上的应用</h3><h5 id="3-1-两个睡眠数据集"><a href="#3-1-两个睡眠数据集" class="headerlink" title="3.1 两个睡眠数据集"></a>3.1 两个睡眠数据集</h5><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201319626.png" alt="image-20210409201319626"></p>
+<p>提取30 s的非重叠窗口，在Sleep EDF上生成T = 2000和C = 2的窗口，在MASS上生成C = 3的T = 3840。<br>对窗口进行归一化，以便通道的均值为0，标准差为1。在每个recording中，总共对2000个锚点窗口进行了均匀采样。对于每个锚窗口，采样了三个正样本和三个负样本。</p>
+<p>训练集测试集和验证集划分：</p>
+<p>Sleep EDF数据集上：验证集——受试者0-19；测试集——受试者20-39；训练集——受试者40-82</p>
+<p>​                                     ==分别生成了训练集：512622；验证集：267,630；测试集：342,300对==</p>
+<p>MASS 数据集：训练集——1-41；验证集——42-52；测试集——52-62</p>
+<p>​                          ==分别生成了训练集：237,882；验证集：52,152；测试集：73,650对==</p>
+<h5 id="3-2-模型算法"><a href="#3-2-模型算法" class="headerlink" title="3.2 模型算法"></a>3.2 模型算法</h5><p>对于特征提取器h，采用的是之前提出的架构【S. Chambon, M. N. Galtier, P. J. Arnal, G. Wainrib, and<br>A. Gramfort, “A deep learning architecture for temporal sleep stage classification using multivariate and multimodal time series,” IEEE Trans Neur Syst Rehab Eng, vol. 26, no. 4, pp. 758–769, 2018.  】</p>
+<p>输入：$(C,T,1)$</p>
+<p>CNN结构：<img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201347481.png" alt="image-20210409201347481"></p>
+<p>SleepEDF数据集：k=50，m=13，D=100   可训练参数个数：55545</p>
+<p>MASS数据：k=64，m=16，D=100      可训练参数个数：67173</p>
+<h5 id="3-3-模型比较"><a href="#3-3-模型比较" class="headerlink" title="3.3 模型比较"></a>3.3 模型比较</h5><p>将经过SSL任务训练的模型与三个神经网络的baseline进行比较：</p>
+<p>1）随机初始化</p>
+<p>2）卷积自动编码器。自编码器使用特征提取器h作为编码器，四层卷积作为解码器，均方误差作为重建损失。</p>
+<p>3）纯监督学习。在特征提取器h中增加softmax层</p>
+<p>人工提取了脑电图特征：均值方差、偏度峰度、标准差、（0.5，4，8，13，30，49）Hz之间的频率对数功率带及其所有可能的比率、峰峰值、Hurst指数、近似熵和Hjorth复杂度。致使每个EEG通道有34个特征，将这些特征串联至单个向量组成特征向量。</p>
+<p>为解决class之间的不平衡问题，我们使用平衡acc（bal acc）【定义为每个class的平均召回率】来评估下游任务的模型性能。另外，训练时，加权损失也可解决class的不平衡。</p>
+<h5 id="3-4-实验"><a href="#3-4-实验" class="headerlink" title="3.4 实验"></a>3.4 实验</h5><p>实验一：分析了不同SSL超参数值下CNN的性能及其对CNN的影响。</p>
+<p>实验二：带有有限标签的SSL任务对提高预测性能的作用。</p>
+<p>实验三：探究SSL学习到的特征，研究他们的生理相关性。</p>
+<h6 id="实验一"><a href="#实验一" class="headerlink" title="实验一"></a>实验一</h6><p>首先评估CNN架构学习SSL任务的能力。使用具有三组超参数$\tau<em>{pos}$和$\tau</em>{neg}$的RP和TS任务，在整个训练集上训练特征提取器h。训练了h后，我们将标记的样本投影到网络各自的特征空间中，然后在每组特征上训练多项式线性logistic回归模型以预测睡眠阶段。</p>
+<p>【MASS数据集上，超参数$\tau<em>{pos}$和$\tau</em>{neg}$（in minutes）不同值时，SSL任务和下游分类任务的平衡准确度】</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201406945.png" alt="image-20210409201406945"></p>
+<p>从结果中可以得到以下：</p>
+<p>1）在MASS数据集上，前两组实验（$\tau<em>{pos}$=2，$\tau</em>{neg}$=2和$\tau<em>{pos}$=4，$\tau</em>{neg}$=15）中，SSL任务和下游分类任务的平衡准确度近似。</p>
+<p>2）增大超参数$\tau_{pos}$到120后，任务更加困难，SSL任务和分类任务的性能也降低。</p>
+<p>最终，决定选择$\tau<em>{pos}$=4，$\tau</em>{neg}$=15，因为相较于第一组可以增加从正context中抽取到的窗口数量</p>
+<h6 id="实验二"><a href="#实验二" class="headerlink" title="实验二"></a>实验二</h6><p>用不同的方法对特征提取器h进行训练（AE、RP、TS在无标签数据上及全监督模型在标签数据上）然后提取特征。同时使用随机初始化权重的模型（未经过培训的模型）提取特征。下游分类任务采用逻辑回归。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201423387.png" alt="image-20210409201423387"></p>
+<p>在MASS数据集上，SSL的性能要优于纯监督模型，RP要略高于TS，AE和随机初始化模型都较低。SleepEDF数据集上也表现出类似的结果：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201431798.png" alt="image-20210409201431798"></p>
+<p>使用自动编码器预制的模型获得了非常低的性能，因为使用均方误差损失的重建任务鼓励模型专注于输入信号的低频率。事实上，这些频率比像EEG这样的生物信号中的高频具有更高的功率。</p>
+<h6 id="实验三"><a href="#实验三" class="headerlink" title="实验三"></a>实验三</h6><p>为了进一步探索使用 SSL 学到的功能，我们使用 UMAP [20] 将标记的 Sleep EDF 数据集上获得的 100 维嵌入投影到两个维度。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201503906.png" alt="image-20210409201503906"></p>
+<p>上图中可以看出，从使用标签的彩色编码样本来看，groups不仅对应着睡眠阶段，同时按照顺序排列：从图形的右侧开始，向左移动，我们可以绘制一个连续穿过 W、N1、N2 和 N3 的轨迹。R阶段与W和N1重叠。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201512739.png" alt="image-20210409201512739"></p>
+<p>此外，在图2-B中，人们可以观察到嵌入编码与年龄相关的信息。年轻受试者的样本占据点云的左外部分，而来自较老受试者的样本则位于U形结构的内侧。这种现象在N1、N2和N3阶段可见，但在W和R阶段不可见，那里看不到明显的老化结构。这可以解释为睡眠主轴的流行，主要特征用于识别随着年龄的增长而变化的N2和N3。</p>
+<h3 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h3><h5 id="feature-extractor"><a href="#feature-extractor" class="headerlink" title="feature extractor"></a>feature extractor</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">EEG_FeatureExtractor</span>(<span class="params">nn.Module</span>):</span></span><br><span class="line">    <span class="comment"># based on &quot;A deep learning architecture for temporal sleep stage</span></span><br><span class="line">    <span class="comment"># classification using multivariate and multimodal time series&quot;</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, C, T, k=<span class="number">50</span>, m=<span class="number">13</span>, dropout_prob=<span class="number">0.5</span>, embedding_dim=<span class="number">100</span>, n_spatial_filters=<span class="number">8</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    C: number of EEG channels</span></span><br><span class="line"><span class="string">    T: number of timepoints in a window</span></span><br><span class="line"><span class="string">    k: length of spatial filters (i.e. how much you look in time)  #？空间过滤器的长度</span></span><br><span class="line"><span class="string">    m: maxpool size</span></span><br><span class="line"><span class="string">    n_spatial_filters: number of spatial filters   #空间过滤器的数量</span></span><br><span class="line"><span class="string">    embedding_dim: embedding dimension (D)</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># input is (1, C, T) &lt;-- notation (channels, dim1, dim2) is different than paper (dim1, dim2, channels)</span></span><br><span class="line">    <span class="built_in">super</span>().__init__()</span><br><span class="line">    self.depthwise_conv = nn.Conv2d(in_channels=<span class="number">1</span>, out_channels=C, kernel_size=(C,<span class="number">1</span>))</span><br><span class="line">    self.spatial_padding = nn.ReflectionPad2d((<span class="built_in">int</span>(np.floor((k-<span class="number">1</span>)/<span class="number">2</span>)),<span class="built_in">int</span>(np.ceil((k-<span class="number">1</span>)/<span class="number">2</span>)),<span class="number">0</span>,<span class="number">0</span>))</span><br><span class="line">    self.spatialwise_conv1 = nn.Conv2d(in_channels=<span class="number">1</span>, out_channels=n_spatial_filters, kernel_size=(<span class="number">1</span>,k))</span><br><span class="line">    self.spatialwise_conv2 = nn.Conv2d(in_channels=n_spatial_filters, out_channels=n_spatial_filters, kernel_size=(<span class="number">1</span>,k))</span><br><span class="line">    self.relu = nn.ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line">    self.maxpool = nn.MaxPool2d(kernel_size=(<span class="number">1</span>,m), stride=(<span class="number">1</span>,m))</span><br><span class="line">    self.dropout = nn.Dropout(p=dropout_prob, inplace=<span class="literal">True</span>)</span><br><span class="line">    self.linear = nn.Linear(n_spatial_filters * C * ((T // m) // m), embedding_dim)</span><br></pre></td></tr></table></figure>
+<h6 id="ReflectionPad2d"><a href="#ReflectionPad2d" class="headerlink" title="ReflectionPad2d"></a>ReflectionPad2d</h6><p>对输入数据进行扩边，扩充方法采用镜像填充。ReflectionPad2d(n)相比原来数组每行每列都要增加n</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201537136.png" alt="image-20210409201537136"></p>
+<h6 id="dropout"><a href="#dropout" class="headerlink" title="dropout"></a>dropout</h6><p>防止过拟合的方法之一，对于神经网络单元，按照一定的概率将其暂时从网络中丢弃。</p>
+<p>dropout=0.5时效果最好</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20210409201558044.png" alt="image-20210409201558044"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0/" rel="tag"># 自监督学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/09/LiWenhao/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="prev" title="lwh 时序数据库">
+      <i class="fa fa-chevron-left"></i> lwh 时序数据库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/" rel="next" title="gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph">
+      gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#section2%EF%BC%9Athe-SSL-tasks-and-learning-problems"><span class="nav-number">1.</span> <span class="nav-text">section2：the SSL tasks and learning problems</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-pretext%E2%80%94-relative-position"><span class="nav-number">1.0.1.</span> <span class="nav-text">2.1 pretext—-relative position</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-pretext%E2%80%94-temporal-shuffling"><span class="nav-number">1.0.2.</span> <span class="nav-text">2.2 pretext—-temporal shuffling</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-feature-extractor"><span class="nav-number">1.0.3.</span> <span class="nav-text">2.3 feature extractor</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-4-predict"><span class="nav-number">1.0.4.</span> <span class="nav-text">2.4 predict</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#section-3%EF%BC%9A%E5%9C%A8%E7%9D%A1%E7%9C%A0%E6%95%B0%E6%8D%AE%E4%B8%8A%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">section 3：在睡眠数据上的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-%E4%B8%A4%E4%B8%AA%E7%9D%A1%E7%9C%A0%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">2.0.1.</span> <span class="nav-text">3.1 两个睡眠数据集</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-%E6%A8%A1%E5%9E%8B%E7%AE%97%E6%B3%95"><span class="nav-number">2.0.2.</span> <span class="nav-text">3.2 模型算法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-3-%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83"><span class="nav-number">2.0.3.</span> <span class="nav-text">3.3 模型比较</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-4-%E5%AE%9E%E9%AA%8C"><span class="nav-number">2.0.4.</span> <span class="nav-text">3.4 实验</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%80"><span class="nav-number">2.0.4.1.</span> <span class="nav-text">实验一</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%BA%8C"><span class="nav-number">2.0.4.2.</span> <span class="nav-text">实验二</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E4%B8%89"><span class="nav-number">2.0.4.3.</span> <span class="nav-text">实验三</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Code"><span class="nav-number">3.</span> <span class="nav-text">Code</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#feature-extractor"><span class="nav-number">3.0.1.</span> <span class="nav-text">feature extractor</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#ReflectionPad2d"><span class="nav-number">3.0.1.1.</span> <span class="nav-text">ReflectionPad2d</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#dropout"><span class="nav-number">3.0.1.2.</span> <span class="nav-text">dropout</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

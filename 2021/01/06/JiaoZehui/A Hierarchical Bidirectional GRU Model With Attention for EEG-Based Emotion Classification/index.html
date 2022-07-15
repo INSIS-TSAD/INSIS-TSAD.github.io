@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="摘要本文提出了一种层次结构双向门控递归单元(GRU)网络，用于从连续的脑电信号中进行情感分类。Attention用于EEG的samples和epochs两个级别上。 我们在DEAP数据集上进行了跨受试者情感分类实验，以评估模型的性能。实验结果表明，在valence和arousal维度上，我们的1-s EEG序列分别比最佳deep baseline LSTM模型好4.2%和4.6%，比最佳shall">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification">
+<meta property="og:url" content="http://example.com/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="摘要本文提出了一种层次结构双向门控递归单元(GRU)网络，用于从连续的脑电信号中进行情感分类。Attention用于EEG的samples和epochs两个级别上。 我们在DEAP数据集上进行了跨受试者情感分类实验，以评估模型的性能。实验结果表明，在valence和arousal维度上，我们的1-s EEG序列分别比最佳deep baseline LSTM模型好4.2%和4.6%，比最佳shall">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201005212230396.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006140501283.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006145907433.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006150436115.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006150443547.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006151353306.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153106754.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153551794.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153607719.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154225760.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154247800.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154305924.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154317371.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006155249282.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:47:31.754Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201005212230396.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/A%20Hierarchical%20Bidirectional%20GRU%20Model%20With%20Attention%20for%20EEG-Based%20Emotion%20Classification/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh A Hierarchical Bidirectional GRU Model With Attention for EEG-Based Emotion Classification
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:47:31" itemprop="dateModified" datetime="2021-01-16T11:47:31+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>本文提出了一种层次结构双向门控递归单元(GRU)网络，用于从连续的脑电信号中进行情感分类。Attention用于EEG的samples和epochs两个级别上。</p>
+<p>我们在DEAP数据集上进行了跨受试者情感分类实验，以评估模型的性能。实验结果表明，在valence和arousal维度上，我们的1-s EEG序列分别比最佳deep baseline LSTM模型好4.2%和4.6%，比最佳shallow baseline模型好11.7%和12%。</p>
+<a id="more"></a> 
+<h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊: </strong>IEEE ACCESS 2019</p>
+<p><strong>作者:</strong>  <img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201005212230396.png" alt="image-20201005212230396"></p>
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>Hierarchical, bidirectional GRU, attention, EEG, emotion classification</strong></p>
+<h2 id="介绍及相关工作"><a href="#介绍及相关工作" class="headerlink" title="介绍及相关工作"></a>介绍及相关工作</h2><p>由于脑电信号具有高度的时间依赖性、非平稳性和易受噪声干扰等特点，因此很难分辨和提取出脑电信号序列中情感相关性较高的关键时间点或片段。</p>
+<p>假设EEG信号是平稳的，则 <strong>Dynamic Statistical Parametric Maps (DSPM), Minimum Norm Estimation<br>(NME), Phase Shift and Vector Modulation </strong> 可以使用。滑动窗口问题在某种程度上解决了数据的非平稳性，但是它的统计效率是很低的。</p>
+<p>目前，CNN、RNN和LSTM已逐渐应用于脑电信号的建模，但研究仍处于起步阶段。</p>
+<p>这些方法在一定程度上提高了脑电情感分类的性能，但很少有模型考虑到<strong>脑电epoch和sample</strong>对序列情感类别的有不同的重要性。</p>
+<p>此外，目前的研究主要集中在依赖受试者的脑电数据的情感分类上，而非<strong>独立于受试者</strong>的脑电数据。我们不打算为每个用户单独训练一个模型，而是通过微调来预测用户的情感状态。</p>
+<p>我们提出了一种具有注意机制的分层双向门控递归单元(GRU)网络，称为H-ATT-BGRU。</p>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="双向GRU编码器"><a href="#双向GRU编码器" class="headerlink" title="双向GRU编码器"></a>双向GRU编码器</h3><p>GRU模型比标准的LSTM模型更简单、更快。特别是在训练大数据时，与标准LSTM模型相比，性能差异小，可以节省大量时间。对于许多序列建模任务来说，了解未来和过去的序列是有益的。然而，标准GRU网络按时间顺序处理序列，它们忽略了上下文。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006140501283.png" alt="image-20201006140501283"></p>
+<h3 id="层次的Attention结构"><a href="#层次的Attention结构" class="headerlink" title="层次的Attention结构"></a>层次的Attention结构</h3><p>为了应用好我们的模型，我们把样本分成epoch，每个epoch有多个sample。</p>
+<h4 id="sample-encoder"><a href="#sample-encoder" class="headerlink" title="sample encoder"></a>sample encoder</h4><p>我们首先将sample进行编码，使用的是双向GRU。</p>
+<h4 id="sample-attention"><a href="#sample-attention" class="headerlink" title="sample attention"></a>sample attention</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006145907433.png" alt="image-20201006145907433"></p>
+<script type="math/tex; mode=display">
+\begin{aligned} u_{j t} &=\tanh \left(W_{s} h_{j t}+b_{s}\right) \\ \alpha_{j t} &=\frac{\exp \left(u_{j t}^{T} u_{s}\right)}{\sum_{t} \exp \left(u_{j t}^{T} u_{s}\right)} \\ e_{j} &=\sum_{t} \alpha_{j t} h_{j t} \end{aligned}</script><p>$u_{s}$随机初始化，并在过程中进行调整。</p>
+<h4 id="epoch-encoder"><a href="#epoch-encoder" class="headerlink" title="epoch encoder"></a>epoch encoder</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006150436115.png" alt="image-20201006150436115"></p>
+<h4 id="epoch-decoder"><a href="#epoch-decoder" class="headerlink" title="epoch decoder"></a>epoch decoder</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006150443547.png" alt="image-20201006150443547"></p>
+<h4 id="sequence-classification"><a href="#sequence-classification" class="headerlink" title="sequence classification"></a>sequence classification</h4><p>结果输出</p>
+<script type="math/tex; mode=display">
+p=\operatorname{softmax}\left(W_{c} v+b_{c}\right)</script><p>损失函数</p>
+<script type="math/tex; mode=display">
+\mathrm{E} \Theta=-\frac{1}{N} \sum_{n=1}^{N} Y_{n} \log \left(\tilde{Y}_{n}\left(X_{n}, \theta\right)\right)+\frac{\lambda}{2}|| \theta||_{2}^{2}</script><h3 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006151353306.png" alt="image-20201006151353306" style="zoom:67%;" /></p>
+<h2 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>伦敦玛丽皇后大学的研究人员开发了DEAP数据集，这是一个大型的开源数据集，包含多种带有情绪评估的生理信号。该数据集记录了32名受试者在观看40个1分钟的具有不同情绪倾向的音乐视频时的脑电图、心电图、肌电图和其他生物电信号。然后，受试者的情绪用从1到9对看视频的感受进行衡量，包括valence，arousal，liking，dominance，familiarity。评级值从小到大表示各指数由负到正或由弱到强。这40个刺激视频由20个valence/arousal视频和20个valence/arousal视频组成。</p>
+<h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><ol>
+<li>32导EEG被下采样到128赫兹。使用4-47Hz的带通滤波器来消除噪音。使用盲源分离取均值到参考值，并且去除了EOG伪影。</li>
+<li>预处理后的脑电信号总长度为63-s，包括看视频的60-s和看前的3-s。然后，我们从观看视频的60秒脑电图信号(7680次读数)中去除3秒基本信号的平均值，并对跨通道数据进行归一化。</li>
+<li>每个受试者数据为 40(trials)×60(epochs)×128 (samples)×32(channels)，大于5的标为1，小于等于5的标为0。</li>
+<li>其余划分方式<img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153106754.png" alt="image-20201006153106754"></li>
+</ol>
+<h4 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h4><p>batchsize为60，学习率为0.05。</p>
+<p>数据则选择25%为训练集，GRU隐藏单元个数为64，双向拼接为128。</p>
+<h3 id="Baseline"><a href="#Baseline" class="headerlink" title="Baseline"></a>Baseline</h3><h4 id="shallow-baseline"><a href="#shallow-baseline" class="headerlink" title="shallow baseline"></a>shallow baseline</h4><p>我们使用AR和PSD来提取特征值，送入BT和SVM中进行分类。</p>
+<h4 id="deep-baseline"><a href="#deep-baseline" class="headerlink" title="deep baseline"></a>deep baseline</h4><p>CNN</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153551794.png" alt="image-20201006153551794"></p>
+<p>LSTM</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006153607719.png" alt="image-20201006153607719"></p>
+<h3 id="实验效果"><a href="#实验效果" class="headerlink" title="实验效果"></a>实验效果</h3><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154225760.png" alt="image-20201006154225760"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154247800.png" alt="image-20201006154247800"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154305924.png" alt="image-20201006154305924"></p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006154317371.png" alt="image-20201006154317371"></p>
+<h4 id="Attention-权重"><a href="#Attention-权重" class="headerlink" title="Attention 权重"></a>Attention 权重</h4><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20201006155249282.png" alt="image-20201006155249282"></p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>本文提出了一种具有注意机制的分层双向GRU模型(H-A TT-BGRU)，用于学习脑电序列特征并对其进行跨受试者情感分类。随着脑电序列epoch长度的增加，我们的模型表现出比其他baseline模型更好的分类性能，表明该模型能够有效降低长期脑电序列非平稳性的影响，提高基于脑电的情感分类的准确性和鲁棒性。该模型将应用于未来开发鲁棒的情感脑机接口的应用。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/Deep%20Transfer%20Learning%20for%20Single-Channel%20Automatic%20Sleep%20Staging%20with%20Channel%20Mismatch/" rel="prev" title="jzh Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch">
+      <i class="fa fa-chevron-left"></i> jzh Deep Transfer Learning for Single-Channel Automatic Sleep Staging with Channel Mismatch
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/A%203D%20Convolutional%20Neural%20Network%20for%20Emotion%20Recognition%20based%20on%20EEG%20Signals/" rel="next" title="jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals">
+      jzh A 3D Convolutional Neural Network for Emotion Recognition based on EEG Signals <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">介绍及相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E5%90%91GRU%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-number">5.1.</span> <span class="nav-text">双向GRU编码器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E7%9A%84Attention%E7%BB%93%E6%9E%84"><span class="nav-number">5.2.</span> <span class="nav-text">层次的Attention结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sample-encoder"><span class="nav-number">5.2.1.</span> <span class="nav-text">sample encoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sample-attention"><span class="nav-number">5.2.2.</span> <span class="nav-text">sample attention</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#epoch-encoder"><span class="nav-number">5.2.3.</span> <span class="nav-text">epoch encoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#epoch-decoder"><span class="nav-number">5.2.4.</span> <span class="nav-text">epoch decoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sequence-classification"><span class="nav-number">5.2.5.</span> <span class="nav-text">sequence classification</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84"><span class="nav-number">5.3.</span> <span class="nav-text">模型结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">6.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">6.1.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-number">6.2.</span> <span class="nav-text">数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E8%AE%BE%E7%BD%AE"><span class="nav-number">6.2.1.</span> <span class="nav-text">实验设置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Baseline"><span class="nav-number">6.3.</span> <span class="nav-text">Baseline</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#shallow-baseline"><span class="nav-number">6.3.1.</span> <span class="nav-text">shallow baseline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#deep-baseline"><span class="nav-number">6.3.2.</span> <span class="nav-text">deep baseline</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E6%95%88%E6%9E%9C"><span class="nav-number">6.4.</span> <span class="nav-text">实验效果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Attention-%E6%9D%83%E9%87%8D"><span class="nav-number">6.4.1.</span> <span class="nav-text">Attention 权重</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="介绍一般来说，利用干预是最好的揭示因果机制的方式，因为它能得到一个直观且鲁棒的因果概念。然而，只有当观测数据可获得的时候，我们才有显著的辨明因果依赖性的需求，这些数据必须具有实用性，并且收集成本较低（例如，在还没有介入临床试验之前，必须依靠观察性研究）。然而，与临床试验相比，来自较少控制的环境的真实数据给我们的分析带来了许多挑战。如果不可能进行干预，则无法确定某些因果结构。重要的是，真实数据的主要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cyf 【ICLR2021】潜在的收敛交叉映射">
+<meta property="og:url" content="http://example.com/2021/04/18/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="介绍一般来说，利用干预是最好的揭示因果机制的方式，因为它能得到一个直观且鲁棒的因果概念。然而，只有当观测数据可获得的时候，我们才有显著的辨明因果依赖性的需求，这些数据必须具有实用性，并且收集成本较低（例如，在还没有介入临床试验之前，必须依靠观察性研究）。然而，与临床试验相比，来自较少控制的环境的真实数据给我们的分析带来了许多挑战。如果不可能进行干预，则无法确定某些因果结构。重要的是，真实数据的主要">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223432.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210411141140752.png">
+<meta property="og:image" content="c:/Users/acer/AppData/Roaming/Typora/typora-user-images/image-20210411155057665.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223551.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223604.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223609.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223614.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223622.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223629.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223637.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223645.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223715.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223659.png">
+<meta property="og:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223703.png">
+<meta property="article:published_time" content="2021-04-18T07:00:24.000Z">
+<meta property="article:modified_time" content="2021-04-18T15:14:38.594Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223432.png">
+
+<link rel="canonical" href="http://example.com/2021/04/18/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>cyf 【ICLR2021】潜在的收敛交叉映射 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/18/ChenYifei/%E6%BD%9C%E5%9C%A8%E7%9A%84%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          cyf 【ICLR2021】潜在的收敛交叉映射
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-04-18 15:00:24 / Modified: 23:14:38" itemprop="dateCreated datePublished" datetime="2021-04-18T15:00:24+08:00">2021-04-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cyf/" itemprop="url" rel="index"><span itemprop="name">cyf</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>一般来说，利用干预是最好的揭示因果机制的方式，因为它能得到一个直观且鲁棒的因果概念。然而，只有当观测数据可获得的时候，我们才有显著的辨明因果依赖性的需求，这些数据必须具有实用性，并且收集成本较低（例如，在还没有介入临床试验之前，必须依靠观察性研究）。然而，与临床试验相比，来自较少控制的环境的真实数据给我们的分析带来了许多挑战。如果不可能进行干预，则无法确定某些因果结构。重要的是，真实数据的主要问题是缺失值。特别是，当收集纵向数据时，所得到的时间序列通常是零星的:采样在时间上是不规律的，并且跨维度导致了在任何给定时间上的一个给定变量的观察值和多个缺失的观察值之间的时间间隔的变化。这一问题普遍存在于各个领域，例如医疗保健，气候科学或者航空航天。</p>
+<a id="more"></a>
+<p>收敛交叉映射算法(CCM)基于混沌的动态系统理论，尤其是Takens嵌入定理，能够适用于变量不可分离的场景以及弱耦合的系统。然而因为这种方法依赖时间序列的延迟嵌入，所以它对序列的值的缺失高度敏感并且要求时间序列有一定长度且不受干扰。因此这种方法不适用于反复的短的零星的时间序列，而在许多的实际情况中都会出现。为了攻克这个限制，我们提出了学习时间序列间的因果依赖性的方案，那就是在时间序列的潜在过程中证实交叉收敛映射的存在。在零星观测到的时间序列的所有片段上建立一个联合模型，并且命令该模型学习数据的内在的动态系统。我们证明了此方法可以根据短且零星的时间序列中检测到因果关系，而不需要计算延迟嵌入。为了学习系统的相空间的一个连续时间的潜在表征，我们使用GRU-ODE-Bayes(D Brouwer et al., 2019)，它是近来提出的神经ODE模型(2018)的扩展模型。对于因果推断来说，重要的是，模型的过滤特征确保了未来的信息不会泄露到过去，然后我们检验学习到的潜在表征之间的连续映射的存在性，并据此判断因果关系的方向。</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223432.png" alt="image-20210410230057988"></p>
+<h2 id="相关研究"><a href="#相关研究" class="headerlink" title="相关研究"></a>相关研究</h2><p>收敛交叉映射算法近来的发展</p>
+<p>短且零星的时序的因果推断：短的时间序列在实践中十分常见，有许多基于相空间重构的短时序的因果研究方法被提出。交叉映射光滑性(2014)，多空间的收敛交叉映射(2015)。相比之下，在解决不规律采样的基础上，本文的方法通过在所有数据段之间共享的模型来计算含更多信息的相空间表示。而在不完整的时序上推断因果关系的技术已经被提出过，但是它们都基于Granger因果的框架，这使得它们不适用于变量不可分离场景。</p>
+<script type="math/tex; mode=display">
+\begin{align}
+X[t+1]&=X[t]Y[t] \\
+X[t+1]&=X[t]+Y[t]
+\end{align}</script><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>我们考虑两个多维度的时间序列$X[t]\in \boldsymbol{R}^{d_X}$，$Y[t]\in \boldsymbol{R}^{d_Y}$，我们要在它们的几个片段上探测这两个时间变量的因果关系。我们假定$X[t],Y[t]$由一个未知动态系统生成。作为一个例子，考虑如下能表示X和Y的动态系统的ODE方程：</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411141140752.png" alt="image-20210411141140752"></p>
+<p>为了考虑更广泛的场景，我们假设这些时序都是仅仅在有限的区间内观测到的片段。$X[t]$和$Y[t]$各自包括N个的短时间序列$(X^1[t],…,X^N[t])$和$(Y^1[t],…,Y^N[t])$。重点在X和Y的每个部分都是同时观测的。这些时间序列中每一个也是零星的，即不是规律采样的且每次不是所有维度都能观测到。</p>
+<h3 id="收敛交叉映射和Takens嵌入定理"><a href="#收敛交叉映射和Takens嵌入定理" class="headerlink" title="收敛交叉映射和Takens嵌入定理"></a>收敛交叉映射和Takens嵌入定理</h3><p>CCM算法是通过验证一个时间序列的相空间里的动态性能否从另一个反应，来探究这两个时间变量间的因果方向。如果X因果影响了Y，那么X是被包含在Y的动态系统中的并且我们有可能从Y的动态系统中获得关于X的动态系统的一个表示。</p>
+<p>令$X[t] \in \boldsymbol{R}^{d_X}$对应一个混沌动态系统，这个动态系统有一个计算盒维数为$d_M$的吸引子$\cal{M}$，而吸引子被认为是一个混沌动态系统趋向于向其演化的流形。利用在$\cal{M}$的一个流来对应系统的动力学特性</p>
+<script type="math/tex; mode=display">
+\phi_{(\cdot)}(\cdot):\boldsymbol{R} \times \cal{M} \to \cal{M} \\
+\phi_{\tau}(\cal{M}_{t})=\cal{M}_{t+\tau}</script><p>$\cal{M}<em>t$表示流形上时间指标为t的某个点。这样的流被编码进了系统的ODE中。观测的时间序列$X[t]$由观测函数获得，即$f</em>{obs}(\cdot):X[t]=f_{obs}(\cal{M}_t).$。Takens嵌入定理：一个延迟嵌入$\Phi$，延迟$\tau$以及嵌入维数$k$</p>
+<p><img src="C:\Users\acer\AppData\Roaming\Typora\typora-user-images\image-20210411155057665.png" alt="image-20210411155057665"></p>
+<p>是吸引子$\cal{M}$的一个拓扑不变意义下的嵌入如果$k&gt;2d_M$，而且$\alpha:\cal{R}^{d_M}\to \cal{R}$是一个二阶可微的观测函数。具体来说，嵌入映射$\Phi$保证原始吸引子流形$\cal{M}$和由延迟嵌入生成的阴影流形$\cal{M}’$之间的微分同胚性。在此假定下，在理论上我们能通过延迟嵌入的表示重构出原始时间序列。</p>
+<p>最简单的观测函数$\alpha$是简单地取动态系统观测值中的某一个维度。记$X_i[t]$表示$X[t]$的第i个维度，Takens定理确保由$X’[t]=(X_i[t],…,X_i[t-k\tau])$生成的阴影流形$\cal{M}’$与整个动态系统的原始流形之间是微分同胚的。因此，我们可以在阴影流形上研究子系统之间的耦合关系。</p>
+<p>CCM算法首先对系统X和Y进行相空间重构以获得阴影流形$\cal{M}’_X$和$\cal{M}’_Y$。</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223551.png" alt="image-20210411161615961"></p>
+<p>我们使用皮尔逊相关系数来评价估计结果的好坏。</p>
+<p>因为时序的样本长度决定了重构出的阴影流形里轨线的密集程度，长度越长，流形越密集，则近邻点越靠近，从而估计(预测)值越精准，这意味着我们计算出的相关系数随时序长度增加呈现收敛态势。显著的高的相关系数和收敛性是我们判断因果关系的重要依据。</p>
+<h3 id="神经ODEs"><a href="#神经ODEs" class="headerlink" title="神经ODEs"></a>神经ODEs</h3><p>许多连续时间的确定性动态系统都能够用常微分方程组(ODEs)描述。但通常来说，不是动态系统的所有维度都能被观测到，这使得一个系统更好地表示形式应该是，（在观测值$X[t]$被生成的条件下）一个在连续的潜在过程$H(t)$上的ODE。例如，当只观测到2维动态系统的一个维度时，我们不能在一个单维度变量上确定一个流$\phi_t(X)$，但我们可以确定一个潜在过程$H(t)$。然后我们有如下的动态系统表述形式：</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223604.png" alt="image-20210411163834868"></p>
+<p>$\theta$表示ODE的参数，$f_{\theta}(\cdot)$是一个Lipschitz连续函数，$g(\cdot)$是一个连续函数。动态系统的学习在于从过程X的观测值组成的一个有限集合中确定参数$\theta$。神经ODEs(2018)通过一个神经网络实现对这个函数的参数化。</p>
+<p><strong>摘自《Neural Ordinary Differential Equations》的内容</strong></p>
+<p>诸如残差网络和递归神经网络的解码器和正则化流是通过构成一个隐藏层状态的转换序列来构建复杂的转换</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223609.png" alt="image-20210411175033475"></p>
+<p>这些迭代更新可以视作连续变换的欧拉离散化。如果我们加入更多的层和更短的时间步，在极限状态，我们参数化了这样的隐藏层单元的连续动态系统通过使用一个由神经网络指定的常微分方程(ODE)：</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223614.png" alt="image-20210411175715109"></p>
+<p>从输入层$\mathbf{h}(0)$开始，我们能定义输出层$\mathbf{h}(T)$为这个ODE初值问题在某个时间T的解。而这个值可以通过一个黑盒的微分方程求解器进行计算，该求解器可在任何需要的地方估计隐藏层单元的动态系统$f$以确定所需的精度。</p>
+<p>这种方式的好处有：</p>
+<p>1.存储效率——连续深度模型具有恒定的存储成本 </p>
+<p>2.现今的ODE求解技术为逼近误差的增长提供保证，能动态调整其估计策略以达到要求的精度水平</p>
+<p>3.当隐藏层的单元的动态系统参数化地变为一个连续的时间函数时，附近层的参数自动捆绑到一起，这将减少了监督学习所需的参数数量</p>
+<p>4.变量公式的变化更容易计算。避免了正则化流的单一单元的瓶颈且可以通过极大似然进行直接训练</p>
+<p>5.连续定义的动态系统可以自然地合并在任意时刻到达的数据</p>
+<h3 id="使用潜在的CCM进行因果推断"><a href="#使用潜在的CCM进行因果推断" class="headerlink" title="使用潜在的CCM进行因果推断"></a>使用潜在的CCM进行因果推断</h3><p>CCM算法的关键步骤是计算时间序列的延迟嵌入：$\Phi(X[t])$和$\Phi(Y[t])$。然而，当数据仅在不规律的区间上零星地被观测到时，对任意的t来说观测到整个延迟样本$X_i[t],X_i[t-\tau],…,X_i[t-k\tau]$的概率几乎为0。$X’[t]=(X_i[t],…,X_i[t-k\tau])$和$Y’[t]$不能被完整观测到（实际上仅有一个维度被观测到）并且不能执行最邻近点的预测。而且，短的时间序列也妨碍我们使用足够的嵌入维数（k）和时间延迟（$\tau$）来计算延迟嵌入。代替计算延迟嵌入，我们利用一个被神经ODE参数化的连续时间的隐藏层过程来学习动态系统，并且使用这种隐藏层的表示作为一个完整的相空间的表示。因此，它不再要求进行延迟嵌入，CCM也不再强调长的，稳定采样的时间序列。下面通过一个图展示这个方法</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223622.png" alt="image-20210411205148120"></p>
+<p>为推断X[t]和Y[t]之间的因果关系，首先对两个GRU-ODE-Bayes模型进行训练（一种神经ODEs的扩展）。作为一种滤波方法，GRU-ODE-Bayes保证了未来的信息不会向后泄露，这与我们的因果概念——因一定发生在果之前相符合。潜在过程的连续性也是重要的，因为它使得动态系统的吸引子具有更大的范围。事实上，在观测值之间的一个恒定的潜在过程（例如用GRU等经典的循环神经网络获得的过程）会导致较少的独特的潜在过程观测。</p>
+<p>同样的模型被用在每个时序的所有片段上，并且经过训练使得预测误差最小化。我们学习观测函数$g$，ODE$f<em>{\theta}$以及连续时间的潜在过程$H(t)$。我们把来自时序X的所有片段上的潜在向量的结果空间写成$\mathcal{H}</em>{X}$。</p>
+<p>通过验证在$\mathcal{H}<em>{X}$和$\mathcal{H}</em>{Y}$之间的连续映射的存在性，我们可以做出因果关系的判断。与CCM类似，如果$\mathcal{H}<em>{X}$和$\mathcal{H}</em>{Y}$之间存在一个连续映射的话，我们考虑X是Y的因。实际$\mathcal{H}_{X}$代替了延迟嵌入$\Phi_X$，我们进行因果推断的方式和CCM是相似的。</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223629.png" alt="image-20210411211642840"></p>
+<p>后续的过程和CCM一样，连续映射的存在性通过相关性来体现。例如，对于$X \to Y$，我们计算实际的$\mathcal{H}_X$和基于$\mathcal{H}_Y$获得的$\mathcal{H}_X$的预测值之间的相关性。</p>
+<p>它的代码是公开的： https: //github.com/edebrouwer/latentCCM</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>对应上面的示意图，本文用了一个物理的系统：双摆系统</p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223637.png" alt="image-20210411213159189"></p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223645.png" alt="image-20210411214112681"></p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223715.png" alt="image-20210411214325246"></p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223659.png" alt="image-20210414110403624"></p>
+<p><img src="https://gitee.com/cyf_1739551672/my_-figure/raw/master/img/20210418223703.png" alt="image-20210414155800140"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>神经ODEs是一种能够处理不规律采样的时间序列的深度网络，本文也是使用了它的扩展形式GRU-ODE-Bayes学习潜在过程得到的结果空间$\mathcal{H}$代替了最初的延迟嵌入的相空间，成功处理了短的采样不规律的时序数据的因果探测问题。实际上其它的研究领域也可能存在数据零星的问题，可以考虑使用神经ODEs这种新型的网络。</p>
+<h2 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h2><p><strong>《神经ODEs》论文的摘要</strong></p>
+<p>我们引入了一种新的深度神经网络模型。我们不用指定一个离散的隐藏层序列，而是使用神经网络参数化隐藏状态的导数。网络的输出使用黑盒的微分方程求解器计算。这些连续深度模型具有恒定的存储成本，根据每个输入调整其评估策略，并可以明确地以数值精度换取速度。我们在连续深度残差网络和连续时间潜在变量模型中证明了这些性质。我们还构造了连续正则化流，这是一个生成模型，可以通过最大似然进行训练，而无需对数据维度进行划分或排序。作为训练，我们展示了如何通过任何ODE求解器进行可伸缩的反向传播，而不需要访问其内部操作。这允许在更大的模型中对ode进行端到端的训练。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/14/GongSa/WSDM_2021_Time-Series%20Event%20Prediction%20with%20Evolutionary%20State%20Graph(1)/" rel="prev" title="gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph">
+      <i class="fa fa-chevron-left"></i> gs 【WSDM2021】Time-Series Event Prediction with Evolutionary State Graph
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/14/SongYudan/%E3%80%90ICML2020%E3%80%91Which%20Tasks%20Should%20Be%20Learned%20Together%20in%20Multi-task%20Learning/" rel="next" title="syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning?">
+      syd 【ICML2020】Which Tasks Should Be Learned Together in Multi-task Learning? <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%A0%94%E7%A9%B6"><span class="nav-number">2.</span> <span class="nav-text">相关研究</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B6%E6%95%9B%E4%BA%A4%E5%8F%89%E6%98%A0%E5%B0%84%E5%92%8CTakens%E5%B5%8C%E5%85%A5%E5%AE%9A%E7%90%86"><span class="nav-number">3.1.</span> <span class="nav-text">收敛交叉映射和Takens嵌入定理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8FODEs"><span class="nav-number">3.2.</span> <span class="nav-text">神经ODEs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%BD%9C%E5%9C%A8%E7%9A%84CCM%E8%BF%9B%E8%A1%8C%E5%9B%A0%E6%9E%9C%E6%8E%A8%E6%96%AD"><span class="nav-number">3.3.</span> <span class="nav-text">使用潜在的CCM进行因果推断</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.</span> <span class="nav-text">实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">6.</span> <span class="nav-text">补充</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

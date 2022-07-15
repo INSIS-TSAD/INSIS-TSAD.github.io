@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="任务场景在社交媒体中，有非常多的二部图。比如推特中，有关注者和被关注者两种节点，关注关系形成一个二部图；在大众点评中，有用户和商家两种节点，用户对商家的点评关系形成一个二部图；在淘宝里，用户购买商品，也形成一个二部图。          1234Fraudar可以解决哪些问题呢？（二部图的问题）\1. 用户在电商平台，购买商品（刷单）\2. 用户评论电影，美食，游戏评分（刷评分）\3. 推特，博客">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage">
+<meta property="og:url" content="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="任务场景在社交媒体中，有非常多的二部图。比如推特中，有关注者和被关注者两种节点，关注关系形成一个二部图；在大众点评中，有用户和商家两种节点，用户对商家的点评关系形成一个二部图；在淘宝里，用户购买商品，也形成一个二部图。          1234Fraudar可以解决哪些问题呢？（二部图的问题）\1. 用户在电商平台，购买商品（刷单）\2. 用户评论电影，美食，游戏评分（刷评分）\3. 推特，博客">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226160804505.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165517763.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165801736.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226170724326.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226172725831.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227154756119.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227160318769.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227160011064.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227162143737.png">
+<meta property="article:published_time" content="2021-03-31T12:24:24.000Z">
+<meta property="article:modified_time" content="2022-03-02T09:25:59.300Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="反欺诈">
+<meta property="article:tag" content="风控">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226160804505.png">
+
+<link rel="canonical" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-31 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-31T20:24:24+08:00">2021-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-03-02 17:25:59" itemprop="dateModified" datetime="2022-03-02T17:25:59+08:00">2022-03-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="任务场景"><a href="#任务场景" class="headerlink" title="任务场景"></a>任务场景</h3><p>在社交媒体中，有非常多的二部图。比如推特中，有关注者和被关注者两种节点，关注关系形成一个二部图；在大众点评中，有用户和商家两种节点，用户对商家的点评关系形成一个二部图；在淘宝里，用户购买商品，也形成一个二部图。</p>
+<p><center class="half"><br>    <img img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226160804505.png" alt="image-20220226160804505" width="150"/><br>    <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165517763.png" width="500" /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Fraudar可以解决哪些问题呢？（二部图的问题）</span><br><span class="line">\1. 用户在电商平台，购买商品（刷单）</span><br><span class="line">\2. 用户评论电影，美食，游戏评分（刷评分）</span><br><span class="line">\3. 推特，博客关注信息（购买粉丝）</span><br></pre></td></tr></table></figure>
+<p>为了在二部图中检测出上述的欺诈行为，以往的方法（在此篇论文发表的2016年以前）是检测二部图中的稠密子图。以购买粉丝为例，购买者会突然增加许多粉丝，在二部图中，购买者这个节点的边突然增多（稠密子图）。</p>
+<a id="more"></a>
+<h3 id="解决的问题"><a href="#解决的问题" class="headerlink" title="解决的问题"></a>解决的问题</h3><p>欺诈者会想办法伪装自己的欺诈行为。以大众点评为例，某个商家向欺诈者购买了大量好评。欺诈者通过操控大量的账户，给商家好评，从而提高该商家的人气。为了不那么容易被检测出来，欺诈者会伪装自己的欺诈行为。本文提出的方案针对3种伪装方法：</p>
+<ol>
+<li>随机伪装。除了给目标商家好评，也随机给其他商家好评。</li>
+<li>有偏的伪装。除了给目标商家好评，也随机给其他比较热门的商家好评。</li>
+<li>劫持用户。通过劫持正常用户的账号，给目标商家好评。</li>
+</ol>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165801736.png" alt="image-20220226165801736"></p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>首先明确抗伪装的定义， 定义$g$为一个子图的密集程度指标（越密集越可疑），抗伪装的要求是：即使欺诈者做了一些伪装，这个指标$g$不会因此下降。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226170724326.png" alt="image-20220226170724326"></p>
+<p>看看作者设计的解决方案。作者设计的子图异常指标$g$（稠密程度）如下（左侧公式，右侧例子），其中$\mathcal{V}$是点集，$\mathcal{E}$是边集, $\mathcal{S}$是一个子图。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226172725831.png" alt="image-20220226172725831"></p>
+<p>这个指标满足几个欺诈检测中对异常指标的要求：</p>
+<ol>
+<li>子图规模相同的情况下，包含高危节点的子图更可疑。</li>
+<li>子图的边增加，将会增加该子图的可疑性。</li>
+<li>当点和边的权重相同时（并且在同样边的密度下），大图比小图更可疑（相同密度，越大越可疑）</li>
+<li>如果总的可疑度相同，小图比大图更可疑（密度越大越可疑）</li>
+</ol>
+<p>算法流程：</p>
+<p>是一个贪心算法。令$\mathcal{X}$是所有节点， 每次寻找一个节点$i$,使得下面这条式子最大：$\Delta_{i}=f(\mathcal{X} \backslash{i})-f(\mathcal{X})$</p>
+<p>直观理解：每次选出一个节点，去除这个节点后，剩余的节点构成的子图的异常指标$f$最大。</p>
+<p>遍历完成之后，取其中的一个子图作为异常子图，这个子图使得异常指标$g(S)=\frac{f_{S}}{|S|}$最大。</p>
+<h5 id="这个算法是如何对抗伪装的？"><a href="#这个算法是如何对抗伪装的？" class="headerlink" title="这个算法是如何对抗伪装的？"></a>这个算法是如何对抗伪装的？</h5><p>回顾异常计算指标：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+f(\mathcal{S}) &=f_{\mathcal{V}}(\mathcal{S})+f_{\mathcal{E}}(\mathcal{S}) \\
+&=\sum_{i \in \mathcal{S}} a_{i}+\sum_{i, j \in \mathcal{S} \wedge(i, j) \in \mathcal{E}} c_{i j}
+\end{aligned}</script><p>其中$a<em>i$是节点的权重，$c</em>{i, j}$边的权重。通过调整$c_{i, j}$来抗伪装。</p>
+<p>即通过令边权重$c_{i j}=\frac{1}{log (d_j+c)}$来达到抗伪装的目的， 其中$d_j$是商品节点$j$的度。这样调整权重的含义时，一个商品的度越高，它的边的权重越低。</p>
+<h5 id="为什么这个权重-c-i-j-是抗伪装的？"><a href="#为什么这个权重-c-i-j-是抗伪装的？" class="headerlink" title="为什么这个权重$c_{i,j}$是抗伪装的？"></a>为什么这个权重$c_{i,j}$是抗伪装的？</h5><h5 id=""><a href="#" class="headerlink" title=""></a><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227154756119.png" alt="image-20220227154756119"></h5><h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p><strong>0. 本文使用的数据集</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227160318769.png" alt="image-20220227160318769" style="zoom: 67%;" /></p>
+<p><strong>1. 在生成数据中的实验。</strong> </p>
+<p>在亚马逊的关于评论的图中，提取2000个用户和2000个商品的子图。往这个子图中注入欺诈块。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227160011064.png" alt="image-20220227160011064"></p>
+<p><strong>2. 在真实数据中的实验。</strong> </p>
+<p>数据是推特的”关注者-被关注者“图。2009年采集数据，包含了4170万用户和14.7亿用户。在这张图上，Fraudar检测到4031关注者和4313被关注者的子图。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220227162143737.png" alt="image-20220227162143737" style="zoom:50%;" /></p>
+<p>总结：通过迭代图中所有节点，检测出异常稠密的子图，这个子图就是有欺诈行为嫌疑的群体。</p>
+<p>优点：</p>
+<ol>
+<li>是一个无监督的方法。</li>
+<li>针对的是通过操纵大量用户进行欺诈的行为。</li>
+</ol>
+<p>不足之处：</p>
+<ol>
+<li>没有从时序的角度对用户和商品进行建模。用户和商品如果跟欺诈有关，会有特定的行为模式。</li>
+<li>没有考虑用户、商品、和连边的内部特征。用户的个人特征、商品的特征、连边（评论）的特征也可以用来提高欺诈检测效果。这里可以引入GNN来实现这个目的。</li>
+<li>不适用于检测个别用户的欺诈行为。</li>
+</ol>
+<p>附：本文中使用的数据集调研</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8F%8D%E6%AC%BA%E8%AF%88/" rel="tag"># 反欺诈</a>
+              <a href="/tags/%E9%A3%8E%E6%8E%A7/" rel="tag"># 风控</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/" rel="prev" title="zhj 【NIPS2020】Supervised Contrastive Learning">
+      <i class="fa fa-chevron-left"></i> zhj 【NIPS2020】Supervised Contrastive Learning
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/" rel="next" title="jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals">
+      jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">任务场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">解决的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">3.</span> <span class="nav-text">解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BF%99%E4%B8%AA%E7%AE%97%E6%B3%95%E6%98%AF%E5%A6%82%E4%BD%95%E5%AF%B9%E6%8A%97%E4%BC%AA%E8%A3%85%E7%9A%84%EF%BC%9F"><span class="nav-number">3.0.1.</span> <span class="nav-text">这个算法是如何对抗伪装的？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B8%AA%E6%9D%83%E9%87%8D-c-i-j-%E6%98%AF%E6%8A%97%E4%BC%AA%E8%A3%85%E7%9A%84%EF%BC%9F"><span class="nav-number">3.0.2.</span> <span class="nav-text">为什么这个权重$c_{i,j}$是抗伪装的？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link"><span class="nav-number">3.0.3.</span> <span class="nav-text"></span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">实验结果</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

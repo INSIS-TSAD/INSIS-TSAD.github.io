@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Proc. VLDB Endow. 13(8): 1176-1189 (2020)   摘要随着云数据库市场的不断增长，检测和消除慢速查询对服务稳定性至关重要。以前的研究集中在优化由于内部原因(例如，编写得不好的sql)而导致的缓慢查询。 在这项工作中，我们发现了一组不同的慢速查询，与其他慢速查询相比，这些查询对数据库用户的危害可能更大。我们将这种查询命名为间歇性慢速查询(iSQs)，因为它们通">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gs Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases">
+<meta property="og:url" content="http://example.com/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Proc. VLDB Endow. 13(8): 1176-1189 (2020)   摘要随着云数据库市场的不断增长，检测和消除慢速查询对服务稳定性至关重要。以前的研究集中在优化由于内部原因(例如，编写得不好的sql)而导致的缓慢查询。 在这项工作中，我们发现了一组不同的慢速查询，与其他慢速查询相比，这些查询对数据库用户的危害可能更大。我们将这种查询命名为间歇性慢速查询(iSQs)，因为它们通">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBXBF.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBqXT.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBbcV.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBH10.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBOnU.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBxAJ.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDShR.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBzN9.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJBH10.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJD991.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDABD.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDC1x.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDijK.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDZAH.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDPc6.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDknO.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDeNd.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDu9I.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJD1u8.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDK3t.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDMgP.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/12/sJDQjf.png">
+<meta property="article:published_time" content="2021-01-16T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:42:51.114Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="根因诊断">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/01/12/sJBXBF.png">
+
+<link rel="canonical" href="http://example.com/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>gs Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/16/GongSa/gs_VLDB_2020_Diagnosing%20Root%20Causes%20of%20Intermittent%20Slow%20Queries%20in%20Large-Scale%20Cloud%20Databases/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gs Diagnosing Root Causes of Intermittent Slow Queries in Large-Scale Cloud Databases
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-01-16 20:24:24 / Modified: 11:42:51" itemprop="dateCreated datePublished" datetime="2021-01-16T20:24:24+08:00">2021-01-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gs/" itemprop="url" rel="index"><span itemprop="name">gs</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>Proc. VLDB Endow. 13(8): 1176-1189 (2020)</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBXBF"><img src="https://s3.ax1x.com/2021/01/12/sJBXBF.png" alt="sJBXBF.png"></a></p>
+</blockquote>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>随着云数据库市场的不断增长，检测和消除慢速查询对服务稳定性至关重要。以前的研究集中在优化由于内部原因(例如，编写得不好的sql)而导致的缓慢查询。</p>
+<p>在这项工作中，我们发现了一组不同的慢速查询，与其他慢速查询相比，这些查询对数据库用户的危害可能更大。我们将这种查询命名为<strong>间歇性慢速查询(iSQs)</strong>，因为它们通常是由外部的间歇性性能问题造成的(例如，在数据库或机器级别)。诊断iSQs的根本原因是一项艰巨但非常有价值的任务。</p>
+<p>本文提出<strong>iSQUAD（Intermittent Slow QUery Anomaly Diagnoser）</strong>，一个可以诊断iSQs的根本原因的框架，它对人工干预的需求比较松。</p>
+<a id="more"></a> 
+<p>面临的挑战：<strong>通用性、标签开销和可解释性</strong>。因此设计了四个组件：</p>
+<ul>
+<li>异常提取</li>
+<li>依赖清理</li>
+<li>面向类型的模式集成聚类(TOPIC)</li>
+<li>贝叶斯实例模型（Bayesian Case Model）</li>
+</ul>
+<p><strong>组成：</strong></p>
+<ul>
+<li>阶段一：离线聚类+解释</li>
+<li>阶段二：在线跟因诊断+更新</li>
+</ul>
+<p><strong>数据集：</strong>阿里巴巴OLTP数据库的真实数据集</p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>云数据库正在不断地发展，数据库中的服务中断或性能故障可能会导致严重的效率损失和品牌损失。因此，数据库总是处于不断的监控之中，检测和消除慢速查询对于服务的稳定性至关重要。</p>
+<p>大多数数据库系统，如MySQL、Oracle、SQL Server，会自动记录完成时间超过用户限制阈值的查询的详细信息。一些缓慢的查询是由<u>内部原因</u>造成的，比如复杂性、缺乏索引和SQL语句编写得很差，这些可以被自动分析和优化。</p>
+<p><strong>间歇性慢速查询(iSQs)：</strong>这些慢速查询是由<u>外部的</u>间歇性性能问题(例如，在数据库或机器级别)导致的。</p>
+<blockquote>
+<p><strong>造成损失严重，手动诊断费事费力</strong></p>
+<p>通常，iSQs是云数据库中性能问题甚至故障的主要症状。由于iSQs是断断续续的，服务开发人员和客户希望它们能够正常响应，而突然增加的延迟会产生巨大的影响。例如，在浏览网页时，iSQ可能导致网页加载延迟。据报道，亚马逊每0.1秒的加载延迟就会损失1%的销售额，而谷歌搜索结果每0.5秒的加载延迟就会导致的流量下降20%。我们获得了阿里巴巴OLTP数据库的数据库管理员在一年内注意到的几个性能问题记录:当一个性能问题发生时，一系列的isq持续几分钟。事实上，手动诊断iSQs的根本原因需要几十分钟，这既费时又容易出错。</p>
+</blockquote>
+<p>本文的工作目标：尽可能的减少人工干预来进行于数据库中iSQ的跟因诊断。以下是观察到的异常症状和跟因的一些记录：</p>
+<ul>
+<li><strong>数据库管理员需要扫描数百个关键性能指标来查找性能问题症状。</strong></li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBqXT"><img src="https://s3.ax1x.com/2021/01/12/sJBqXT.png" alt="sJBqXT.png"  /></a></p>
+<ul>
+<li><p><strong>性能问题异常主要包括不同的kpi模式。</strong>我们总结了三组对称的KPI模式，即，<strong>突起突降，水平漂移（向上或向下），缺失</strong>。单纯基于检测KPI异常与否，我们无法准确诊断iSQs的根本原因。</p>
+</li>
+<li><p><strong>一个异常KPI通常伴随着另一个或多个异常KPI。</strong></p>
+</li>
+<li><p><strong>类似的异常与相同的根因相关。</strong>在每个根本原因类别中，性能问题的KPI症状彼此相似。</p>
+</li>
+</ul>
+<p>提出<strong>iSQUAD（Intermittent Slow QUery Anomaly Diagnoser）</strong>，其中，我们采用异常提取和依赖清理来代替传统的异常检测方法，以解决异常多样性的挑战。为了减少标记开销，提出了面向类型的模式集成聚类(TOPIC)，将具有相同根源的iSQ聚类在一起，同时考虑KPI和异常类型。在聚类可解释性方面，利用贝叶斯实例模型为每个聚类提取基于实例的表示，便于DBAs研究。</p>
+<p><strong>组成：</strong></p>
+<ul>
+<li><p>阶段一：离线聚类+解释</p>
+<p>获得聚类和跟因，用于在线阶段的诊断。数据库管理员只需要对每个聚类标记一次，除非在线阶段出现了新的类。</p>
+</li>
+<li><p>阶段二：在线跟因诊断+更新</p>
+</li>
+</ul>
+<p><strong>工作主要贡献：</strong></p>
+<ul>
+<li><p>基于云数据库中iSQs速度慢的问题，并设计了一个名为<strong>iSQUAD的可伸缩框架</strong>，该框架可以为iSQs提供准确而有效的根因诊断。它采用了机器学习技术，克服了在通用性、标识开销和可交互性等方面的挑战。</p>
+</li>
+<li><p><strong>异常提取</strong>：使用KPIs的异常提取来代替异常检测来区分异常类型。</p>
+</li>
+<li><p><strong>聚类</strong>：提出了一种新的聚类算法TOPIC来减少标记开销。</p>
+</li>
+<li><p>最先通过<strong>贝叶斯实例模型</strong>在数据库领域中应用和改进基于实例的推理，并将实例子空间表示推给DBAs用于标记。</p>
+</li>
+<li><p>我们对iSQUAD的评估进行了大量的实验，证明了我们的方法获得了平均F1-score 80.4%，较前一种技术提高了49.2%。此外，已经在真实的云数据库服务中部署了iSQUAD的原型。iSQUAD可以帮助DBAs在80分钟内找到数百个iSQs的全部10个根因，这比传统的逐例诊断快大约30倍。</p>
+</li>
+</ul>
+<h3 id="背景与动机"><a href="#背景与动机" class="headerlink" title="背景与动机"></a>背景与动机</h3><h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><h5 id="阿里巴巴OLTP数据库"><a href="#阿里巴巴OLTP数据库" class="headerlink" title="阿里巴巴OLTP数据库"></a>阿里巴巴OLTP数据库</h5><p>支持的服务有淘宝、天猫、钉钉和菜鸟等。这个数据库包含了跨越几十个地理区域的十万个实际运行的实体，配备有一个度量系统用于收集日志和KPIs。</p>
+<h5 id="Intermittent-Slow-Queries-iSQs"><a href="#Intermittent-Slow-Queries-iSQs" class="headerlink" title="Intermittent Slow Queries (iSQs)"></a>Intermittent Slow Queries (iSQs)</h5><p><strong>查询时间</strong>：SQL查询被提交给数据库和其结果被数据库返回之间的时间。</p>
+<p><strong>iSQ：</strong>第$t$ 个SQL语句 $Q_t$，执行时间$X_t$,当$X_t&gt;z$且$P(X_i&gt;z)&lt;\epsilon$,其中$1&lt;=t,i&lt;=T$，z是一个iSQ的阈值。对于阿里数据库管理员设置：$z=1s,\epsilon=0.01,T=10^4$</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBbcV"><img src="https://s3.ax1x.com/2021/01/12/sJBbcV.png" alt="sJBbcV.png"></a></p>
+<blockquote>
+<p>图（a） 每条语句查询时间的概率分布，iSQs的占比0.0028</p>
+<p>图（b） 每条语句查询时间的概率分布，每条SQL语句都比较慢</p>
+</blockquote>
+<p>在慢速查询中，其他类型的慢速查询主要是由任务的复杂性造成的，通常是非交互和可容忍的(约占79%)，这些慢速查询可以通过添加索引或重写SQL语句等方式来进行优化。</p>
+<p>iSQs只占1%，但其影响非常大，比例很小，但是每天都会是成千上万的，处理优化这些异常有利于调高用户体验。</p>
+<h4 id="观察"><a href="#观察" class="headerlink" title="观察"></a>观察</h4><p>由于当出现性能问题时，许多正常的在线服务查询会受到影响，速度会比平时慢得多，所以，理解iSQs的根本原因对于缓解慢速查询很重要。</p>
+<ul>
+<li><p><strong>（需要多变量）KPIs对于定位iSQs的根本原因非常重要。</strong>单独的KPI不能捕获所有类型的问题，不同类型的KPI才能掌握跟踪整个系统的状态。</p>
+</li>
+<li><p><strong>（以前的工作并没有关注异常类型，仅关注<u>是否异常</u>）应该注意kpi的异常类型。</strong></p>
+<p>​    突起突降、水平漂移（向上或向下）、无效（缺失或为0）</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBH10"><img src="https://s3.ax1x.com/2021/01/12/sJBH10.png" alt="sJBH10.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBOnU"><img src="https://s3.ax1x.com/2021/01/12/sJBOnU.png" alt="sJBOnU.png"></a></p>
+<blockquote>
+<p>异常类型与异常跟因有关</p>
+<p>case1 实例1进行数据库备份，两个实例共享IO</p>
+<p>case2 只有一个物理机器，发生总体工作负载增加（闪购时间）</p>
+</blockquote>
+<ul>
+<li><p><strong>（序列之间的相关性、依赖性）KPIs间异常是高度相关的，</strong>其关系可能是单向，也可能双向。</p>
+</li>
+<li><p><strong>类似的KPI模式与相同的根本原因相关。</strong></p>
+<blockquote>
+<p>例：DBAs将异常跟因分为了10类，每种跟因中，有些KPI异常是相似的，可以相互替换，比如 sql-update和sql-delete引起的负载异常。</p>
+</blockquote>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBxAJ"><img src="https://s3.ax1x.com/2021/01/12/sJBxAJ.png" alt="sJBxAJ.png"></a></p>
+<h4 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h4><ul>
+<li>异常类型多样性</li>
+</ul>
+<blockquote>
+<p>之前的方法的局限性：目前的异常研究普遍忽略和过度概括了异常类型。这样的检测方法可能会在(监控数据)预处理阶段错误地检测出大量信息，从而降低(监控)数据集的质量。</p>
+</blockquote>
+<ul>
+<li>标签开销大：专家工作量大、过程复杂</li>
+</ul>
+<blockquote>
+<p>之前的方法的局限性：有复现跟因的方法——实际情况不允许；<u>自定义数据负载进行统计也是不现实的</u>（？）</p>
+</blockquote>
+<ul>
+<li>可解释的模型：模型的准确性和它对人类的可解释性之间存在不可避免的权衡。</li>
+</ul>
+<blockquote>
+<p>之前的方法的局限性：决策树，依赖于开始时提供精确的信息，因为即使是输入中的细微差别也可能导致大的树修改，此外，决策树还可能产生“分析瘫痪”的问题，即向决策者提供的信息过多，而不是关键要素。</p>
+</blockquote>
+<h3 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h3><p>模型框架：<strong>iSQUAD (Intermittent Slow QUery Anomaly Diagnoser)</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDShR"><img src="https://s3.ax1x.com/2021/01/12/sJDShR.png" alt="sJDShR.png"></a></p>
+<ul>
+<li><p>离线阶段：对iSQs进行聚类，让专家更容易的识别标记跟因。</p>
+<p>异常提取—异常KPIs离散化—依赖清理—聚类—Bayesian Case Model（一个典型的iSQ和它的基本KPI矩阵作为特征空间）</p>
+</li>
+<li><p>在线阶段：输入iSQ和其对应的KPIs—异常提取—异常KPIs离散化—依赖清理—查询匹配一个跟因类—给DBAs展示解释异常（若未匹配，则分配到一个新类）</p>
+</li>
+</ul>
+<h3 id="iSQUAD细节设计"><a href="#iSQUAD细节设计" class="headerlink" title="iSQUAD细节设计"></a>iSQUAD细节设计</h3><h4 id="离线阶段：异常提取"><a href="#离线阶段：异常提取" class="headerlink" title="离线阶段：异常提取"></a>离线阶段：异常提取</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBzN9"><img src="https://s3.ax1x.com/2021/01/12/sJBzN9.png" alt="sJBzN9.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJBH10"><img src="https://s3.ax1x.com/2021/01/12/sJBH10.png" alt="sJBH10.png"></a></p>
+<ul>
+<li><p>峰值：Robust Threshold（中位数和中位数绝对偏差值）（假设是柯西分布），时间间隔1h，阈值根据经验。</p>
+</li>
+<li><p>水平漂移：分成两个窗口，检验两个窗口分布是否相似，如果通过T-Test（一种用于测试两组平均差异的推断统计量）发现存在明显差异，则确定发生水平飘移。窗口30分钟，t值根据经验。</p>
+</li>
+</ul>
+<h4 id="离线阶段：依赖清理"><a href="#离线阶段：依赖清理" class="headerlink" title="离线阶段：依赖清理"></a>离线阶段：依赖清理</h4><p>目的：确保KPIs之间相互独立，这样就没有相关性或者过度表示。</p>
+<p><strong>相关指数（阈值）</strong>：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJD991"><img src="https://s3.ax1x.com/2021/01/12/sJD991.png" alt="sJD991.png"></a></p>
+<blockquote>
+<p>例子：CPU（实体和物理机器）</p>
+</blockquote>
+<h4 id="离线阶段：面向类型的模式集成聚类（Type-Oriented-Pattern-Integration-Clustering，TOPIC）"><a href="#离线阶段：面向类型的模式集成聚类（Type-Oriented-Pattern-Integration-Clustering，TOPIC）" class="headerlink" title="离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）"></a>离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）</h4><blockquote>
+<p>pattern：一个iSQ的封装的KPI特定组合</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDABD"><img src="https://s3.ax1x.com/2021/01/12/sJDABD.png" alt="sJDABD.png"></a></p>
+<p>两个iSQs之间的相似度：<a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDC1x"><img src="https://s3.ax1x.com/2021/01/12/sJDC1x.png" alt="sJDC1x.png"></a>t是KPI类型数目，T是总KPI类型数目</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDijK"><img src="https://s3.ax1x.com/2021/01/12/sJDijK.png" alt="sJDijK.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDZAH"><img src="https://s3.ax1x.com/2021/01/12/sJDZAH.png" alt="sJDZAH.png"></a></p>
+<h4 id="离线阶段：Bayesian-Case-Model-贝叶斯实例模型"><a href="#离线阶段：Bayesian-Case-Model-贝叶斯实例模型" class="headerlink" title="离线阶段：Bayesian Case Model 贝叶斯实例模型"></a>离线阶段：Bayesian Case Model 贝叶斯实例模型</h4><p>作用：从每个聚类中提取有用的和有启发性的信息，为DBAs打标签提供便利</p>
+<p>前提：离散化 标签（聚类的结果）</p>
+<h4 id="在线阶段：跟因检测和更新"><a href="#在线阶段：跟因检测和更新" class="headerlink" title="在线阶段：跟因检测和更新"></a>在线阶段：跟因检测和更新</h4><p>匹配：相似度最高的一个模式</p>
+<p>更新：匹配失败后，交给DBAs处理</p>
+<h3 id="评估"><a href="#评估" class="headerlink" title="评估"></a>评估</h3><h4 id="设置"><a href="#设置" class="headerlink" title="设置"></a>设置</h4><p><strong>iSQs数据集</strong> 阿里OLTP数据集（随机的，一个任意一天的数据集 两个 周数据集）（一个实体上的每个时间戳只选一个iSQ）</p>
+<p><strong>KPIs数据集</strong> 发生在iSQ前后一小时的数据，粒度5秒</p>
+<p><strong>人工标记标记 （DBAs）</strong></p>
+<ul>
+<li>三个数据集上随机选取319个iSQs标记跟因 </li>
+</ul>
+<h4 id="评估分数"><a href="#评估分数" class="headerlink" title="评估分数"></a>评估分数</h4><ul>
+<li>F1-Score</li>
+<li>Weighted Average F1-score</li>
+<li>Clustering Accuracy </li>
+<li>Normalized Mutual Information （归一化互信息）</li>
+</ul>
+<h4 id="iSQUAD的准确性和效率"><a href="#iSQUAD的准确性和效率" class="headerlink" title="iSQUAD的准确性和效率"></a>iSQUAD的准确性和效率</h4><blockquote>
+<p>设置：对174个iSQs进行聚类，得到10个聚类，对剩下145进行测试</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDPc6"><img src="https://s3.ax1x.com/2021/01/12/sJDPc6.png" alt="sJDPc6.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDknO"><img src="https://s3.ax1x.com/2021/01/12/sJDknO.png" alt="sJDknO.png"></a></p>
+<blockquote>
+<p>iSQUAD在四个方面优于DBSherlock</p>
+<p>1）DBSherlock需要用户自定义或自动生成KPI的异常和正常间隔。其旨在解释异常间隔，而非时间戳</p>
+<p>2）DBSherlock根据<strong>平均值</strong>的差异是否超过一个阈值来区分两个部分，iSQUAD具有利用不同波动的异常提取功能</p>
+<p>3）DBSherlock不能消除KPIs之间的依赖关系</p>
+<p>4）DBSherlock利用因果模型提供纯文本解释不同，忽略了一部分异常类型和模式；iSQUAD使用了贝叶斯实例模型，以向DBAs显示可理解的实例子空间表示。</p>
+</blockquote>
+<h4 id="异常提取的性能"><a href="#异常提取的性能" class="headerlink" title="异常提取的性能"></a>异常提取的性能</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDeNd"><img src="https://s3.ax1x.com/2021/01/12/sJDeNd.png" alt="sJDeNd.png"></a></p>
+<blockquote>
+<p>时间计算：执行一个iSQ</p>
+<p>性能优的原因：包容性和通用性</p>
+</blockquote>
+<h4 id="依赖清理精度"><a href="#依赖清理精度" class="headerlink" title="依赖清理精度"></a>依赖清理精度</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDu9I"><img src="https://s3.ax1x.com/2021/01/12/sJDu9I.png" alt="sJDu9I.png"></a></p>
+<h4 id="TOPIC评估"><a href="#TOPIC评估" class="headerlink" title="TOPIC评估"></a>TOPIC评估</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJD1u8"><img src="https://s3.ax1x.com/2021/01/12/sJD1u8.png" alt="sJD1u8.png"></a></p>
+<blockquote>
+<p>层次聚类容易产生离群值效应，新模式的iSQ会被归类为离群值，而非新的一类。层次聚类需要预先设定聚类中心的个数。</p>
+<p>K-means集群也需要预先限定的集群数量。此外，它高度依赖于初始iSQ模式，因此不稳定。</p>
+<p>DBSCAN产生的集群是严重倾斜和分散</p>
+</blockquote>
+<h4 id="BCM评估"><a href="#BCM评估" class="headerlink" title="BCM评估"></a>BCM评估</h4><p><strong>BCM的影响：</strong>使用了iSQUAD后，减少了DBAs需要考虑的KPIs数量。减少诊断时间，是以前的30倍。</p>
+<p><strong>可视化平台：</strong>将贝叶斯实例模型嵌入可视化平台中，该可视化平台可以显示iSQ类的实例子空间表示及其跟因。在DBA选择iSQ类之后，该平台会立即显示相应的KPI，并输出这个iSQ类的根因。</p>
+<p><strong>用户研究</strong></p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDK3t"><img src="https://s3.ax1x.com/2021/01/12/sJDK3t.png" alt="sJDK3t.png"></a></p>
+<h3 id="案例及讨论"><a href="#案例及讨论" class="headerlink" title="案例及讨论"></a>案例及讨论</h3><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDMgP"><img src="https://s3.ax1x.com/2021/01/12/sJDMgP.png" alt="sJDMgP.png"></a></p>
+<blockquote>
+<p>人工：18min</p>
+<p>框架：40s</p>
+</blockquote>
+<p><strong>多跟因</strong>：1）挖掘更深层次的原因 2）多跟因的发生概率很小</p>
+<p><strong>iSQUAD的普遍性</strong> 很多场景适用</p>
+<p><strong>对不同原因的操作</strong></p>
+<p>（1）Scaling(#1，#2，#3，#5，#6)：增大资源</p>
+<p>（2）Limiting (#4, #8)：限制速率</p>
+<p>（3）Optimizing (#7, #9, #10)</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/sJDQjf"><img src="https://s3.ax1x.com/2021/01/12/sJDQjf.png" alt="sJDQjf.png"></a></p>
+<h3 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h3><ul>
+<li><p>Slow Query Analysis</p>
+<p>自动化索引修改、机器学习算法调优数据库参数、深度学习提升查询</p>
+</li>
+<li><p>Anomaly Extraction</p>
+<p>二分类（即异常、正常）的异常检测方法：</p>
+<blockquote>
+<p>Opprentice</p>
+<p>dSPOT </p>
+<p>iSST </p>
+<p>雅虎的EGADS</p>
+<p>推特的S-H-ESD </p>
+<p>Netflix的RPCA</p>
+</blockquote>
+</li>
+<li><p>Clustering Algorithm</p>
+</li>
+<li><p>Root Cause Diagnosis</p>
+</li>
+</ul>
+<h3 id="未来工作"><a href="#未来工作" class="headerlink" title="未来工作"></a>未来工作</h3><p>作为未来的工作，我们的目标是在iSQUAD的基础上开发一个更通用的、更有能力的框架，自动化故障诊断和系统恢复。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E6%A0%B9%E5%9B%A0%E8%AF%8A%E6%96%AD/" rel="tag"># 根因诊断</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90CVPR%202019%E3%80%91End-To-End%20Multi-Task%20Learning%20With%20Attention/" rel="prev" title="syd 【CVPR2019】Multi-task learning">
+      <i class="fa fa-chevron-left"></i> syd 【CVPR2019】Multi-task learning
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/16/GongSa/gs_AAAI_2020_A%20Deep%20Neural%20Network%20for%20Unsupervised%20Anomaly%20Detection%20and%20Diagnosis%20in%20Multivariate%20Time%20Series%20Data/" rel="next" title="gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data">
+      gs A Deep Neural Network for Unsupervised Anomaly Detection and Diagnosis in Multivariate Time Series Data <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E5%8A%A8%E6%9C%BA"><span class="nav-number">3.</span> <span class="nav-text">背景与动机</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">3.1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4OLTP%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">3.1.1.</span> <span class="nav-text">阿里巴巴OLTP数据库</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Intermittent-Slow-Queries-iSQs"><span class="nav-number">3.1.2.</span> <span class="nav-text">Intermittent Slow Queries (iSQs)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F"><span class="nav-number">3.2.</span> <span class="nav-text">观察</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%91%E6%88%98"><span class="nav-number">3.3.</span> <span class="nav-text">挑战</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%A7%88"><span class="nav-number">4.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iSQUAD%E7%BB%86%E8%8A%82%E8%AE%BE%E8%AE%A1"><span class="nav-number">5.</span> <span class="nav-text">iSQUAD细节设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E9%98%B6%E6%AE%B5%EF%BC%9A%E5%BC%82%E5%B8%B8%E6%8F%90%E5%8F%96"><span class="nav-number">5.1.</span> <span class="nav-text">离线阶段：异常提取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E9%98%B6%E6%AE%B5%EF%BC%9A%E4%BE%9D%E8%B5%96%E6%B8%85%E7%90%86"><span class="nav-number">5.2.</span> <span class="nav-text">离线阶段：依赖清理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E9%98%B6%E6%AE%B5%EF%BC%9A%E9%9D%A2%E5%90%91%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%A8%A1%E5%BC%8F%E9%9B%86%E6%88%90%E8%81%9A%E7%B1%BB%EF%BC%88Type-Oriented-Pattern-Integration-Clustering%EF%BC%8CTOPIC%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">离线阶段：面向类型的模式集成聚类（Type-Oriented Pattern Integration Clustering，TOPIC）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E9%98%B6%E6%AE%B5%EF%BC%9ABayesian-Case-Model-%E8%B4%9D%E5%8F%B6%E6%96%AF%E5%AE%9E%E4%BE%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.4.</span> <span class="nav-text">离线阶段：Bayesian Case Model 贝叶斯实例模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E7%BA%BF%E9%98%B6%E6%AE%B5%EF%BC%9A%E8%B7%9F%E5%9B%A0%E6%A3%80%E6%B5%8B%E5%92%8C%E6%9B%B4%E6%96%B0"><span class="nav-number">5.5.</span> <span class="nav-text">在线阶段：跟因检测和更新</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0"><span class="nav-number">6.</span> <span class="nav-text">评估</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE"><span class="nav-number">6.1.</span> <span class="nav-text">设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E5%88%86%E6%95%B0"><span class="nav-number">6.2.</span> <span class="nav-text">评估分数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#iSQUAD%E7%9A%84%E5%87%86%E7%A1%AE%E6%80%A7%E5%92%8C%E6%95%88%E7%8E%87"><span class="nav-number">6.3.</span> <span class="nav-text">iSQUAD的准确性和效率</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E6%8F%90%E5%8F%96%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">6.4.</span> <span class="nav-text">异常提取的性能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E6%B8%85%E7%90%86%E7%B2%BE%E5%BA%A6"><span class="nav-number">6.5.</span> <span class="nav-text">依赖清理精度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TOPIC%E8%AF%84%E4%BC%B0"><span class="nav-number">6.6.</span> <span class="nav-text">TOPIC评估</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BCM%E8%AF%84%E4%BC%B0"><span class="nav-number">6.7.</span> <span class="nav-text">BCM评估</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B%E5%8F%8A%E8%AE%A8%E8%AE%BA"><span class="nav-number">7.</span> <span class="nav-text">案例及讨论</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">8.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E5%B7%A5%E4%BD%9C"><span class="nav-number">9.</span> <span class="nav-text">未来工作</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

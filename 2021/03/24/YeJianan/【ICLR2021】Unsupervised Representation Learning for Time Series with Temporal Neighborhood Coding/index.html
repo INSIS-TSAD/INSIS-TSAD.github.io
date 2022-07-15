@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关键词：自监督学习，EEG，时间序列 Abstract时间序列通常很复杂且信息丰富，但标记稀疏，因此很难建模。 在本文中，我们提出了一种自监督框架，用于学习非平稳时间序列的通用表示。 我们的方法称为时间邻域编码（TNC），它利用信号生成过程的局部平滑度来及时定义具有相似属性的邻域。 通过使用无偏差的对比目标（debiased contrastive objective），我们的框架通过确保在编码空">
+<meta property="og:type" content="article">
+<meta property="og:title" content="yjn 【ICLR 2021】Unsupervised Representation Learning for Time Series with Temporal Neighborhood Coding">
+<meta property="og:url" content="http://example.com/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关键词：自监督学习，EEG，时间序列 Abstract时间序列通常很复杂且信息丰富，但标记稀疏，因此很难建模。 在本文中，我们提出了一种自监督框架，用于学习非平稳时间序列的通用表示。 我们的方法称为时间邻域编码（TNC），它利用信号生成过程的局部平滑度来及时定义具有相似属性的邻域。 通过使用无偏差的对比目标（debiased contrastive objective），我们的框架通过确保在编码空">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/3dCjzPMTJtHSxqv.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/kgsl6fRWUoEmvXi.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/rCd6HmRkwfKoXVu.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/NzUtsgIokSfCZKi.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/dT8tuzom4P6j5SZ.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/curpoZymWHD5xfJ.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/CPnaqxjihApBoRJ.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/gqmlaBciOYMkeTV.png">
+<meta property="og:image" content="https://i.loli.net/2021/03/22/do4vht1sRQaZurn.png">
+<meta property="article:published_time" content="2021-03-24T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-24T14:44:29.031Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="自监督">
+<meta property="article:tag" content="EEG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/03/22/3dCjzPMTJtHSxqv.png">
+
+<link rel="canonical" href="http://example.com/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>yjn 【ICLR 2021】Unsupervised Representation Learning for Time Series with Temporal Neighborhood Coding | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/24/YeJianan/%E3%80%90ICLR2021%E3%80%91Unsupervised%20Representation%20Learning%20for%20Time%20Series%20with%20Temporal%20Neighborhood%20Coding/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          yjn 【ICLR 2021】Unsupervised Representation Learning for Time Series with Temporal Neighborhood Coding
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-03-24 20:24:24 / Modified: 22:44:29" itemprop="dateCreated datePublished" datetime="2021-03-24T20:24:24+08:00">2021-03-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/yjn/" itemprop="url" rel="index"><span itemprop="name">yjn</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关键词：自监督学习，EEG，时间序列</p>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>时间序列通常很复杂且信息丰富，但标记稀疏，因此很难建模。 在本文中，我们提出了一种自监督框架，用于学习非平稳时间序列的通用表示。 我们的方法称为时间邻域编码（TNC），它利用信号生成过程的局部平滑度来及时定义具有相似属性的邻域。 通过使用无偏差的对比目标（debiased contrastive objective），我们的框架通过确保在编码空间中来自邻域内的信号的编码特征与非邻域信号的编码特征是可区分的，来学习时间序列表示。 我们的动机来自医学领域，在该领域中，对时间序列数据的动态性质进行建模的能力对于在几乎不可能标记数据的环境中识别，跟踪和预测潜在患者的潜在状态尤其有价值。 我们将我们的方法与最近开发的无监督表示学习方法进行了比较，并证明了在针对多个数据集进行聚类和分类任务方面的卓越性能。</p>
+<a id="more"></a>
+<p>ICLR 2021</p>
+<p>Sana Tonekaboni∗, Danny Eytan, Anna Goldengerg (University of Toronto &amp; Vector Institute；The Hospital for Sick Children)</p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>由于时间序列的复杂性以及标签在真实场景下不可获得性，监督学习变得比较困难。采用无监督表示学习可以利用数据内在的结构特点，从原始序列中提取低维的、富含信息的表示，而无需监督信息。这些表示更加通用并且鲁棒，这是因为他们不是针对某个特定的监督任务提取的。无监督表示学习在CV, NLP上都有广泛的应用，但是在时间序列上面的研究还比较少。这种建模时间序列动态特性在医学领域是非常有价值的，因为健康检测数据通常表现为时间序列。</p>
+<p>本文提出了一种自监督框架来学习复杂的多变量非平稳时间序列的表示，称为TNC（Temporal Neighborhood Coding），是专门为信号随着时间变换而变化的这种时序特征设计的，目的在于捕捉序列潜在的时序动态性。我们评估了在多个数据集上学习到的表示的质量，并表明学到的表示是通用的，可转移到许多下游任务，如分类和聚类。本文贡献主要体现在下面三方面：</p>
+<ul>
+<li>针对非平稳多元时间序列数据，我们提出了一种新的基于邻域的无监督学习框架</li>
+<li>我们引入了具有平稳性质的时间邻域的概率作为相似窗口在时间上的分布。利用信号的性质和统计测试结果<strong>自动确定邻域边界</strong></li>
+<li>我们引入正例的无标记学习（Positive Unlabel learning）的概念，具体来说是对非邻域的样本进行权重调整，以解释为对比损失在抽样负样本时引入的偏差</li>
+</ul>
+<h2 id="2-Method"><a href="#2-Method" class="headerlink" title="2. Method"></a>2. Method</h2><p>我们提出一个自监督学习框架，学习一个表示空间，通过确保在表示空间中，可区分近端信号在时间上的分布与远端信号的分布。定义如下符号表示：</p>
+<p>原信号：$X\in R^{D*T}$，$T$为序列长度，$D$为特征维数</p>
+<p>时间窗：$X[t-\frac{\delta}{2},t+\frac{\delta}{2}]$ 表示以时刻$t$为中心，长度为$\delta$的窗口长度，也记为$W_t$</p>
+<p>$W_t$的邻居集合：$N_t$, 是由以$t^<em>$为中心，从一个正态分布$t^</em>\sim \mathcal N(t,\eta·\delta)$采样得到。$\eta$是定义邻居范围的参数，描述了信号的统计特征如何随时间变化的特性，通常需要领域专家基于专业知识来确定。</p>
+<p>$W_t$的非邻居集合：$\bar{N_t}$</p>
+<p><strong>我们的目标是：来学习$W_t$的潜在表示，再通过时间上的滑窗，我们可以获得信号潜在状态的变化轨迹。</strong></p>
+<p>基于这样的假设：利用信号生成过程的局部平滑性，将邻域分布特征刻画为高斯分布，对时域数据中的逐渐过渡进行建模，直观地，这些邻域样本（正样本）的表示与$W_t$的表示相似度大，而非邻域中的样本（负样本）和$W_t$的表示相似度小。</p>
+<blockquote>
+<p><strong><em>然而，这种假设可能会受到抽样偏差的影响，这是大多数对比学习方法中常见的问题。</em></strong></p>
+<p>在随机选取负样本的时候可能存在这样的情况，虽然“负样本”距离$W_t$很远，但是和参考样本很相似，有相同的隐含状态。例如，在存在长期季节性的情况下，信号可以在遥远的时间表现出类似的特性。</p>
+</blockquote>
+<p><strong>$TNC$由两部分组成：</strong></p>
+<ol>
+<li>编码器$Enc(W_t)$将$W_t\in \mathbb{R}^{D*\delta}$编码成更低维的空间$Z_t\in \mathbb{R}^M$</li>
+<li>鉴别器$\mathcal{D}(Z_t,Z)$来估计$Z$在和邻域$N_t$内的概率。确切来说，它从编码空间中接收两个样本，并预测属于同一时间邻域的样本的概率。对于鉴别器$\mathcal{D}(Z_t,Z)$，我们使用一个简单的多头二进制分类器，如果$Z$和$Z_t$是邻居在时间上的表示，则输出1，否则输出0</li>
+</ol>
+<p><img src="https://i.loli.net/2021/03/22/3dCjzPMTJtHSxqv.png" alt="image-20210322112042341"></p>
+<p>我们希望鉴别器的概率似然估计是准确的，即输入一对近邻样本的表示时概率接近于1，输入一对相聚较远样本的表示时概率接近于0。在非邻域$\bar{N}$内，为了缓解上面提到的负样本抽样偏差问题，采用权重系数$w$来调整非邻域内的正样本。</p>
+<p><img src="https://i.loli.net/2021/03/22/kgsl6fRWUoEmvXi.png" alt="image-20210322113221422"></p>
+<p>我们通过优化这一目标，同时训练编码器和鉴别器。注意，鉴别器只是训练的一部分，不会在推理过程中使用。</p>
+<ul>
+<li>确定$\eta$值</li>
+</ul>
+<p>ADF-test ——可用于验证时间序列的平稳性假设</p>
+<p>由于邻居样本代表相似的样本，我们需要确定$\eta$合适的值，使得在一个平稳信号生成过程中，应该能识别出这个相似时间跨度的样本分布。这里采用ADF test（Augmented Dickey-Fuller）自动根据信号本身的行为对每个时间窗确定$\eta$的范围。$\eta$太小，邻域内的许多样本会重叠，使得编码器学习到的信息都是重复信息；如果$\eta$太大，领域可能跨越多种潜在状态，使得编码器也学不到不同状态之间的变化，因此无法区分。</p>
+<p>我们将每个窗口周围的时间邻域定义为信号相对平稳的区域。由于信号可能会在一段未知的时间内保持潜在状态，因此每个窗口的邻域范围$\eta$可能在大小上有所不同，必须根据信号的行为进行调整。为此，我们使用ADF-test得出邻域范围的统计检验。</p>
+<ul>
+<li>负样本抽样偏差的问题</li>
+</ul>
+<p>PU learning（Positive Unlabeled learning）——在只有正例和无标记样本的情况下训练一个二分类器</p>
+<p>如上提到的偏差问题，我们考虑在$N_t$内的样本都和当前参考样本$W_t$相似，视为已知的正样本，但在的样邻域外的样本不一定和$W_t$不同。我们将非邻域样本视为 Unlabeled data。因此有两种策略去解决unlabeled data：1. 把所有无标签样本都视为负样本；2. 把无标签样本视为带更小权重的负样本。在第二种策略下，无标签数据在损失项中需要被赋予适当的权重，才能去训练一个无偏的分类器。</p>
+<p>在TNC框架中，这个权重$w$指的是$\bar{N_t}$中样本与$W_t$的相似样本出现的概率。附录A.6解释了如何为我们不同的实验设置选择权重参数，也演示了权重调整对下游任务性能的影响。</p>
+<p><strong>窗口大小选择的影响：</strong></p>
+<p><img src="https://i.loli.net/2021/03/22/rCd6HmRkwfKoXVu.png" alt="image-20210322193157095"></p>
+<p><strong>无偏损失系数$w$的影响</strong></p>
+<p><img src="https://i.loli.net/2021/03/22/NzUtsgIokSfCZKi.png" alt="image-20210322194318089"></p>
+<p><img src="https://i.loli.net/2021/03/22/dT8tuzom4P6j5SZ.png" alt="image-20210322194507015"></p>
+<p>完成邻域分布的定义后，我们训练目标函数来鉴别邻域内样本的表示和邻域外样本的表示。理想的编码器完成编码后，得到的编码空间保留了邻域内样本的特性。设$Z_l=Enc(W_t),W_l\in N_t,Z_k=Enc(W_k),W_k\in \bar{N_t}$</p>
+<h2 id="3-Experiment"><a href="#3-Experiment" class="headerlink" title="3. Experiment"></a>3. Experiment</h2><p>我们在多个时间序列数据集上评估我们的框架的可用性，这些数据集具有随时间变化的动态潜在状态。我们将时间序列的分类性能和可聚类性与两种最先进的无监督表示学习方法进行了比较:<strong>1.对比预测编码(CPC)</strong> ，使用预测编码原则训练编码器的概率对比损失。<strong>2. triplet - loss (T-Loss)</strong>，它采用基于时间的负采样和triple - loss来学习时间序列窗口的表示。triplet-loss 的目标是通过最小化正样本(子序列)之间的距离，同时最大化正样本与负样本之间的距离，确保相似的时间序列具有相似的表示。</p>
+<p>为了公平比较，确保最后的性能差异不是模型的结构造成的，本文在所有baseline中用一样的Encoder网络，因为我们的目标是比较学习框架的性能，与编码器的选择无关。我们通过1)评估编码空间的聚类性和；2)使用下游分类任务的表示来评估表示的泛化性。</p>
+<p>除了上述baseline，还有基于DTW的K-means/KNN </p>
+<h3 id="Datasets"><a href="#Datasets" class="headerlink" title="Datasets"></a>Datasets</h3><ul>
+<li><h4 id="Simulated-data"><a href="#Simulated-data" class="headerlink" title="Simulated data"></a>Simulated data</h4><p>采用HMM生成随机隐含状态，在每个状态，时间序列又由不同的过程生成如不同核函数的高斯过程，非线性自回归移动平均模型，最终生成的序列包含3个特征的2000个测量值，包含4个不同的隐含状态。我们使用了一种双向、单层递归神经网络作为编码器</p>
+</li>
+<li><h4 id="Clinical-Waveform-Data"><a href="#Clinical-Waveform-Data" class="headerlink" title="Clinical Waveform Data"></a>Clinical Waveform Data</h4><p>MIT-BIH Atrial Fibrillation dataset。该数据集包括25个患有房颤的人类受试者的长期心电图记录(持续10小时)。它由两个心电信号组成，每个都以250hz采样。随着时间的推移，信号被标注为4类不同类型的心律。本实验的目的是在没有任何标签信息的情况下确定每个样本的潜在心律失常类型。</p>
+<p>由于简单的RNN结构不能建模高频的ECG信号，因此，这里采用6层CNN结构作为编码器。窗口大小设为2500个点，编码的表示为64维的向量。</p>
+</li>
+<li><h4 id="Human-Activity-Recognition-HAR-data"><a href="#Human-Activity-Recognition-HAR-data" class="headerlink" title="Human Activity Recognition (HAR) data"></a>Human Activity Recognition (HAR) data</h4><p>利用加速度计和陀螺仪测量的时间数据来预测活动类型。数据集包含30个个体，每个人监测6种活动。单层RNN编码器作为编码器。窗口设为4，代表15s的记录，编码的向量10维。</p>
+</li>
+</ul>
+<h2 id="4-Results"><a href="#4-Results" class="headerlink" title="4. Results"></a>4. Results</h2><p>这里评估了所有baseline再所有数据集上的可聚类性能和下游任务上的分类性能。可群集性表示每种方法恢复原先状态的良好程度，而分类则评估我们的表示对下游任务的信息量有多大。</p>
+<h3 id="4-1可聚类性"><a href="#4-1可聚类性" class="headerlink" title="4.1可聚类性"></a>4.1可聚类性</h3><p>许多真实世界的时间序列数据具有底层的多类别结构，这自然导致了具有集群属性的表示。如果隐含状态的信息被编码器充分学到了，那具有相同隐含状态的信号编码后应该能聚集在一起。</p>
+<p>下面是针对仿真数据，利用三种不同的框架学习到的隐空间的特征表示可视化结果：</p>
+<p><img src="https://i.loli.net/2021/03/22/curpoZymWHD5xfJ.png" alt="image-20210322151146107"></p>
+<p>为了比较每个baseline聚类的一致性，我们使用两个常用来衡量聚类有效性的指标：Silhouette score$\in[-1,1]$，分数越高代表聚集性越好；Davies-Bouldin index，衡量类内相似性和类间差异，分数越低代表聚集性越好。我们在表示空间中使用K-means聚类来度量这些可群集性得分。</p>
+<p><img src="https://i.loli.net/2021/03/22/CPnaqxjihApBoRJ.png" alt="image-20210322151809362"></p>
+<p>TNC：在所有baseline和数据集上都取得了最好的得分，可聚集性表现最好</p>
+<p>CPC：HAR数据集，CPC可以很好地对状态进行分组，因为大多数活动都是按照特定的顺序记录的，增强了预测性编码。在ECG波形数据上的表现接近于Triplet-loss，但在模拟数据集上表现较差，因为模拟信号是非平稳的，而且过渡难以预测</p>
+<p>Triplet-loss：在模拟环境中表现良好，但无法区分状态0和状态2，可能原因是其中信号来自不同参数的自回归模型</p>
+<h3 id="4-2-分类性能"><a href="#4-2-分类性能" class="headerlink" title="4.2 分类性能"></a>4.2 分类性能</h3><p>我们训练一个线性分类器来评估使用表示来分类隐藏状态的效果如何。所有baseline的性能与监督分类器进行比较，监督分类器由一个编码器和一个与无监督模型具有相同架构的分类器组成，以及一个使用DTW度量的k近邻分类器。评价指标：AUPRC（area under the precision-recall curve），因为对于不平衡分类设置，如波形数据集，AUPRC可以更准确地反映模型性能。</p>
+<p><img src="https://i.loli.net/2021/03/22/gqmlaBciOYMkeTV.png" alt="image-20210322154050083"></p>
+<p>TNC接近端到端有监督模型的分类效果。这进一步证明了我们的编码捕获了时间序列的信息部分，并且可泛化用于下游任务。</p>
+<p>对于HAR这样的数据集，时序内部的状态更替存在一定的顺序性，因此CPC能取得较好的结果。而当时序中增加非平稳性后，性能就下降了。CPC和triple Loss方法性能相对较低也可能是因为这些方法都没有明确解释当随机选择的负样本时，仍然得到和参考样本$W_t$相似的信号段从而造成抽样偏差。</p>
+<h3 id="4-3-trajectory"><a href="#4-3-trajectory" class="headerlink" title="4.3 trajectory"></a>4.3 trajectory</h3><p><img src="https://i.loli.net/2021/03/22/do4vht1sRQaZurn.png" alt="image-20210322155426855"></p>
+<p>上面部分是原始序列，下面是编码序列，阴影部分表示一种隐含状态。原信号的状态转换也体现在编码特征。</p>
+<h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>本文提出了TNC（Temporal Neighborhood Coding）框架，来学习非平稳，多变量时间序列的状态表示。文章的出发点是在医疗保健领域，学习丰富的时间医学数据表示对于了解患者的潜在健康状况变化非常重要。然而，现有的大多数表征学习方法都是针对特定的下游任务而设计的，需要专家进行标记。本文在多个数据集上验证了TNC学到的表示是通用的，灵活可扩展的。因此这一框架也可以用于其他数据领域。同时也可以将这种表示学习方法应用到多种下游任务比如异常检测。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%87%AA%E7%9B%91%E7%9D%A3/" rel="tag"># 自监督</a>
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/24/WuTao/informer/" rel="prev" title="wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting">
+      <i class="fa fa-chevron-left"></i> wt【AAAI 2021】Informer:Beyond Efficient Transformer for Long Sequence Time-Series Forecasting
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/31/XuWei/Learnable%20Dynamic%20Temporal%20Pooling%20for%20Time%20Series%20Classification/" rel="next" title="xw 【AAAI2021】Learnable Dynamic Temporal pooling for Time Series Classification">
+      xw 【AAAI2021】Learnable Dynamic Temporal pooling for Time Series Classification <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Method"><span class="nav-number">3.</span> <span class="nav-text">2. Method</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Experiment"><span class="nav-number">4.</span> <span class="nav-text">3. Experiment</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Datasets"><span class="nav-number">4.1.</span> <span class="nav-text">Datasets</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Simulated-data"><span class="nav-number">4.1.1.</span> <span class="nav-text">Simulated data</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Clinical-Waveform-Data"><span class="nav-number">4.1.2.</span> <span class="nav-text">Clinical Waveform Data</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Human-Activity-Recognition-HAR-data"><span class="nav-number">4.1.3.</span> <span class="nav-text">Human Activity Recognition (HAR) data</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Results"><span class="nav-number">5.</span> <span class="nav-text">4. Results</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1%E5%8F%AF%E8%81%9A%E7%B1%BB%E6%80%A7"><span class="nav-number">5.1.</span> <span class="nav-text">4.1可聚类性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%88%86%E7%B1%BB%E6%80%A7%E8%83%BD"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 分类性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-trajectory"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 trajectory</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Conclusion"><span class="nav-number">6.</span> <span class="nav-text">5. Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

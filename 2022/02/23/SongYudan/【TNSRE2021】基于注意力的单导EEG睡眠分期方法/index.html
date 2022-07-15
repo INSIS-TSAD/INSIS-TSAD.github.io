@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="0. Abstract睡眠阶段自动分类对睡眠质量的监测具有重要意义，本文提出了一种基于注意力的深度网络AttnSleep，利用单导EEG进行睡眠分期。用多分辨率卷积网络（MRCNN）提取特征，通过自适应特征重校准(AFR)对特征之间的依赖进行建模；第二模块是时间上下文编码器（TCE），用多头注意机制（MHA）来捕获所提取特征之间的时间关系，在三个公开数据集上评估了模型性能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd【TNSRE 2021】AttnSleep:基于注意力的单导EEG睡眠分期方法">
+<meta property="og:url" content="http://example.com/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="0. Abstract睡眠阶段自动分类对睡眠质量的监测具有重要意义，本文提出了一种基于注意力的深度网络AttnSleep，利用单导EEG进行睡眠分期。用多分辨率卷积网络（MRCNN）提取特征，通过自适应特征重校准(AFR)对特征之间的依赖进行建模；第二模块是时间上下文编码器（TCE），用多头注意机制（MHA）来捕获所提取特征之间的时间关系，在三个公开数据集上评估了模型性能。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="c:/Users/Meow/AppData/Roaming/Typora/typora-user-images/image-20220220110924685.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220112301982.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222214454068.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222214524168.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222214906606.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222215215070.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222213916364.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222215714918.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220145538499.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222124458946.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222124824623.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222123523566.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220154458646.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220155316071.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220155340802.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222132430242.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220163514761.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222134939389.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222140441122.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220172854286.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220175454471.png">
+<meta property="article:published_time" content="2022-02-23T06:20:10.000Z">
+<meta property="article:modified_time" content="2022-02-23T03:26:19.028Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="睡眠分期">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/Meow/AppData/Roaming/Typora/typora-user-images/image-20220220110924685.png">
+
+<link rel="canonical" href="http://example.com/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd【TNSRE 2021】AttnSleep:基于注意力的单导EEG睡眠分期方法 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd【TNSRE 2021】AttnSleep:基于注意力的单导EEG睡眠分期方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-02-23 14:20:10 / Modified: 11:26:19" itemprop="dateCreated datePublished" datetime="2022-02-23T14:20:10+08:00">2022-02-23</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="0-Abstract"><a href="#0-Abstract" class="headerlink" title="0. Abstract"></a>0. Abstract</h3><p>睡眠阶段自动分类对睡眠质量的监测具有重要意义，本文提出了一种基于注意力的深度网络<strong>AttnSleep</strong>，利用<strong>单导EEG</strong>进行<strong>睡眠分期</strong>。用多分辨率卷积网络（<strong>MRCNN</strong>）提取特征，通过自适应特征重校准(<strong>AFR</strong>)对特征之间的依赖进行建模；第二模块是时间上下文编码器（<strong>TCE</strong>），用多头注意机制（MHA）来捕获所提取特征之间的时间关系，在三个公开数据集上评估了模型性能。</p>
+<a id="more"></a>
+<h3 id="1-Intorduction"><a href="#1-Intorduction" class="headerlink" title="1. Intorduction"></a>1. Intorduction</h3><p>研究<strong>意义</strong>：睡眠的重要性；PSG人工分类；</p>
+<p>研究<strong>现状</strong>：特征工程+分类器；深度学习方法，CNN，CNN+RNN（时间相关性），注意力机制；类不均衡问题，过采样。</p>
+<p>本文<strong>贡献</strong>：所以本文提出了AttnSleep，MRCNN提取高频、低频特征，AFR对特征依赖进行建模，加强特征学习；时间上下文编码器（TCE），多头注意力+因果卷积来捕获特征中的时间相关性；针对类不均衡问题设计了类相关的损失函数；在三个公开数据集上进行实验。</p>
+<h3 id="2-Method"><a href="#2-Method" class="headerlink" title="2. Method"></a>2. Method</h3><h4 id="2-1-总框架"><a href="#2-1-总框架" class="headerlink" title="2.1 总框架"></a>2.1 总框架</h4><p>总体框架如图1，由<strong>三部分</strong>组成：<strong>1)</strong>特征提取块，<strong>2)</strong>时间上下文编码块，<strong>3)</strong>分类块。MRCNN提取高频、低频特征，ARF自适应地选择和突出最重要的特征；TCE模块来捕获特征中的时间相关性；softmax进行分类，类感知的损失函数。</p>
+<p><img src="C:\Users\Meow\AppData\Roaming\Typora\typora-user-images\image-20220220110924685.png" alt="image-20220220110924685"></p>
+<h4 id="2-2-特征提取"><a href="#2-2-特征提取" class="headerlink" title="2.2 特征提取"></a>2.2 特征提取</h4><h5 id="2-2-1-MRCNN"><a href="#2-2-1-MRCNN" class="headerlink" title="2.2.1 MRCNN"></a>2.2.1 MRCNN</h5><p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220112301982.png" alt="image-20220220112301982"></p>
+<p>不同的睡眠阶段具有不同的频率范围，所以两个不同卷积核的卷积分支，探索不同的频带，<strong>捕获不同的时间步长范围</strong>（4s，0.5s）；EEG具有非平稳特征，不同类型的特征组合对非平稳特征信号有重要意义。</p>
+<p>在MRCNN模块中使用<strong>GELU</strong>激活函数，因为它允许输入的一些负权值通过，对很小的负值有较强的控制力（与leakyrelu等相比）</p>
+<h5 id="2-2-2-ARF"><a href="#2-2-2-ARF" class="headerlink" title="2.2.2 ARF"></a>2.2.2 ARF</h5><p>AFR的目的是对MRCNN学习的特征进行重新校准，以提高其性能。通过residual SE块对特征之间的依赖性进行建模，自适应地选择最具<strong>鉴别</strong>性的特征。</p>
+<p>在residualSE块中，包含两层<strong>卷积</strong>（kerner和stride均为1）；再用自适应平均<strong>池化</strong>来压缩全局的空间信息得到s，经过线性层-激活函数-线性层-激活函数 得到e，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222214454068.png" alt="image-20220222214454068" style="zoom:80%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222214524168.png" alt="image-20220222214524168" style="zoom:80%;" /></p>
+<p>利用e对F进行放缩，得到加权求和：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222214906606.png" alt="image-20220222214906606" style="zoom:80%;" /></p>
+<p>shortcut连接，将原始输入I和residualSE的输出相加，得到ARF最终的输出：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222215215070.png" alt="image-20220222215215070" style="zoom:80%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222213916364.png" style="zoom:80%;" /></p>
+<blockquote>
+<p>“Squeeze-and-Excitation(SE)”单元，对通道间的依赖关系进行建模，可以自适应的调整各通道的特征响应值；学习每个通道的重要程度，增强有用的特征，抑制无用的特征</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222215714918.png" alt="image-20220222215714918" style="zoom: 80%;" /></p>
+<p>SE block主要由三部分构成，Squeeze操作,Excitation操作，Fscale操作。</p>
+<p>首先，Ftr把输入的X映射为特征图U，Ftr可以是一个最常见的卷积操作或者其他操作。</p>
+<p>其次，Squeeze操作对U进行一个全局的池化操作，比如最大池化或者平均池化(WxH空间范围内进行池化)，产生一个embedding（1x1xC）。</p>
+<p>再次，Excitation操作将上面产生的embedding进行一系列非线性映射(比如FC+RELU+FC)，最后跟一个sigmoid得到每个通道的权重。</p>
+<p>最后，将上面得到的每个通道的权重作用于U，对每个通道的U进行加权求和。至此，就完成了整个SE block的映射。</p>
+<p><strong>核心思想是不同通道的权重应该自适应分配，由网络自己学习出来。</strong></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/70881455">https://zhuanlan.zhihu.com/p/70881455</a></p>
+</blockquote>
+<h4 id="2-3-TCE（时间上下文编码器）"><a href="#2-3-TCE（时间上下文编码器）" class="headerlink" title="2.3 TCE（时间上下文编码器）"></a>2.3 TCE（时间上下文编码器）</h4><p>TCE目的是捕获提取<strong>特征中的时间依赖性</strong>，TCE层由多头注意(MHA)层、归一化层和FC层组成，该结构重复两次，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220145538499.png" alt="image-20220220145538499"></p>
+<h5 id="2-3-1-自注意力"><a href="#2-3-1-自注意力" class="headerlink" title="2.3.1 自注意力"></a>2.3.1 自注意力</h5><p>SA给感兴趣的区域赋予较高的权重，不感兴趣的区域赋予较低的权重，量化<strong>输入特征之间</strong>的相互依赖。</p>
+<p>将原始输入z通过$\phi$转换到另一个空间（此处的$\phi$为因果卷积），计算第i个特征和第j个特征之间的<strong>attention score</strong>（相关度、权重），并进行归一：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222124458946.png" alt="image-20220222124458946" style="zoom:80%;" /></p>
+<p>第i个特征的新表示是<strong>加权和</strong>：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222124824623.png" alt="image-20220222124824623" style="zoom:80%;" /></p>
+<blockquote>
+<p>自注意力：<a target="_blank" rel="noopener" href="https://blog.csdn.net/rocking_struggling/article/details/106201849">https://blog.csdn.net/rocking_struggling/article/details/106201849</a></p>
+</blockquote>
+<h5 id="2-3-2-多头注意力"><a href="#2-3-2-多头注意力" class="headerlink" title="2.3.2 多头注意力"></a>2.3.2 多头注意力</h5><p>MHA是SA的进阶版：将输入特征划分为<strong>多个子空间</strong>，再将多个子空间的结果<strong>拼接</strong>起来。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222123523566.png" alt="image-20220222123523566" style="zoom:80%;" /></p>
+<p>先经过因果卷积（捕获位置信息）得到X-hat，三个X-hat作为输入，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220154458646.png" alt="image-20220220154458646" style="zoom:80%;" /></p>
+<p>将X-hat分解到H个子空间，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220155316071.png" alt="image-20220220155316071" style="zoom:80%;" /></p>
+<p>将H个表示拼接起来，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220155340802.png" alt="image-20220220155340802" style="zoom:80%;" /></p>
+<h5 id="2-3-3-add-amp-normalize"><a href="#2-3-3-add-amp-normalize" class="headerlink" title="2.3.3 add&amp;normalize"></a>2.3.3 add&amp;normalize</h5><p>通过残差连接将前面的输入与后面的输出相加、标准化，帮助模型利用到<strong>底层</strong>的特征，标准化也能<strong>加速</strong>训练过程。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222132430242.png" alt="image-20220222132430242" style="zoom:80%;" /></p>
+<h4 id="2-4-类感知的损失函数"><a href="#2-4-类感知的损失函数" class="headerlink" title="2.4 类感知的损失函数"></a>2.4 类感知的损失函数</h4><p>标准的多类交叉熵损失函数对每个类分错的惩罚是相同的；在此基础上，为每个类设置一个<strong>权重</strong>w：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220163514761.png" alt="image-20220220163514761" style="zoom: 80%;" /></p>
+<p>权值和该类出现的<strong>频次、区分的难易程度</strong>有关，样本量越少，分类难度越大，权重越大，$\mu_k$是超参数。</p>
+<p>N1和N3较少，但是N3容易区分，N1难区分，所以$\mu_k$如下，a&lt;b&lt;c，通过除以K使得$\mu_k$&lt;1，对样本数量比进行放缩：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222134939389.png" alt="image-20220222134939389" style="zoom:80%;" /></p>
+<h3 id="3-实验结果"><a href="#3-实验结果" class="headerlink" title="3. 实验结果"></a>3. 实验结果</h3><h4 id="3-1-数据集-amp-指标"><a href="#3-1-数据集-amp-指标" class="headerlink" title="3.1 数据集&amp;指标"></a>3.1 数据集&amp;指标</h4><p>sleepEDF20；sleepEDF78；SHHS</p>
+<p>ACC ；<strong>MF1</strong>； Cohen Kappa (κ)； <strong>MGm</strong></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220222140441122.png" alt="image-20220222140441122" style="zoom:80%;" /></p>
+<h4 id="3-4-baseline对比"><a href="#3-4-baseline对比" class="headerlink" title="3.4 baseline对比"></a>3.4 baseline对比</h4><p>DeepSleepNet； SleepEEGNet；ResnetLSTM ；MultitaskCNN；SeqSleepNet；20折交叉验证，训练100轮，超参数设置。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220172854286.png" alt="image-20220220172854286"></p>
+<p>AttnSleep优于其他方法，且训练时间更短（无LSTM）；在MF1和GMm指标上更优，说明有效地解决了类不均衡问题。</p>
+<h4 id="3-5-消融实验"><a href="#3-5-消融实验" class="headerlink" title="3.5 消融实验"></a>3.5 消融实验</h4><p>AttnSleep由MRCNN、AFR和TCE模块以及类感知损失函数组成，消融实验的几个模型为：MRCNN  MRCNN+ARF MRCNN+TCE   MRCNN+AFR+TCE  AttnSleep</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/image-20220220175454471.png" alt="image-20220220175454471"></p>
+<p>TCE比ARF还重要；MF1和GMm指标在加入类感知的损失函数时大幅提升，有效解决了类不均衡问题。</p>
+<h3 id="5-结论"><a href="#5-结论" class="headerlink" title="5. 结论"></a>5. 结论</h3><p>提出了基于注意力的单导EEG睡眠分期架构AttnSleep，基于MRCNN和ARF提取特征，TCE模块中利用MHA捕获所提取特征之间的时间相关性，设计类感知的损失函数，解决类不均衡问题，并在三个公开数据集上进行了对比实验、消融实验，证明了该模型的有效性。</p>
+<hr>
+<p>epoch之间的依赖性；一个epoch内部</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F/" rel="tag"># 睡眠分期</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/" rel="prev" title="lyx GAN ensemble for anomaly detection">
+      <i class="fa fa-chevron-left"></i> lyx GAN ensemble for anomaly detection
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/02/23/DengJiaoxue/SELF-SUPERVISED%20LEARNING%20FOR%20FEW-SHOT%20IMAGE%20CLASSIFICATION%E3%80%90ICASSP2021%E3%80%91/" rel="next" title="djx ELF-SUPERVISED LEARNING FOR FEW-SHOT IMAGE CLASSIFICATION【ICASSP2021】">
+      djx ELF-SUPERVISED LEARNING FOR FEW-SHOT IMAGE CLASSIFICATION【ICASSP2021】 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#0-Abstract"><span class="nav-number">1.</span> <span class="nav-text">0. Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Intorduction"><span class="nav-number">2.</span> <span class="nav-text">1. Intorduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Method"><span class="nav-number">3.</span> <span class="nav-text">2. Method</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E6%80%BB%E6%A1%86%E6%9E%B6"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 总框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E7%89%B9%E5%BE%81%E6%8F%90%E5%8F%96"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 特征提取</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-1-MRCNN"><span class="nav-number">3.2.1.</span> <span class="nav-text">2.2.1 MRCNN</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-2-ARF"><span class="nav-number">3.2.2.</span> <span class="nav-text">2.2.2 ARF</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-TCE%EF%BC%88%E6%97%B6%E9%97%B4%E4%B8%8A%E4%B8%8B%E6%96%87%E7%BC%96%E7%A0%81%E5%99%A8%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 TCE（时间上下文编码器）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-1-%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="nav-number">3.3.1.</span> <span class="nav-text">2.3.1 自注意力</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-2-%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9B"><span class="nav-number">3.3.2.</span> <span class="nav-text">2.3.2 多头注意力</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-3-3-add-amp-normalize"><span class="nav-number">3.3.3.</span> <span class="nav-text">2.3.3 add&amp;normalize</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-%E7%B1%BB%E6%84%9F%E7%9F%A5%E7%9A%84%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 类感知的损失函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">3. 实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E6%95%B0%E6%8D%AE%E9%9B%86-amp-%E6%8C%87%E6%A0%87"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 数据集&amp;指标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-baseline%E5%AF%B9%E6%AF%94"><span class="nav-number">4.2.</span> <span class="nav-text">3.4 baseline对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.3.</span> <span class="nav-text">3.5 消融实验</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%BB%93%E8%AE%BA"><span class="nav-number">5.</span> <span class="nav-text">5. 结论</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

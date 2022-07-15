@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="论文信息论文：Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning 会议：KDD 2019 作者：  Introduction时间序列预测问题是研究如何在历史观测的基础上准确地预测未来。提高预测精度有利于提高社会各方面的运行效率 摘要 本文提出了一种新颖的数据驱动方法来解决多水平概率预测任务，该任务可预测未来时间">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xw Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning">
+<meta property="og:url" content="http://example.com/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="论文信息论文：Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning 会议：KDD 2019 作者：  Introduction时间序列预测问题是研究如何在历史观测的基础上准确地预测未来。提高预测精度有利于提高社会各方面的运行效率 摘要 本文提出了一种新颖的数据驱动方法来解决多水平概率预测任务，该任务可预测未来时间">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122205649219.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122232538815.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201124155629912.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123205439202.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123232718614.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123232823979.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233028016.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233425077.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233441242.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201124234637201.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201125134650866.png">
+<meta property="article:published_time" content="2020-11-23T15:38:20.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:51:36.746Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时序预测">
+<meta property="article:tag" content="Attention">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122205649219.png">
+
+<link rel="canonical" href="http://example.com/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>xw Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/11/23/XuWei/Multi-Horizon%20TimeSeries%20Forecasting%20with%20Temporal%20Attention%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          xw Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-11-23 23:38:20" itemprop="dateCreated datePublished" datetime="2020-11-23T23:38:20+08:00">2020-11-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:51:36" itemprop="dateModified" datetime="2021-01-16T11:51:36+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p>论文：<strong>Multi-Horizon TimeSeries Forecasting with Temporal Attention Learning</strong></p>
+<p>会议：KDD 2019</p>
+<p>作者：</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122205649219.png" alt="image-20201122205649219"></p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p><strong>时间序列预测问题</strong>是研究如何在历史观测的基础上准确地预测未来。提高预测精度有利于提高社会各方面的运行效率</p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><blockquote>
+<p>本文提出了一种新颖的数据驱动方法来解决多水平概率预测任务，该任务可预测未来时间范围内时间序列的完整分布。本文说明，历史信息中隐藏的时间模式在长时间序列的准确预测中起着重要作用。传统的方法依赖于人工建立时间依赖关系来探索历史数据的相关模式，这在现实世界数据的长期序列预测中是不现实的。相反，<strong>本文提出显示地学习用深层神经网络构建隐藏模式表征，并关注历史的不同部分来预测未来。</strong></p>
+<p>本文提出了一个用于多水平时间序列预测的端到端深度学习的框架，通过时间注意机制，以更好地捕捉历史数据中的潜在模式。基于学习到的潜在模式特征，可以同时<strong>生成多个未来水平的多分位数的预测</strong>。本文还提出了一种多模式融合机制，该机制用于<strong>组合历史不同部分的特征以更好地预测未来</strong>。实验结果表明，本文的方法在两个不同领域的大型预测数据集上均实现了最先进的性能。</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><ol>
+<li>长期预测给基于LSTM的模型带来了挑战（局部动态来源于历史信息和未来的动态输入变量）</li>
+<li>有时需要预测目标的总体分布，以帮助企业决策。(分位数预测：一个典型的例子是，库存计划需要对产品的销售进行不同程度的高估，以降低库存缺货成本。根据每种产品的受欢迎程度和缺货成本，从预测分布中选择不同的高估水平)</li>
+</ol>
+<h3 id="分位数回归"><a href="#分位数回归" class="headerlink" title="分位数回归"></a>分位数回归</h3><p>分位数回归：分位数回归提出的原因，就是因为不希望仅仅是研究y的期望，而是希望能探索y的完整分布状况，</p>
+<p>ex1:</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201122232538815.png" alt="image-20201122232538815" style="zoom:50%;" /></p>
+<p><em>具有分位数预测的现实世界在线销售数据上的销售预测示例。 显示了每月50,000种产品的平均日销售量。 考虑到洋红色线条所示的2018年1月至3月的历史每日销售额，任务是预测4月至6月。 黑线表示实际销售额； 深蓝色线表示分位数为0.5的预测； 蓝色阴影区域显示分位数预测为0.2和0.8。</em></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201124155629912.png" alt="image-20201124155629912" style="zoom:50%;" /></p>
+<h3 id="Contribution"><a href="#Contribution" class="headerlink" title="Contribution"></a>Contribution</h3><ol>
+<li><p>提出了一种用于多水平时间序列预测的端到端深度学习框架，该框架具有新颖的结构以更好地捕捉未来水平上的时间模式，能组合历史不同部分的特征以更好地预测未来，同时生成多分位数预测。</p>
+<blockquote>
+<p>这个想法是首先使用双向LSTM解码器在向前和向后两个方向上传播未来输入变量的信息，同时考虑诸如促销和日历事件之类的动态未来信息。然后在每个未来的时间步中，我们使用解码器隐藏状态关注历史的几个不同时期，并分别生成关注向量。我们将不同的历史时期视为不同的模式，通过学习每种模式在预测当前时间步长的相对重要性，我们将它们结合起来。组合特征，我们称为时间背景特征，结合历史信息和未来的背景信息，可以最好地描述当前的时间步</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="Method"><a href="#Method" class="headerlink" title="Method"></a>Method</h2><h3 id="Basic-encoder-decoder-structure"><a href="#Basic-encoder-decoder-structure" class="headerlink" title="Basic encoder-decoder structure"></a>Basic encoder-decoder structure</h3><p>本文采用这个序列到序列的学习流水线来编码历史(和未来)的输入变量，并对未来的预测进行解码</p>
+<p><strong>LSTM</strong>：将历史信息映射进潜在表示$h<em>{t-1}$: $h</em>{t}^{e}=L S T M^{e}\left(x<em>{t} ; h</em>{t-1}\right)$</p>
+<script type="math/tex; mode=display">
+\begin{aligned} i_{t} &=\sigma\left(W_{i x} x_{t}+W_{i m} m_{t-1}\right) \\ f_{t} &=\sigma\left(W_{f x} x_{t}+W_{f m} m_{t-1}\right) \\ o_{t} &=\sigma\left(W_{o x} x_{t}+W_{o m} m_{t-1}\right) \\ c_{t} &=f_{t} \cdot c_{t-1}+i_{t} \cdot \tanh \left(W_{c x} x_{t}+W_{c m} m_{t-1}\right) \\ h_{t} &=o_{t} \cdot \tanh \left(c_{t}\right) \end{aligned}</script><p>$x<em>{t}$为t时刻的输入， $h</em>{t}$为t时刻的隐藏状态</p>
+<h4 id="BiLSTM"><a href="#BiLSTM" class="headerlink" title="BiLSTM"></a>BiLSTM</h4><script type="math/tex; mode=display">
+\begin{aligned} h_{t}^{f} &=L S T M^{f}\left(x_{t} ; h_{t-1}\right) \\ h_{t}^{b} &=L S T M^{b}\left(x_{t} ; h_{t+1}\right) \\ h_{t} &=\left[h_{t}^{f} ; h_{t}^{b}\right] \end{aligned}</script><h4 id="quantile-predictions"><a href="#quantile-predictions" class="headerlink" title="quantile predictions"></a>quantile predictions</h4><p>分位数的预测（K维）</p>
+<script type="math/tex; mode=display">
+\begin{aligned} y_{t}^{e} &=W_{e} h_{t}^{e}+b_{e} \\ y_{t}^{d} &=W_{d} h_{t}^{d}+b_{d} \end{aligned}</script><h4 id="Structure"><a href="#Structure" class="headerlink" title="Structure"></a>Structure</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123205439202.png" alt="image-20201123205439202" style="zoom:35%;" /></p>
+<ol>
+<li>分为Encoder 和Decoder</li>
+<li>Encoder 编码历史信息，使用单向的LSTM对历史信息进行编码</li>
+<li>Decoder使用编码的历史信息作为初始状态，使用未来信息作为输入，生成未来序列的输出，采用的是双向的LSTM（使未来的每个时间片都能得到未来和过去的输入信息。）</li>
+<li>最后的预测应该在BiLSTM中信息传播之后进行，换句话说，并不使用之前时间步的预测结果来预测当前的时间步。将信息传播阶段与预测阶段分离的目的是为了防止误差积累，特别是对于长水平预测</li>
+</ol>
+<h3 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h3><p>由于LSTM记忆机制，需要不断的擦除旧的记忆，更新新的观测值，所以很难捕捉长程依赖。可以使用基于位置的注意力模型(position-based attention model)来捕捉历史数据中的伪周期模式。但是，他们的模型存在误差积累问题，同时需要动态的未来信息，这对预测精度有很大的影响。而且，他们的模型很难直接应用于长时间的历史，因为他们的注意力适用于整个历史，可能会被明显稀释</p>
+<h4 id="Stracture"><a href="#Stracture" class="headerlink" title="Stracture"></a>Stracture</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123232718614.png" alt="image-20201123232718614" style="zoom:40%;" /></p>
+<h4 id="Temporal-attention"><a href="#Temporal-attention" class="headerlink" title="Temporal attention"></a>Temporal attention</h4><p>在译码阶段，在每个未来时间步上使用BiLSTM hidden state来关注历史的不同部分，从而形成未来步的隐藏表示。没有关注整个历史，（1. 历史数据可能非常长， 2. 分别关注不同的时期，与多模态可以结合起来捕获周期信息）</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123232823979.png" alt="image-20201123232823979" style="zoom:40%;" /></p>
+<p><strong>公式：</strong></p>
+<script type="math/tex; mode=display">
+\begin{array}{l}\mathrm{g}=\mathrm{v}_{g}^{\top} \tanh \left(\mathrm{W}_{g} \mathrm{~s}_{t}+\mathrm{V}_{g} \mathrm{~h}+\mathrm{b}_{g}\right) \\ \gamma_{i}=\frac{\exp \left(g_{i}\right)}{\sum_{j=1}^{T_{h}} \exp \left(g_{j}\right)} \quad \text { for } i=1 \ldots T_{h}\end{array}</script><script type="math/tex; mode=display">
+\begin{aligned} \mathbf{c}_{t} &=\sum_{i=1}^{T_{h}} \gamma_{i} \mathbf{h}_{i} \\ \mathbf{d}_{t} &=\operatorname{ReLU}\left(\mathbf{W}_{d} \mathbf{c}_{t}+\mathbf{b}_{d}\right) \end{aligned}</script><h4 id="Multimodal-fusion"><a href="#Multimodal-fusion" class="headerlink" title="Multimodal fusion"></a>Multimodal fusion</h4><p>使用之前计算出的转换向量$\mathrm{d}_{t}^{m}$和BiLSTM隐藏状态$s_t$计算不同时间段的权值，进一步进行多模态的融合（这的多模态指的是不同的时期）。</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233028016.png" alt="image-20201123233028016" style="zoom:50%;" /></p>
+<p><strong>公式：</strong></p>
+<script type="math/tex; mode=display">
+\begin{aligned} \mathbf{p}_{t}^{m} &=\mathbf{v}_{p}^{\top} \tanh \left(\mathbf{W}_{p} \mathbf{s}_{t}+\mathbf{V}_{p}^{m} \mathbf{d}_{t}^{m}+\mathbf{b}_{p}\right) \\ \phi_{t}^{m} &=\frac{\exp \left(p_{t}^{m}\right)}{\sum_{k=1}^{M} \exp \left(p_{t}^{k}\right)} \quad \text { for } m=1 \ldots M \end{aligned}</script><p>最终得到：</p>
+<script type="math/tex; mode=display">
+\mathbf{x}_{t}=\sum_{m=1}^{M} \phi_{t}^{m} \mathbf{d}_{t}^{m}</script><h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><h4 id="D50K-Online-Sales-Forecasting"><a href="#D50K-Online-Sales-Forecasting" class="headerlink" title="D50K Online Sales Forecasting"></a>D50K Online Sales Forecasting</h4><p>本文从全球在线零售公司JD.com收集了庞大的现实世界在线销售数据集。 该数据集包括2014年至2018年在中国6个地区销售的不同产品的每日销售数据的50,000个时间序列。坐着感兴趣的是预测所有需求区域中所有产品感兴趣月份的每日需求量，并且感兴趣的是0.50到0.95的分位数预测</p>
+<p>由于必须同时考虑多个因素，例如产品类别，地理区域，促销等，因此销售预测具有挑战性。我们简要介绍可用功能，作为数据集中提供的历史和未来信息：</p>
+<ol>
+<li>配送中心id</li>
+<li>商品分类</li>
+<li>促销活动(促销活动假定是预先计划好的，因此可以作为历史和未来的输入变量)</li>
+<li>日历信息（节日等信息）</li>
+</ol>
+<p><strong>Loss</strong>:</p>
+<script type="math/tex; mode=display">
+L^{M A D}=\sum_{i} \sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{i t}-\hat{y}_{i t}^{q}\right)^{+}+(1-q)\left(\hat{y}_{i t}^{q}-y_{i t}\right)^{+}\right]</script><p>$i \in{1,2, \ldots, 50,000}$表示第i条序列</p>
+<p>$q \in{0.5,0.6,0.7,0.8,0.9,0.95}$表示预设的分位数</p>
+<p>$t$表示预测的未来时间步</p>
+<h4 id="GEFCom2014-Electricity-Price-Forecasting"><a href="#GEFCom2014-Electricity-Price-Forecasting" class="headerlink" title="GEFCom2014 Electricity Price Forecasting"></a>GEFCom2014 Electricity Price Forecasting</h4><p>2014年全球能源预测大赛(GEFCom2014)引入的电价预测任务评估模型。GEFCom2014价格预测数据集包含2011-01- 2013-12-31三年的小时电价。这项任务是在平均分配的12个评估周内提供未来24小时的预测。在此数据集中，基于小时的区域和总电力负荷估算是过去和未来信息中都可以使用的两个时间特征。</p>
+<p><strong>Loss</strong></p>
+<script type="math/tex; mode=display">
+L^{M A D}=\sum_{q} \frac{1}{T} \sum_{t}\left[q\left(y_{t}-\hat{y}_{t}^{q}\right)^{+}+(1-q)\left(\hat{y}_{t}^{q}-y_{t}\right)^{+}\right]</script><h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><h4 id="Baseline"><a href="#Baseline" class="headerlink" title="Baseline"></a>Baseline</h4><ol>
+<li>Benchmark ：直接复制历史值作为将来的预测</li>
+<li>Gradient-Boosting:梯度提升机，这是一种用于回归和分类问题的经典机器学习方法。</li>
+<li>POS-RNN ：这是一种深度学习方法，将基于位置的注意力模型应用于序列的历史，并获得一个历史特征</li>
+<li>MQ-RNN：使用LSTM编码器将序列的历史总结为一个隐藏特征，并使用MLP对隐藏特征与所有未来输入变量一起对所有未来范围进行预测，避免了错误累计。</li>
+<li>TRMF：通过添加可衡量观察训练时间序列可能性的正则化项，将时间依赖性纳入矩阵分解模型中。本文采用他们选择的参数进行销售预测</li>
+</ol>
+<h4 id="Model-variants"><a href="#Model-variants" class="headerlink" title="Model variants"></a>Model variants</h4><ol>
+<li>BiLSTM-Enc-Dec(h=1)，BiLSTM-Enc-Dec(h=3)是上文提到了不包含Attention机制的 LSTM encoder and BiLSTM decoder模型，其中h表示模型编码的历史信息的周期数</li>
+<li>Single-Attention(h=1), 只涉及一个历史周期的Attention计算</li>
+<li>Multimodal-Attention(h=3)，接受三个时期的历史数据，并首先分别对它们进行多重关注，然后将它们与多模式融合相结合，</li>
+</ol>
+<h4 id="Experiment-results"><a href="#Experiment-results" class="headerlink" title="Experiment results"></a>Experiment results</h4><p><strong>分位数损失对比</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233425077.png" alt="image-20201123233425077" style="zoom:33%;" /></p>
+<ol>
+<li>Benchmark仅仅通过复制历史信息，就达到了 4.98的分位数损失</li>
+<li>POS-RNN由于使用attention挖掘历史信息，达到了2.95的分位数损失</li>
+<li>MQ-RNN要比POS-RNN更好，它独立输出每个未来的结果，并避免解码阶段的错误累积</li>
+<li>bi-lstm - ence - dec (h=1)和bi-lstm - ence - dec (h=3)超出了以前的方法，这多亏了使用BiLSTMdecoder，它可以向前和向后传播动态的未来信息(事件和促销)。</li>
+<li>通过结合注意机制，Single-Attention(h=1)模型将bi-lstm模型提高到2.14，而多注意(h=3)模型进一步提高到2.12，该模型使用了三个月的历史数据，并将注意应用于每个月。</li>
+</ol>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201123233441242.png" alt="image-20201123233441242" style="zoom:33%;" /></p>
+<p><strong>MSE对比</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201124234637201.png" alt="image-20201124234637201" style="zoom:33%;" /></p>
+<p>还将在CEFCom2014和JD50K数据集上，将本文的方法Single-Attention（h = 1）和Multimodal-Attention（h = 3）与具有均方误差（MSE）的基准和TRMF [32]进行了比较。 所示，在两个数据集上，本文提出的方法总是优于基准和TRMF超过20％，Multimodal-Attention（h = 3）优于Single-Attention（h = 1）约3％</p>
+<h4 id="Forecasts-visualization"><a href="#Forecasts-visualization" class="headerlink" title="Forecasts visualization"></a>Forecasts visualization</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201125134650866.png" alt="image-20201125134650866" style="zoom:50%;" /></p>
+<p>对电价预测方法进行了两周的评估。黑线表示实际价格;红色阴影区域的上下边界表示0.25和0.75的分位数的预测;黄色阴影区域的边界显示0.01和0.99分位数的预测。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E5%BA%8F%E9%A2%84%E6%B5%8B/" rel="tag"># 时序预测</a>
+              <a href="/tags/Attention/" rel="tag"># Attention</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/21/XuWei/Adaptive%20Graph%20Convolutional%20Recurrent%20Network%20for%20Traffic%20Forecasting/" rel="prev" title="xw Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting">
+      <i class="fa fa-chevron-left"></i> xw Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/09/ZhangHongjun/anoGan-f-anoGan/" rel="next" title="zhj anoGan">
+      zhj anoGan <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">论文信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Motivation"><span class="nav-number">2.2.</span> <span class="nav-text">Motivation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E4%BD%8D%E6%95%B0%E5%9B%9E%E5%BD%92"><span class="nav-number">2.3.</span> <span class="nav-text">分位数回归</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Contribution"><span class="nav-number">2.4.</span> <span class="nav-text">Contribution</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Method"><span class="nav-number">3.</span> <span class="nav-text">Method</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Basic-encoder-decoder-structure"><span class="nav-number">3.1.</span> <span class="nav-text">Basic encoder-decoder structure</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BiLSTM"><span class="nav-number">3.1.1.</span> <span class="nav-text">BiLSTM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#quantile-predictions"><span class="nav-number">3.1.2.</span> <span class="nav-text">quantile predictions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Structure"><span class="nav-number">3.1.3.</span> <span class="nav-text">Structure</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Attention"><span class="nav-number">3.2.</span> <span class="nav-text">Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Stracture"><span class="nav-number">3.2.1.</span> <span class="nav-text">Stracture</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Temporal-attention"><span class="nav-number">3.2.2.</span> <span class="nav-text">Temporal attention</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Multimodal-fusion"><span class="nav-number">3.2.3.</span> <span class="nav-text">Multimodal fusion</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">4.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">4.1.</span> <span class="nav-text">数据集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#D50K-Online-Sales-Forecasting"><span class="nav-number">4.1.1.</span> <span class="nav-text">D50K Online Sales Forecasting</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GEFCom2014-Electricity-Price-Forecasting"><span class="nav-number">4.1.2.</span> <span class="nav-text">GEFCom2014 Electricity Price Forecasting</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">4.2.</span> <span class="nav-text">实验结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Baseline"><span class="nav-number">4.2.1.</span> <span class="nav-text">Baseline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Model-variants"><span class="nav-number">4.2.2.</span> <span class="nav-text">Model variants</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Experiment-results"><span class="nav-number">4.2.3.</span> <span class="nav-text">Experiment results</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Forecasts-visualization"><span class="nav-number">4.2.4.</span> <span class="nav-text">Forecasts visualization</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

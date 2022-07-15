@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="【ICML，2017】 【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】 Abstract隐单元在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是难训练的，在前向后向模型中是互补的。同时训练两个模型，提高参数学习的效">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd 【ICML207】Bidirectional Learning for Time-series Models with Hidden Units">
+<meta property="og:url" content="http://example.com/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="【ICML，2017】 【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】 Abstract隐单元在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是难训练的，在前向后向模型中是互补的。同时训练两个模型，提高参数学习的效">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135323.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135347.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135409.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135433.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135456.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135514.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135531.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135550.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135616.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135633.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135633.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135653.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135732.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135749.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135749.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135826.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135904.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135923.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135949.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140009.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140036.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140103.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140139.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140159.png">
+<meta property="article:published_time" content="2021-01-07T06:20:10.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:23:37.059Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135323.png">
+
+<link rel="canonical" href="http://example.com/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd 【ICML207】Bidirectional Learning for Time-series Models with Hidden Units | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd 【ICML207】Bidirectional Learning for Time-series Models with Hidden Units
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-14 17:23:37" itemprop="dateModified" datetime="2021-07-14T17:23:37+08:00">2021-07-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>【ICML，2017】</p>
+<p>【Takayuki Osogami, Hiroshi Kajino, Taro Sekiyama，IBM Research- Tokyo】</p>
+<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p><strong>隐单元</strong>在长程依赖或非线性时序建模中有重要作用，但是相关参数不好训练，提出后向训练来学习这样的模型。后向模型和前向模型有共同的参数集，只有一小部分参数是<strong>难训练</strong>的，在前向后向模型中是<strong>互补</strong>的。同时训练两个模型，提高参数学习的效率。在带隐单元的动态玻尔兹曼机上应用了双向学习，合成/真实数据集上演示了<strong>双向学习</strong>的优势。</p>
+<a id="more"></a>
+<hr>
+<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p>在一些时序模型中，隐单元对于时序中的长程依赖和非线性是至关重要的；但是隐单元的值只有通过观测未来值才能可靠估计，训练困难。设时序模型的参数用一个或几个矩阵$M$表示，$M<em>{i,j}$可能代表节点i的历史值和节点j的后续值之间的权重，其中一些隐节点j的$M</em>{i,j}$难估计。根据参数矩阵为$M$的时序模型，构造后向模型，参数矩阵为$M^T$。</p>
+<p><strong>contribution 1:</strong> 提出<strong>双向方法</strong>来训练带隐单元的时序模型。两个模型结构相同、训练方式相同（随机梯度方法）；前向模型用正常时序，后向模型用逆向时序，分别学习$M$和$M^T。$两个矩阵中难训练的元素是<strong>不同</strong>的，所以双向训练可以提高参数学习效率。</p>
+<p><strong>contribution 2: </strong>在<strong>带隐单元DyBM</strong>上应用双向学习。分析了带隐单元的DyBM，阐释了参数学习的<strong>困难性</strong>；通过双向学习，学习历史可见值和后续隐值之间的权值，学习过去的哪些值对于预测是重要的。</p>
+<p><strong>相关但不同的模型：</strong></p>
+<p>双向训练&amp;BRNN: BRNN的双向模型没有共享参数，而双向训练会<strong>共享参数</strong>。动机不同，BRNN使用双向模型训练、预测，用前面、后面的值来估计中间的值；而双向训练只用双向模型进行训练，预测时还是<strong>只用历史值</strong>。</p>
+<p>双向训练&amp;FBLG：FBLG（Forward Backward Lasso Granger，包括前向VAR和后向VAR，得到平均模型）中没有隐单元，而双向训练是为了训练<strong>带隐单元</strong>的时序模型。</p>
+<p>双向训练&amp;考虑隐变量的VAR模型或线性动态系统：后者是通过隐变量估计可见变量之间的关系；双向学习是为了学习可见单元和隐单元之间的关系。</p>
+<h3 id="2-DyBM-with-Hidden-Units"><a href="#2-DyBM-with-Hidden-Units" class="headerlink" title="2. DyBM with Hidden Units"></a>2. DyBM with Hidden Units</h3><p><strong>玻尔兹曼机：</strong>一种随机递归神经网络，可以看作是一种随机的Hopfield网络，通过学习数据的固有内在表示，来解决困难学习问题。一般BM可见单元和隐单元之间的<strong>能量函数</strong>为：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135323.png" style="zoom:67%;" /></p>
+<p>BM通过调整各神经元之间的权值，使模型的概率分布等于训练样本集的概率分布，使<strong>出现概率最高的全局状态得到最低的能量</strong>，最终转换为<strong>最大化似然函数</strong>。</p>
+<p><strong>DyBM:</strong> 结合<strong>STDP</strong>的特殊结构的玻尔兹曼机，是一个多维时间序列的随机模型</p>
+<p><strong>STDP:</strong> spike-timing dependent plasticity，脉冲时间相关的突触可塑性；它根据神经元学习的先后顺序，<strong>调整神经元之间连接的强弱</strong>。STDP可以说是Hebb学习的一种延伸，Hebb学习提出如果两个神经元常常一起活动，则二者之间的连接会增强。STDP则是进一步提出，两个神经元之间的活动，如果其他神经元的信息在本身活动产生之前，则两神经元之间的连接会增强。如果神经元本身产生活动之后才接受其他神经元传来的信息，则两神经元之间的连接会减弱。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135347.png" style="zoom:67%;" /></p>
+<p>图1给出了针对时序的特殊结构化的玻尔兹曼机，时序长T+1，水平有T+1层；每层都有隐藏部分和可见部分，第$\delta$层可见部分$x^{[t-\delta]}$代表时序$t-\delta$时刻的值。图1的BM偏置为b，权重参数为$(U,V,W,Z)$，$\theta=(V,W,b)$是和可见单元$x^{[t]}$相关的参数，$\phi=（U,Z）$是隐单元参数。DyBM的能量如下：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135409.png" style="zoom:67%;" /></p>
+<p>其中</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135433.png" style="zoom:67%;" /></p>
+<p>同理定义第二项。</p>
+<p>研究这种情况：$W=(W^{\delta})_{1&lt;=\delta&lt;=T}$，$\delta&gt;=d$时满足以下条件（衰减）：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135456.png" style="zoom:67%;" /></p>
+<p>其中$\lambda$是衰减率，T趋向于无穷时，式（2）的<strong>能量如下</strong>：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135514.png" style="zoom:67%;" /></p>
+<p>第二项同理，其中</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135531.png" style="zoom:67%;" /></p>
+<p>式（5）的能量给出了，<strong>给出$x^{[&lt;t]}$,$h^{[&lt;t]}$下$x^{[t]}$的条件概率分布</strong>，对二进制时序中任意的$x^{[t]}$，有：<br><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135550.png" style="zoom:67%;" /></p>
+<p>其中Z是使概率之和为1的归一化因子。</p>
+<h3 id="3-Training-a-DyBM-with-Hidden-Units"><a href="#3-Training-a-DyBM-with-Hidden-Units" class="headerlink" title="3. Training a DyBM with Hidden Units"></a>3. Training a DyBM with Hidden Units</h3><p><strong>推导可见单元参数$\theta$的学习规则，这个规则不适用于$\phi$</strong>。</p>
+<p>带隐单元的DyBM给出了时序的概率：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135616.png" style="zoom:67%;" /><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135633.png" alt=""></p>
+<p>其中：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135633.png" style="zoom:67%;" /></p>
+<p>通过最大化Jensen不等式给出的下界，来<strong>最大化给定x的对数似然函数</strong>，</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135653.png" style="zoom:67%;" /></p>
+<p>其中</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135732.png" style="zoom:67%;" /><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135749.png" alt=""></p>
+<p>下界对$\theta$的梯度是：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135749.png" style="zoom:67%;" /></p>
+<p>随机梯度的方法：每一步t，根据概率取样出$h^{[t-1]}$然后基于它的梯度来更新$\theta$:</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135826.png" style="zoom:67%;" /></p>
+<p>下界对$\phi$的梯度：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135904.png" style="zoom:67%;" /></p>
+<p>根据概率取样出$h^{[t-1]}$然后基于它的梯度来更新$\phi$:</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135923.png" style="zoom:67%;" /></p>
+<p>式27的计算复杂度随时序长度线性增长，<strong>计算效率低</strong>；而式17的复杂度和长度无关。可用递归方式近似计算G：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135949.png" style="zoom:67%;" /></p>
+<p>式26中存在一个<strong>对数似然和梯度的乘积</strong>，如果不依赖于对数似然函数，它的学习规则就与可见单元是相同的。而这两项相乘是不可避免的，因为隐单元的特定值是否有利于预测未来值，只有在看到未来值之后才能知道。</p>
+<h3 id="4-Learning-with-Reversed-Time-series"><a href="#4-Learning-with-Reversed-Time-series" class="headerlink" title="4.  Learning with Reversed Time-series"></a>4.  Learning with Reversed Time-series</h3><p>$\phi$的随机梯度需要近似，$\theta$不需要，所以参数$\phi$的学习不像$\theta$一样高效。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140009.png" style="zoom:67%;" /></p>
+<p>图2是后向DyBM，和前向DyBM有共同的参数集，它是由前向DyBM得到的，结构相同，参数矩阵转置，只是逆序处理时序。前向模型中$\theta=(V,W,b)$，$\phi=（U,Z）$，后向模型中$\theta’=(U^T,W^T,b)$, $\phi’=(V^T,Z^T)$, $U$在前向模型中是比较难学习的，而在后向模型中是相对好学习的。</p>
+<h3 id="5-Experiments"><a href="#5-Experiments" class="headerlink" title="5.  Experiments"></a>5.  Experiments</h3><p><strong>5.1 具体学习算法</strong></p>
+<p>三种训练模式：不带隐单元的DyBM；带隐单元的DyBM只进行前向学习；带隐单元的DyBM的双向学习。</p>
+<p>双向学习：前$T_0$轮迭代进行双向学习，每$F+1$步进行后向学习，剩余的迭代中只进行前向学习。前向学习时不更新U，后向学习时不更新V。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140036.png" style="zoom:67%;" /></p>
+<p><strong>5.2 合成数据</strong></p>
+<p>在<strong>一维带噪声锯齿波</strong>合成数据上实验，探究双向训练的有效性。锯齿波在每个阶段末端都存在很强的不连续性，所以隐单元对于学习是至关重要的。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140103.png" style="zoom:67%;" /></p>
+<p>训练了带一个隐藏单元/没有隐藏单元的DyBM，前一半迭代$T/2$进行双向学习。</p>
+<p>图3a、c是训练过程，RMSE评估预测误差。在图3c中，从T0时刻（双向学习结束之后），RMSE的下降开始加速，<strong>说明通过双向学习学到合适的U之后，更有利于学习其余参数（V W b）</strong>。虽然双向学习有助于学到合适的U，但是不一定优化DyBM的所有参数，后向DyBM和逆时序的DyBM不同。</p>
+<p>图3b、d给出了预测结果。<strong>双向学习的DyBM和真实值接近，可以很好的预测到每一个周期结尾的大幅下降</strong>，而基线在这里比较平滑。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140139.png" style="zoom:67%;" /></p>
+<p><strong>5.3 真实数据</strong></p>
+<p>每月太阳黑子数：一维，2820步；每周汽油柴油零售价：八维，1223步；2：1划分；NOAA全球表面温度：391维，1635步，4：1划分；数据进行归一化。</p>
+<p>测试了带4个隐单元/不带隐单元的DyBM，设置不同的$T_0$和d，前d步进行前向学习和后d步进行后向学习。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107140159.png" alt=""></p>
+<p>对于太阳黑子数据，双向学习没有提高，但是隐藏单元能得到更低的RMSE。对于价格和温度数据，T0轮之后，双向学习效果优于基线，并且另外两种情况会<strong>过拟合</strong>。<strong>双向学习会减慢RMSE的下降，但是停止双向训练后，会加速RMSE的下降，双向学习最终的RMSE更低</strong>。</p>
+<h3 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h3><p>提出了带隐单元时序模型的双向学习，前向模型（训练前向序列）和后向模型（训练后向序列）有相同的参数集，<strong>一个模型中比较难学习的参数在另一个模型中可能是比较好学习的</strong>。分析了带隐单元的<strong>DyBM</strong>，可见单元$\theta(V,W,b)$和隐单元$\phi(U,Z)$的<strong>梯度不同</strong>，不能用同样的方式学习权重。所以双向学习可以提高参数学习效率，在合成/真实数据集上进行了实验，实验证明双向学习还可以<strong>避免过拟合</strong>。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/" rel="prev" title="syd 【NIPS2019】TWNet:a Dynamic Time Warping Network">
+      <i class="fa fa-chevron-left"></i> syd 【NIPS2019】TWNet:a Dynamic Time Warping Network
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90CVPR%202019%E3%80%91End-To-End%20Multi-Task%20Learning%20With%20Attention/" rel="next" title="syd 【CVPR2019】Multi-task learning">
+      syd 【CVPR2019】Multi-task learning <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-DyBM-with-Hidden-Units"><span class="nav-number">3.</span> <span class="nav-text">2. DyBM with Hidden Units</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Training-a-DyBM-with-Hidden-Units"><span class="nav-number">4.</span> <span class="nav-text">3. Training a DyBM with Hidden Units</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Learning-with-Reversed-Time-series"><span class="nav-number">5.</span> <span class="nav-text">4.  Learning with Reversed Time-series</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Experiments"><span class="nav-number">6.</span> <span class="nav-text">5.  Experiments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Conclusion"><span class="nav-number">7.</span> <span class="nav-text">6. Conclusion</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

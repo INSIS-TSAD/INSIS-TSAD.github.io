@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="【NIPS2019】   AbstractDTW常用于相似性度量，由于DTW对时间轴的规整不变性，可以提供信号间的差异测量。本文提出了ANN的新组件，利用DTW进行特征提取（以往常用DTW作为损失函数）。从理论上分析了DTW损失，用随机反向传播机制来提高DTW学习的准确率和效率。所提出的框架可用作数据分析工具，进行数据分解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="syd 【NIPS2019】TWNet:a Dynamic Time Warping Network">
+<meta property="og:url" content="http://example.com/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="【NIPS2019】   AbstractDTW常用于相似性度量，由于DTW对时间轴的规整不变性，可以提供信号间的差异测量。本文提出了ANN的新组件，利用DTW进行特征提取（以往常用DTW作为损失函数）。从理论上分析了DTW损失，用随机反向传播机制来提高DTW学习的准确率和效率。所提出的框架可用作数据分析工具，进行数据分解。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134144.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134212.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134237.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134302.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134321.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134348.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134415.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134435.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134501.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134524.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134557.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134618.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134638.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134501.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134721.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134741.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134810.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134837.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134920.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135113.png">
+<meta property="og:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135138.png">
+<meta property="article:published_time" content="2021-01-07T06:20:10.000Z">
+<meta property="article:modified_time" content="2021-07-14T09:24:16.367Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134144.png">
+
+<link rel="canonical" href="http://example.com/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>syd 【NIPS2019】TWNet:a Dynamic Time Warping Network | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/07/SongYudan/%E3%80%90NIPS2019%E3%80%91notes_DTWNet%20a%20Dynamic%20Time%20Warping%20Network/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          syd 【NIPS2019】TWNet:a Dynamic Time Warping Network
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-07 14:20:10" itemprop="dateCreated datePublished" datetime="2021-01-07T14:20:10+08:00">2021-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-14 17:24:16" itemprop="dateModified" datetime="2021-07-14T17:24:16+08:00">2021-07-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/syd/" itemprop="url" rel="index"><span itemprop="name">syd</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>【NIPS2019】</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134144.png" style="zoom: 67%;" /></p>
+<hr>
+<h3 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h3><p>DTW常用于相似性度量，由于DTW对时间轴的规整不变性，可以提供信号间的<strong>差异测量</strong>。本文提出了ANN的新组件，利用DTW进行<strong>特征提取</strong>（以往常用DTW作为损失函数）。从理论上分析了DTW损失，用随机反向传播机制来提高DTW学习的准确率和效率。所提出的框架可用作数据分析工具，进行<strong>数据分解</strong>。</p>
+<a id="more"></a>
+<h3 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h3><p>相似性度量很重要，闵可夫斯基距离比较常用，$dist(x,y)=(\sum_{k=1}^{d}|x_k-y_k|^p)^{1/p}$（p=1，曼哈顿距离；p=2，欧氏距离）；马氏距离是扭曲的欧氏距离，$dist(x,y)=((x-y)^T\sum^{-1}(x-y))^{1/2}$。闵可夫斯基距离和马氏距离不能反应序列数据之间的<strong>真正相似性</strong>，DTW具有对时间规整的<strong>不变性</strong>。DTW还可作为<strong>特征提取</strong>工具，可以通过DTW计算定义预定义模式，后续可以用这些模式对时间数据进行分类。</p>
+<p>DTW通过cost矩阵C、动态规划得到最佳归整路径：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134212.png" style="zoom:80%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134237.png" style="zoom:80%;" /></p>
+<p>DTW虽然可以进行相似性评估、特征提取，但是对<strong>深度学习领域</strong>没有很大贡献。好的特征提取器是ANN的关。DTW有非线性变换特性（规整），提供了针对多普勒效应的目标总结，是潜在的ANN特征提取器。本文提出了DTWNet，<strong>有可学习DTW核的神经网络。</strong></p>
+<p>主要贡献：</p>
+<ol>
+<li>在神经网络中应用<strong>可学习的DTW核</strong>来表现多普勒不变性；</li>
+<li>采用基于规整路径的<strong>随机反向传播</strong>来计算动态规划的梯度，进而学习DTW核；给出了反向传播的<strong>收敛性</strong>分析；</li>
+<li>首次对<strong>DTW损失函数</strong>进行理论分析；</li>
+<li>提出了一种<strong>可微流DTW学习</strong>，来克服由标准DTW的全局对齐导致的局部特征缺失问题；</li>
+<li>实证研究表明，该方法是有效的，并成功地利用<strong>DTW核捕获特征</strong>，还演示了一个<strong>数据分解</strong>应用。</li>
+</ol>
+<h3 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h3><p><strong>2.1 DTW简介</strong></p>
+<p>DTW由于多普勒效应不变性，适于处理声学数据；处理ECG、EEG等生物信号来发现潜在疾病。DTW与预定义模式结合，是时序分类任务中一个强大的特征提取器。</p>
+<p>DP时间复杂度高，而且DP是顺序过程，所以DTW计算不能并行，已有一些加速计算的技巧。</p>
+<p>2-D DTW：DTW扩展到二维可用于图像匹配</p>
+<p><strong>2.2 SPRING算法：DTW的流版本</strong></p>
+<p>为了处理DTW度量下的流数据，[18]提出了一种DTW的变体——SPRING。原始DTW找到从两个序列<strong>起始到结束</strong>的最佳对齐；流版本试图从一个给定的序列中识别所有接近于某个给定模式的<strong>子序列</strong>。SPRING算法复杂度$O(nl)$，与标准DTW一致。</p>
+<p>SPRING核原始DTW计算有<strong>两个不同</strong>：首先，它在模式前添加一个通配符（模式的起点能匹配输入序列的<strong>任何位置</strong>）；利用辅助矩阵记录动态规划矩阵中每一个入口的源，这个<strong>源矩阵</strong>记录每一条候选路径，可以从尾端回溯。</p>
+<p><strong>2.3 DTW损失函数</strong></p>
+<p>DTW是顺序过程，计算DP矩阵过程中每一步都要最小化，最小化操作是不连续的，梯度和次梯度都不好定义。可以用<strong>soft-min</strong>代替min操作，[19]给出了soft-min的梯度，用小波学习来提高测试数据有限的时序分类效果。还有研究利用DTW中最小算子的连续松弛来解决视频对齐和分割问题。采用soft-min方法，[4]说明<strong>DTW作为损失函数比欧氏距离更好</strong>。</p>
+<h3 id="3-Proposed-DTW-Layer-and-its-Backpropogation"><a href="#3-Proposed-DTW-Layer-and-its-Backpropogation" class="headerlink" title="3. Proposed DTW Layer and its Backpropogation"></a>3. Proposed DTW Layer and its Backpropogation</h3><p>DTW层包括多个提取特征的DTW核，每个核产生一个通道，产生一个DTW距离值。如果有滑窗，每个核会产生一个距离序列（像卷积核一样），DTW层可以接线形层，得到分类/回归结果。算法1给出分类任务上的DTWNet示例。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134302.png" style="zoom:80%;" /></p>
+<p><strong>梯度计算和反向传播</strong></p>
+<p>DP过程后得到规整路径，序列长n，核长l，路径最长不超过$(n+l)$，DTW距离的平方为：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134321.png" style="zoom:80%;" /></p>
+<p>路径已经确定，只需<strong>沿着路径微分</strong>，DTW距离对x求导：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134348.png" style="zoom:80%;" /></p>
+<p>min操作没有梯度，直接进行自动微分会导致很大的方差，可以用softmin来解决这个问题，soft-min复杂度$O(nl)$。只依赖于路径上的元素，无需对整个cost矩阵的所有entry进行求导，只对确定路径求导$O(n+l)$。每一次迭代DP扭曲路径不同，也会有方差，所以BP被看作一个随机过程。</p>
+<p><strong>时间复杂度：</strong>DP时间复杂度$O(nl)$，梯度计算时间复杂度$O(n+l)$</p>
+<h3 id="4-DTW-Loss-and-Convergence"><a href="#4-DTW-Loss-and-Convergence" class="headerlink" title="4. DTW  Loss and Convergence"></a>4. DTW  Loss and Convergence</h3><p>给定输入序列，目标是得到和y最佳对齐（通过最小化dtw距离）的核。核x随机初始化，通过梯度下降来学习，$d=H_yx$是动态规划得到的DTW距离。</p>
+<p><strong>定义1：</strong>所有可能的归整路径</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134415.png" style="zoom:80%;" /></p>
+<p>$H_yx$和函数空间中的某个函数$f_y^{(u)}(x)$相等，<strong>所以用函数空间中的函数集合来估计$H_yx$</strong>（每一个x对应一个样本函数）。用$f_y^{(u)}(x)$的梯度进行梯度下降，问题是它的梯度是否等于$H_yx$的梯度。</p>
+<p>$H_yx$在x的空间上不是处处光滑的，存在一些x：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134435.png" style="zoom: 80%;" /></p>
+<p>动态规划矩阵在每一步都有3个可选方向，在边界处只有1个可选方向，所以有：</p>
+<p><strong>引理1：</strong>归整路径数$|F_y|&lt;3^{n+l}$，其中n+l是最长归整路径</p>
+<p>x空间被分成区域，在某个区域，可以用$f_y^{(u)}(x)$来估计$H_yx$。用2范数的平方作为DTW loss，则$H_yx$是x的<strong>分段二次函数</strong>，如果用绝对值作为DTW loss，则$H_yx$是x的<strong>分段线性函数</strong>。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134501.png" style="zoom:80%;" /></p>
+<p>图2a，2b给出了示意。生成点来计算DTW loss，x长度为6，y长度为10，只变化x中间的两个元素，便于画出三维图像。图2a说明2范数作为DTW loss时$H_yx$是x的分段二次函数，2b是线性分段函数情况。</p>
+<p><strong>逃离局部最优</strong></p>
+<p>有一些工作给出了非凸神经网络损失函数全局收敛性的证明，本文通过利用损失函数的二次分段（线性分段），区域数上界是$O（3^{n+l}）$。先分析用<strong>标准梯度下降分析逃离u来进入它的邻域v</strong>，假设$y_{p:p+q}$和$x_k$对齐，可以得到u的局部二次函数，以及对$x_k$的偏导：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134524.png" style="zoom:80%;" /></p>
+<p>令偏导等于0，得到稳定点：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134557.png" alt=""></p>
+<p>相邻区域的函数$f<em>y^{v}$除了$y</em>{p+q+1}$的对齐外，都和$f_y^{u}$相同：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134618.png" style="zoom:80%;" /></p>
+<p>同理，该邻域左侧相邻区域的的稳定点如下：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134638.png" style="zoom:80%;" /></p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134501.png" style="zoom:80%;" /></p>
+<p>考虑从u跳到v（u是碗状的，想跳出），区域v有三种情况：</p>
+<ol>
+<li>v的稳定点不在区域v内，在它的左侧。此时全局最优解一定不在v内，u内有一部分比它更小，如果跳到v，梯度会再次让它跳回u；</li>
+<li>u和v都是碗状的，需要从u到v，起点在最低点的左侧（如红色位置所示），否则会跳到w而不是v，为了保证一步跳到v，至多需要$(x<em>k^{(v)*}-x</em>{hat})$；</li>
+<li>v不是碗状的，$x<em>k^{(v)<em>}$在v的右端，走$(x_k^{(v)</em>}-x</em>{hat})$来跳到v，如果v的右邻域是碗状的，则v的右邻域更小，即使v的右邻域不是碗状的，组合区域[v, v+]也可以看作是准碗或扩展的v，所以跳到此处也是合理的。</li>
+</ol>
+<p>考虑左邻域w，w的稳定点在w内或w左侧时，稳定点肯定在起点左侧；w的稳定点在w右侧时，把[w,u]合并为u’，u’的左邻域为w‘，上述分析对这三个新的区域仍然成立，所以有以下定理：</p>
+<p><strong>定理1.</strong>假设起点在u区域（由公式5定义）内，x和y的长度分别为n和l，为了跳出u区域到达紧邻的右侧区域，步长期望满足$E(\eta)&gt;l/(2n)$</p>
+<p>有若干个y，距离函数求和，梯度求和，通过小批量随机梯度下降来更新x。随机梯度是无偏估计，方差代表跳出局部最优解的能力。</p>
+<h3 id="5-Streaming-DTW-Learning"><a href="#5-Streaming-DTW-Learning" class="headerlink" title="5. Streaming DTW Learning"></a>5. Streaming DTW Learning</h3><p>一个ECG序列有多个心跳脉冲，希望DTW核学到心跳脉冲模式，而端到端的DTW会使DTW核与<strong>整个序列</strong>对齐而不是<strong>一个脉冲</strong>。如果核很短，没学到有用的东西。为了解决这个问题，用SPRING算法来输出对齐子序列的模式（DTW核）：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134721.png" style="zoom:90%;" /></p>
+<p>其中i和y的长度待优化。</p>
+<p>流版本试图从一个给定的序列中识别所有接近于某个给定模式的<strong>子序列</strong>。SPRING给出最佳匹配的子序列以及一系列有最小DTW距离的规整路径，提出两个机制：机制一，预设常数k，让SPRING选出<strong>k个最优</strong>的归整路径（k个不同的非重叠的、与模式x的DTW距离最小的子序列）；机制二，不是指定路径数，设置参数$\epsilon$，给出<strong>距离小于$(1+\epsilon)d^*$的路径</strong>（$d^*$是最佳归整路径的DTW距离）。随机/平均作为DTW计算结果。本文中，$\epsilon$设为0.1，随机采样。</p>
+<p><strong>流DTW的正则化矩阵</strong></p>
+<p>SPRING希望核x去学习输入序列中的<strong>重复模式</strong>，对模式的长度没有限制。输入数据中总会出现没有包含太多有效信息的公共部分，不加正则化的核很容易捕捉<strong>无用模式并陷入局部最优值</strong>。加入正则化来解决这个问题：</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134741.png" style="zoom:80%;" /></p>
+<p><strong>正则化会得到“完整”的模式</strong>，模式的起始相隔比较近。如图3a所示，有上半个/下半个半圆待学习，不进行正则化的话，核只能学到部分模式；加入弱正则化，学到更完整的模式；合适的$\alpha$能捕捉到完整的形状。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134810.png" style="zoom: 67%;" /></p>
+<h3 id="6-Experiments-and-Applications"><a href="#6-Experiments-and-Applications" class="headerlink" title="6. Experiments and Applications"></a>6. Experiments and Applications</h3><p>将本方法与现存的方法对比，将端到端的DTW核称为Full DTW，将流版本称为 SPRING DTW。</p>
+<p><strong>6.1 与卷积核的对比</strong></p>
+<p>类别1有<strong>半个方形</strong>信号模式，类别2有下方的<strong>三角</strong>信号模式，模式的位置和长度随机，模式不重叠，图4a给出一些样本。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134837.png" style="zoom: 77%;" /></p>
+<p>输入序列有100个点，模式长度从10-30不等，训练集100条（1：1），测试集100条（1：1），我们比较了Full DTW、SPRING DTW和卷积核，核的长度为10，再加三层线性层，</p>
+<p>图4b给出了收敛后的习得的DTW核，Full DTW试图捕捉<strong>整个</strong>序列，整个序列有两个模式，Full DTW核也有<strong>两个峰</strong>；SPRING DTW只匹配<strong>部分模式</strong>，呈扫描状；图4c和4d给出了acc和loss曲线，两个DTW的曲线几乎一致，只画出了Full DTW的图。令人意外，卷积核未能到100%，MLP表现最差。可以将这个方法扩展到多元时间序列（无需作大的修改）</p>
+<p><strong>6.2 梯度计算评估</strong></p>
+<p>进行质心计算，评估提出的<strong>BP机制的效率和准确性</strong>，使用了UCR数据集，将我们的方法和SoftDTW、DBA、SSG进行对比，5次实验取平均。</p>
+<p>质心实验旨在找到每一类输入序列的质心，计算DTW loss，loss越小，表现越好。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107134920.png" style="zoom:67%;" /></p>
+<p>表1给出了实验结果，Win意思是在85个数据集上达到最小loss的次数，还给出了平均排名、平均loss，我们的方法性能比较好。</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135113.png" style="zoom:67%;" /></p>
+<p><strong>6.3 DTW分解的应用</strong></p>
+<p>将DTWNet作为时间序列<strong>数据分解</strong>工具，设计五个DTW层，每层有一个DTW核。关键是将第i层的残差向前传到下一层。计算DTW距离会得到规整路径，从$y<em>j$中减去对应的$x</em>{i,j}$</p>
+<p><img src="https://gitee.com/meow3009/paper_pic/raw/master/img/20210107135138.png" style="zoom: 67%;" /></p>
+<p>图5阐释了分解的影响，核0-核4对应第一层到最后一层，训练目标是最小化网络输出的残差，训练一定轮数后，不同层的核形成不同的形状，核0是<strong>低频</strong>的、数据<strong>整体</strong>形状，核4形状是<strong>高频</strong>的、<strong>曲折</strong>形状。<strong>层数越深，越能学到高频的部分</strong>，可被用作分解工具，可解释性强。</p>
+<h3 id="7-Conclusions-and-Future-Work"><a href="#7-Conclusions-and-Future-Work" class="headerlink" title="7. Conclusions and Future Work"></a>7. Conclusions and Future Work</h3><p>将DTW核应用为<strong>特征提取器</strong>，提出了DTWNet框架。为了实现反向传播，通过动态规划评估了DTW距离，沿着确定规整路径的计算梯度，给出了DTW作为损失函数的理论研究，将DTW损失定义为分段二次/线性函数，描述了不同情况下的步长（为了跳出局部最优）。实验显示，在某些任务中DTW核比标准的卷积核表现好，评估了梯度计算核反向传播的有效性，给出了数据分解的应用。</p>
+<hr>
+<p>本文由腾讯AI Lab主导，与康涅狄格大学合作完成。深度神经网络在处理时间序列数据时，传统的闵可夫斯基距离不适合作为反应序列相似度的损失函数，而动态时间规整算法（DTW）可以更好地计算序列距离，<strong>因此可以用作深度网络中的损失函数和特征提取算子</strong>。<br>本文提出了一种新的估计方法，使得DTW在作为算子时可以估计输入的梯度，从而实现神经网络中的反向传播。该方法首次分析了DTW作为损失函数的函数形态和应用梯度下降法的收敛性，并且首次提出了基于部分序列匹配的DTW梯度更新算法。实验结果表明，该方法作为一种新的特征抽取手段，可以<strong>更好地提取时间序列数据中的特征</strong>。此外，本文提出的梯度估算方法在实验中展现了良好的<strong>收敛性</strong>。本文也创造性地提出了该方法在<strong>数据分解</strong>上的拓展性应用。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90IEEE2019%E3%80%91notes_A%20Hierarchical%20Neural%20Network%20for%20Sleep%20Stage%20Classification%20Based%20on%20Comprehensive%20Feature%20Learning%20and%20Multi-Flow%20Sequence%20Learning/" rel="prev" title="syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning">
+      <i class="fa fa-chevron-left"></i> syd 【IEEE2019】A Hierarchical Neural Network for Sleep Stage Classification based on Comprehensive Feature Learning and Multi-flow Sequence Learning
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/07/SongYudan/%E3%80%90ICML2017%E3%80%91notes_Bidirectional%20Learning%20for%20Time-series%20Models%20with%20Hidden%20Units/" rel="next" title="syd 【ICML207】Bidirectional Learning for Time-series Models with Hidden Units">
+      syd 【ICML207】Bidirectional Learning for Time-series Models with Hidden Units <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">3.</span> <span class="nav-text">2. Related Work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Proposed-DTW-Layer-and-its-Backpropogation"><span class="nav-number">4.</span> <span class="nav-text">3. Proposed DTW Layer and its Backpropogation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-DTW-Loss-and-Convergence"><span class="nav-number">5.</span> <span class="nav-text">4. DTW  Loss and Convergence</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Streaming-DTW-Learning"><span class="nav-number">6.</span> <span class="nav-text">5. Streaming DTW Learning</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Experiments-and-Applications"><span class="nav-number">7.</span> <span class="nav-text">6. Experiments and Applications</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Conclusions-and-Future-Work"><span class="nav-number">8.</span> <span class="nav-text">7. Conclusions and Future Work</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

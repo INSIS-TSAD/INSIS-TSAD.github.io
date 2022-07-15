@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="题    目：一种严格的对于时间序列可解释性的评估方法 出    处：ICCV2019 关键词：时间序列，可解释性 ​        可解释的人工智能(XAI)方法通常被用于解释和调试黑盒机器学习模型。然而，大多数提出的XAI方法都是黑盒本身的，并且是为图像设计的。因此，他们依靠视觉上的可解释性来评估和证明解释。在这项工作中，我们应用了以前用于时间序列上的图像和文本域的XAI方法。我们提出了一种方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mzy 【ICCV-2019】一种严格的对于时间序列可解释性的评估方法">
+<meta property="og:url" content="http://example.com/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="题    目：一种严格的对于时间序列可解释性的评估方法 出    处：ICCV2019 关键词：时间序列，可解释性 ​        可解释的人工智能(XAI)方法通常被用于解释和调试黑盒机器学习模型。然而，大多数提出的XAI方法都是黑盒本身的，并且是为图像设计的。因此，他们依靠视觉上的可解释性来评估和证明解释。在这项工作中，我们应用了以前用于时间序列上的图像和文本域的XAI方法。我们提出了一种方">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140342914.png">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-394f4995a0959c73c170618dafdcd797_1440w.jpg">
+<meta property="og:image" content="https://pic3.zhimg.com/80/v2-e1c59900784c404e09e0e91122672f06_1440w.jpg">
+<meta property="og:image" content="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140404595.png">
+<meta property="og:image" content="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140414381.png">
+<meta property="og:image" content="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140423790.png">
+<meta property="article:published_time" content="2022-04-13T12:24:24.000Z">
+<meta property="article:modified_time" content="2022-04-13T06:22:13.163Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="可解释">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140342914.png">
+
+<link rel="canonical" href="http://example.com/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mzy 【ICCV-2019】一种严格的对于时间序列可解释性的评估方法 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/04/13/MaZhaoyang/%E4%B8%80%E7%A7%8D%E4%B8%A5%E6%A0%BC%E7%9A%84%E5%AF%B9%E4%BA%8E%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E8%AF%84%E4%BC%B0%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mzy 【ICCV-2019】一种严格的对于时间序列可解释性的评估方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-04-13 20:24:24 / Modified: 14:22:13" itemprop="dateCreated datePublished" datetime="2022-04-13T20:24:24+08:00">2022-04-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mzy/" itemprop="url" rel="index"><span itemprop="name">mzy</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>题    目：</strong>一种严格的对于时间序列可解释性的评估方法</p>
+<p><strong>出    处：</strong>ICCV2019</p>
+<p><strong>关键词：</strong>时间序列，可解释性</p>
+<p>​        可解释的人工智能(XAI)方法通常被用于解释和调试黑盒机器学习模型。然而，大多数提出的XAI方法都是黑盒本身的，并且是为图像设计的。因此，他们依靠视觉上的可解释性来评估和证明解释。在这项工作中，我们应用了以前用于时间序列上的图像和文本域的XAI方法。我们<strong>提出了一种方法来测试和评估时间序列上的各种XAI方法</strong>，通过引入新的验证方法来纳入时间维度。我们进一步进行了初步实验，以评估在一系列数据集上使用各种验证方法对所选择的XAI方法解释的质量，并对其进行质量指标的检查。我们证明，在我们最初的实验中，Shap对所有模型都很有效，但其他模型如DeepLIFT、LRP和显著性地图在特定架构中工作得更好。</p>
+<a id="more"></a>
+<h3 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h3><p>​       由于深度学习在很多领域先进的表现，这种复杂模型的可解释性引起了越来越多的兴趣。机器学习系统的需求（公平性、隐私性、可靠性、信任构建）为模型提供了一个新的选择过程。</p>
+<p>​        许多突出的XAI方法都是<strong>针对特定的输入类型而定制</strong>的，例如：图像=&gt;显著性图，文本=&gt;LRP。然而，例如，视频（图像序列）和音频有另一个时间维度，这是目前被XAI方法省略的。目前，XAI对时间序列数据的研究非常有限。然而，由于传感器越来越便宜，除了视频和音频之外，还会产生更多面向时间的数据，因此，首先测试已经突出的XAI方法和发现新的方法是很重要的。</p>
+<p>​        因为原始时间序列很大，即使是领域专家自己也难以解释，因此通过原始数据进行评估和解释检查是不可行的。由于缺乏可连接的领域知识，需要一种可量化的方法来验证解释。在计算机视觉中存在一些关于评估可解释性的工作（例如，将相关像素设置为零），这也可以在时间序列上使用。然而，这些方法通过假设特征独立性或仅局部（短期）依赖来省略时间依赖。因此，需要对先前方法的适应或新的变体来评估对时间序列的解释。</p>
+<h3 id="2-时间序列可解释性"><a href="#2-时间序列可解释性" class="headerlink" title="2. 时间序列可解释性"></a>2. 时间序列可解释性</h3><p>​        时间序列D的分类数据集，包括属于k个类$c<em>{1}, c</em>{2}, c<em>{3}, \ldots, c</em>{k}$。的n个样本。每一个样本t由m个时间点组成$t=\left(t<em>{0}, t</em>{1}, t<em>{2}, \ldots, t</em>{m}\right)$</p>
+<p>​       对大多数XAI方法通常考虑的解释是局部特征的重要性，时间点转换为特性，以引入在时间序列上使用XAI方法的解决方案。局部特征的重要性产生了对每个时间点t<sub>i</sub>的相关性r<sub>i</sub>，然后可以建立一个时间序列向量$t=\left(t<em>{0}, t</em>{1}, t<em>{2}, \ldots, t</em>{m}\right)$对应的一个相关向量$r=\left(r<em>{0}, r</em>{1}, r<em>{2}, \ldots, r</em>{m}\right)$。</p>
+<p>​        模型m从D的子集X以及标签Y训练得到。模型m根据给定的数据X,Y进行训练，并用于新的子集Xnew的预测。在时间序列任务中，x是一个由m个时间点组成的样本$t=\left(t<em>{0}, t</em>{1}, t<em>{2}, \ldots, t</em>{m}\right)$，一个可解释性方法可以被定义为$x a i(x, m)=e x p$，其中exp是指事后解释。对于时间序列，exp往往是指m个时间点的相关性$r=\left(r<em>{0}, r</em>{1}, r<em>{2}, \ldots, r</em>{m}\right)$。</p>
+<p>​        与图像上的显著性图类似，可以基于相关性创建一个热图，可以用这个热图来丰富原始时间序列的线形图来创建一个可视化。与领域知识一起，专家可以检查所产生的解释可视化，以定性地验证结果。</p>
+<p>​        使用的数据集是FordA时间序列集，模型使用的是ResNet。</p>
+<p>​        FordA任务中每条数据是包含500个汽车发动机噪音测量值的时间序列，基于这个时间序列来判断汽车发动机是否有问题。</p>
+<p>​        <strong>上图中，蓝色曲线表示为选取的一条FordA数据，红线表示数据中每个点的特征重要度</strong>。</p>
+<p>​        红线颜色越深表示该点的特征对于输出影响越大，红色越浅表示影响越小。</p>
+<p>​        <strong>上图中三个蓝色框标记的数据点表示为对输出有明显影响的特征</strong>，SHAP、LRP和DeepLIFT三种算法对于这类特征有明显的划分。</p>
+<p><img src="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140342914.png" alt="image-20220413140342914"></p>
+<blockquote>
+<p>LIME：一种和模型无关的局部可解析性算法。</p>
+<p>Scaliency Maps: 基于反向传播梯度生成heatmap，显示输入像素对于输出的影响。</p>
+<p>LRP: 基于反向传播relevance score生成heatmap。(主要用于图像领域，目前有不少nlp方向的应用)</p>
+<p>DeepLIFT: 一种改进的基于反向传播梯度生成heatmap的算法。</p>
+<p>SHAP: 基于博弈论shapely值计算特征的重要度。</p>
+</blockquote>
+<h3 id="3-评估时间序列的可解释性"><a href="#3-评估时间序列的可解释性" class="headerlink" title="3. 评估时间序列的可解释性"></a>3. 评估时间序列的可解释性</h3><p>​        关于如何自动评估和验证XAI解释，有多种方法。在计算机视觉中，一种常见的方法是扰动分析。这种分析方法根据图像的重要性（最大或最小相关像素）替换图像的几个像素。考虑到面向时间的数据的序列特性，我们提出了两种明确适用于时间序列的新方法。</p>
+<p><strong>a. 首先通过可解释性算法计算时间序列中每个时间点ti对应的特征重要度ri</strong>：</p>
+<p><img src="https://pic4.zhimg.com/80/v2-394f4995a0959c73c170618dafdcd797_1440w.jpg" alt="img" style="zoom:80%;" /></p>
+<p><strong>b.扰动时间序列：Pertubation on time series</strong></p>
+<p><img src="https://pic3.zhimg.com/80/v2-e1c59900784c404e09e0e91122672f06_1440w.jpg" alt="img"></p>
+<p><strong>c.基于时间序列特征的扰动方法：</strong></p>
+<p>​        在b中两种对于时间序列的扰动方法并不能保证对输出会有很大的影响。</p>
+<p>​        如果模型能学到时间序列上的波动趋势，那么仅扰动离散的几个时间点，并不能保证随机扰动和有选择扰动两种方式对于输出的影响有很大的差异。</p>
+<p>​         由此，作者又提出专门针对时间序列特性的扰动方法：</p>
+<p><strong>swap time points</strong>：选取扰动时间点<strong>ti</strong>周围<strong>ns</strong>个时间点作为一个需要扰动的时间子序列，将其逆序插回原来的时间序列。</p>
+<p><img src="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140404595.png" alt="image-20220413140404595"></p>
+<p><strong>mean time points</strong>： 选取扰动时间点<strong>ti</strong>周围<strong>ns</strong>个时间点作为一个需要扰动的时间子序列，取其平均后插回原来的时间序列。</p>
+<p><img src="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140414381.png" alt="image-20220413140414381"></p>
+<h3 id="4-实验结果"><a href="#4-实验结果" class="headerlink" title="4. 实验结果"></a>4. 实验结果</h3><p><img src="https://flyingimage.oss-cn-beijing.aliyuncs.com/image-20220413140423790.png" alt="image-20220413140423790"></p>
+<p>分别实验了5种可解释性算法在3种模型上的效果，其中分别用4种扰动方法比较准确率的波动。</p>
+<p>CNN：在都使用CNN模型的情况下，基于LRP和DeepLIFT算法的扰动效果最好。</p>
+<p>RNN：在都使用RNN模型的情况下，基于Saliency和SHAP算法的扰动效果最好。</p>
+<p>ResNet：在都是用ResNet模型的情况下，基于SHAP算法的扰动效果最好。</p>
+<p>综上所述：</p>
+<p>（1）作者认为SHAP算法鲁棒性最强，在解析各种模型时都有较好的效果。</p>
+<p>（2）基于LRP和DeepLIFT这类基于反向回传的可解性算法在cnn模型表现更好。</p>
+<p>（3） LIME算法在解析各类模型时表现最差。</p>
+<p>（4）使用swap和mean扰动时间序列时，更能区分随机扰动和选择性扰动的效果。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%8F%AF%E8%A7%A3%E9%87%8A/" rel="tag"># 可解释</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/13/WangXuehui/AdaRNN%20Adaptive%20Learning%20and%20Forecasting%20of%20Time%20Series%E3%80%90CIKM%202021%E3%80%91/" rel="prev" title="wxh【CIKM-2021】AdaRNN--Adaptive Learning and Forecasting of Time Series">
+      <i class="fa fa-chevron-left"></i> wxh【CIKM-2021】AdaRNN--Adaptive Learning and Forecasting of Time Series
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/07/15/ShaoShikuan/Transfer%20Learning%20for%20Anomaly%20Detection%20through%20Localized%20and%20Unsupervised%20Instance%20Selection/" rel="next" title="ssk Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection">
+      ssk Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%BC%95%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">1. 引言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">2. 时间序列可解释性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E8%AF%84%E4%BC%B0%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text">3. 评估时间序列的可解释性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">4.</span> <span class="nav-text">4. 实验结果</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

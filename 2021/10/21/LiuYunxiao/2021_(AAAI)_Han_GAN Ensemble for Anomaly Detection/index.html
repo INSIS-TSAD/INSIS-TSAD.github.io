@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="1.研究背景当异常检测形式化为一个无监督的学习问题时，通常需要模型学习正常数据的分布。基于GAN的方法以及改进版本已经被提出。很多工作主要是修改生成器的结构。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lyx GAN ensemble for anomaly detection">
+<meta property="og:url" content="http://example.com/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="1.研究背景当异常检测形式化为一个无监督的学习问题时，通常需要模型学习正常数据的分布。基于GAN的方法以及改进版本已经被提出。很多工作主要是修改生成器的结构。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114049170.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114208417.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114227885.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114337312.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114411780.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114423492.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114434333.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114445317.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114523041.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114532072.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114542638.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114553207.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114609434.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114618807.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114627399.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114638379.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114655086.png">
+<meta property="og:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114708627.png">
+<meta property="article:published_time" content="2021-10-21T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-10-21T03:49:03.367Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="GAN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114049170.png">
+
+<link rel="canonical" href="http://example.com/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>lyx GAN ensemble for anomaly detection | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/21/LiuYunxiao/2021_(AAAI)_Han_GAN%20Ensemble%20for%20Anomaly%20Detection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          lyx GAN ensemble for anomaly detection
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-10-21 20:24:24 / Modified: 11:49:03" itemprop="dateCreated datePublished" datetime="2021-10-21T20:24:24+08:00">2021-10-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/lyx/" itemprop="url" rel="index"><span itemprop="name">lyx</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-研究背景"><a href="#1-研究背景" class="headerlink" title="1.研究背景"></a>1.研究背景</h1><p>当异常检测形式化为一个无监督的学习问题时，通常需要模型学习正常数据的分布。基于GAN的方法以及改进版本已经被提出。很多工作主要是修改生成器的结构。</p>
+<a id="more"></a> 
+<h1 id="2-研究动机"><a href="#2-研究动机" class="headerlink" title="2.研究动机"></a>2.研究动机</h1><p>GAN方法存在模式塌陷以及训练不稳定的问题。</p>
+<p>图像生成任务中相关的研究表明GAN集成通常比单个GAN更加稳定。</p>
+<p>因此，本研究提供了构造基于GAN的异常检测方法进行集成，从而更好提高异常检测性能。</p>
+<h1 id="3-基于GAN的异常检测集成方法"><a href="#3-基于GAN的异常检测集成方法" class="headerlink" title="3. 基于GAN的异常检测集成方法"></a>3. 基于GAN的异常检测集成方法</h1><h2 id="3-1-基于GAN的异常检测模型"><a href="#3-1-基于GAN的异常检测模型" class="headerlink" title="3.1 基于GAN的异常检测模型"></a>3.1 基于GAN的异常检测模型</h2><p>基于GAN的异常检测模型通常包含一个编码-解码结构的生成器和一个分类模型作为解码器。现有的一些基于GAN的异常检测模型都可以统一到这个框架中 (f-AnoGAN, EGBAD, GANomaly, Skip-GANomaly等)。</p>
+<p><strong>生成器</strong>：通常由一个编码网络和一个解码网络组成</p>
+<p>​            编码网络：$G<em>{e}(\cdot,\phi):\mathbb{R}^d \rightarrow \mathbb{R}^{d’}$，解码网络： $G</em>{d}(\cdot,\psi):\mathbb{R}^{d’} \rightarrow \mathbb{R}^{d}$;</p>
+<p>​                                 $\bold{z}=G<em>{e}(\bold{x},\phi) , \tilde{\bold{x}}=G</em>{d}(\bold{z},\psi)$</p>
+<p><strong>鉴别器</strong>：$D(\cdot,\gamma): \mathbb{R}^d \rightarrow \mathbb{R}$</p>
+<p>基于GAN的异常检测模型通常会考虑以下四种损失函数：</p>
+<ol>
+<li>对抗损失<ol>
+<li>vanilla GAN：$L_{a-g}(\bold{x}) = \log {D(x)+\log ({1-D(G_d(G_e(\bold{x})))}})$</li>
+<li>WGAN：$L_{a-wg}(\bold{x}) = D(\bold{x}) + D(G_d(\tilde{\bold{z}}))$</li>
+<li>BiGAN：$L_{a-bg}(\bold{x}) = \log {D(\bold{x}, G_e(\bold{x}))+\log ({1-D(G_d(G_d(\tilde{\bold{z}}),\tilde{\bold{z}})}})$</li>
+</ol>
+</li>
+<li>重构损失：$L_r(\bold{x})=||\bold{x}-G_d(G_e(\bold{x}))||_l^{l}$</li>
+<li>鉴别损失：$L_d(\bold{x})=||f_D(\bold{x})-f_D(G_d(G_e(\bold{x})))||_l^{l}$</li>
+<li>编码损失：$L_e(\bold{x})=||G_e(\bold{x};\phi)-G_e(G_d(G_e(\bold{x};\phi));\tilde{\phi})||_l^l$</li>
+</ol>
+<p>为训练鉴别器，这些GAN的模型需要最小化对抗损失；</p>
+<script type="math/tex; mode=display">
+\max_\limits{\gamma} \quad \sum_{i=1}^{N}L_a(\bold{x}_i;\phi, \psi, \gamma)</script><p>而为了训练生成器，这些GAN模型需要最小化上面提到的四种损失函数。</p>
+<script type="math/tex; mode=display">
+\min_\limits{\phi, \psi, \tilde{\phi}} \quad \sum_{i=1}^{N} \alpha_1 L_a(\bold{x}_i;\phi, \psi, \gamma)
++\alpha_2 L_r(\bold{x}_i;\phi, \psi)
++\alpha_3 L_e(\bold{x}_i;\phi, \psi, \tilde{\phi})
++ \alpha_4 L_d(\bold{x}_i;\phi, \psi, \gamma) \\</script><p>训练完成之后，异常分数通常是重构误差和鉴别损失的加权和：</p>
+<script type="math/tex; mode=display">
+A(\bold{x}’)=L_r(\bold{x}’) + \beta L_d(\bold{x}’ )</script><p>几个基于GAN的异常检测方法：</p>
+<p><strong>f-AnoGAN</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114049170.png" alt="image-20211021114049170"></p>
+<p><strong>鉴别器</strong>：</p>
+<script type="math/tex; mode=display">
+\max_\limits{\gamma} \quad \sum_{i=1}^{N}L_a(\bold{x}_i;\phi, \psi, \gamma)\\</script><p>采用WGAN的对抗损失$L_{a-bg}(\bold{x}) = \log {D(\bold{x}, G_e(\bold{x}))+\log ({1-D(G_d(G_d(\tilde{\bold{z}}),\tilde{\bold{z}})}})$。</p>
+<p><strong>生成器</strong>：</p>
+<script type="math/tex; mode=display">
+\min_\limits{\phi, \psi, \tilde{\phi}} \quad \sum_{i=1}^{N} \alpha_1 L_a(\bold{x}_i;\phi, \psi, \gamma)
++\alpha_2 L_r(\bold{x}_i;\phi, \psi)
++\alpha_3 L_e(\bold{x}_i;\phi, \psi, \tilde{\phi})
++ \alpha_4 L_d(\bold{x}_i;\phi, \psi, \gamma) \\
+\alpha_2 = \alpha_3 =  \alpha_4 = 0;</script><p>生成器只利用了对抗损失。</p>
+<p>然后固定鉴别器和生成器，以$\alpha_1=\alpha_3=0$训练编码器。</p>
+<p><strong>EGBAN</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114208417.png" alt="image-20211021114208417"></p>
+<p><strong>鉴别器</strong>：</p>
+<script type="math/tex; mode=display">
+\max_\limits{\gamma} \quad \sum_{i=1}^{N}L_a(\bold{x}_i;\phi, \psi, \gamma)\\</script><p>采用BiGAN的对抗损失$L_{a-bg}(\bold{x}) = \log {D(\bold{x}, G_e(\bold{x}))+\log ({1-D(G_d(G_d(\tilde{\bold{z}}),\tilde{\bold{z}})}})$。</p>
+<p><strong>生成器</strong>：</p>
+<script type="math/tex; mode=display">
+\min_\limits{\phi, \psi, \tilde{\phi}} \quad \sum_{i=1}^{N} \alpha_1 L_a(\bold{x}_i;\phi, \psi, \gamma)
++\alpha_2 L_r(\bold{x}_i;\phi, \psi)
++\alpha_3 L_e(\bold{x}_i;\phi, \psi, \tilde{\phi})
++ \alpha_4 L_d(\bold{x}_i;\phi, \psi, \gamma) \\
+\alpha_2 = \alpha_3 = \alpha_4 = 0;</script><p>生成器只利用了对抗损失。</p>
+<p><strong>GANomaly</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114227885.png" alt="image-20211021114227885"></p>
+<p><strong>鉴别器</strong>：</p>
+<script type="math/tex; mode=display">
+\max_\limits{\gamma} \quad \sum_{i=1}^{N}L_a(\bold{x}_i;\phi, \psi, \gamma)\\</script><p>采用VanillaGAN的对抗损失$L_{a-g}(\bold{x}) = \log {D(x)+\log ({1-D(G_d(G_e(\bold{x})))}})$。</p>
+<p><strong>生成器</strong>：</p>
+<script type="math/tex; mode=display">
+\min_\limits{\phi, \psi, \tilde{\phi}} \quad \sum_{i=1}^{N} \alpha_1 L_a(\bold{x}_i;\phi, \psi, \gamma)
++\alpha_2 L_r(\bold{x}_i;\phi, \psi)
++\alpha_3 L_e(\bold{x}_i;\phi, \psi, \tilde{\phi})
++ \alpha_4 L_d(\bold{x}_i;\phi, \psi, \gamma) \\</script><p>生成器利用了上述所说的各种损失函数，唯一例外的是异常分数使用了$L_r$。</p>
+<p><strong>Skip-GANomaly</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114337312.png" alt="image-20211021114337312"></p>
+<p>训练生成器的时候没有使用编码误差。</p>
+<h2 id="3-2-基于GAN异常检测算法的集成学习"><a href="#3-2-基于GAN异常检测算法的集成学习" class="headerlink" title="3.2 基于GAN异常检测算法的集成学习"></a>3.2 基于GAN异常检测算法的集成学习</h2><p>一组生成器：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114411780.png" alt="image-20211021114411780"></p>
+<p>一组鉴别器：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114423492.png" alt="image-20211021114423492"></p>
+<p>将生成器和鉴别器两类配对，将索引为(i,j)的生成器和鉴别器对的对抗损失和鉴别损失记做：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114434333.png" alt="image-20211021114434333"></p>
+<p>类似的，将每个生成器的重构损失和编码损失记为：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114445317.png" alt="image-20211021114445317"></p>
+<p><strong>集成GAN异常检测的目标是：</strong></p>
+<p>最大化对抗损失的和训练鉴别器，同时最小化生成器的损失训练鉴别器：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114523041.png" alt="image-20211021114523041"></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114532072.png" alt="image-20211021114532072"></p>
+<p>异常评分是来自多个生成器和鉴别器的平均：</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114542638.png" alt="image-20211021114542638"></p>
+<h1 id="4-实验评估"><a href="#4-实验评估" class="headerlink" title="4. 实验评估"></a>4. 实验评估</h1><h2 id="4-1-数据集"><a href="#4-1-数据集" class="headerlink" title="4.1 数据集"></a>4.1 数据集</h2><ul>
+<li>KDD99 </li>
+<li>OCT</li>
+<li>MNIST</li>
+<li>CIFAE-10</li>
+</ul>
+<h2 id="4-2-对比方法"><a href="#4-2-对比方法" class="headerlink" title="4.2 对比方法"></a>4.2 对比方法</h2><ul>
+<li>f-AnoGAN</li>
+<li>EGBAD </li>
+<li>GANomaly </li>
+<li>Skip-GANomaly</li>
+</ul>
+<p>实验设置：所有的实验都是利用3个生成器和3个鉴别器，即$I=J=3$。</p>
+<h2 id="4-3-性能比较"><a href="#4-3-性能比较" class="headerlink" title="4.3 性能比较"></a>4.3 性能比较</h2><p><strong>MNIST数据集上构造了10个异常检测任务，每类数字作为异常类，其余的9类作为正常数据。性能如表1所示。</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114553207.png" alt="image-20211021114553207"></p>
+<p><strong>CIFAR10数据集上也是构造了10个异常检测任务。结果如表2所示。</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114609434.png" alt="image-20211021114609434"></p>
+<p><strong>OCT数据集，三类任务</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114618807.png" alt="image-20211021114618807"></p>
+<p><strong>KDD99数据集</strong></p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114627399.png" alt="image-20211021114627399"></p>
+<h2 id="4-4-集成大小分析"><a href="#4-4-集成大小分析" class="headerlink" title="4.4 集成大小分析"></a>4.4 集成大小分析</h2><p>生成模型和鉴别模型的数目在{1,3,5,7}之间变化。</p>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114638379.png" alt="image-20211021114638379"></p>
+<h2 id="4-5-Encoding-vector和hidden-vector分析"><a href="#4-5-Encoding-vector和hidden-vector分析" class="headerlink" title="4.5 Encoding vector和hidden vector分析"></a>4.5 Encoding vector和hidden vector分析</h2><p>Encoding vector：指的是从编码器的编码输出</p>
+<p>hidden vector： 指的是鉴别器最后一个隐层的输出</p>
+<p>集成模型的Encoding vector 和hidden vector取得是多个模型的平均。</p>
+<ul>
+<li>如图4(a),4(b)所示，正常样本和异常样本的encoding vector混合在一起。意味着重构误差并不能将异常和正常样本分开。</li>
+<li>如图4(b)所示，在基模型的鉴别器中，训练样本和测试样本得到了不同的表示，意味着单个模型的鉴别器可能会过拟合训练数据。而如图4(e)所示，集成训练展示了训练数据和测试数据的表示是类似的。</li>
+<li>如图4(c)所示，单个模型的鉴别器不能区分测试正常和异常样本，图4(f)所示，异常和正常似乎有一些区分。</li>
+</ul>
+<p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114655086.png" alt="image-20211021114655086"></p>
+<h2 id="4-6-参数-beta"><a href="#4-6-参数-beta" class="headerlink" title="4.6 参数$\beta$"></a>4.6 参数$\beta$</h2><p><img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20211021114708627.png" alt="image-20211021114708627"></p>
+<p>$\beta$：表示重构损失与鉴别损失的相对权重。</p>
+<p>随着$\beta$值的增加，鉴别损失对于异常评分的贡献越大，检测性能提高。说明鉴别损失对于异常检测是重要的。</p>
+<p>与基模型相比，对于大的$\beta$值，集成模型提升更多。表明集成模型主要是提高了基模型的鉴别损失。</p>
+<h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5. 总结"></a>5. 总结</h1><ul>
+<li>本文对现有的基于GAN的异常检测方法进行了框架统一；</li>
+<li>本文主要介绍了将现有的基于GAN的异常检测算法的集成方法；</li>
+<li>本文在多个领域的实验结果表明集成方法确实得到了更好的性能。并且也从编码向量和隐向量的角度验证了理论分析以及集成学习的益处。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/GAN/" rel="tag"># GAN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/" rel="prev" title="【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction">
+      <i class="fa fa-chevron-left"></i> 【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/02/23/SongYudan/%E3%80%90TNSRE2021%E3%80%91%E5%9F%BA%E4%BA%8E%E6%B3%A8%E6%84%8F%E5%8A%9B%E7%9A%84%E5%8D%95%E5%AF%BCEEG%E7%9D%A1%E7%9C%A0%E5%88%86%E6%9C%9F%E6%96%B9%E6%B3%95/" rel="next" title="syd【TNSRE 2021】AttnSleep:基于注意力的单导EEG睡眠分期方法">
+      syd【TNSRE 2021】AttnSleep:基于注意力的单导EEG睡眠分期方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E7%A0%94%E7%A9%B6%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">1.研究背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E7%A0%94%E7%A9%B6%E5%8A%A8%E6%9C%BA"><span class="nav-number">2.</span> <span class="nav-text">2.研究动机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E5%9F%BA%E4%BA%8EGAN%E7%9A%84%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E9%9B%86%E6%88%90%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">3. 基于GAN的异常检测集成方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-%E5%9F%BA%E4%BA%8EGAN%E7%9A%84%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 基于GAN的异常检测模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-%E5%9F%BA%E4%BA%8EGAN%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95%E7%9A%84%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 基于GAN异常检测算法的集成学习</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E5%AE%9E%E9%AA%8C%E8%AF%84%E4%BC%B0"><span class="nav-number">4.</span> <span class="nav-text">4. 实验评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 数据集</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-%E5%AF%B9%E6%AF%94%E6%96%B9%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 对比方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 性能比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-%E9%9B%86%E6%88%90%E5%A4%A7%E5%B0%8F%E5%88%86%E6%9E%90"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 集成大小分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-Encoding-vector%E5%92%8Chidden-vector%E5%88%86%E6%9E%90"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 Encoding vector和hidden vector分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-%E5%8F%82%E6%95%B0-beta"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 参数$\beta$</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5. 总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

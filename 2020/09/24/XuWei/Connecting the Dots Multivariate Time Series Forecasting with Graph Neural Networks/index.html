@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="论文信息题目: Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks 会议: KDD 2020 作者: Introduction摘要 多元时间序列建模一直是一个热门主题，吸引了来自不同领域的研究人员，包括经济、金融和交通。多元时间序列预测背后的一个基本假设是，其变量相互依赖，但仔细观">
+<meta property="og:type" content="article">
+<meta property="og:title" content="xw Connecting the Dots Multivariate Time Series Forecasting with Graph Neural Networks">
+<meta property="og:url" content="http://example.com/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="论文信息题目: Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks 会议: KDD 2020 作者: Introduction摘要 多元时间序列建模一直是一个热门主题，吸引了来自不同领域的研究人员，包括经济、金融和交通。多元时间序列预测背后的一个基本假设是，其变量相互依赖，但仔细观">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007210738438.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007211843231.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007214453265.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008100536371.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007220142608.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007220652954.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007221752735.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092338113.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092414037.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092456714.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092605904.png">
+<meta property="og:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092637606.png">
+<meta property="article:published_time" content="2020-09-24T08:15:40.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:51:24.739Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时序预测">
+<meta property="article:tag" content="GCN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007210738438.png">
+
+<link rel="canonical" href="http://example.com/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>xw Connecting the Dots Multivariate Time Series Forecasting with Graph Neural Networks | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/09/24/XuWei/Connecting%20the%20Dots%20Multivariate%20Time%20Series%20Forecasting%20with%20Graph%20Neural%20Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          xw Connecting the Dots Multivariate Time Series Forecasting with Graph Neural Networks
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-09-24 16:15:40" itemprop="dateCreated datePublished" datetime="2020-09-24T16:15:40+08:00">2020-09-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:51:24" itemprop="dateModified" datetime="2021-01-16T11:51:24+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><p><strong>题目:</strong></p>
+<p><strong>Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks</strong></p>
+<p><strong>会议:</strong></p>
+<p>KDD 2020</p>
+<p><strong>作者:</strong><br><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007210738438.png" alt="image-20201007210738438"></p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><blockquote>
+<p>多元时间序列建模一直是一个热门主题，吸引了来自不同领域的研究人员，包括经济、金融和交通。多元时间序列预测背后的一个基本假设是，其变量相互依赖，但仔细观察，可以说现有方法无法完全利用变量对之间的潜在空间依赖性。同时，近年来，图神经网络（GNN）在处理关系依赖方面表现出了很高的能力。GNN需要用于信息传播的定义明确的图结构，这意味着它们无法直接应用于事先不知道相关性的多元时间序列。在本文中，我们<strong>提出了一个专门为多元时间序列数据设计的通用图神经网络框架</strong>。我们的方法<strong>通过图形学习模块自动提取变量之间的单向关系，可以轻松地将诸如变量属性之类的外部知识整合到其中</strong>。进一步<strong>提出了一种新颖的混合跳跃传播层和一个扩张的起始层来捕获时间序列内的空间和时间依赖性</strong>。在端到端框架中共同学习图学习，图卷积和时间卷积模块。实验结果表明，我们提出的模型在4个基准数据集中的3个方面优于最新的基线方法，并在提供额外结构信息的两个交通数据集上与其他方法相比具有同等的性能。</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="时空图神经网络"><a href="#时空图神经网络" class="headerlink" title="时空图神经网络"></a>时空图神经网络</h3><p><strong>图神经网络由于其置换不变性、局部连通性和组合性</strong>，在处理图数据方面取得了很大的成功。通过通过结构传播信息，<strong>图神经网络允许图中的每个节点都知道它的邻域</strong>。</p>
+<p>多元时间序列预测可以很自然地从图的角度来看待。<strong>多元时间序列中的变量可以看作是图中的节点，它们通过隐藏的依赖关系相互连接</strong>。因此，利用图神经网络对多变量时间序列数据进行建模是一种很有前途的方法，可以在充分利用时间序列之间的相关性的同时，保留多变量时间序列的时间轨迹。</p>
+<p><strong>最适合用于多变量时间序列的图神经网络类型是时空图神经网络</strong>。时空图神经网络以多元时间序列和外部图结构作为输入，预测多元时间序列的未来值或标签。与不利用结构信息的方法相比，时空图神经网络已经取得了显著的改进。</p>
+<h3 id="挑战"><a href="#挑战" class="headerlink" title="挑战"></a>挑战</h3><p><strong>挑战1:未知的图形结构。</strong>现有的GNN方法很大程度上依赖于预先设定的图结构来进行时间序列预测。在大多数情况下，多元时间序列没有明确的图结构。变量之间的关系必须从数据中发现，而不是作为基本真理知识提供。</p>
+<p><strong>挑战2:图形学习与处理GNN学习。</strong>虽然有图结构，但大多数GNN方法只关注消息传递(GNN学习)，忽略了图结构不是最优的，需要在训练时进行更新。接下来的问题是如何在端到端框架中同时学习时间序列的图结构和GNN。</p>
+<h3 id="模型总结"><a href="#模型总结" class="headerlink" title="模型总结"></a>模型总结</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007211843231.png" alt="image-20201007211843231" style="zoom:50%;" /></p>
+<p><strong>框架由三个核心组件组成:图学习层、图卷积模块和时序卷积模块。</strong></p>
+<ul>
+<li>针对挑战1，我们提出了一种新的图学习层，它基于数据自适应地表达稀疏图邻接矩阵。此外，我们开发了一个图卷积模块来解决变量之间的空间依赖性，给定由图学习层计算的邻接矩阵。</li>
+<li>最后，我们提出了一个时间卷积模块，通过改进一维卷积来捕获时间模式。它既能发现多频率的时间模式，又能处理很长的序列。</li>
+<li>由于所有参数都可以通过梯度下降来学习，因此提出的框架能够以端到端的方式对多元时间序列数据进行建模并同时学习内部图形结构</li>
+<li>将时间序列划分成子组，适用于长短的时间序列任务</li>
+</ul>
+<h3 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h3><p><strong>如图1所示，我们的框架由三个核心组件组成:图学习层、图卷积模块和时序卷积模块。</strong></p>
+<p><strong>1.据我们所知，这是第一次使用图形神经网络从基于图形的角度对多变量时间序列数据进行研究。</strong></p>
+<p><strong>2.我们提出了一个新的图学习模块来学习变量之间隐藏的空间依赖关系。该方法为GNN模型在处理数据时不需要明确的图结构打开了一扇新的大门。</strong></p>
+<p><strong>3.我们提出了一个建模多元时间序列数据和学习图结构的联合框架。我们的框架比任何现有的时空图神经网络更通用，因为它可以处理多变量时间序列，无论是否使用预先修改过的图结构。</strong></p>
+<p><strong>4.实验结果表明，我们的方法在4个基准数据集中的3个数据集上的性能优于现有的方法，并在两个提供额外结构信息的交通数据集上达到与其他GNNs相同的性能。</strong></p>
+<h3 id="FRAMEWORK-OF-MTGNN"><a href="#FRAMEWORK-OF-MTGNN" class="headerlink" title="FRAMEWORK OF MTGNN"></a>FRAMEWORK OF MTGNN</h3><p>图2所示，最高级别的MTGNN由学习层，m个图卷积模块，m个时间卷积模块和输出模块组成。 为了发现节点之间的隐藏关联，图学习层计算图邻接矩阵，该矩阵随后用作所有图卷积模块的输入。图卷积模块与时间卷积模块交错，分别捕获空间和时间相关性。  为了避免梯度消失的问题，将残余连接从时间卷积模块的输入添加到图卷积模块的输出。 在每个时间卷积模块之后添加跳过连接。 为了获得最终输出，输出模块将隐藏特征投影到所需的输出尺寸。 </p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007214453265.png" alt="image-20201007214453265"></p>
+<p><strong>时空卷积结合</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008100536371.png" alt="image-20201008100536371"></p>
+<p><em>红色是t时序卷积 蓝色是空间卷积</em></p>
+<h4 id="Graph-Learning-Layer"><a href="#Graph-Learning-Layer" class="headerlink" title="Graph Learning Layer"></a>Graph Learning Layer</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007220142608.png" alt="image-20201007220142608"></p>
+<p>$E$是随机的节点嵌入(可以进行预设。外部知识)，$\Theta$是模型参数</p>
+<h4 id="Graph-Convolution-Module"><a href="#Graph-Convolution-Module" class="headerlink" title="Graph Convolution Module"></a>Graph Convolution Module</h4><p>图卷积模块旨在将节点的信息与邻居的信息融合在一起，以处理图中的空间依赖性。 图卷积模块由两个混合跃点传播层组成，以分别处理通过每个节点的流入和流出信息。 通过将两个混合跳跃传播层的输出相加获得净流入信息。 下图显示了图卷积模块和mix-hop传播层的体系结构</p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007220652954.png" alt="image-20201007220652954"></p>
+<h5 id="Mix-hop"><a href="#Mix-hop" class="headerlink" title="Mix-hop"></a>Mix-hop</h5><p>给定一个图邻接矩阵，我们提出了混合跳跃传播层来处理信息流在空间上相关的节点。 所提出的混合跳跃传播层包括两个步骤-信息传播步骤和信息选择步骤。GC module 通过A和A的转置来整合双向的信息</p>
+<p><strong>信息传播：</strong></p>
+<script type="math/tex; mode=display">
+\mathrm{H}^{(k)}=\beta \mathrm{H}_{i n}+(1-\beta) \tilde{\mathrm{A}} \mathrm{H}^{(k-1)}</script><p><strong>信息选择:</strong></p>
+<script type="math/tex; mode=display">
+\mathbf{H}_{o u t}=\sum_{i=0}^{K} \mathbf{H}^{(k)} \mathbf{W}^{(k)}</script><p>k是传播的深度，$\mathbf{H}<em>{i n}$表示上一层产生的输入隐状态，$\mathbf{H}</em>{out}$表示当前层的输出</p>
+<p><strong>信息传播</strong>通过k次卷积运算，计算了k-hop的邻居</p>
+<p><strong>信息选择</strong>则进行信息选择和整合</p>
+<h4 id="Temporal-Convolution-Module"><a href="#Temporal-Convolution-Module" class="headerlink" title="Temporal Convolution Module"></a>Temporal Convolution Module</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201007221752735.png" alt="image-20201007221752735"></p>
+<p>sigmoid起着门控的作用，控制信息流入</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><h4 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h4><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092338113.png" alt="image-20201008092338113"></p>
+<h3 id="多元时间序列的单步预测"><a href="#多元时间序列的单步预测" class="headerlink" title="多元时间序列的单步预测"></a>多元时间序列的单步预测</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092414037.png" alt="image-20201008092414037"></p>
+<h3 id="多元时间序列的多步预测"><a href="#多元时间序列的多步预测" class="headerlink" title="多元时间序列的多步预测"></a>多元时间序列的多步预测</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092456714.png" alt="image-20201008092456714"></p>
+<h3 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h3><p><strong>数据集：METR-LA</strong></p>
+<p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092605904.png" alt="image-20201008092605904"></p>
+<h3 id="图学习方法对比"><a href="#图学习方法对比" class="headerlink" title="图学习方法对比"></a>图学习方法对比</h3><p><img src="https://imagebed-richado.oss-cn-beijing.aliyuncs.com/img/image-20201008092637606.png" alt="image-20201008092637606"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E5%BA%8F%E9%A2%84%E6%B5%8B/" rel="tag"># 时序预测</a>
+              <a href="/tags/GCN/" rel="tag"># GCN</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/21/XuWei/Adaptive%20Graph%20Convolutional%20Recurrent%20Network%20for%20Traffic%20Forecasting/" rel="next" title="xw Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting">
+      xw Adaptive Graph Convolutional Recurrent Network for Traffic Forecasting <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="nav-number">1.</span> <span class="nav-text">论文信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">2.1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E7%A9%BA%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">2.2.</span> <span class="nav-text">时空图神经网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%91%E6%88%98"><span class="nav-number">2.3.</span> <span class="nav-text">挑战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E6%80%BB%E7%BB%93"><span class="nav-number">2.4.</span> <span class="nav-text">模型总结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A1%E7%8C%AE"><span class="nav-number">2.5.</span> <span class="nav-text">贡献</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FRAMEWORK-OF-MTGNN"><span class="nav-number">2.6.</span> <span class="nav-text">FRAMEWORK OF MTGNN</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Graph-Learning-Layer"><span class="nav-number">2.6.1.</span> <span class="nav-text">Graph Learning Layer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Graph-Convolution-Module"><span class="nav-number">2.6.2.</span> <span class="nav-text">Graph Convolution Module</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Mix-hop"><span class="nav-number">2.6.2.1.</span> <span class="nav-text">Mix-hop</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Temporal-Convolution-Module"><span class="nav-number">2.6.3.</span> <span class="nav-text">Temporal Convolution Module</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C"><span class="nav-number">2.7.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">2.7.1.</span> <span class="nav-text">数据集</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%85%83%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E5%8D%95%E6%AD%A5%E9%A2%84%E6%B5%8B"><span class="nav-number">2.8.</span> <span class="nav-text">多元时间序列的单步预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%85%83%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E5%A4%9A%E6%AD%A5%E9%A2%84%E6%B5%8B"><span class="nav-number">2.9.</span> <span class="nav-text">多元时间序列的多步预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="nav-number">2.10.</span> <span class="nav-text">消融实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-number">2.11.</span> <span class="nav-text">图学习方法对比</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

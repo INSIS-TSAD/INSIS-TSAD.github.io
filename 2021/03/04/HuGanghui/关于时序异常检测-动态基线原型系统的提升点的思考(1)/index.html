@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="关于时序异常检测-动态基线原型系统的提升点的思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hgh 关于时序异常检测-动态基线原型系统的提升点的思考">
+<meta property="og:url" content="http://example.com/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="关于时序异常检测-动态基线原型系统的提升点的思考">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-04T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-03-08T05:32:18.211Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="时间序列">
+<meta property="article:tag" content="异常检测">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>hgh 关于时序异常检测-动态基线原型系统的提升点的思考 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hgh 关于时序异常检测-动态基线原型系统的提升点的思考
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-04 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-04T20:24:24+08:00">2021-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:32:18" itemprop="dateModified" datetime="2021-03-08T13:32:18+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="关于时序异常检测-动态基线原型系统的提升点的思考"><a href="#关于时序异常检测-动态基线原型系统的提升点的思考" class="headerlink" title="关于时序异常检测-动态基线原型系统的提升点的思考"></a>关于时序异常检测-动态基线原型系统的提升点的思考</h2><a id="more"></a>
+<h3 id="关于动态基线原型系统实时处理的思考"><a href="#关于动态基线原型系统实时处理的思考" class="headerlink" title="关于动态基线原型系统实时处理的思考"></a>关于动态基线原型系统实时处理的思考</h3><p>实时处理的逻辑是来一个点，处理一个点，目前动态基线使用的是STL/EMD分解+3Sigma/四分数来进行异常检测，并且当前的运行逻辑是类似批处理的概念，前端传入一个文件，包含一批数据，然后对这一批数据进行分解+异常检测。</p>
+<p>但如果使用改为流处理（实时处理）在异常检测方面的问题都不是很大，因为目前的3Sigma以及四分位数都已经使用上了流式的算法，一个是流式的均值计算，一个是流式的中位数（以及第一、三四分位数的计算）。</p>
+<p>因此，主要的关键问题就在于时序分解的实时化处理，当然，目前有一个非常简单的实现方式便是：</p>
+<p>当来一个点，结合之前的若干的点，比如1-2千个点，重新进行一下时序分解，来获取当前点的残差项，季节项以及趋势项，然后进行后续的异常检测，这里会存在稍微多一些的重复分解计算的工作。同时，工程上，可以有一个专门的缓存数组，来动态更新需要重复利用的那1-2千个点。</p>
+<h3 id="关于动态基线原型系统的判断时序数据是否有周期性的判定算法的调研"><a href="#关于动态基线原型系统的判断时序数据是否有周期性的判定算法的调研" class="headerlink" title="关于动态基线原型系统的判断时序数据是否有周期性的判定算法的调研"></a>关于动态基线原型系统的判断时序数据是否有周期性的判定算法的调研</h3><p>目前的动态基线原型系统是缺少对时序数据是否具有周期性的判定算法的，就不管是否真的具备周期性，都直接给ACF来获取该时序的周期，然后使用时序分解来进行分解。其实应该要有一个判定算法的。</p>
+<p>不过说起来，本身航信提供的数据大多都是tps-average之类的有周期性的数据，这么想的话，确实也不完全需要周期性判断算法。</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/266766105">AIOps在美团的探索与实践——故障发现篇</a>这篇博客里有提到美团关于如何进行时序分类的，详见其中的<strong>3.2 时序数据自动分类</strong>，同时，这里还有提到<strong>3.3 周期型指标异常检测</strong>，使用了类似学徒系统的有监督算法，当然也会有各种各样的问题，因此在<strong>3.3.5 特殊场景优化</strong>有专门的特殊的优化方式。</p>
+<h3 id="关于工业界目前前沿落地的其他时序异常检测算法"><a href="#关于工业界目前前沿落地的其他时序异常检测算法" class="headerlink" title="关于工业界目前前沿落地的其他时序异常检测算法"></a>关于工业界目前前沿落地的其他时序异常检测算法</h3><ul>
+<li><p>美团</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/266766105">AIOps在美团的探索与实践——故障发现篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&amp;mid=2651749742&amp;idx=1&amp;sn=b6bcf56ab7f11e765bdd4384e462bd0e&amp;chksm=bd12a4238a652d35668eb3b77023244fe17e2fd0759337723653eb3a38bdd0888039a6c5174d&amp;scene=21#wechat_redirect">数据库智能运维探索与实践</a></li>
+</ul>
+</li>
+<li><p>阿里云</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/93024.html?spm=a2c4g.11186623.6.873.25c5455fvPBuwl">日志服务机器学习功能</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/670718">SLS机器学习最佳实战：时序异常检测和报警</a></li>
+<li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/172130.html?spm=a2c4g.11186623.2.10.4e9a31e8sflG5L">流式统计算法异常检测</a></li>
+<li><a target="_blank" rel="noopener" href="https://help.aliyun.com/document_detail/172132.html?spm=a2c4g.11186623.2.10.16365bb9e0ovgD">流式图算法异常检测</a></li>
+<li><a target="_blank" rel="noopener" href="https://petecheng.github.io">https://petecheng.github.io</a> 一个浙大的同学，时序人公众号的作者，主要做的也是时序异常检测</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97/" rel="tag"># 时间序列</a>
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/03/JiaoZehui/Attention%20guided%20for%20partial%20domain%20adaptation(1)/" rel="prev" title="jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation">
+      <i class="fa fa-chevron-left"></i> jzh 【INFORMATION SCIENCES-2020】Attention guided for partial domain adaptation
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/" rel="next" title="hgh A时间序列异常检测论文阅读汇总">
+      hgh A时间序列异常检测论文阅读汇总 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text">关于时序异常检测-动态基线原型系统的提升点的思考</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E5%AE%9E%E6%97%B6%E5%A4%84%E7%90%86%E7%9A%84%E6%80%9D%E8%80%83"><span class="nav-number">1.1.</span> <span class="nav-text">关于动态基线原型系统实时处理的思考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%88%A4%E6%96%AD%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E6%98%AF%E5%90%A6%E6%9C%89%E5%91%A8%E6%9C%9F%E6%80%A7%E7%9A%84%E5%88%A4%E5%AE%9A%E7%AE%97%E6%B3%95%E7%9A%84%E8%B0%83%E7%A0%94"><span class="nav-number">1.2.</span> <span class="nav-text">关于动态基线原型系统的判断时序数据是否有周期性的判定算法的调研</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E5%B7%A5%E4%B8%9A%E7%95%8C%E7%9B%AE%E5%89%8D%E5%89%8D%E6%B2%BF%E8%90%BD%E5%9C%B0%E7%9A%84%E5%85%B6%E4%BB%96%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">关于工业界目前前沿落地的其他时序异常检测算法</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

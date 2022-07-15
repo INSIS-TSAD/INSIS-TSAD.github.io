@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="Improving EEG-Based Emotion Classification Using Conditional Transfer Learning[TOC] 信息期刊： Frontiers in Human Neuroscience, 2017 作者： Yuan-Pin Lin, National Sun Yat-sen University; Tzyy-Ping Jung, Unive">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning">
+<meta property="og:url" content="http://example.com/2021/01/06/JiaoZehui/Improving%20EEG-Based%20Emotion%20Classification%20Using%20Conditional%20Transfer%20Learning/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="Improving EEG-Based Emotion Classification Using Conditional Transfer Learning[TOC] 信息期刊： Frontiers in Human Neuroscience, 2017 作者： Yuan-Pin Lin, National Sun Yat-sen University; Tzyy-Ping Jung, Unive">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929164105930.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929165903471.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929170235650.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929171453556.png">
+<meta property="og:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929172435547.png">
+<meta property="article:published_time" content="2021-01-06T12:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:46:22.946Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="EEG">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929164105930.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/JiaoZehui/Improving%20EEG-Based%20Emotion%20Classification%20Using%20Conditional%20Transfer%20Learning/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/JiaoZehui/Improving%20EEG-Based%20Emotion%20Classification%20Using%20Conditional%20Transfer%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jzh mproving EEG-Based Emotion Classification Using Conditional Transfer Learning
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T20:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:46:22" itemprop="dateModified" datetime="2021-01-16T11:46:22+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Improving-EEG-Based-Emotion-Classification-Using-Conditional-Transfer-Learning"><a href="#Improving-EEG-Based-Emotion-Classification-Using-Conditional-Transfer-Learning" class="headerlink" title="Improving EEG-Based Emotion Classification Using Conditional Transfer Learning"></a>Improving EEG-Based Emotion Classification Using Conditional Transfer Learning</h1><p>[TOC]</p>
+<h2 id="信息"><a href="#信息" class="headerlink" title="信息"></a>信息</h2><p><strong>期刊：</strong> Frontiers in Human Neuroscience, 2017</p>
+<p><strong>作者：</strong> Yuan-Pin Lin, National Sun Yat-sen University; Tzyy-Ping Jung, University of California, San Diego</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>近年来，迁移学习在脑电信号挖掘领域受到越来越多的关注。然而，盲目的迁移学习也会导致负迁移现象。</p>
+<p>本研究提出了一个条件迁移(cTL)框架，以促进每个个体的正迁移。通过对26的个体进行实验，相比仅仅利用自身的数据，在valence分类上提升了15%，在arousal分类上提升了26%。</p>
+<p>简单来讲，cTL设置了一个阈值，如果准确率不高，则可以考虑迁移学习(利用其他相似个体的数据)，否则没必要进行迁移学习。</p>
+<a id="more"></a> 
+<h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong>EEG，emotion，transfer learning，classification</strong></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p><strong>现状：</strong> 为个体开发一个适应的模型效果应该是比较好的，但是因为缺乏数据，已经成为一个瓶颈问题。</p>
+<ul>
+<li><p>一个直接的方案是基于受试者群体的数据开发一个独立于受试者的分类模型，而不是为每个个体构建一个依赖于受试者的模型。如果个体之间的类分布在某种程度上是相似的，那应该有不错的效果。但是实际情况往往不满足这些情况，所以广义的分类器有时无法取得优秀的结果。</p>
+<blockquote>
+<p>Zhu J , Zheng W , Lu B . Cross-subject and Cross-gender Emotion Classification from EEG[J]. 2015.</p>
+</blockquote>
+</li>
+<li><p>另一个方案允许个体选择性地使模型适应来自其他受试者的数据或信息，从而可以在某种程度上减轻个体差异的影响。</p>
+<blockquote>
+<p>TCA: Zheng W L , Zhang Y Q , Zhu J Y , et al. Transfer components between subjects for EEG-based emotion recognition[C]// International Conference on Affective Computing &amp; Intelligent Interaction. IEEE, 2015.</p>
+<p>KPCA: Zheng W L, Lu B L. Personalizing EEG-based affective models with transfer learning[C]//Proceedings of the Twenty-Fifth International Joint Conference on Artificial Intelligence. 2016: 2732-2738.</p>
+<p>TPT: Sangineto E, Zen G, Ricci E, et al. We are not all equal: Personalizing models for facial expression analysis with transductive parameter transfer[C]//Proceedings of the 22nd ACM international conference on Multimedia. 2014: 357-366.</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="研究过程"><a href="#研究过程" class="headerlink" title="研究过程"></a>研究过程</h2><h3 id="假设-通过实验验证"><a href="#假设-通过实验验证" class="headerlink" title="假设(通过实验验证)"></a>假设(通过实验验证)</h3><ol>
+<li>本研究假设TL框架可以显著改善那些参与度低的受试者的分类器。</li>
+<li>本研究进一步假设由TL获得的分类性能的提高应该与目标域和源域中包含的受试者的相似程度正相关。</li>
+</ol>
+<h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p>Oscar soundtrack EEG dataset ，数据集由从26名健康受试者收集的30通道脑电图信号组成。音乐使用了16个30s音乐节选，并试图按照二维valence-arousal情绪模型归纳出四种情绪类别。</p>
+<p>本文中因为类别分类不平衡，将四分类问题改为两个二分类问题。</p>
+<h3 id="处理EEG信号"><a href="#处理EEG信号" class="headerlink" title="处理EEG信号"></a>处理EEG信号</h3><ol>
+<li>通过短时傅里叶变换+50%覆盖的汉明窗，通过1-50Hz的巴特沃斯滤波器获得了五个频带。</li>
+<li>通过DLAT对12导的五个频带进行处理，生成了60维特征，然后除以前5s的平均能量值，使用gain<br>model-based calibration method，使用z-transformed对特征进行归一化。</li>
+<li>使用ReliefF方法对特征空间进行选择，没有选择DLAT的全部空间。</li>
+<li>使用高斯朴素贝叶斯分类器进行分类。</li>
+</ol>
+<h3 id="迁移学习"><a href="#迁移学习" class="headerlink" title="迁移学习"></a>迁移学习</h3><p><strong>领域 (Domain)</strong>: 是进行学习的主体。领域主要由两部分构成： 数据和生成这些数据的概率分布。通常我们用花体 D 来表示一个 domain，用大写斜体 P 来表示一个概率分布。</p>
+<p>特别地，因为涉及到迁移，所以对应于两个基本的领域： <strong>源领域 (Source Domain) 和目标领域 (Target Domain)</strong>。源领域就是有知识、有大量数据标注的领域，是我们要迁移的对象；目标领域就是我们最终要赋予知识、赋予标注的对象。知识从源领域传递到目标领域，就完成了迁移 。</p>
+<h3 id="条件迁移学习框架"><a href="#条件迁移学习框架" class="headerlink" title="条件迁移学习框架"></a>条件迁移学习框架</h3><p><strong>when：</strong> 当由他们自己的数据训练，仅实现低于chance-level的准确性(即两类分类问题中的50%)。</p>
+<p><strong>how：</strong> 本研究基于其ReliefF排序的情感相关特征空间来表征主体间的相似性。相似性被定义为皮尔逊相关系数的值。即相关系数值越大，受试者越相似。</p>
+<p><strong>what：</strong> 本研究将所选样本集和相似样本集的数据连接在一起，开发一个更一般化但信息量更大的特征空间。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929164105930.png" alt="image-20200929164105930"></p>
+<p>​    <strong>条件迁移学习框架前提：</strong> 数据集共26人，25人看成源领域，1人看作目标领域。每个人数据由16次实验组成，实验中采用LTO方法，即每次利用15次实验数据去预测另一次实验的数据。</p>
+<ol>
+<li>计算源域和目标域的相似性，便于后续利用。</li>
+<li>选择O个最相似的人，和当前受试者的15次实验组成新的数据集，即O*16 + 15。</li>
+<li>为了在分类器建模过程中消除类别不平衡问题的影响，该步骤在500次重复的训练中随机选择类别平衡样本，试图产生最优但公平的训练模型。每次重复应用5倍交叉验证并且添加一个特征，即一次添加一个具有高ReliefF分数的特征。</li>
+<li>使用朴素高斯贝叶斯分类器进行重新分类。</li>
+</ol>
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929165903471.png" alt="image-20200929165903471"></p>
+<p>图2：纵轴为acc，横轴为目标域index。左边是valence，右边是arousal，灰色线是50%acc，也就是瞎蒙的水平。蓝色代表自身预测就比较好的，红色代表自身预测比较差的，数字代表第几位受试者。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929170235650.png" alt="image-20200929170235650"></p>
+<p>图3：横轴是添加源域的人数，也就是说使用迁移学习方法，我们决定引入源域多少人(1-25)。纵轴是效果，有提升也有下降。第一行是valence，第二行是arousal。第一列是添加的相似人数，第二列是添加的不相似人数。红色线代表原始数据效果不好使用迁移学习的变化，蓝色线代表原始数据效果好的使用迁移学习变化。灰色线是目标域所有的数据使用迁移学习后的结果。三角代表得出的最高点或者最低点。</p>
+<p>首先可以看出，本身效果就不错的实验，添加了其他人的数据，结果都会变差。这也证明了条件迁移的必要性。同时，添加相似的数据效果是比添加不相似的效果更好，但是二者最终趋于统一。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929171453556.png" alt="image-20200929171453556"></p>
+<p>图4：该图是通过上图的添加人数得出的新结果，valence为18人，arousal为12人。横轴为不相似性，即离得越远越不相似。纵轴为acc的变化率。灰色直线为线性回归线，三角形和原形均表示正迁移，叉号和加号均表示负迁移。红色代表添加相关数据，蓝色代表添加不相关数据。图中数字为受试者编号。第一列为原本结果优秀的人，第二列为原本结果比较差的人。</p>
+<p>从图中可以看到，蓝色普遍靠右，很容易理解，因为不相似性肯定更大。同时右侧结果普遍提升比较大，也证明了迁移学习对原本效果比较差的有较大提升。</p>
+<p><img src="https://jzh-markdown-pics.oss-cn-beijing.aliyuncs.com/img/image-20200929172435547.png" alt="image-20200929172435547"></p>
+<p>图5：图为4种方法的对比，default即最原始的方法，rTL则是将所有的数据都进行迁移学习，cTL则是当结果低于50%的时候进行迁移学习，oTL比较鸡贼，先迁移学习，如果发生了正迁移则采用，否则不适用迁移学习。<em>和*</em>是两个实验的假设检验。</p>
+<h2 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h2><h3 id="正迁移的时机"><a href="#正迁移的时机" class="headerlink" title="正迁移的时机"></a>正迁移的时机</h3><p>因此，本研究的动机是提出有条件的迁移学习，假设迁移学习将使结果表现较低的受试者受益，而不是那些表现相对较好的受试者。本研究直观地采用了高于或低于机会水平(即50%)的默认标准来推断是否进行迁移。</p>
+<h3 id="正迁移的相似性数据和不相似性数据"><a href="#正迁移的相似性数据和不相似性数据" class="headerlink" title="正迁移的相似性数据和不相似性数据"></a>正迁移的相似性数据和不相似性数据</h3><p>迁移学习的分类模型通过利用5-10个相似受试者获得了立即的改进，但是将所有可用的受试者集合在一起并不能绝对保证在使用相似或不相似源域受试者的情况下最大程度地提高性能。</p>
+<p>这项研究将这一问题设为将来单独的研究，通过添加更多的受试者数据寻找规律。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EEG/" rel="tag"># EEG</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/Transfer%20Learning%20for%20EEG-Based%20Brain-Computer%20Interfaces%20A%20Review%20of%20Progress%20Made%20Since%202016/" rel="prev" title="jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016">
+      <i class="fa fa-chevron-left"></i> jzh Transfer Learning for EEG-Based Brain-Computer Interfaces:A Review of Progress Made Since 2016
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/JiaoZehui/Emotion%20Recognition%20using%20Multimodal%20Residual%20LSTM%20Network/" rel="next" title="jzh Emotion Recognition using Multimodal Residual LSTM Network">
+      jzh Emotion Recognition using Multimodal Residual LSTM Network <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Improving-EEG-Based-Emotion-Classification-Using-Conditional-Transfer-Learning"><span class="nav-number">1.</span> <span class="nav-text">Improving EEG-Based Emotion Classification Using Conditional Transfer Learning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF"><span class="nav-number">1.1.</span> <span class="nav-text">信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">1.3.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.4.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A0%94%E7%A9%B6%E8%BF%87%E7%A8%8B"><span class="nav-number">1.5.</span> <span class="nav-text">研究过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%87%E8%AE%BE-%E9%80%9A%E8%BF%87%E5%AE%9E%E9%AA%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">1.5.1.</span> <span class="nav-text">假设(通过实验验证)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%9B%86"><span class="nav-number">1.5.2.</span> <span class="nav-text">数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86EEG%E4%BF%A1%E5%8F%B7"><span class="nav-number">1.5.3.</span> <span class="nav-text">处理EEG信号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.5.4.</span> <span class="nav-text">迁移学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0%E6%A1%86%E6%9E%B6"><span class="nav-number">1.5.5.</span> <span class="nav-text">条件迁移学习框架</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">1.6.</span> <span class="nav-text">结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A8%E8%AE%BA"><span class="nav-number">1.7.</span> <span class="nav-text">讨论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E8%BF%81%E7%A7%BB%E7%9A%84%E6%97%B6%E6%9C%BA"><span class="nav-number">1.7.1.</span> <span class="nav-text">正迁移的时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AD%A3%E8%BF%81%E7%A7%BB%E7%9A%84%E7%9B%B8%E4%BC%BC%E6%80%A7%E6%95%B0%E6%8D%AE%E5%92%8C%E4%B8%8D%E7%9B%B8%E4%BC%BC%E6%80%A7%E6%95%B0%E6%8D%AE"><span class="nav-number">1.7.2.</span> <span class="nav-text">正迁移的相似性数据和不相似性数据</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

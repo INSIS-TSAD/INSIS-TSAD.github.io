@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance SelectionVincent Vercruyssen 2020 AAAI 提出LOCIT算法：1、选择源域(带标签)中的子集迁移到目标域(不带标签)中。2、使用半监督最近邻的方法同时考虑带标签和不带标签的实例来计算异常分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结">
+<meta property="og:url" content="http://example.com/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance SelectionVincent Vercruyssen 2020 AAAI 提出LOCIT算法：1、选择源域(带标签)中的子集迁移到目标域(不带标签)中。2、使用半监督最近邻的方法同时考虑带标签和不带标签的实例来计算异常分">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201110202315.png">
+<meta property="article:published_time" content="2021-01-06T02:24:24.000Z">
+<meta property="article:modified_time" content="2021-01-16T03:50:02.629Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="异常检测">
+<meta property="article:tag" content="迁移学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201110202315.png">
+
+<link rel="canonical" href="http://example.com/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结 | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/06/ShaoShikuan/Transfer%20learning%20and%20Semi-Supervised%E6%96%87%E7%AB%A0%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ssk Vincent Vercruyssen-Transfer learning and Semi-Supervised文章总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-06 10:24:24" itemprop="dateCreated datePublished" datetime="2021-01-06T10:24:24+08:00">2021-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-01-16 11:50:02" itemprop="dateModified" datetime="2021-01-16T11:50:02+08:00">2021-01-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="1-Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection"><a href="#1-Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection" class="headerlink" title="1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection"></a>1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection</h4><p>Vincent Vercruyssen</p>
+<p>2020 AAAI</p>
+<p>提出LOCIT算法：1、选择源域(带标签)中的子集迁移到目标域(不带标签)中。2、使用半监督最近邻的方法同时考虑带标签和不带标签的实例来计算异常分数。</p>
+<a id="more"></a>
+<p><strong>贡献：</strong></p>
+<p>1、使用实例在源域和目标域的分布(d1-局部距离和d2-相关距离)来度量是否可以迁移，使用目标域中的实例(假设了近邻的分布相同，距离很远点的分布不同)来训练一个SVM分类器判断是否可以迁移。</p>
+<p>2、同时考虑目标实例近邻中的带标签和不带标签的实例(半监督)来分别计算异常分数，并为这两个异常分数根据label instance的近邻中是否也包含目标实例来分配权重。</p>
+<p>LOF(基于密度的离群点检测方法)原理：利用了点O的周围密度和O的邻域内的周围密度的比值，这个值越接近1说明点O和他周围点越相似。这就和上面计算有标签和无标签的权重的方式很像</p>
+<p><strong>普通数据集构建：</strong></p>
+<p>​    本文确定的基准包含三个特性：1、出于经验评估的目的，benchmark应该包含大量的源域-目标域的数据对，他们之间的联合分布存在不同程度的差异。2、每一个源域-目标域对应该处于相同的特征空间。3、第三，源和目标域应该包含对分类来说并不简单的正常和异常实例。</p>
+<p>​    生成过程：为了生成目标域，从最大类(第二大类)采样正常目标实例(异常目标实例)，为了确保源域和目标域的分布差异，我们从目标域相同或不同类别来采样异常和正常样本来构造源域；follow了Emmott等人的程序来满足这个过程。</p>
+<p><strong>时间序列数据集构建：</strong></p>
+<p>​    有三个商店的三年的用水数据(单变量，采样间隔5分钟)，首先将每条时间序列按一小时间隔划分成时间窗口，通过特征提取，每个窗口提取出31维特征。由于每天的不同时间的用水量差异很大，所以对于相同的时间间隔，就将他们分成一个组(例如11：00-12：00)，这样每个商店就可以得到24个组，为每一个组训练一个异常检测器。</p>
+<p>​    这样是不是相当于把每天内，用水量的时间依赖信息给切断了。</p>
+<h4 id="2-Semi-supervised-Anomaly-Detection-with-an-Application-to-Water-Analytics"><a href="#2-Semi-supervised-Anomaly-Detection-with-an-Application-to-Water-Analytics" class="headerlink" title="2  -Semi-supervised Anomaly Detection with an Application to Water Analytics"></a>2  -Semi-supervised Anomaly Detection with an Application to Water Analytics</h4><p>Vincent Vercruyssen</p>
+<p>2018 ICDM</p>
+<p>提出了一种新的基于约束聚类的异常检测方法，该方法可在无监督和半监督环境下工作</p>
+<p><strong>贡献：</strong></p>
+<p>​    1、结合机器学习方法，以设计一种新的半监督的异常检测方法；</p>
+<p>​            该方法首先基于无监督模型，该模型使用基于聚类的方法(COP-k means约束聚类，)来定义典型的正常行为并识别异常(主要工作是<strong>基于三个假设定义一个异常分数，此异常分数比原来的分数相比有改进</strong>)。我们的系统采用主动学习，因此领域专家可以以真实标签的形式向模型提供反馈(Incorporating expert feedback into active anomaly discovery 2016)。只要提供反馈，该方法就会以半监督的方式运行，并以两种方式利用标签。第一，标签用于以约束形式指导聚类。第二，通过标签传播的方式更新初始的基于聚类的异常评分，以最大化所获取的标签数据的有用性。</p>
+<p>​    2、说明如何将我们的方法应用于用水案例；</p>
+<p>​    3、一项实证研究表明，我们提出的方法优于现有的异常检测方法以及公司的基准方法</p>
+<p>​    4、讨论了已部署的系统体系结构。</p>
+<p>在本文的相关工作(related work)中，作者列举了参考的其他方法，包括无监督和半监督，并且在每种方法的最后都强调了下自己方法的不同—-无监督和半监督结合，基于聚类（参考了CBLOF，参数少，并且考虑了聚类中心）等等</p>
+<p>划分窗口，特征构建：</p>
+<p><strong>实验：</strong></p>
+<p>​    数据集划分：</p>
+<p>​        这里的数据集划分和上面这篇Transfer Learning for Anomaly Detection的方法是相同的，也是将每天相同的小时组成一个组，为了进行评估，将那些包含多于50个带标签窗口的组挑选出来进行试验。 </p>
+<p>​    实验设置：</p>
+<p>​        将每个组中带标签的窗口划分成训练集$D<em>{train}$和测试集$D</em>{test}$，将$D’<em>{train}$初始化为空集，逐渐增加$D’</em>{train}$中元素的数量直到等于$D<em>{train}$，用来验证专家标签数量逐步增加对于半监督方法性能的提升有多大。使用$D’</em>{train}$选择最好的参数，来在$D_{test}$中测试。</p>
+<p><strong>已部署</strong></p>
+<h4 id="3-Transfer-learning-for-time-series-anomaly-detection"><a href="#3-Transfer-learning-for-time-series-anomaly-detection" class="headerlink" title="3 -Transfer learning for time series anomaly detection"></a>3 -Transfer learning for time series anomaly detection</h4><p>Vincent Vercruyssen</p>
+<p>2017 In CEUR Work- shop Proceedings</p>
+<p>​    本文的算法尝试将源域中的带标签的数据迁移到目标域(没有标签)中，迁移的方法利用了异常是低频和不经常发生的观点来决定是否将实例进行迁移。一旦迁移完成，就在目标域中构建最近邻分类器，并将动态时间规整作为相似性度量。在一个真实数据集中进行实验，并发现他的效果超过了无监督的方法。</p>
+<p>本文的方法：</p>
+<p>​    4.1 基于两个性质，定义了每个源实例是否迁移的<strong>权重</strong>，而这个权重需要估计<strong>源实例</strong>在<strong>目标域</strong>的<strong>概率分布</strong></p>
+<script type="math/tex; mode=display">
+\hat{f}_T(x_S)</script><p>​    4.2 基于密度的迁移决策函数</p>
+<p>​    本文的数据是基于单变量时间序列，每条序列长度固定，<strong>将每条序列看成是一个长度为 d 的向量</strong>，将这些向量进行迁移并进行异常检测。但由于随着向量维度的增加需要指数及增加的样本来进行密度估计，但这样是不现实的，所以为了精确的概率密度估计，将长度为d的向量分割成 $l$ 个等长度 m 的子向量，然后进行密度估计。得到每条子序列的密度估计</p>
+<script type="math/tex; mode=display">
+\hat{f}_{T,m}(s)</script><p>​    由于上面的调整，对于一条时间序列会得到$l$个密度估计值估计，所以需要调整权重的计算方式。计算出最终的权重之后，给权重设置一个阈值，来决定是否进行迁移。</p>
+<p>​    4.3 基于聚类的迁移决策函数</p>
+<p>​    首先对<strong>目标域</strong>进行聚类，将整个目标域划分成大集合和小集合两个集合，并定义每个聚类的半径。最后，还是基于上面的两个性质来决定是否将<strong>源域中</strong>的实例迁移到目标域中：对于一个正常标签的实例，如果被划分到目标域中的大集合；对于一个异常标签的实例，满足其中一个条件：这个实例被划分到小集合，或者被划分到大集合，但是该实例到聚类中心的距离大于聚类半径。</p>
+<p>​    4.4 监督异常检测</p>
+<p>​    迁移之后，进行有监督异常检测。我们忽略目标域中没有标签的实例，只使用有标签的实例，用这些带标签的实例，构建1NN(最近邻)-DTW(dynamic time warping)分类器。</p>
+<p>贡献：</p>
+<p>​    对于时间序列中基于实例的迁移学习收到很少的关注。本文提出的基于实例的迁移方法不需要目标域有任何的标签，</p>
+<p>实验：</p>
+<p>​    本文用到的无监督基线还是CBLOF(cluster based local outlier factor)这个算法。</p>
+<p>​    对于数据集，用到的也是真实数据集(用水)，对于数据集的划分，也是同样的方法-由于每天的用水量差异很大，所以也是划分成24个窗口，得到24个数据集，每一个实例都是长度为1小时的时间序列。</p>
+<p><img src="http://echo23334.gitee.io/pic_repo/%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20201110202315.png" alt="微信截图_20201110202315" style="zoom:60%;" /></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B/" rel="tag"># 异常检测</a>
+              <a href="/tags/%E8%BF%81%E7%A7%BB%E5%AD%A6%E4%B9%A0/" rel="tag"># 迁移学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/04/HuGanghui/Adversarial%20Graph%20Representation%20Adaptation%20for%20Cross-Domain%20Facial%20Expression%20Recognition/" rel="prev" title="hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition">
+      <i class="fa fa-chevron-left"></i> hgh Adversarial Graph Representation Adaptation for Cross-Domain Facial Expression Recognition
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/06/YeJianan/Uncovering%20the%20structure%20of%20clinical%20EEG%20signals%20with%20self-supervised%20learning(SSL)/" rel="next" title="yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL)">
+      yjn Uncovering the structure of clinical EEG signals with self-supervised learning(SSL) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Transfer-Learning-for-Anomaly-Detection-through-Localized-and-Unsupervised-Instance-Selection"><span class="nav-number">1.</span> <span class="nav-text">1  -Transfer Learning for Anomaly Detection through Localized and Unsupervised Instance Selection</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Semi-supervised-Anomaly-Detection-with-an-Application-to-Water-Analytics"><span class="nav-number">2.</span> <span class="nav-text">2  -Semi-supervised Anomaly Detection with an Application to Water Analytics</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Transfer-learning-for-time-series-anomaly-detection"><span class="nav-number">3.</span> <span class="nav-text">3 -Transfer learning for time series anomaly detection</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
