@@ -293,6 +293,31 @@
     
     
     <entry>
+      <title>cyf Cellular QoE Prediction for Video Service Based on Causal Structure Learning</title>
+      <link href="2021/07/20/ChenYifei/Cellular%20QoE%20Prediction%20for%20Video%20Service%20Based%20on%20Causal%20Structure%20Learning/"/>
+      <url>2021/07/20/ChenYifei/Cellular%20QoE%20Prediction%20for%20Video%20Service%20Based%20on%20Causal%20Structure%20Learning/</url>
+      
+        <content type="html"><![CDATA[<p><img src="https://s2.loli.net/2022/07/20/xKvXGjfTiHlVwd2.png" alt="image-20220720111309043"></p><p>2022年新发表在IEEE Transaction Intelligent Transportation Systems上</p><p>作者团队来自北京邮电大学的信息与通讯工程系</p><p>随着通信技术的发展和智能设备的普及，蜂窝网络中的用户体验成为人们关注的首要因素。同时，网络运营商面临着两个难题:预测用户实时体验，寻找对用户体验有决定性影响的网络参数。针对这两个问题，我们提出了一种新的用户体验预测方案。蜂窝网络的因果结构学习用于分析从基站收集的众多性能指标(kpi)和关键质量指标(kqi)。通过因果结构学习，可以得到基于kpi与KQI之间关联的有向因果图。这种因果结构可以嵌入到图的注意网络中。其中，选择注意机制进一步强化参数之间的相关性。每个KPI之间以及KPI与KQI之间的相关性用于预测单元级用户体验的未来价值。结果表明，该方法在蜂窝网络数据分析和用户体验预测方面具有良好的性能。</p><p>技术路线：算法挖掘因果结构图 $\to$ 因果图作为输入参与图注意力网络 $\to$ 预测用户体验质量(QoE)</p><h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>视频领域的主要矛盾之一是==流媒体质量评价的高需求==和==体验质量预测结果[7]的低准确性==之间的矛盾。QoS的具体指标是KPI，通常是蜂窝网络中基站采集的数据。QoE指标和QoS指标不一样。QoE指标通常是平均意见评分(MOS)，由主观和客观两个部分组成。主观部分往往因人而异，没有具体的判断标准。客观部分是KQI。目前对体验质量的研究多集中在主观指标上。虽然MOS和QoE[8]的映射可以很好地判断用户的感知，但在实际的网络优化中，获取每个用户的主观意见显然是不现实的。对于客观部分，KQI的预测常常面临预测精度不高的问题。</p><p>当前问题：KPI参数的预测比较成熟预测结果较准确，但是KPI并不能准确估计用户体验，因此KQI的估计逐渐成为研究热点。KQI估计的主要方法是找出KPI和KQI之间的关系，通过KPI的值估计KQI。虽然这种方法对当前的KQI估计准确性较高，但是对其未来值得预测却不好，因为这依赖于==KPI预测算法的稳定性==和==从KPI估计KQI算法的稳定性==。</p><p>解决方案：为了保证算法的稳定性，作者主张利用KPI和KQI之间的因果关系构建预测算法。</p><p>好处有1.在QoS（各种KPI指标）中找到影响video service的因果关系，用该因果结构取估计用户的体验（KQI）2.无线网络的各种数值型参数中也挖掘出一个因果结构，只使用直接影响用户体验的参数，实现了数据降维。这样得到的1-有向无环因果图和降维了的数据集将会被用到KQI的预测当中。</p><p><img src="https://s2.loli.net/2022/07/20/dAVF6T4mtUNksbL.png" alt="image-20220720111433829"></p><h1 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h1><h2 id="数据集介绍"><a href="#数据集介绍" class="headerlink" title="数据集介绍"></a>数据集介绍</h2><p><img src="https://s2.loli.net/2022/07/20/kgsybhKRFY4d2J9.png" alt="image-20220720111503413" style="zoom:67%;" /></p><p>三个月内一个基站收集到的数据，数据是每一小时记录一次，其统计值是一个小时内的平均值，KPI参数和KQI参数如上表所示；（在实际网络部署中，一个基站通常有两个载波频率。每个频率的资源分别分配给三个cell。）在图2中，目标细胞被标记为绿色，蓝色部分表示相邻相同载频的细胞。棕色部分表示不同的载波频率。不同载频小区的覆盖范围与目标小区的覆盖范围一致。数据收集方面，在空间上，采用目标单元相邻单元的kpi进行分析;从频域角度，采集与目标单元相同位置的不同频段数据;就时间而言，所有kpi都是时间序列数据。我们的分析是基于这三个方面的kpi。</p><p><img src="https://s2.loli.net/2022/07/20/cMRaCrlEkLbNdG6.png" alt="image-20220720111637004" style="zoom:50%;" /></p><h2 id="因果结构学习"><a href="#因果结构学习" class="headerlink" title="因果结构学习"></a>因果结构学习</h2><p>作者使用了TE（传递熵）来探测KPIs之间和KPI与KQI之间的因果关系。$S=[V_1,V_2,…,V_N]$是包含KPI参数的矩阵，$C=[c_1,c_2,…,c_T]$是包含KQI参数的一个向量，$T$表示时间序列的长度。给定来自$S$的两条时间序列$V_i$和$V_j$，从$V_i$到$V_j$的TE定义为</p><p><img src="https://s2.loli.net/2022/07/20/yIlF5kc37dYvUzr.png" alt="image-20220720111705873" style="zoom:50%;" /></p><p><img src="https://s2.loli.net/2022/07/20/8GWmwt2Rc59AYUN.png" alt="image-20220720111730430" style="zoom:50%;" /></p><p>比值大于1说明有$V_i \to V_j$，小于1则说明不存在（这种度量方法有失偏颇，强行假设$V_i,V_j$一定存在因果联系）；进一步地，根据因果强度构造关于所有参数地一个因果图，如算法1所示，在stage1，具有因果关系的每两个节点根据TE会给予一条有向边。stage2将会进图结构优化，具体地，删除因果链的中间节点，最后保留的因果结构类似于一个树图。在树图中，KQI是根节点，其它叶子节点表示不同的KPIs。</p><p><img src="https://s2.loli.net/2022/07/20/yaPlhpKWLEFR4zU.png" alt="image-20220720111801763" style="zoom:50%;" /></p><p><img src="https://s2.loli.net/2022/07/20/gU4uCMyJ91ze3XO.png" alt="image-20220720111814717" style="zoom:50%;" /></p><h2 id="图注意力网络"><a href="#图注意力网络" class="headerlink" title="图注意力网络"></a>图注意力网络</h2><p>图卷积网络（GCN）是常用的网络模型，它的缺点是根据训练集的图结构整合邻接节点的特征，使得不易在其它图结构上获取好的泛化性能。图注意力网络（GAT）则通过注意力机制聚合邻接节点，实现不同邻点权值的自适应分配，提高了图神经网络模型的表达能力。注意力机制被用于对相邻节点的加权特征进行求和。相邻节点特征的权值完全依赖于节点特征，与图结构无关。在因果结构学习时，我们只获得了因果结构，而KQI的邻接节点的影响则需要通过图神经网络来学习，作者采用GAT模型实现。</p><p>具体操作：GAT模型的输入是因果关系结构数据，具体表示为$h={h_1,h_2,…,h_N}$，$h_1$表示C即KQI参数，其余表示结构图中的KPI参数，$h_i\in R^T$，即拥有T个特征，$T$是时间序列长度。这里的注意力系数根据有向图的连边关系采用masked attention，并且只计算节点$i$和它的邻接节点$j$的相关性，引入leakyReLU激活</p><p><img src="https://s2.loli.net/2022/07/20/qjuGwrScDyQzmHK.png" alt="image-20220720111950219" style="zoom: 50%;" /></p><p>整个嵌入过程如图5所示</p><p><img src="https://s2.loli.net/2022/07/20/K45ergY9Whc8LBP.png" alt="image-20220720112008784" style="zoom:50%;" /></p><p>模型此外还采用了多头注意力，K个相互独立的注意力机制执行下，最后的输出结果表示如下（||表示拼接）</p><p><img src="https://s2.loli.net/2022/07/20/sBLiS3an7de9xH5.png" alt="image-20220720112127963" style="zoom:50%;" /></p><p>整个的流程图</p><p><img src="https://s2.loli.net/2022/07/20/IV7FOoHZQgumlAS.png" alt="image-20220720112445936"></p><h1 id="评价"><a href="#评价" class="headerlink" title="评价"></a>评价</h1><p>从参数降维的层面上，有用的KPI参数得到提炼，如下图的对比</p><p><img src="https://s2.loli.net/2022/07/20/U86Kuf14ExpBcbn.png" alt="image-20220720112550395"></p><p>验证因果结构学习的作用，比较本网络模型与其它模型的预测能力</p><p><img src="https://s2.loli.net/2022/07/20/p6DCj74TbmVLafy.png" alt="image-20220720112617531"></p><p>CGAT是本文的模型，GAT和LSTM是baseline，本文模型的RMSE更小。</p><p>此外作者还比较了本方法和之前的先预测KPI再估计KQI的模式（KPI预测用GCN或LSTM，KQI估计用SVM，GNB）。本文预测的是连续值，但通常KQI会根据阈值进行离散化，因此连续的预测值将会按照阈值分成两类。下面展示本文方法和之前方法的AUC</p><p><img src="https://s2.loli.net/2022/07/20/ahHz3LepDrktK2c.png" alt="image-20220720112639248" style="zoom:50%;" /></p><p>结果表明在两种阈值设置下（中位数，更低的分位数）本文的AUC都更大一些。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这是一篇特定任务场景下的结合传统因果推断算法的时间序列预测任务的研究论文，将因果算法引入到图神经网络当中，可以降低模型和数据的复杂度，提高模型的解释性，特征与标签之间的因果关系也可能为模型的泛化性能提供鲁棒性。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> cyf </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 因果结构学习 - 时间序列预测 - 图注意力网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>nxj 【ICML2020】Deep Graph Random Process for Relational-Thinking-Based Speech Recognition</title>
       <link href="2021/07/14/NingXiaojun/%5BICML2020%5D%20Deep%20Graph%20Random%20Process%20for%20Relational-Thinking-Based%20Speech%20Recognition/"/>
       <url>2021/07/14/NingXiaojun/%5BICML2020%5D%20Deep%20Graph%20Random%20Process%20for%20Relational-Thinking-Based%20Speech%20Recognition/</url>
