@@ -184,6 +184,132 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/20/MaZhaoyang/%E3%80%90AAAI2021%E3%80%91A%20Novel%20Visual%20Interpretability%20for%20Deep%20Neural%20Networks%20by%20Optimizing%20Activation%20Maps%20with%20Perturbation%20%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84%E6%B7%B1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/07/20/MaZhaoyang/%E3%80%90AAAI2021%E3%80%91A%20Novel%20Visual%20Interpretability%20for%20Deep%20Neural%20Networks%20by%20Optimizing%20Activation%20Maps%20with%20Perturbation%20%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84%E6%B7%B1/" class="post-title-link" itemprop="url">mzy 【AAAI2021】A Novel Visual Interpretability for Deep Neural Networks by Optimizing Activation Maps with Perturbation  一种新的深度神经网络的视觉可解释性</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-07-20 10:30:24" itemprop="dateCreated datePublished" datetime="2021-07-20T10:30:24+08:00">2021-07-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-07-20 10:38:25" itemprop="dateModified" datetime="2022-07-20T10:38:25+08:00">2022-07-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mzy/" itemprop="url" rel="index"><span itemprop="name">mzy</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="【AAAI2021】A-Novel-Visual-Interpretability-for-Deep-Neural-Networks-by-Optimizing-Activation-Maps-with-Perturbation-一种新的深度神经网络的视觉可解释性"><a href="#【AAAI2021】A-Novel-Visual-Interpretability-for-Deep-Neural-Networks-by-Optimizing-Activation-Maps-with-Perturbation-一种新的深度神经网络的视觉可解释性" class="headerlink" title="【AAAI2021】A Novel Visual Interpretability for Deep Neural Networks by Optimizing Activation Maps with Perturbation 一种新的深度神经网络的视觉可解释性"></a>【AAAI2021】A Novel Visual Interpretability for Deep Neural Networks by Optimizing Activation Maps with Perturbation 一种新的深度神经网络的视觉可解释性</h3><p><img src="https://s2.loli.net/2022/07/20/4q6DHVa7G3UlcQK.png" alt="image-20220610142553209"></p>
+<h4 id="摘要："><a href="#摘要：" class="headerlink" title="摘要："></a>摘要：</h4><p>可解释性一直被视为部署深度神经网络的一个重要组件，基于显著性的方法是最流行的可解释的方法之一，因为它可以生成单独直观的热图，突出部分输入图像最重要的决定深度网络在一个特定的分类目标。然而，<strong>由现有方法生成的热图要么包含很少的表示对象的信息（基于扰动的方法），要么不能有效地定位多类对象（基于激活的方法）。</strong>为了解决这个问题，设计了一个可视化深度神经网络可解释性的两阶段框架，称为<strong>扰动优化激活(AOP)</strong>，以优化一般基于扰动的方法和基于扰动的方法生成的激活图。最后，为了更好地解释不同类型的图像，我们进一步提出了AOP框架的一个实例，即<strong>基于平滑集成梯度的类激活图(SIGCAM)</strong>，该实例提出了一种应用特征图作为权重系数的加权梯度CAM</p>
+<h4 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h4><p><strong>现有方法：</strong></p>
+<ul>
+<li>将梯度或其变体反向传播到输入图像中，以决定哪些像素或区域与预测的变化更相关=&gt;这些变化不一定表明像素或区域对预测有重大影响。</li>
+</ul>
+<p>（如下图：softmax层后的分类得分：双体船：0.521，海盗0.068。故逐渐将海盗进行mask并测试对于双体船的影响。结果表明：删除“海盗”对“双体船”的分类得分有显著影响，但与“双体船”无关）</p>
+<p><img src="https://s2.loli.net/2022/07/20/3MxJDdRnu6QTiIV.png" alt="image-20220610143347474"></p>
+<ul>
+<li>基于激活的方法（如GradCAM）=&gt;使用反向传播梯度作为权重来组合前向特征图=&gt;这些方法可能会捕获很多毫无意义的信息，因为特征映射并不一定与目标类别相关</li>
+<li>基于扰动的方法（如EMP，I-GOS）=&gt;采用梯度作为掩模=&gt;生成的热图可能包含的用于表示对象的信息很少</li>
+</ul>
+<p><strong>本文贡献：</strong>本文提出平滑集成梯度类激活图SIGCAM，首先使用加权梯度WGradCAM生成表现良好base-mask在不同类型的图像上，然后使用I-GOS优化生成的base-mask。</p>
+<ol>
+<li>引入了一个高度灵活的两阶段框架AOP，结合基于激活的方法的优势来捕获足够的信息和基于扰动的方法生成网络决策相关掩模的能力</li>
+<li>我们提出了GradCAM的扩展WGradCAM，通过将特征映射作为权重系数，它与GradCAM++相似，但更简单、更有效。</li>
+<li>提出了SIGCAM，AOP的一个特殊实例，它使用I-GOS来优化所提出的WGradCAM</li>
+</ol>
+<h4 id="2-相关工作"><a href="#2-相关工作" class="headerlink" title="2. 相关工作"></a>2. 相关工作</h4><p>可解释性方法：</p>
+<ol>
+<li>基于梯度的方法</li>
+<li>基于激活的方法</li>
+<li>基于区域的方法</li>
+<li>基于扰动的方法</li>
+</ol>
+<h4 id="3-方法"><a href="#3-方法" class="headerlink" title="3. 方法"></a>3. 方法</h4><h5 id="AOP（Optimizing-Activation-with-Perturbation使用扰动优化激活）"><a href="#AOP（Optimizing-Activation-with-Perturbation使用扰动优化激活）" class="headerlink" title="AOP（Optimizing Activation with Perturbation使用扰动优化激活）"></a>AOP（<strong>Optimizing Activation with Perturbation</strong>使用扰动优化激活）</h5><p>基于扰动方法允许我们直接估计出输入像素的影响，并生成更人性化的显著性映射。</p>
+<p>=&gt;存在问题：它们的效率较低，而且优化过程需要数百次迭代。</p>
+<p>基于激活的方法能够快速生成显著性映射，从而获取更多关于目标对象的信息。</p>
+<p><strong>AOP的思想</strong>：应用基于激活的方法来生成base-mask，并利用基于扰动的方法对其进行优化。AOP的base-mask可以通过不同类型的基于激活的方法生成，优化过程可以通过各种基于扰动的方法进行，使AOP框架具有高度的可扩展性。</p>
+<h5 id="WGradCAM（Weighted-GradCAM-加权GradCAM）"><a href="#WGradCAM（Weighted-GradCAM-加权GradCAM）" class="headerlink" title="WGradCAM（Weighted GradCAM 加权GradCAM）"></a>WGradCAM（<strong>Weighted GradCAM</strong> 加权GradCAM）</h5><p><img src="https://s2.loli.net/2022/07/20/BgPIvRi4otXdqCW.png" alt="image-20220610151418868"></p>
+<p><img src="https://s2.loli.net/2022/07/20/E7sgBZ8zNX95WCF.png" alt="image-20220610152546162" style="zoom:80%;" />，<img src="https://s2.loli.net/2022/07/20/omaGPCJj47SfgWK.png" alt="image-20220705231329471" style="zoom:50%;" />M可以使用基于扰动的方法进行优化。</p>
+<h5 id="SIGCAM"><a href="#SIGCAM" class="headerlink" title="SIGCAM"></a>SIGCAM</h5><p>由于M包含了很多非零像素，所以直接优化M很耗时/bask-mask中太多像素值较高，对人类不友好=&gt;使用滤波器过滤掉小于阈值的像素，并使用调制因子λ将其控制在一个特定范围。</p>
+<p><img src="https://s2.loli.net/2022/07/20/TjfiNwnmODYEqGI.png" alt="image-20220610153333300"></p>
+<p>然后将M上采样到大小小于输入图像形状的矩阵，作为基掩膜。</p>
+<p>本文在微调的过程中，找到M 的最小掩膜M*使得<img src="https://s2.loli.net/2022/07/20/cgDAwsLlnzb5JSN.png" alt="image-20220720102823842" style="zoom: 33%;" />，其中<img src="https://s2.loli.net/2022/07/20/FiQlv4fpSPu3srM.png" alt="image-20220720102904641" style="zoom:33%;" />，<img src="https://s2.loli.net/2022/07/20/XunL3c2lfKydhim.png" alt="image-20220610154541787" style="zoom:67%;" />表示把M上采样到（h1,w1)的大小。<img src="https://s2.loli.net/2022/07/20/IQesPp1NfEZohlu.png" alt="image-20220610154855406" style="zoom:67%;" /><img src="https://s2.loli.net/2022/07/20/GSO8zR6fYWxCMDu.png" alt="image-20220610154917686" style="zoom:67%;" /></p>
+<p>其中<img src="C:\Users\mzy25\AppData\Roaming\Typora\typora-user-images\image-20220610155128666.png" alt="image-20220610155128666" style="zoom: 50%;" />表示一个和I<sub>0</sub>大小一致的baseline图像，但是在类别c上的评分很低。</p>
+<p>最后可以用M∗来最小化以下目标函数：</p>
+<p><img src="https://s2.loli.net/2022/07/20/Zf1q4eDjtGb8KW7.png" alt="image-20220610155431000" style="zoom: 67%;" /></p>
+<p>其中||1-M||是l1正则化，TV(M)是第二项全变范数，使M更分段平滑</p>
+<h4 id="4-实验"><a href="#4-实验" class="headerlink" title="4. 实验"></a>4. 实验</h4><p>数据集：ImageNet-1k、COCO2017（许多图像是<strong>多目标多类</strong>的）</p>
+<p>度量方式：</p>
+<p>deletion：删除与类最相关的像素/区域将导致分类分数显著下降（AUC越小越好）</p>
+<p>insertion：从模糊的图像开始，逐渐重新引入内容，产生更真实的图像，并具有减轻对抗攻击的示例的影响。（AUC越大越好）</p>
+<p>验证WGradCAM的有效性：</p>
+<p>GradCAM对于”多目标，单类别”效果显著下降，GradCAM++对于“多目标，多类别”包含了不相关信息</p>
+<p><img src="https://s2.loli.net/2022/07/20/6fXarOkKoRxVAhb.png" alt="image-20220610160443223"></p>
+<p>与其他显著性方法进行对比。<img src="https://s2.loli.net/2022/07/20/TZKX6qIjWPyGwC7.png" alt="image-20220705234526969"></p>
+<p>如下图所示，Guided-bp生成的热图比其他基于梯度的方法生成的热图更有意义。vanilla</p>
+<p>Back-propagation, Integrated Gradients, and SmoothGrad的显著性图噪声太多，看起来不那么友好。</p>
+<p>I-GOS的热图包含更少的噪声。然而，这些热图中的像素落在分割掩模之外的可能性更高。</p>
+<p>XRAI生成的热图受到分割结果的影响过大。GradCAM和GradCAM++产生更大的区域，这些区域不是那么对人类友好，但可以捕获足够的信息。</p>
+<p>SIGCAM生成了所有方法中最吸引人的热图。热图比IGOS生成的热图包含更少的噪声，并捕获足够的信息来识别目标目标，如GradCAM和GradCAM++。更重要的是，SIGCAM的热图中的像素集中在分割任务中，使热图更加人性化。</p>
+<p><img src="https://s2.loli.net/2022/07/20/lNcApbZT8LIrx6H.png" alt="img"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/14/NingXiaojun/[ICML2020]%20Deep%20Graph%20Random%20Process%20for%20Relational-Thinking-Based%20Speech%20Recognition/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -879,92 +1005,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/" class="post-title-link" itemprop="url">jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-04-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-04-06T20:24:24+08:00">2021-04-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-04-07 11:36:15" itemprop="dateModified" datetime="2021-04-07T11:36:15+08:00">2021-04-07</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>关键词：图神经网络；EEG</p>
-<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>基于脑电信号的情感识别在情感计算中受到了广泛的关注。近年来，提出了一种新的动态图卷积神经网络（DGCNN）模型，该模型同时优化了网络参数和表征脑电记录设备中每对电极之间函数关系强度的加权图G。本文提出了一种<strong>稀疏的DGCNN模型</strong>，该模型通过对G进行稀疏约束来修正DGCNN，提高了情感识别的性能。我们的工作基于一个<strong>重要的观察</strong>：断层扫描研究表明，脑电图电极采集的不同脑区可能与大脑的不同功能有关，电极之间的功能关系可能是<strong>高度局部化和稀疏的</strong>。然而，在图G中引入稀疏性约束，使得稀疏DGCNN的损失函数在某些奇点处不可微。为了保证稀疏DGCNN的训练过程收敛，我们采用了前向后向切分的方法。为了评价稀疏DGCNN的性能，我们将其与四种有代表性的识别方法（SVM、DBN、GELM和DGCNN）进行了比较。除了比较不同的识别方法外，我们的实验还比较了不同的特征和谱带，包括从四个有代表性的脑电数据集（SEED、DEAP、DREAMER和CMEED）中提取的时频域脑电特征（DE、PSD、DASM、RASM、ASM和DCAU）。<br>结果表明：</p>
-<ul>
-<li>稀疏DGCNN的识别准确率始终优于典型方法，且具有良好的可扩展性；</li>
-<li>γ波段的DE、PSD和ASM特征表达了最具区分性的情感信息，分离特征和频带的融合可以提高识别性能。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1034,7 +1074,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1047,7 +1087,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">33</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

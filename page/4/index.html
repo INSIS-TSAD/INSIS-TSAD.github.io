@@ -184,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -198,7 +198,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/" class="post-title-link" itemprop="url">hgh A时间序列异常检测论文阅读汇总</a>
+            <a href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" class="post-title-link" itemprop="url">nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</a>
         </h2>
 
         <div class="post-meta">
@@ -208,14 +208,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2021-03-04 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-04T20:24:24+08:00">2021-03-04</time>
+              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-08 13:32:05" itemprop="dateModified" datetime="2021-03-08T13:32:05+08:00">2021-03-08</time>
+                <time title="Modified: 2021-03-11 09:16:38" itemprop="dateModified" datetime="2021-03-11T09:16:38+08:00">2021-03-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,7 +223,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
                 </span>
             </span>
 
@@ -238,10 +238,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="时间序列异常检测论文阅读汇总"><a href="#时间序列异常检测论文阅读汇总" class="headerlink" title="时间序列异常检测论文阅读汇总"></a>时间序列异常检测论文阅读汇总</h2>
+          <p>关键词： 元学习；迁移学习</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
+<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
+<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
+<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
+<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
+</ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/#more" rel="contents">
+              <a class="btn" href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -323,6 +329,87 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/03/04/HuGanghui/%E5%85%B3%E4%BA%8E%E6%97%B6%E5%BA%8F%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B-%E5%8A%A8%E6%80%81%E5%9F%BA%E7%BA%BF%E5%8E%9F%E5%9E%8B%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8F%90%E5%8D%87%E7%82%B9%E7%9A%84%E6%80%9D%E8%80%83(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/" class="post-title-link" itemprop="url">hgh A时间序列异常检测论文阅读汇总</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-04 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-04T20:24:24+08:00">2021-03-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-08 13:32:05" itemprop="dateModified" datetime="2021-03-08T13:32:05+08:00">2021-03-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="时间序列异常检测论文阅读汇总"><a href="#时间序列异常检测论文阅读汇总" class="headerlink" title="时间序列异常检测论文阅读汇总"></a>时间序列异常检测论文阅读汇总</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/04/HuGanghui/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%BC%82%E5%B8%B8%E6%A3%80%E6%B5%8B%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E6%B1%87%E6%80%BB(1)/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -908,83 +995,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/" class="post-title-link" itemprop="url">xw caNet:Frequency Channel Attention Networks</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-20 14:00:40 / Modified: 15:13:01" itemprop="dateCreated datePublished" datetime="2021-01-20T14:00:40+08:00">2021-01-20</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/xw/" itemprop="url" rel="index"><span itemprop="name">xw</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote>
-<p>注意机制，特别是通道注意，在计算机视觉领域取得了巨大的成功。许多研究集中在如何设计有效的通道注意机制，而忽略了一个基本问题，即使用全局平均池化(GAP)是否存在问题。在这项工作中，本文从一个不同的视角出发，用频率分析重新思考通道注意。<strong>在频域分析的基础上，用数学方法证明了全局平均池化(GAP)是频域特征分解的一种特例。通过证明，自然地将通道注意机制的预处理推广到了频域，并提出了一种新的多谱通道注意网络。</strong>该方法简单有效。只修改计算中的一行代码，以在现有的通道注意方法中实现本文的方法。在图像分类、目标检测和实例分割等任务上，与其他通道注意方法相比，该方法取得了最先进的效果。与基线SENet50相比，在相同的参数数量和计算成本下，本文的方法在ImageNet上的Top-1精度提高了1.8%。</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/20/XuWei/FcaNet%20Frequency%20Channel%20Attention%20Networks/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1054,7 +1064,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1067,7 +1077,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">33</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

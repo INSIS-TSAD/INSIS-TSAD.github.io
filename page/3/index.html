@@ -184,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -198,7 +198,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/" class="post-title-link" itemprop="url">zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage</a>
+            <a href="/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/" class="post-title-link" itemprop="url">jzh【IEEE2021】SparseDGCNN:Recognizing emotion from Multichannel EEG Signals</a>
         </h2>
 
         <div class="post-meta">
@@ -208,14 +208,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2021-03-31 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-31T20:24:24+08:00">2021-03-31</time>
+              <time title="Created: 2021-04-06 20:24:24" itemprop="dateCreated datePublished" datetime="2021-04-06T20:24:24+08:00">2021-04-06</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-03-02 17:25:59" itemprop="dateModified" datetime="2022-03-02T17:25:59+08:00">2022-03-02</time>
+                <time title="Modified: 2021-04-07 11:36:15" itemprop="dateModified" datetime="2021-04-07T11:36:15+08:00">2021-04-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,7 +223,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                  <a href="/categories/jzh/" itemprop="url" rel="index"><span itemprop="name">jzh</span></a>
                 </span>
             </span>
 
@@ -238,13 +238,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="任务场景"><a href="#任务场景" class="headerlink" title="任务场景"></a>任务场景</h3><p>在社交媒体中，有非常多的二部图。比如推特中，有关注者和被关注者两种节点，关注关系形成一个二部图；在大众点评中，有用户和商家两种节点，用户对商家的点评关系形成一个二部图；在淘宝里，用户购买商品，也形成一个二部图。</p>
-<p><center class="half"><br>    <img img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226160804505.png" alt="image-20220226160804505" width="150"/><br>    <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165517763.png" width="500" /></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Fraudar可以解决哪些问题呢？（二部图的问题）</span><br><span class="line">\1. 用户在电商平台，购买商品（刷单）</span><br><span class="line">\2. 用户评论电影，美食，游戏评分（刷评分）</span><br><span class="line">\3. 推特，博客关注信息（购买粉丝）</span><br></pre></td></tr></table></figure>
-<p>为了在二部图中检测出上述的欺诈行为，以往的方法（在此篇论文发表的2016年以前）是检测二部图中的稠密子图。以购买粉丝为例，购买者会突然增加许多粉丝，在二部图中，购买者这个节点的边突然增多（稠密子图）。</p>
+          <p>关键词：图神经网络；EEG</p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><p>基于脑电信号的情感识别在情感计算中受到了广泛的关注。近年来，提出了一种新的动态图卷积神经网络（DGCNN）模型，该模型同时优化了网络参数和表征脑电记录设备中每对电极之间函数关系强度的加权图G。本文提出了一种<strong>稀疏的DGCNN模型</strong>，该模型通过对G进行稀疏约束来修正DGCNN，提高了情感识别的性能。我们的工作基于一个<strong>重要的观察</strong>：断层扫描研究表明，脑电图电极采集的不同脑区可能与大脑的不同功能有关，电极之间的功能关系可能是<strong>高度局部化和稀疏的</strong>。然而，在图G中引入稀疏性约束，使得稀疏DGCNN的损失函数在某些奇点处不可微。为了保证稀疏DGCNN的训练过程收敛，我们采用了前向后向切分的方法。为了评价稀疏DGCNN的性能，我们将其与四种有代表性的识别方法（SVM、DBN、GELM和DGCNN）进行了比较。除了比较不同的识别方法外，我们的实验还比较了不同的特征和谱带，包括从四个有代表性的脑电数据集（SEED、DEAP、DREAMER和CMEED）中提取的时频域脑电特征（DE、PSD、DASM、RASM、ASM和DCAU）。<br>结果表明：</p>
+<ul>
+<li>稀疏DGCNN的识别准确率始终优于典型方法，且具有良好的可扩展性；</li>
+<li>γ波段的DE、PSD和ASM特征表达了最具区分性的情感信息，分离特征和频带的融合可以提高识别性能。</li>
+</ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/#more" rel="contents">
+              <a class="btn" href="/2021/04/06/JiaoZehui/SparseDGCNN%20Recognizing%20Emotion%20from%20Multichannel%20EEG%20Signals(1)/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -322,6 +324,90 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/03/31/ZhangHongjun/%E3%80%902020NIPS%E3%80%91Supervised%20Contrastive%20Learning/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/" class="post-title-link" itemprop="url">zhj 【KDD2016】FRAUDER Bounding Graph Fraud in the face of camouflage</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-31 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-31T20:24:24+08:00">2021-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-03-02 17:25:59" itemprop="dateModified" datetime="2022-03-02T17:25:59+08:00">2022-03-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/zhj/" itemprop="url" rel="index"><span itemprop="name">zhj</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="任务场景"><a href="#任务场景" class="headerlink" title="任务场景"></a>任务场景</h3><p>在社交媒体中，有非常多的二部图。比如推特中，有关注者和被关注者两种节点，关注关系形成一个二部图；在大众点评中，有用户和商家两种节点，用户对商家的点评关系形成一个二部图；在淘宝里，用户购买商品，也形成一个二部图。</p>
+<p><center class="half"><br>    <img img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226160804505.png" alt="image-20220226160804505" width="150"/><br>    <img src="https://gitee.com/kris_poul/imagebed/raw/master/imgbed/image-20220226165517763.png" width="500" /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Fraudar可以解决哪些问题呢？（二部图的问题）</span><br><span class="line">\1. 用户在电商平台，购买商品（刷单）</span><br><span class="line">\2. 用户评论电影，美食，游戏评分（刷评分）</span><br><span class="line">\3. 推特，博客关注信息（购买粉丝）</span><br></pre></td></tr></table></figure>
+<p>为了在二部图中检测出上述的欺诈行为，以往的方法（在此篇论文发表的2016年以前）是检测二部图中的稠密子图。以购买粉丝为例，购买者会突然增加许多粉丝，在二部图中，购买者这个节点的边突然增多（稠密子图）。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/31/ZhangHongjun/%E3%80%902016KDD%E3%80%91FRAUDAR_Bounding%20Graph%20Fraud%20in%20the%20Face%20of%20Camouflage/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -851,93 +937,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" class="post-title-link" itemprop="url">nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-11 09:16:38" itemprop="dateModified" datetime="2021-03-11T09:16:38+08:00">2021-03-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>关键词： 元学习；迁移学习</p>
-<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
-<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
-<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
-<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
-<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1090,7 +1089,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1103,7 +1102,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">33</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
