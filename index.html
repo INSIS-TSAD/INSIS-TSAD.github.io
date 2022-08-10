@@ -184,6 +184,153 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/10/FengZhiyang/FOGS(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/08/10/FengZhiyang/FOGS(1)/" class="post-title-link" itemprop="url">fzy FOGS：First-Order Gradient Supervision with Learning-based Graph for Traffc Flow Forecasting</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-08-10 20:24:24 / Modified: 15:26:05" itemprop="dateCreated datePublished" datetime="2022-08-10T20:24:24+08:00">2022-08-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%86%AF%E5%BF%97%E6%B4%8B/" itemprop="url" rel="index"><span itemprop="name">冯志洋</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="FOGS-First-Order-Gradient-Supervision-with-Learning-based-Graph-for-Traffc-Flow-Forecasting"><a href="#FOGS-First-Order-Gradient-Supervision-with-Learning-based-Graph-for-Traffc-Flow-Forecasting" class="headerlink" title="FOGS: First-Order Gradient Supervision with Learning-based Graph for Traffc Flow Forecasting"></a><strong>FOGS: First-Order Gradient Supervision with Learning-based Graph for Traffc Flow Forecasting</strong></h1><p>发表：IJCAI 2022</p>
+<p>作者：<strong>Xuan Rao</strong>，电子科技大学，<strong>Hao Wang</strong> 武汉大学</p>
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p><strong>领域</strong>: <strong>交通流量预测</strong>是智能交通管理和服务（如路线规划、智能交通灯控制等）中最基本的技术之一。</p>
+<p><strong>意义：</strong>准确预测未来交通状况可能有助于人们安排出行，避免潜在的街道拥堵，合理分配交通资源。</p>
+<p><strong>输入：</strong> 用于预测的数据是<strong>交通信号序列</strong>，其中每个信号包含道路网络中所有传感器在一定时间间隔内记录的流量</p>
+<p><strong>考虑因素</strong>：时间因素（过去一段时间的流量）空间因素（附近路段的流量和道路网结构）</p>
+<p><strong>现有方法</strong>：</p>
+<p>​    <strong>思路：</strong>首先建立了传感器之间的相关图，然后基于相关图进行了流量预测。</p>
+<p>​    现有方法存在问题：</p>
+<p>​        问题1：现有方法要么完全忽略历史，要么只是利用它们之间一些整体的时间相似性。<strong>缺乏对更细粒度的历史流的时间相似性的考虑</strong>。此外，大多数现有的<strong>相关图都是手工构建的</strong>，因此人类经验可能会在很大程度上产生偏差。</p>
+<p>​        问题2：大多数现有的方法都是为了<strong>预测准确的流量</strong>。这项任务<strong>具有挑战性</strong>，因为<strong>交通流量的分布是不规则的</strong>。数据量不够大可能会导致欠拟合，降低预测的精度。</p>
+<p>​    解决方法：</p>
+<p>​        1.为了更好地利用时间信息，我们<strong>观察到交通通常遵循每周规律</strong>，<strong>在工作日和周末、高峰时间和正常时间进行人类活动等</strong>。基于这一观察结果，我们将<strong>一周分解为一个连续的时间槽序列</strong>，每个时间槽对应一个特定的时间间隔。对于每个传感器，我们构造一个时间特征向量，其中<strong>每个元素都是相应时间槽内的历史视图的平均值</strong>。因此，两个时间特征向量之间的距离是相应传感器之间的相似性度量。利用这种相似度度量，我们通过将每个传感器与其<strong>k个最相似的传感器连接起来来建立一个时间相关图</strong>。然后，我们提出了一种新的基于学习的方法来学习每个传感器的嵌入，同时考虑了时间相关图和道路网络，可以用于准确的流量预测。</p>
+<ol>
+<li>为了解决<strong>预测过程中的欠拟合问题</strong>，我们设计了一种名为一阶梯度监督 (FOGS) 的新方法。 <strong>FOGS 使用一阶梯度，也就是趋势，而不是精确的流动来训练预测模型</strong>。 简而言之，在某个时刻，趋势是流量相对于前一时刻的相对时间变化。 我们展示了流量的分布和趋势。图 1 是 PEMS03 数据集 1 的训练集。正如我们所见，流动和趋势具有非常不同的分布特性。 流动分布呈不规则形状，分布广泛，而趋势分布则集中度好。 这与我们的直觉是一致的，即人类活动通常遵循一些规律的模式，尽管确切的流动可能因一天而异。因此，我们认为趋势将为流量预测提供更多监督。 FOGS 旨在<strong>从趋势中明智地利用这种监督</strong>。</li>
+</ol>
+<p><img src="https://s2.loli.net/2022/08/10/pYTqCcRH6knmigt.png" alt="image-20220809165455022.png"></p>
+<p><strong>贡献总结：</strong></p>
+<pre><code> 1. 我们提出了一种新的图嵌入方法来学习每个传感器的数据表示。与现有的解决方案相比，我们的数据表示更好地反映了传感器之间的时间和空间相关性。
+ 2. 我们揭示了趋势在牛预测中的重要性。我们提出了一种新的方法，FOGS，它可以明智地利用趋势提供的监督信息进行准确的动态预测。
+ 3. 我们在四个真实世界的数据集上进行了广泛的实验来测试FOGS的性能。结果表明，FOGS在精度方面明显优于现有的解。
+</code></pre><h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a><strong>相关工作</strong></h2><pre><code> 1. DCRNN采用双向随机游走来表征与空间关系相关的扩散过程。
+ 2. STGCN利用时空结构域上的卷积结构，同时提取时空特征。
+ 3. STSGCN，ASTGCN（提出利用空间和时间注意机制分别学习空间和时间相关性）。
+</code></pre><h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><h3 id="时空相关性的学习"><a href="#时空相关性的学习" class="headerlink" title="时空相关性的学习"></a>时空相关性的学习</h3><h4 id="1-时间相关图的构造"><a href="#1-时间相关图的构造" class="headerlink" title="1.时间相关图的构造"></a>1.时间相关图的构造</h4><p>​        原始输入为传感器采集的多通道流量时间序列。时间相关图为C（V，ETIME）。</p>
+<p>​        首先将一周分解为长度等长的时间槽（论文中使用1/w，w为传感器采样频率）。之后<strong>将每个传感器在一个时间槽内采集的数据取平均</strong>得到该时间槽的特征值。由于一周有NW个时间槽，所以最后<strong>每个传感器可以得到一个NW维的时间特征向量</strong>。然后<strong>利用K-最近邻来判断和形成边的连接Etime</strong>。</p>
+<p>​        2.图嵌入学习函数</p>
+<p>​        给定<strong>道路网络R=(V，Eroad)</strong>和<strong>时间相关图C=(V，Etime)</strong>，我们的下一个目标是<strong>建立一个嵌入函数</strong>h：V→Rm，<strong>该函数将每个传感器v∈V映射到一个m维特征向量（即嵌入）</strong>。嵌入函数h（·）将保持传感器之间的在R和c上的紧密性，我们想同时学习一个嵌入函数h和相关图G=(V，E)，传感器之间的时空相关性在E和h中保存。</p>
+<p>​        <strong>采用类似skip-gram的方法</strong>（给出中心词，预测得到上下文，此处是给出中心点，得到嵌入），目标函数为：</p>
+<p><img src="https://s2.loli.net/2022/08/10/ze7vmr2EbGVij9P.png" alt="image-20220809212748597.png"></p>
+<p>​        其中Ns(V)是邻居节点，此处指根据采样策略S得到的所有的邻居。Pr(~)指的是给定嵌入h(v)观测Ns(V)的概率。假定Pr的概率独立性，则概率可以如下计算：</p>
+<p><img src="https://s2.loli.net/2022/08/10/Y2oMgkTuUDpPqNc.png" alt="image-20220809213043386.png"></p>
+<p>​        而其中的每个邻居对嵌入的条件概率Pr计算公式如下：</p>
+<p><img src="https://s2.loli.net/2022/08/10/ovIRfsOZ5S3Lkzh.png" alt="image-20220809213217798.png"></p>
+<ol>
+<li><p>函数优化：</p>
+<p><img src="https://s2.loli.net/2022/08/10/ndxrsvJm7uNywHA.png" alt="image-20220809213503137.png"></p>
+<p>图2说明了我们的随机游走过程。显然，等式的目标函数2在很大程度上受邻域函数<strong>NS（·）</strong>。<strong>但公式2不适合现实案例，我们需要遍历V</strong>。<strong>由于现实案例中的全部邻居集合V过大，所以采用随机游走和负采样方法来进行调整</strong>。</p>
+<p>刚才的目标函数可以通过SGD等优化器进行优化。这样可以得到最好的嵌入h。</p>
+</li>
+</ol>
+<p>​    传统的图嵌入方法基于拓扑结构生成随机游动来识别邻居的集合，这没有利用时间相关性。在这项工作中，<strong>我们提出了一种新的采样策略S来考虑时间相关性的随机游动</strong>：</p>
+<p>​        采样器S通过下面的公式决定下一个邻居vj+1:</p>
+<p>​        <img src="https://s2.loli.net/2022/08/10/Q7jKTSXZAwdlz4m.png" alt="image-20220809214346424.png"></p>
+<p>​        <img src="https://s2.loli.net/2022/08/10/CIcoDnK37GwyXfk.png" alt="image-20220809214432652.png"></p>
+<p>​        其中dr为Vj-1到Vj+1的最短距离。（个人理解：随机游走中时间相关性的考虑在于pai的选取条件中包含了路径必须存在于时间图中）</p>
+<ol>
+<li><h3 id="一阶梯度监督"><a href="#一阶梯度监督" class="headerlink" title="一阶梯度监督"></a>一阶梯度监督</h3></li>
+</ol>
+<p>​        <strong>现有的研究通常利用精确的流量来训练他们的模型，然后预测网络中的未来的流量</strong>。然而，我们认为有许多外部因素影响着特定传感器的交通流量，如地理位置、周边地区的设施等。如图1(a)所示，<strong>流量流量的分布形状不规则</strong>，在<strong>训练数据量有限的情况下</strong>，与ft是不同的。尽管如此，从图1(b)中，我们<strong>观察到趋势的分布是集中的</strong>。</p>
+<p>​        对于传感器Vj，定义t时间后的趋势为：</p>
+<p><img src="https://s2.loli.net/2022/08/10/cubGvTRipxAS3l9.png" alt="image-20220809215938551.png"></p>
+<p>​    时空相关图构建：</p>
+<p>​    由于我们已经在传感器V上学习了一个嵌入函数h（·），它很好地保留了空间和时间的相关性，我们现在准备构建一个基于学习的时空相关图G。为此，我们<strong>计算了每对传感器之间的时空相关矩阵M∈[0,1]|V|×|V|</strong>。</p>
+<p>​    <img src="https://s2.loli.net/2022/08/10/mvnXlDo5SgO17A8.png" alt="image-20220809220243186.png"></p>
+<p>​    然后基于M计算得到图G：</p>
+<p><img src="https://s2.loli.net/2022/08/10/qKz9tAlGBPCf2ix.png" alt="image-20220809220350730.png"></p>
+<p><img src="https://s2.loli.net/2022/08/10/VEhaUHNluKz4sv5.png" alt="image-20220809220400026.png"></p>
+<p>​    图3显示了FOGS框架。将替换后的<strong>输入数据**</strong>X和时空相关图G**输入到基于图的模型G中，得到预测输出，即趋势矩阵：</p>
+<p><img src="https://s2.loli.net/2022/08/10/gQMn7rqv8JuBlp9.png" alt="image-20220809220429035.png"></p>
+<p>​    整理（感觉优点乱）模型步骤为：</p>
+<pre><code>    1. 首先根据时间槽划分传感器的输入，并取平均得到每个传感器的时间向量，并利用K-最近邻构造时间图C。
+    2. 基于时间图C和路网R去构造和优化嵌入函数（机制类似skip-gram）。
+    3. 基于优化的嵌入函数计算一个时空相关矩阵G，并基于矩阵G和输入X利用图神经网络得到趋势输出。
+    4. 通过标签计算得到趋势标签，并用mae损失函数进行优化。
+</code></pre><p>​    预测模型Graph-based-model为STFGNN等已有图神经网络模型。</p>
+<p>损失函数选择mae，同时在评估阶段基于下面公式转化为流量：</p>
+<p><img src="https://s2.loli.net/2022/08/10/UNzVT7odplEwkRL.png" alt="image-20220809221527795.png"></p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>​    1.数据集：四个真实数据集PEMS03，PEMS04，PEMS07，PEMS08。这些数据提取自加州四个不同地区的加州运输局性能测量系统。</p>
+<p>​    与之前的研究一样[Song etal.，2020；LI和Zhu，2021]，我们将每个传感器v映射到真实的道路网络中，构建传感器的道路网络，即第3节中的R。此外，我们利用z分数归一化来标准化输入数据。</p>
+<h3 id="实验设置"><a href="#实验设置" class="headerlink" title="实验设置"></a>实验设置</h3><p>​    我们以<strong>7：1：2的比例将这四个数据集分为训练、验证和测试集</strong>。我们用<strong>一个小时的时间来预测下一个小时的时间</strong>。也就是说，我们在实验中设置了T=K=12，使用12个连续的图信号来预测接下来的12个。在<strong>我们的随机游走策略中，如第4节中介绍的参数p和q，都设为1</strong>。在构造时间相关图C（第4节）和fnal时空相关图G（第5节）时，我们考虑了每个传感器的<strong>k=10个最近邻</strong>。此外，我们将<strong>传感器嵌入的维数设置为128</strong>，<strong>随机游走长度L设置为25，窗口阈值∆设置为10</strong>。我们的实现可以在Pytorch3中找到</p>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>​    <img src="https://s2.loli.net/2022/08/10/4PDahOsuyC3WFzB.png" alt="image-20220809221931449.png"></p>
+<pre><code>1. 在所有数据集上的所有指标下，我们提出的方法明显优于所有其他最先进的基线。
+2. 比较STFGNN和我们的方法FOGS，我们可以发现我们提出的方法大大提高了性能。**原因可能是在我们的方法中使用的时空相关图G是学习的**，而不是手工构建的，这可以更好地捕获时空信息。此外，它还证明了具有趋势而不是流量的训练模型可以提高模型的性能。
+3. 通过比较在PEMS04和PEMS07数据集上的性能改进，我们可以看到FOGS在PEMS03和PEMS08数据集上的表现更好。原因可能是道路网络在PEMS04和PEMS07数据集上更加稀疏，导致学习图g不准确，而且交通数据缺失率较高也会导致模型性能较差。
+</code></pre><h3 id="消融实验"><a href="#消融实验" class="headerlink" title="消融实验"></a>消融实验</h3><p>​    在我们的框架中有<strong>两个主要的组成部分</strong>：(i)<strong>学习到的图</strong>，和(ii)<strong>趋势监督</strong>。为了显示这些成分的影响，我们对FOGS进行了消融实验：</p>
+<p>​    <img src="https://s2.loli.net/2022/08/10/yQKcVvBopj8IWGw.png" alt="image-20220809222207406.png"></p>
+<pre><code>1. 我们可以证明我们学习到的图可以提高模型的性能。因为通过随机游走算法学习到的传感器嵌入不仅可以重构空间网络的拓扑结构，还可以重构历史流量移动模式。它们的组合使学习到的图能够有效地利用边信息。
+2. 我们可以注意到，以趋势训练STFGNN模型可以提高模型在所有数据集上的性能。利用趋势可以提高表现。
+</code></pre><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>在本文中，<strong>我们提出了一种新的基于学习的方法来学习一个图</strong>，可以有效地利用时空数据中的信息。通过我们的采样方法，我们学习了每个传感器的嵌入情况，该方法可以捕获道路网络的拓扑结构和历史交通流模式。该图是由具有k个近邻的传感器嵌入之间的余弦值构造的。此外，<strong>提出了一种新的监督方法FOGS来提高模型性能，利用趋势而不是指定来训练模型</strong>。我们在四个公共数据集上进行了广泛的实验和分析，结果表明我们提出的方法明显优于现有的基线。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/10/JinXiyuan/2022%20ICLR%20Uncertainty%20Modeling%20for%20out-of-distribution%20generalization(1)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -917,84 +1064,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/" class="post-title-link" itemprop="url">【ICLR2019】mpt Integrating Physiological Time Series and Clinical Notes with Deep Learning for Improved ICU Mortality Prediction</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-10-21 20:24:24 / Modified: 13:30:41" itemprop="dateCreated datePublished" datetime="2021-10-21T20:24:24+08:00">2021-10-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mpt/" itemprop="url" rel="index"><span itemprop="name">mpt</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="不规则采样时间序列的插值预测网络"><a href="#不规则采样时间序列的插值预测网络" class="headerlink" title="不规则采样时间序列的插值预测网络"></a>不规则采样时间序列的插值预测网络</h1><h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a><strong>摘要</strong></h3><p>本文提出了一种新的<strong>深度学习体系结构</strong>,来解决具有<strong>稀疏和不规则采样</strong>的<strong>多元时间序列</strong>的<strong>监督学习</strong>问题。该架构基于<strong>插值网络</strong>的使用，随后是<strong>预测网络</strong>的应用。</p>
-<ul>
-<li><strong>插值网络</strong>允许在插值阶段<strong>跨多元时间序列的多个维度共享信息</strong>，而任何<strong>标准深度学习模型</strong>都可以用于<strong>预测网络</strong>。这项工作的动机是分析电子健康记录中的<strong>生理时间序列数据</strong>，这些数据是稀疏的、不规则采样的和多变量的。我们研究了这个架构在<strong>分类和回归任务上的性能</strong>，表明我们的方法优于一系列基线和最近提出的模型。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/21/MaPeitao/2021Integrating%20Physiological%20Time%20Series%20and%20Clinical%20Notes/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1064,20 +1133,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-count">70</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
