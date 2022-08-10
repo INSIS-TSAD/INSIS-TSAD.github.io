@@ -533,7 +533,7 @@ X[t+1]&=X[t]+Y[t]
 </code></pre><h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>在本文中，<strong>我们提出了一种新的基于学习的方法来学习一个图</strong>，可以有效地利用时空数据中的信息。通过我们的采样方法，我们学习了每个传感器的嵌入情况，该方法可以捕获道路网络的拓扑结构和历史交通流模式。该图是由具有k个近邻的传感器嵌入之间的余弦值构造的。此外，<strong>提出了一种新的监督方法FOGS来提高模型性能，利用趋势而不是指定来训练模型</strong>。我们在四个公共数据集上进行了广泛的实验和分析，结果表明我们提出的方法明显优于现有的基线。</p>
 ]]></content>
       <categories>
-        <category>冯志洋</category>
+        <category>fzy</category>
       </categories>
       <tags>
         <tag>交通流量预测</tag>
@@ -2736,7 +2736,7 @@ g(\Lambda)=\sum_{k=0}^{K-1} \theta_{k}^{\prime} \Lambda^{k} \simeq \sum_{k=0}^{K
 <h1 id="7-CONCLUSIONS"><a href="#7-CONCLUSIONS" class="headerlink" title="7. CONCLUSIONS"></a>7. CONCLUSIONS</h1><p>在本文中，我们提出了一种概率方法，通过在训练期间使用合成特征统计对域移动的不确定性进行建模来提高网络泛化能力。假设每个特征统计量遵循多变量高斯分布，以模拟不同的电位位移。由于生成的特征统计具有不同的分布可能性，因此模型可以对不同的域转移获得更好的鲁棒性。实验结果证明了该方法在提高网络泛化能力方面的有效性。</p>
 ]]></content>
       <categories>
-        <category>靳希源</category>
+        <category>jxy</category>
       </categories>
       <tags>
         <tag>不确定性</tag>
