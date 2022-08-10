@@ -184,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -198,7 +198,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" class="post-title-link" itemprop="url">nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</a>
+            <a href="/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/" class="post-title-link" itemprop="url">hgh 【ISSRE-2019】Unsupervised Detection of Microservice Trace Anomalies through Service-Level Deep Bayesian Networks</a>
         </h2>
 
         <div class="post-meta">
@@ -215,7 +215,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-03-11 09:16:38" itemprop="dateModified" datetime="2021-03-11T09:16:38+08:00">2021-03-11</time>
+                <time title="Modified: 2021-03-11 09:19:56" itemprop="dateModified" datetime="2021-03-11T09:19:56+08:00">2021-03-11</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,7 +223,7 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                  <a href="/categories/hgh/" itemprop="url" rel="index"><span itemprop="name">hgh</span></a>
                 </span>
             </span>
 
@@ -238,16 +238,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>关键词： 元学习；迁移学习</p>
-<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
-<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
-<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
-<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
-<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
+          <p>关键词：微服务； 异常检测； 根因分析</p>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><h3 id="本文旨在解决微服务调用跟踪异常"><a href="#本文旨在解决微服务调用跟踪异常" class="headerlink" title="本文旨在解决微服务调用跟踪异常"></a>本文旨在解决微服务调用跟踪异常</h3><ul>
+<li><p>挑战</p>
+<ul>
+<li>底层微服务数量众多</li>
+<li>它们之间的调用关系复杂</li>
+<li>响应时间和调用路径之间的相互依赖性</li>
+</ul>
+</li>
+<li><p>TraceAnomaly 核心理念</p>
+<ul>
+<li><p>在定期的离线训练中，使用机器学习来自动学习轨迹的整体正常模式</p>
+<ul>
+<li>新颖的痕迹表示和设计的深度贝叶斯网络后验流</li>
+</ul>
+</li>
+<li><p>在线异常检测中，一个带有小异常分数(根据学习到的正态模式计算)的新轨迹被认为是异常</p>
+</li>
+</ul>
+</li>
+<li><p>效果</p>
+<ul>
+<li>某公司已在18个在线服务上部署了TraceAnomaly</li>
+<li><p>详细评估四大在线服务包含数百个microservices和实验包含41 microservices</p>
+<ul>
+<li>表明TraceAnomaly的查全率和查准率都高于0.97,优于现有的方法(硬编码规则)19.6%和7.1%</li>
+<li>和其他七个基线平均57.0%和41.6%。</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
+              <a class="btn" href="/2021/03/10/HuGanghui/Unsupervised%20Detection%20of%20Microservice%20Trace%20Anomalies%20through%20Service-Level%20Deep%20Bayesian%20Networks/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -335,6 +360,93 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/03/10/NingXiaojun/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/" class="post-title-link" itemprop="url">nxj 【TPAMI-2019】Meta-Transfer Learning through Hard Tasks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-03-10 20:24:24" itemprop="dateCreated datePublished" datetime="2021-03-10T20:24:24+08:00">2021-03-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-03-11 09:16:38" itemprop="dateModified" datetime="2021-03-11T09:16:38+08:00">2021-03-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ssk/" itemprop="url" rel="index"><span itemprop="name">ssk</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>关键词： 元学习；迁移学习</p>
+<h2 id="贡献"><a href="#贡献" class="headerlink" title="贡献"></a>贡献</h2><ul>
+<li>提出了元迁移学习（MTL, Meta-Transfer Learning），该方法学习如何将深度神经网络的权值转移到小样本学习中任务<br>Meta：指训练多个任务；Transfer：学习每个任务的DNN权重的缩放和偏置（<strong>SS</strong>, Scale and Shift）来实现迁移</li>
+<li>其次，提出了Hard Tasks（<strong>HT</strong>）进一步提高MTL的学习效率</li>
+<li>在有监督和半监督的环境下，我们在minimagenet、tieredImageNet和Fewshot-CIFAR100（FC100）这三个具有挑战性的基准上对五类小样本分类任务进行了实验，验证了本文提出的HT模式训练的MTL方法具有很好的性能。消融研究表明，SS和HT两个组件有助于快速收敛和高精度。</li>
+<li>另外，在每个任务上加入元梯度正则化，利用当前任务和前一任务的元梯度加权和对每个任务进行优化。其目的是迫使元学习器在以后的学习中不要忘记旧知识。</li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/10/MaZhaoyang/Meta-Transfer%20Learning%20through%20Hard%20Tasks(1)/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -929,81 +1041,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2021/01/26/DengJiaoxue/ecg_ssl/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="INSIS">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="时序论文分享">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/01/26/DengJiaoxue/ecg_ssl/" class="post-title-link" itemprop="url">djx SELF-SUPERVISED LEARNING FOR ECG-BASED EMOTION RECOGNITION  基于ECG数据情感识别的自监督模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2021-01-26 15:00:24 / Modified: 19:47:03" itemprop="dateCreated datePublished" datetime="2021-01-26T15:00:24+08:00">2021-01-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/djx/" itemprop="url" rel="index"><span itemprop="name">djx</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h5 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h5><p>我们提出了一种使用自我监督学习的基于心电图（ECG）的情绪识别系统。我们提出的体系结构由两个主要网络组成，一个信号转换识别网络和一个情感识别网络。首先，未标记的数据用于成功训练前一个网络，以在自我监督的学习步骤中检测特定的预定信号转换。接下来，将该网络的卷积层的权重转移到情感识别网络，并训练两个密集层以对唤醒和化合价进行分类。我们表明，我们的自我监督方法可帮助模型学习情感识别所需的ECG特征集，其性能与模型的完全监督版本相同或更好。我们提出的方法性能优于使用两个公开可用的数据集SWELL和AMIGOS的基于ECG的最先进的情感识别技术。进一步的分析凸显了我们的自我监督方法的优势，即需要更少的数据来获得可接受的结果。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/01/26/DengJiaoxue/ecg_ssl/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1073,20 +1110,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-count">69</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-count">36</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

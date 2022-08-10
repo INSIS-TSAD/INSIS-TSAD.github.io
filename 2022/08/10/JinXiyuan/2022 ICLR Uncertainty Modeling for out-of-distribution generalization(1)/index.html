@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"./public/search.xml"};
+  </script>
+
+  <meta name="description" content="2022 ICLR Uncertainty Modeling for out-of-distribution generalization1 Introduction深度神经网络在计算机视觉方面取得了令人印象深刻的成功，但严重依赖于训练和测试领域遵循独立和同分布的假设（Ben-David等人，2010；Vapnik，1992）。然而，这种假设在许多实际应用中并不成立。例如，当使用在晴天针对雨雾环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jxy 【ICLR 2022】Uncertainty Modeling for out-of-distribution generalization">
+<meta property="og:url" content="http://example.com/2022/08/10/JinXiyuan/2022%20ICLR%20Uncertainty%20Modeling%20for%20out-of-distribution%20generalization(1)/index.html">
+<meta property="og:site_name" content="时序论文分享">
+<meta property="og:description" content="2022 ICLR Uncertainty Modeling for out-of-distribution generalization1 Introduction深度神经网络在计算机视觉方面取得了令人印象深刻的成功，但严重依赖于训练和测试领域遵循独立和同分布的假设（Ben-David等人，2010；Vapnik，1992）。然而，这种假设在许多实际应用中并不成立。例如，当使用在晴天针对雨雾环境">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nzjcn7ej212e0i878s.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nib3cxgj20kc09ymyc.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nzwcin5j20mq0bu404.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51niao7zvj205m00ymwz.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51niahvd9j203o010jr6.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51niad3zuj203k012gle.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nia2nzrj20cq04iq35.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni9q195j203401ct8i.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni9kmurj202o00ygle.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni98mqcj20bk05cq35.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni93kd9j203k00w742.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8xk9xj203m012a9u.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8rownj205q010mx0.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8xk9xj203m012a9u.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8ebkcj20d8036jrj.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni84zehj20jk02sjrm.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nrxvjxaj20ee02st8r.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ns6fst0j205m01ujr8.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nt5sp12j20ja03mwep.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ntg7jvuj20gi03o0t2.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ntn3qb7j20lc03wglv.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ntv7qzqj210c0qqq9j.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nwv1om8j20t60aewip.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nx6lh28j21im0fcjyx.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nxgausrj20l405a0tm.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nxy9txgj20dc084aax.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ny504z6j20380180sj.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nyblqbjj203m01aglf.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nyjfl7ij20ne05kab2.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nyp2fafj20l803s74r.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nywxgpij20x607e3zy.jpg">
+<meta property="og:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nz5h07yj20mo09sjt8.jpg">
+<meta property="article:published_time" content="2022-08-10T12:24:24.000Z">
+<meta property="article:modified_time" content="2022-08-10T07:13:31.534Z">
+<meta property="article:author" content="INSIS">
+<meta property="article:tag" content="不确定性">
+<meta property="article:tag" content="域偏移 - 特征统计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nzjcn7ej212e0i878s.jpg">
+
+<link rel="canonical" href="http://example.com/2022/08/10/JinXiyuan/2022%20ICLR%20Uncertainty%20Modeling%20for%20out-of-distribution%20generalization(1)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>jxy 【ICLR 2022】Uncertainty Modeling for out-of-distribution generalization | 时序论文分享</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">时序论文分享</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/08/10/JinXiyuan/2022%20ICLR%20Uncertainty%20Modeling%20for%20out-of-distribution%20generalization(1)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="INSIS">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="时序论文分享">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          jxy 【ICLR 2022】Uncertainty Modeling for out-of-distribution generalization
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2022-08-10 20:24:24 / Modified: 15:13:31" itemprop="dateCreated datePublished" datetime="2022-08-10T20:24:24+08:00">2022-08-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9D%B3%E5%B8%8C%E6%BA%90/" itemprop="url" rel="index"><span itemprop="name">靳希源</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="Views" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">Views: </span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="2022-ICLR-Uncertainty-Modeling-for-out-of-distribution-generalization"><a href="#2022-ICLR-Uncertainty-Modeling-for-out-of-distribution-generalization" class="headerlink" title="2022 ICLR Uncertainty Modeling for out-of-distribution generalization"></a>2022 ICLR Uncertainty Modeling for out-of-distribution generalization</h1><h1 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a>1 Introduction</h1><p>深度神经网络在计算机视觉方面取得了令人印象深刻的成功，但严重依赖于训练和测试领域遵循独立和同分布的假设（Ben-David等人，2010；Vapnik，1992）。然而，这种假设在许多实际应用中并不成立。例如，当使用在晴天针对雨雾环境训练的分割模型时（Choi等人，2021），或使用在照片上训练的模型识别艺术画时（Li等人，2017），在这种分布外（out of distriution, OOD）的部署场景中，通常可以观察到不可避免的性能下降。因此，旨在提高网络在各种未知测试域上的鲁棒性的域泛化问题变得非常重要。</p>
+<p>之前的工作（Huang&amp;Belongie，2017；Li等人，2021）表明，<strong>特征统计（均值和标准差）作为学习特征的矩，具有训练数据的域特征</strong>。域特征主要指的是更特定于各个域但与任务目标不太相关的信息，例如对象识别中的照片样式和捕获环境信息。因此，<strong>具有不同数据分布的域通常具有不一致的特征统计</strong>（Wang等人，2020b；2019a；Gao等人，2021a）。大多数深度学习方法遵循经验风险最小化原则（Vapnik，1999），以最小化其对训练数据的平均误差（Shen等人，2021）。<strong>尽管在训练域上的性能令人满意，但这些方法没有明确考虑测试过程中潜在域偏移（domain shift）引起的不确定统计差异</strong>。因此，经过训练的模型往往会过度拟合训练域，并且在测试时易受统计变化的影响，这大大限制了学习表示的泛化能力。</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nzjcn7ej212e0i878s.jpg" alt="图片"></p>
+<p>2-D t-SNE（Maaten&amp;Hinton，2008）风格统计的可视化（平均值和标准偏差的串联），从在四个不同域上训练的ResNet-18的第一个剩余块特征图计算（He等人，2016）（Li等人，2017）。很明显，不同的域是完全分开的</p>
+<p>直观地说，与训练域相比，<strong>测试域可能会带来具有不同潜在方向和强度的不确定性统计位移</strong>（如图1所示），<strong>这意味着域偏移的不确定性</strong>。考虑到潜在域移动的这种“不确定性”，合成新的特征统计变量来模拟不同的域移动可以提高训练网络对不同测试分布的鲁棒性。为此，我们引入了一种新的概率方法，通过适当地建模具有不确定性的域偏移（Domain Shifts with Uncertainty, DSU），即将特征统计量描述为不确定分布，来提高网络泛化能力。<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nib3cxgj20kc09ymyc.jpg" alt="图片"><br>（图1 使用预先训练的样式转换自动编码器，通过合成特征统计数据可视化重建样本。特征统计信息的图示可能在强度（intensity）和方向(direction)上发生变化（即，特征统计信息向量空间中的不同偏移）。我们还展示了通过操纵不同方向和强度的特征统计位移生成的“新”域的图像。注意：这些图像仅用于可视化，而不是输入网络进行训练。）</p>
+<p>在我们的方法中，我们假设在考虑潜在不确定性后，特征统计遵循多变量高斯分布，而不是将每个特征统计视为从特征测量的确定点。将分布“中心”设置为每个特征的原始统计值，分布“范围”表示考虑潜在域移动的变化强度。这里采用不确定性估计来描述概率特征统计的分布“范围”。具体而言，我们基于小批量（minibatch）统计的方差以有效的非参数方式估计分布“范围”。随后，从估计的高斯分布中随机抽样特征统计变量，然后用于替换原始确定性值，以模拟不同的域偏移，如图2所示。由于生成的特征统计具有不同的分布可能性，可以训练模型以适当地减轻域扰动并编码更好的域不变特征。<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nzwcin5j20mq0bu404.jpg" alt="图片"><br>（图2：假设特征统计在训练期间遵循多变量高斯分布。当通过该模块时，从相应分布中随机抽取的新特征统计将取代原始特征统计，以模拟不同的域转移。）</p>
+<p>我们提出的方法简单但相当有效，可以缓解域偏移造成的性能下降，并且可以很容易地集成到现有网络中，而无需引入额外的模型参数或损耗约束。在广泛的视觉任务上进行的综合实验证明了我们提出的方法的优越性，表明在特征统计中引入不确定性可以很好地提高模型对域移动的泛化能力。</p>
+<h1 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2 Related Work"></a>2 Related Work</h1><h1 id="3-Method"><a href="#3-Method" class="headerlink" title="3 Method"></a>3 Method</h1><h2 id="3-1-Preliminaries"><a href="#3-1-Preliminaries" class="headerlink" title="3.1 Preliminaries"></a>3.1 Preliminaries</h2><p> 给定<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51niao7zvj205m00ymwz.jpg" alt="图片">是网络中间层的编码特征，我们表示<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51niahvd9j203o010jr6.jpg" alt="图片">和<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51niad3zuj203k012gle.jpg" alt="图片">分别为小批量中每个实例的通道特征均值和标准偏差，其公式如下：<br>   <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nia2nzrj20cq04iq35.jpg" alt="图片"></p>
+<p>根据之前的工作（Huang&amp;Belongie，2017；Li等人，2021），作为特征的抽象，特征统计可以捕捉对应域的信息特征（例如颜色、纹理和对比度）。在分布外（OOD）场景中，由于不同的域特征，特征统计通常与训练域不一致（Wang等人，2019a；Gao等人，2021a），这不适用于非线性层和归一化层等深度学习模块，并降低了模型的泛化能力（Wang等，2020b）。然而，大多数深度学习方法仅将特征统计视为从特征测量的确定值，而缺乏对潜在不确定统计差异的明确考虑。<strong>由于模型对这种差异的固有脆弱性</strong>，学习表示的泛化能力受到限制。最近的一些方法（Nuriel等人，2021；Zhou等人，2021b）利用特征统计来解决领域泛化问题。尽管取得了成功，他们通常对成对样本采用线性操作（即交换和插值）来生成新的特征统计，这限制了合成变化的多样性。具体而言，其变体的方向由所选参考样本确定，并且这种内部操作限制了其变体的张力。因此，这些方法在处理现实世界中的不同和不确定的域转移时是次优的。</p>
+<h2 id="3-2-MODELING-DOMAIN-SHIFTS-WITH-UNCERTAINTY"><a href="#3-2-MODELING-DOMAIN-SHIFTS-WITH-UNCERTAINTY" class="headerlink" title="3.2  MODELING DOMAIN SHIFTS WITH UNCERTAINTY"></a>3.2  MODELING DOMAIN SHIFTS WITH UNCERTAINTY</h2><p>鉴于任意测试域在方向和强度上都具有不确定的特征统计位移，正确建模域位移成为解决域泛化问题挑战的一项重要任务。</p>
+<p>考虑到域偏移的不确定性和随机性，本文“不确定性”方法来处理域偏移的“不确定性”。在本文中，我们提出了一种新的方法，通过不确定性域偏移建模（DSU）。我们假设，在考虑潜在不确定性后，每个特征统计的分布遵循多变量高斯分布，而不是将每个特征统计视为从学习特征测量的确定值。这意味着每个特征统计量都有一个从特定分布中提取的概率表示，即特征统计量的平均值和标准偏差分别遵循<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni9q195j203401ct8i.jpg" alt="图片">和<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni9kmurj202o00ygle.jpg" alt="图片">。具体而言，相应的高斯分布的中心被设置为每个特征的原始统计信息，而高斯分布的标准偏差描述了不同潜在位移的不确定性范围。通过使用概率方法随机抽样不同的合成特征统计，可以训练模型，以提高网络对统计变化的鲁棒性。</p>
+<h3 id="3-2-1-UNCERTAINTY-ESTIMATION"><a href="#3-2-1-UNCERTAINTY-ESTIMATION" class="headerlink" title="3.2.1 UNCERTAINTY ESTIMATION"></a>3.2.1 UNCERTAINTY ESTIMATION</h3><p>考虑到域偏移的不确定性，我们方法中的不确定性估计旨在描述每个概率特征统计量的不确定性范围。然而，测试域未知，这使得获得适当的变异范围具有挑战性（希望能够对域的特征统计量有一个范围的感知）</p>
+<p>一些基于生成的研究（沈和周，2021；王等人，2019b）表明，特征之间的方差包含隐含的语义，方差较大的方向可以暗示更有价值的语义变化的潜力。受此启发，我们提出了一种简单而有效的非参数不确定性估计方法，利用特征统计的方差提供一些说明：<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni98mqcj20bk05cq35.jpg" alt="图片"></p>
+<p>其中<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni93kd9j203k00w742.jpg" alt="图片">与<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8xk9xj203m012a9u.jpg" alt="图片"> 分别表示特征平均值µ和特征标准偏差σ的不确定性估计。不确定性估计的大小可以揭示相应信道可能发生潜在变化的可能性。尽管域位移的潜在分布是不可预测的，但从小批量中捕获的不确定性估计可以为每个特征通道提供适当且有意义的变化范围，这不会损害模型训练，但可以模拟各种潜在位移。</p>
+<h3 id="3-2-2-PROBABILISTIC-DISTRIBUTION-OF-FEATURE-STATISTICS"><a href="#3-2-2-PROBABILISTIC-DISTRIBUTION-OF-FEATURE-STATISTICS" class="headerlink" title="3.2.2 PROBABILISTIC DISTRIBUTION OF FEATURE STATISTICS"></a>3.2.2 PROBABILISTIC DISTRIBUTION OF FEATURE STATISTICS</h3><p>一旦获得每个特征通道的不确定性估计，就可以建立概率特征统计的高斯分布。为了使用随机性来建模不确定性，我们采用随机抽样来进一步利用概率表示中的不确定性。新的特征统计量，均值<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8rownj205q010mx0.jpg" alt="图片">和标准偏差<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8xk9xj203m012a9u.jpg" alt="图片">可以从相应的分布中随机抽取，如下所示：<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni8ebkcj20d8036jrj.jpg" alt="图片"></p>
+<p>在这里，我们使用重新参数化技巧（Kingma&amp;Welling（2013））使采样操作可微，µ和σ均遵循标准高斯分布。通过利用给定的高斯分布，随机抽样可以生成具有不同方向和强度组合的各种新特征统计信息。</p>
+<h3 id="3-2-3-IMPLEMENTATION"><a href="#3-2-3-IMPLEMENTATION" class="headerlink" title="3.2.3 IMPLEMENTATION"></a>3.2.3 IMPLEMENTATION</h3><p>我们的方法是通过AdaIN（Huang&amp;Belongie（2017））实现的，并用随机抽取的特征统计替换特征统计以实现转换。建议方法的最终形式可表述为：<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ni84zehj20jk02sjrm.jpg" alt="图片"></p>
+<p>备注：<br>使用实例特定均值和标准偏差对特征张量进行归一化可有效去除样式转换（style transfer）模型中的图像样式（Ulyanov等人，2016；Huang&amp;Belongie，2017；Dumoulin等人，2017）。这种操作被广泛称为实例规范化（IN，Ulyanov等人（2016））。<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nrxvjxaj20ee02st8r.jpg" alt="图片"></p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ns6fst0j205m01ujr8.jpg" alt="图片">为可学习的参数，</p>
+<p>Huang&amp;Belongie（2017）引入了自适应实例规范化（AdaIN），它简单地将缩放和移位参数与样式输入y的特征统计重新放置在等式（1）中，以实现任意样式转换：<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nt5sp12j20ja03mwep.jpg" alt="图片"></p>
+<p>可以实现向目标风格的统计量迁移</p>
+<p>MixStyle(2021 ICLR)在特征统计量上实现了风格迁移：<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ntg7jvuj20gi03o0t2.jpg" alt="图片"></p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ntn3qb7j20lc03wglv.jpg" alt="图片"></p>
+<p>上述操作可以作为一个灵活的模块集成在网络的各个位置。请注意，该模块仅在模型训练期间工作，并且可以在测试时丢弃。为了权衡这个模块的强度，我们设置了一个超参数p，表示应用它的概率。附录中描述了算法。得益于所提出的方法，使用不确定特征统计训练的模型将获得更好的性能<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ntv7qzqj210c0qqq9j.jpg" alt="图片"></p>
+<h1 id="4-EXPERIMENTS"><a href="#4-EXPERIMENTS" class="headerlink" title="4. EXPERIMENTS"></a>4. EXPERIMENTS</h1><p>为了验证所提出的方法在提高网络泛化能力方面的有效性，我们在广泛的任务上进行了实验，包括图像分类、语义分割、实例检索和对损坏的鲁棒性，其中训练集和测试集具有不同的分布变化情况，例如样式变化，合成到真实间隙、场景变化和像素级损坏。</p>
+<h2 id="4-1-GENERALIZATION-ON-MULTI-DOMAIN-CLASSIFICATION"><a href="#4-1-GENERALIZATION-ON-MULTI-DOMAIN-CLASSIFICATION" class="headerlink" title="4.1  GENERALIZATION ON MULTI-DOMAIN CLASSIFICATION"></a>4.1  GENERALIZATION ON MULTI-DOMAIN CLASSIFICATION</h2><p><strong>设置和实现细节</strong>：我们在PACS（Li et al.（2017））上评估了提出的方法，PACS是一个广泛使用的领域综合基准(benchmark)，具有四种不同风格：艺术绘画(Art)、卡通(Cartoon)、照片(Photo)和草图(Sketch)，共计9991张图片和7种类别。该实现遵循MixStyle的官方设置（Zhou等人（2021b）），使用一个离开域协议（leave-one-domain-out，在三种域上训练，剩下一种做测试），并使用ResNet18（He等人，2016）作为主干(backbone)。<strong>MixStyle的随机混洗版本用于公平比较，它不使用域标签</strong>。除PACS外，我们还在附录中使用Office Home（Venkateswara等人，2017）进行多域泛化实。</p>
+<p><strong>实验结果</strong>：表1所示的实验结果证明了我们对基线方法的显著改进，这表明了我们对传统确定性方法的优势。特别是在艺术和素描方面，我们的方法平均准确度提高了近10%。此外，我们的方法的性能也优于竞争方法，这表明我们在特征统计上建模不同的不确定移位的方法有效地提高了针对不同域移位的网络泛化能力。Photo具有与ImageNet数据集相似的域特征，轻微下降可能是由于ImageNet预训练（也在（Xu等人，2021）中讨论）。我们的DSU增强了功能，并扩大了培训活动的多样性。相比之下，基线方法保留了来自ImageNet的更多预训练知识，因此倾向于过度拟合受益于预训练的照片样式数据集<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nwv1om8j20t60aewip.jpg" alt="图片"></p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nx6lh28j21im0fcjyx.jpg" alt="图片"></p>
+<h2 id="4-2-GENERALIZATION-ON-SEMANTIC-SEGMENTATION"><a href="#4-2-GENERALIZATION-ON-SEMANTIC-SEGMENTATION" class="headerlink" title="4.2 GENERALIZATION ON SEMANTIC SEGMENTATION"></a>4.2 GENERALIZATION ON SEMANTIC SEGMENTATION</h2><h2 id="4-3-GENERALIZATION-ON-INSTANCE-RETRIEVAL"><a href="#4-3-GENERALIZATION-ON-INSTANCE-RETRIEVAL" class="headerlink" title="4.3  GENERALIZATION ON INSTANCE RETRIEVAL"></a>4.3  GENERALIZATION ON INSTANCE RETRIEVAL</h2><h2 id="4-4-ROBUSTNESS-TOWARDS-CORRUPTIONS"><a href="#4-4-ROBUSTNESS-TOWARDS-CORRUPTIONS" class="headerlink" title="4.4 ROBUSTNESS TOWARDS CORRUPTIONS"></a>4.4 ROBUSTNESS TOWARDS CORRUPTIONS</h2><h1 id="5-ABLATION-STUDY"><a href="#5-ABLATION-STUDY" class="headerlink" title="5.ABLATION STUDY"></a>5.ABLATION STUDY</h1><p>在本节中，我们利用在ResNet上训练的模型，对PACS和分段任务（GTA5到城市景观）上提出的方法进行了广泛的消融研究。下面分析所提出方法的不同插入位置和超参数的影响。同时，我们还分析了不确定性分布的不同选择的影响。</p>
+<p><strong>不同插入位置的效果</strong>：DSU可以是一个即插即用模块，可以随时插入任何位置。在这里，我们将第一个Conv、最大池层、第1、2、3、4个ConvBlock之后的ResNet位置分别命名为0、1、2、、3、4、5。如表5所示，无论模块插入何处，性能始终高于基线方法。结果表明，在位置0-5插入模块将具有更好的性能，这也表明对所有训练阶段的不确定性建模将具有更好效果。根据分析，我们在所有实验中将模块插入位置0-5。<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nxgausrj20l405a0tm.jpg" alt="图片"></p>
+<p><strong>超参数效应</strong>：概率p的超参数是为了权衡特征统计增强的强度。如图4所示，结果对概率设置不敏感，当p设置为0.5时，精度达到最佳结果，如果未指定，也将其作为所有实验的默认设置。<br> <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nxy9txgj20dc084aax.jpg" alt="图片"></p>
+<p><strong>不确定性分布的选择</strong>：在我们的方法中，采用具有不确定性估计的高斯分布作为默认设置，我们还在表6中进行其他分布的比较。具体而言，随机表示直接添加从固定高斯<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51ny504z6j20380180sj.jpg" alt="图片">得出的随机位移，均匀表示从<img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nyblqbjj203m01aglf.jpg" alt="图片">，其中∑是从我们的不确定性估计中获得的范围。如我们所见，直接使用具有不当变化范围的高斯分布将损害模型性能，这表明特征统计的变化范围应该有一些指导。<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nyjfl7ij20ne05kab2.jpg" alt="图片"></p>
+<p>我们还进行了实验，以测试用不同电位处理不同通道的有效性。信道共享表示样本的所有信道共享相同的不确定性分布，即使用信道之间的平均不确定性估计。如表9所示，结果表明，在不同渠道之间共享相同的不确定性分布效果较差，这忽略了渠道的不同潜力，并将限制其性能。同时，提出的方法明确考虑了不同信道的不同潜力，并带来了更好的性能</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nyp2fafj20l803s74r.jpg" alt="图片"></p>
+<h1 id="6-QUANTITATIVE-ANALYSIS-ON-THE-PROPOSED-METHOD"><a href="#6-QUANTITATIVE-ANALYSIS-ON-THE-PROPOSED-METHOD" class="headerlink" title="6.  QUANTITATIVE ANALYSIS ON THE PROPOSED METHOD"></a>6.  QUANTITATIVE ANALYSIS ON THE PROPOSED METHOD</h1><p>在本小节中，我们将分析所提出的方法对中间特征和特征表示的影响。定量实验在PACS上进行，我们选择艺术绘画（Art）作为看不见的测试域，其余部分作为训练域。</p>
+<p>为了研究特征统计移位现象，我们在ResNet18中捕获第二个块后的中间特征，并分别在训练域和测试域中测量一个类别的平均特征统计值。特征统计的分布如图5所示。正如之前的工作（Wang等人，2020b；2019a）所示，从基线模型提取的特征统计由于不同的数据分布而显示出明显的变化。可以看出，用我们的方法训练的模型具有较小的偏移。我们的方法可以帮助模型获得对域偏移的鲁棒性，因为它正确地建模了潜在的特征统计偏移。<br><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nywxgpij20x607e3zy.jpg" alt="图片"></p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h51nz5h07yj20mo09sjt8.jpg" alt="图片"></p>
+<p>为了分析对特征表示的影响，我们使用t-SNE（Van der Maaten&amp;Hinton，2008）在看不见的域中对不同类别的特征表示向量进行了统计。得益于所提出的方法，同一类别的特征变得更加紧凑。因为我们的方法可以减轻训练期间的域扰动，并使模型专注于内容信息，获得更不变的特征表示。</p>
+<h1 id="7-CONCLUSIONS"><a href="#7-CONCLUSIONS" class="headerlink" title="7. CONCLUSIONS"></a>7. CONCLUSIONS</h1><p>在本文中，我们提出了一种概率方法，通过在训练期间使用合成特征统计对域移动的不确定性进行建模来提高网络泛化能力。假设每个特征统计量遵循多变量高斯分布，以模拟不同的电位位移。由于生成的特征统计具有不同的分布可能性，因此模型可以对不同的域转移获得更好的鲁棒性。实验结果证明了该方法在提高网络泛化能力方面的有效性。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7/" rel="tag"># 不确定性</a>
+              <a href="/tags/%E5%9F%9F%E5%81%8F%E7%A7%BB-%E7%89%B9%E5%BE%81%E7%BB%9F%E8%AE%A1/" rel="tag"># 域偏移 - 特征统计</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/07/20/MaZhaoyang/%E3%80%90AAAI2021%E3%80%91A%20Novel%20Visual%20Interpretability%20for%20Deep%20Neural%20Networks%20by%20Optimizing%20Activation%20Maps%20with%20Perturbation/" rel="prev" title="mzy 【AAAI2021】A Novel Visual Interpretability for Deep Neural Networks by Optimizing Activation Maps with Perturbation 一种新的深度神经网络的视觉可解释性">
+      <i class="fa fa-chevron-left"></i> mzy 【AAAI2021】A Novel Visual Interpretability for Deep Neural Networks by Optimizing Activation Maps with Perturbation 一种新的深度神经网络的视觉可解释性
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2022-ICLR-Uncertainty-Modeling-for-out-of-distribution-generalization"><span class="nav-number">1.</span> <span class="nav-text">2022 ICLR Uncertainty Modeling for out-of-distribution generalization</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Introduction"><span class="nav-number">2.</span> <span class="nav-text">1 Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">3.</span> <span class="nav-text">2 Related Work</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Method"><span class="nav-number">4.</span> <span class="nav-text">3 Method</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-Preliminaries"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 Preliminaries</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-MODELING-DOMAIN-SHIFTS-WITH-UNCERTAINTY"><span class="nav-number">4.2.</span> <span class="nav-text">3.2  MODELING DOMAIN SHIFTS WITH UNCERTAINTY</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-1-UNCERTAINTY-ESTIMATION"><span class="nav-number">4.2.1.</span> <span class="nav-text">3.2.1 UNCERTAINTY ESTIMATION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-2-PROBABILISTIC-DISTRIBUTION-OF-FEATURE-STATISTICS"><span class="nav-number">4.2.2.</span> <span class="nav-text">3.2.2 PROBABILISTIC DISTRIBUTION OF FEATURE STATISTICS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-3-IMPLEMENTATION"><span class="nav-number">4.2.3.</span> <span class="nav-text">3.2.3 IMPLEMENTATION</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-EXPERIMENTS"><span class="nav-number">5.</span> <span class="nav-text">4. EXPERIMENTS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-GENERALIZATION-ON-MULTI-DOMAIN-CLASSIFICATION"><span class="nav-number">5.1.</span> <span class="nav-text">4.1  GENERALIZATION ON MULTI-DOMAIN CLASSIFICATION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-GENERALIZATION-ON-SEMANTIC-SEGMENTATION"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 GENERALIZATION ON SEMANTIC SEGMENTATION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-GENERALIZATION-ON-INSTANCE-RETRIEVAL"><span class="nav-number">5.3.</span> <span class="nav-text">4.3  GENERALIZATION ON INSTANCE RETRIEVAL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-ROBUSTNESS-TOWARDS-CORRUPTIONS"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 ROBUSTNESS TOWARDS CORRUPTIONS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-ABLATION-STUDY"><span class="nav-number">6.</span> <span class="nav-text">5.ABLATION STUDY</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-QUANTITATIVE-ANALYSIS-ON-THE-PROPOSED-METHOD"><span class="nav-number">7.</span> <span class="nav-text">6.  QUANTITATIVE ANALYSIS ON THE PROPOSED METHOD</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-CONCLUSIONS"><span class="nav-number">8.</span> <span class="nav-text">7. CONCLUSIONS</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">INSIS</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">INSIS</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="Total Visitors">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="Total Views">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
